@@ -129,7 +129,7 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
   root.classList.add('cal-view');
   root.innerHTML = `<div class="cal-control-bar"><div class="cal-toolbar" data-cal-navigation>
       <button type="button" class="cal-arrow" data-cal-action="previous" data-cal-focus="previous" aria-label="上一月">${icon('chevron-left')}</button>
-      <label class="cal-month-picker"><span class="sr-only">选择月份</span><select data-cal-month data-cal-focus="month-picker" aria-label="选择月份"></select></label>
+      <label class="cal-month-picker"><span class="sr-only">选择月份</span><select data-cal-month data-cal-focus="month-picker" aria-label="选择月份"></select>${icon('chevron')}</label>
       <button type="button" class="cal-arrow" data-cal-action="next" data-cal-focus="next" aria-label="下一月">${icon('chevron-right')}</button>
       <button type="button" class="cal-today" data-cal-action="today" data-cal-focus="today">今天</button>
     </div><div class="cal-view-switch" role="group" aria-label="日期预览方式">
