@@ -70,13 +70,14 @@ async function series(page,name,action,type='click',after=async()=>{}){
  console.log(name,JSON.stringify({frame:report.interactions[name].frameEstimate,eventTiming:report.interactions[name].eventTiming,longTask:report.interactions[name].longTaskMaximumMs}));
 }
 try{
- for(let index=0;index<(process.argv.includes('--trace-cold')?1:5);index++){
+ for(let index=0;index<(process.argv.includes('--stress-only')?0:process.argv.includes('--trace-cold')?1:5);index++){
   const {context,page}=await prepare();await page.waitForTimeout(1200);
   const metric=await page.evaluate(()=>{flushMeasures();let max=0,sum=0,first=0,last=0;for(const shift of measure.shifts.filter(s=>!s.recentInput)){if(!last||shift.start-last>1000||shift.start-first>5000){sum=0;first=shift.start}sum+=shift.value;last=shift.start;max=Math.max(max,sum)}return {lcp:measure.lcp.at(-1),cls:max,shifts:measure.shifts,longTasks:measure.longTasks,navigation:performance.getEntriesByType('navigation')[0].toJSON()}});
   report.cold.push(metric);await context.close();console.log('cold',index+1,metric.lcp?.start,metric.cls);
  }
  if(!process.argv.includes('--cold-only')){
  const {context,page,cdp}=await prepare();await page.waitForTimeout(500);
+ if(!process.argv.includes('--stress-only')){
  await series(page,'preset',i=>page.locator(`[data-preset=${i%2?'guru':'practice'}]`).click());
  await series(page,'checkbox',()=>page.locator('#event-dakini-tsok').click());
  await series(page,'category',()=>page.locator('[data-group-id="masters"]>summary').click());
@@ -89,6 +90,20 @@ try{
  await cdp.send('Profiler.enable');await cdp.send('Profiler.start');
  for(let i=0;i<6;i++)await page.locator(`[data-preset=${i%2?'guru':'practice'}]`).click();
  const {profile}=await cdp.send('Profiler.stop');await fs.writeFile(path.join(directory,`${label}.cpuprofile`),JSON.stringify(profile));
+ }
+ // Stress the real controls with the heaviest supported reminder selection.
+ await page.locator('[data-preset=practice]').click();await page.locator('#reminder-settings').click();
+ await page.locator('input[name="reminder-mode"][value="remind"]').check();await page.locator('#add-reminder').click();
+ await page.locator('#reminder-form button[type="submit"]').click();
+ const before=await page.evaluate(()=>localStorage.getItem('huideng.calendar.v2'));
+ const preferences=Object.values(JSON.parse(before).events).filter(value=>value.mode!=='off');
+ if(preferences.length!==54||!preferences.every(value=>value.mode==='remind'&&value.reminders.length===2))throw new Error('54项双提醒测试前置状态不正确');
+ const stress=[];
+ for(let index=0;index<100;index++)stress.push(await sample(page,'continuous-dual',index,()=>page.locator('#event-dakini-tsok').click()));
+ const after=await page.evaluate(()=>localStorage.getItem('huideng.calendar.v2'));
+ if(before!==after)throw new Error('连续操作后设置发生丢失');
+ report.stability={actions:100,selected:54,remindersPerEvent:2,settingsRetained:before===after,eventTiming:stats(stress.flatMap(s=>s.nativeMs===null?[]:[s.nativeMs])),longTaskMaximumMs:Math.max(0,...stress.flatMap(s=>s.longTasks.map(t=>t.duration)))};
+ console.log('stability',JSON.stringify(report.stability));
  await context.close();
  }
  report.status='measured';

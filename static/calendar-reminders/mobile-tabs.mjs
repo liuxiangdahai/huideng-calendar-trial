@@ -6,7 +6,7 @@ export function createMobileTabs({onLayout = () => {}} = {}) {
   const buttons = [...tabs.querySelectorAll('[data-tab]')];
   const positions = new Map();
   const mobile = matchMedia('(max-width: 1023px)');
-  let current = workspace.dataset.activeTab, restoring = 0;
+  let current = workspace.dataset.activeTab;
   const pane = name => document.getElementById(`${name}-pane`);
   const tabHeight = () => mobile.matches ? tabs.getBoundingClientRect().height : 0;
   const pageTop = node => node.getBoundingClientRect().top + scrollY;
@@ -35,9 +35,7 @@ export function createMobileTabs({onLayout = () => {}} = {}) {
           : position ? pageTop(pane(next)) + position.offset : pageTop(target) - tabHeight() - 12;
         // Both panels use normal document scrolling; prevent anchor adjustments
         // during the visibility change from overriding the chosen position.
-        cancelAnimationFrame(restoring);
         scrollTo({top: Math.max(0, y), behavior: 'auto'});
-        restoring = requestAnimationFrame(() => scrollTo({top: Math.max(0, y), behavior: 'auto'}));
       }
     }
     if (focus) buttons.find(button => button.dataset.tab === next)?.focus({preventScroll: true});
