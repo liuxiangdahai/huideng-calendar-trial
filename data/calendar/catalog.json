@@ -1,0 +1,1950 @@
+{
+  "schemaVersion": 2,
+  "groups": [
+    {
+      "id": "tsok",
+      "name": "荟供日",
+      "description": "莲师与空行母荟供",
+      "icon": "vajra",
+      "defaultMode": "remind"
+    },
+    {
+      "id": "buddha",
+      "name": "佛菩萨殊胜日",
+      "description": "佛陀殊胜日与佛菩萨加持日",
+      "icon": "lotus",
+      "defaultMode": "off"
+    },
+    {
+      "id": "masters",
+      "name": "上师纪念日",
+      "description": "诞辰与圆寂纪念日",
+      "icon": "person",
+      "defaultMode": "off"
+    },
+    {
+      "id": "practice",
+      "name": "法会与修行月",
+      "description": "法会起止与殊胜修行月",
+      "icon": "book",
+      "defaultMode": "off"
+    },
+    {
+      "id": "festivals",
+      "name": "藏历节庆",
+      "description": "藏历新年与传统节日",
+      "icon": "calendar",
+      "defaultMode": "off"
+    },
+    {
+      "id": "nature",
+      "name": "节气与天象",
+      "description": "日月食与四季节气",
+      "icon": "sun",
+      "defaultMode": "off"
+    },
+    {
+      "id": "other",
+      "name": "其他纪念日",
+      "description": "阅读、素食与其他日子",
+      "icon": "bookmark",
+      "defaultMode": "off"
+    }
+  ],
+  "events": [
+    {
+      "id": "guru-tsok",
+      "group": "tsok",
+      "title": "莲师荟供日",
+      "sourceLabel": "莲师荟供日",
+      "sourceLabels": [
+        "莲师荟供日"
+      ],
+      "recurrence": "monthly",
+      "ruleLabel": "藏历每月初十",
+      "rule": {
+        "kind": "tibetan-monthly",
+        "day": 10,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "include",
+        "evidence": [
+          {
+            "date": "2026-01-28",
+            "tibetan": "十二月初十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-"
+          },
+          {
+            "date": "2026-02-26",
+            "tibetan": "一月初十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-"
+          },
+          {
+            "date": "2026-03-28",
+            "tibetan": "二月初十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-"
+          },
+          {
+            "date": "2026-04-26",
+            "tibetan": "三月初十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/4/-"
+          },
+          {
+            "date": "2026-05-26",
+            "tibetan": "四月初十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-"
+          },
+          {
+            "date": "2026-06-24",
+            "tibetan": "五月初十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/6/-"
+          },
+          {
+            "date": "2026-07-24",
+            "tibetan": "六月初十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-"
+          },
+          {
+            "date": "2026-08-22",
+            "tibetan": "七月初十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-"
+          },
+          {
+            "date": "2026-09-21",
+            "tibetan": "八月初十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/9/-"
+          },
+          {
+            "date": "2026-10-21",
+            "tibetan": "九月初十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-"
+          },
+          {
+            "date": "2026-11-19",
+            "tibetan": "十月初十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-"
+          },
+          {
+            "date": "2026-12-19",
+            "tibetan": "十一月初十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-"
+          },
+          {
+            "date": "2027-01-17",
+            "tibetan": "十二月初十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-"
+          },
+          {
+            "date": "2027-02-16",
+            "tibetan": "一月初十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-"
+          },
+          {
+            "date": "2027-03-17",
+            "tibetan": "二月初十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+          },
+          {
+            "date": "2027-04-16",
+            "tibetan": "闰二月初十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dakini-tsok",
+      "group": "tsok",
+      "title": "空行母荟供日",
+      "sourceLabel": "空行母荟供日",
+      "sourceLabels": [
+        "空行母荟供日"
+      ],
+      "recurrence": "monthly",
+      "ruleLabel": "藏历每月廿五",
+      "rule": {
+        "kind": "tibetan-monthly",
+        "day": 25,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "include",
+        "evidence": [
+          {
+            "date": "2026-01-13",
+            "tibetan": "十一月廿五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-"
+          },
+          {
+            "date": "2026-02-11",
+            "tibetan": "十二月廿五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-"
+          },
+          {
+            "date": "2026-03-13",
+            "tibetan": "一月廿五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-"
+          },
+          {
+            "date": "2026-04-12",
+            "tibetan": "二月廿五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/4/-"
+          },
+          {
+            "date": "2026-05-12",
+            "tibetan": "三月廿五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-"
+          },
+          {
+            "date": "2026-06-10",
+            "tibetan": "四月廿五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/6/-"
+          },
+          {
+            "date": "2026-07-09",
+            "tibetan": "五月廿四",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-"
+          },
+          {
+            "date": "2026-08-08",
+            "tibetan": "六月廿五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-"
+          },
+          {
+            "date": "2026-09-06",
+            "tibetan": "七月廿五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/9/-"
+          },
+          {
+            "date": "2026-10-05",
+            "tibetan": "八月廿五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-"
+          },
+          {
+            "date": "2026-11-04",
+            "tibetan": "九月廿五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-"
+          },
+          {
+            "date": "2026-12-03",
+            "tibetan": "十月廿五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-"
+          },
+          {
+            "date": "2027-01-02",
+            "tibetan": "十一月廿五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-"
+          },
+          {
+            "date": "2027-02-01",
+            "tibetan": "十二月廿五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-"
+          },
+          {
+            "date": "2027-03-02",
+            "tibetan": "一月廿五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+          },
+          {
+            "date": "2027-04-01",
+            "tibetan": "二月廿五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+          },
+          {
+            "date": "2027-05-01",
+            "tibetan": "闰二月廿五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/5/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "buddha-birth",
+      "group": "buddha",
+      "title": "释迦牟尼佛诞辰日",
+      "sourceLabel": "释迦牟尼佛诞辰日",
+      "sourceLabels": [
+        "释迦牟尼佛诞辰日"
+      ],
+      "recurrence": "annual",
+      "ruleLabel": "藏历四月初七",
+      "rule": {
+        "kind": "tibetan-annual",
+        "month": 4,
+        "day": 7,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "exclude",
+        "evidence": [
+          {
+            "date": "2026-05-23",
+            "tibetan": "四月初七",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "saga-dawa",
+      "group": "buddha",
+      "title": "释迦牟尼佛降魔、成道、涅槃的纪念日",
+      "sourceLabel": "释迦牟尼佛降魔、成道、涅槃的纪念日",
+      "sourceLabels": [
+        "释迦牟尼佛降魔、成道、涅槃的纪念日"
+      ],
+      "recurrence": "annual",
+      "ruleLabel": "藏历四月十五",
+      "rule": {
+        "kind": "tibetan-annual",
+        "month": 4,
+        "day": 15,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "exclude",
+        "evidence": [
+          {
+            "date": "2026-05-31",
+            "tibetan": "四月十五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "turning-wheel",
+      "group": "buddha",
+      "title": "佛初转法轮日",
+      "sourceLabel": "佛初转法轮日",
+      "sourceLabels": [
+        "佛初转法轮日"
+      ],
+      "recurrence": "annual",
+      "ruleLabel": "藏历六月初四",
+      "rule": {
+        "kind": "tibetan-annual",
+        "month": 6,
+        "day": 4,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "exclude",
+        "evidence": [
+          {
+            "date": "2026-07-18",
+            "tibetan": "六月初四",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "lhabab",
+      "group": "buddha",
+      "title": "天降日",
+      "sourceLabel": "天降日",
+      "sourceLabels": [
+        "天降日"
+      ],
+      "recurrence": "annual",
+      "ruleLabel": "藏历九月廿二",
+      "rule": {
+        "kind": "tibetan-annual",
+        "month": 9,
+        "day": 22,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "exclude",
+        "evidence": [
+          {
+            "date": "2026-11-01",
+            "tibetan": "九月廿二",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "kalachakra-teaching",
+      "group": "buddha",
+      "title": "佛陀传时轮金刚日",
+      "sourceLabel": "佛陀传时轮金刚日",
+      "sourceLabels": [
+        "佛陀传时轮金刚日"
+      ],
+      "recurrence": "annual",
+      "ruleLabel": "藏历三月十五",
+      "rule": {
+        "kind": "tibetan-annual",
+        "month": 3,
+        "day": 15,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "exclude",
+        "evidence": [
+          {
+            "date": "2026-05-01",
+            "tibetan": "三月十五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "buddha-conception",
+      "group": "buddha",
+      "title": "释迦牟尼佛入胎日",
+      "sourceLabel": "释迦牟尼佛入胎日",
+      "sourceLabels": [
+        "释迦牟尼佛入胎日"
+      ],
+      "recurrence": "annual",
+      "ruleLabel": "藏历六月十五",
+      "rule": {
+        "kind": "tibetan-annual",
+        "month": 6,
+        "day": 15,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "exclude",
+        "evidence": [
+          {
+            "date": "2026-07-29",
+            "tibetan": "六月十五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "jigme-lingpa",
+      "group": "masters",
+      "title": "持明无畏洲（吉美林巴）尊者圆寂纪念日",
+      "sourceLabel": "持明无畏洲（吉美林巴）尊者圆寂纪念日",
+      "sourceLabels": [
+        "持明无畏洲（吉美林巴）尊者圆寂纪念日"
+      ],
+      "recurrence": "annual",
+      "ruleLabel": "藏历九月初三",
+      "rule": {
+        "kind": "tibetan-annual",
+        "month": 9,
+        "day": 3,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "exclude",
+        "evidence": [
+          {
+            "date": "2026-10-13",
+            "tibetan": "九月初三",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-"
+          }
+        ]
+      },
+      "aliases": [
+        "晋美淋巴",
+        "晋美林巴",
+        "吉美林巴",
+        "持明无畏洲"
+      ]
+    },
+    {
+      "id": "longchenpa",
+      "group": "masters",
+      "title": "全知龙钦巴（无垢光）尊者圆寂纪念日",
+      "sourceLabel": "全知龙钦巴（无垢光）尊者圆寂纪念日",
+      "sourceLabels": [
+        "全知龙钦巴（无垢光）尊者圆寂纪念日"
+      ],
+      "recurrence": "annual",
+      "ruleLabel": "藏历十二月十八",
+      "rule": {
+        "kind": "tibetan-annual",
+        "month": 12,
+        "day": 18,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "exclude",
+        "evidence": [
+          {
+            "date": "2026-02-04",
+            "tibetan": "十二月十八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-"
+          },
+          {
+            "date": "2027-01-25",
+            "tibetan": "十二月十八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "jigme-phuntsok",
+      "group": "masters",
+      "title": "圣者法王如意宝圆寂纪念日",
+      "sourceLabel": "圣者法王如意宝圆寂纪念日",
+      "sourceLabels": [
+        "圣者法王如意宝圆寂纪念日"
+      ],
+      "recurrence": "annual",
+      "ruleLabel": "藏历十一月十五",
+      "rule": {
+        "kind": "tibetan-annual",
+        "month": 11,
+        "day": 15,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "exclude",
+        "evidence": [
+          {
+            "date": "2026-01-03",
+            "tibetan": "十一月十五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-"
+          },
+          {
+            "date": "2026-12-23",
+            "tibetan": "十一月十四",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "mipham",
+      "group": "masters",
+      "title": "全知麦彭尊者圆寂纪念日",
+      "sourceLabel": "全知麦彭尊者圆寂纪念日",
+      "sourceLabels": [
+        "全知麦彭尊者圆寂纪念日"
+      ],
+      "recurrence": "annual",
+      "ruleLabel": "藏历四月廿九",
+      "rule": {
+        "kind": "tibetan-annual",
+        "month": 4,
+        "day": 29,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "exclude",
+        "evidence": [
+          {
+            "date": "2026-06-14",
+            "tibetan": "四月廿九",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/6/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "sakya-pandita",
+      "group": "masters",
+      "title": "萨迦班智达圆寂纪念日",
+      "sourceLabel": "萨迦班智达圆寂纪念日",
+      "sourceLabels": [
+        "萨迦班智达圆寂纪念日"
+      ],
+      "recurrence": "annual",
+      "ruleLabel": "藏历十一月十四",
+      "rule": {
+        "kind": "tibetan-annual",
+        "month": 11,
+        "day": 14,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "exclude",
+        "evidence": [
+          {
+            "date": "2026-01-02",
+            "tibetan": "十一月十四",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-"
+          },
+          {
+            "date": "2026-12-23",
+            "tibetan": "十一月十四",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "muntso-birthday",
+      "group": "masters",
+      "title": "门措上师诞生日",
+      "sourceLabel": "门措上师诞生日",
+      "sourceLabels": [
+        "门措上师诞生日"
+      ],
+      "recurrence": "annual",
+      "ruleLabel": "藏历十二月初二",
+      "rule": {
+        "kind": "tibetan-annual",
+        "month": 12,
+        "day": 2,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "exclude",
+        "evidence": [
+          {
+            "date": "2026-01-20",
+            "tibetan": "十二月初二",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-"
+          },
+          {
+            "date": "2027-01-09",
+            "tibetan": "十二月初二",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "jigme-phuntsok-birthday",
+      "group": "masters",
+      "title": "圣者法王如意宝诞辰纪念日",
+      "sourceLabel": "圣者法王如意宝诞辰纪念日",
+      "sourceLabels": [
+        "圣者法王如意宝诞辰纪念日"
+      ],
+      "recurrence": "annual",
+      "ruleLabel": "藏历一月初三",
+      "rule": {
+        "kind": "tibetan-annual",
+        "month": 1,
+        "day": 3,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "exclude",
+        "evidence": [
+          {
+            "date": "2026-02-20",
+            "tibetan": "一月初三",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-"
+          },
+          {
+            "date": "2027-02-09",
+            "tibetan": "一月初三",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "milarepa",
+      "group": "masters",
+      "title": "米拉日巴尊者圆寂纪念日",
+      "sourceLabel": "米拉日巴尊者圆寂纪念日",
+      "sourceLabels": [
+        "米拉日巴尊者圆寂纪念日"
+      ],
+      "recurrence": "annual",
+      "ruleLabel": "藏历一月十四",
+      "rule": {
+        "kind": "tibetan-annual",
+        "month": 1,
+        "day": 14,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "exclude",
+        "evidence": [
+          {
+            "date": "2026-03-02",
+            "tibetan": "一月十四",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-"
+          },
+          {
+            "date": "2027-02-19",
+            "tibetan": "一月十三",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "taranatha-anniversary",
+      "group": "masters",
+      "title": "觉囊派遍知大师多罗那他尊者的圆寂日",
+      "sourceLabel": "觉囊派遍知大师多罗那他尊者的圆寂日",
+      "sourceLabels": [
+        "觉囊派遍知大师多罗那他尊者的圆寂日"
+      ],
+      "recurrence": "annual",
+      "ruleLabel": "藏历三月廿八",
+      "rule": {
+        "kind": "tibetan-annual",
+        "month": 3,
+        "day": 28,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "exclude",
+        "evidence": [
+          {
+            "date": "2026-05-15",
+            "tibetan": "三月廿八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "taranatha-birthday",
+      "group": "masters",
+      "title": "觉囊派遍知大师多罗那他尊者的诞生日",
+      "sourceLabel": "觉囊派遍知大师多罗那他尊者的诞生日",
+      "sourceLabels": [
+        "觉囊派遍知大师多罗那他尊者的诞生日"
+      ],
+      "recurrence": "annual",
+      "ruleLabel": "藏历六月初八",
+      "rule": {
+        "kind": "tibetan-annual",
+        "month": 6,
+        "day": 8,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "exclude",
+        "evidence": [
+          {
+            "date": "2026-07-22",
+            "tibetan": "六月初八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "padmasambhava-birthday",
+      "group": "masters",
+      "title": "莲花生大师诞生日",
+      "sourceLabel": "莲花生大师诞生日",
+      "sourceLabels": [
+        "莲花生大师诞生日"
+      ],
+      "recurrence": "annual",
+      "ruleLabel": "藏历六月初十",
+      "rule": {
+        "kind": "tibetan-annual",
+        "month": 6,
+        "day": 10,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "exclude",
+        "evidence": [
+          {
+            "date": "2026-07-24",
+            "tibetan": "六月初十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "atisha",
+      "group": "masters",
+      "title": "阿底峡尊者圆寂纪念日",
+      "sourceLabel": "阿底峡尊者圆寂纪念日",
+      "sourceLabels": [
+        "阿底峡尊者圆寂纪念日"
+      ],
+      "recurrence": "annual",
+      "ruleLabel": "藏历九月十八",
+      "rule": {
+        "kind": "tibetan-annual",
+        "month": 9,
+        "day": 18,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "exclude",
+        "evidence": [
+          {
+            "date": "2026-10-28",
+            "tibetan": "九月十八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "mipham-birthday",
+      "group": "masters",
+      "title": "全知麦彭仁波切诞辰日",
+      "sourceLabel": "全知麦彭仁波切诞辰日",
+      "sourceLabels": [
+        "全知麦彭仁波切诞辰日"
+      ],
+      "recurrence": "annual",
+      "ruleLabel": "藏历十月初五",
+      "rule": {
+        "kind": "tibetan-annual",
+        "month": 10,
+        "day": 5,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "exclude",
+        "evidence": [
+          {
+            "date": "2026-11-14",
+            "tibetan": "十月初五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "tsongkhapa",
+      "group": "masters",
+      "title": "宗喀巴大师圆寂纪念日（燃灯节）",
+      "sourceLabel": "宗喀巴大师圆寂纪念日（燃灯节）",
+      "sourceLabels": [
+        "宗喀巴大师圆寂纪念日（燃灯节）"
+      ],
+      "recurrence": "annual",
+      "ruleLabel": "藏历十月廿五",
+      "rule": {
+        "kind": "tibetan-annual",
+        "month": 10,
+        "day": 25,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "exclude",
+        "evidence": [
+          {
+            "date": "2026-12-03",
+            "tibetan": "十月廿五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "meditation-buddha",
+      "group": "buddha",
+      "title": "禅定胜王佛加持日",
+      "sourceLabel": "禅定胜王佛加持日",
+      "sourceLabels": [
+        "禅定胜王佛加持日"
+      ],
+      "recurrence": "monthly",
+      "ruleLabel": "藏历每月初一",
+      "rule": {
+        "kind": "tibetan-monthly",
+        "day": 1,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "include",
+        "evidence": [
+          {
+            "date": "2026-01-19",
+            "tibetan": "十二月初一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-"
+          },
+          {
+            "date": "2026-02-18",
+            "tibetan": "一月初一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-"
+          },
+          {
+            "date": "2026-03-19",
+            "tibetan": "二月初一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-"
+          },
+          {
+            "date": "2026-04-18",
+            "tibetan": "三月初一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/4/-"
+          },
+          {
+            "date": "2026-05-17",
+            "tibetan": "四月初一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-"
+          },
+          {
+            "date": "2026-06-16",
+            "tibetan": "五月初一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/6/-"
+          },
+          {
+            "date": "2026-07-15",
+            "tibetan": "六月初一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-"
+          },
+          {
+            "date": "2026-08-13",
+            "tibetan": "七月初一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-"
+          },
+          {
+            "date": "2026-09-12",
+            "tibetan": "八月初一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/9/-"
+          },
+          {
+            "date": "2026-10-11",
+            "tibetan": "九月初一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-"
+          },
+          {
+            "date": "2026-11-10",
+            "tibetan": "十月初一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-"
+          },
+          {
+            "date": "2026-12-09",
+            "tibetan": "十一月初一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-"
+          },
+          {
+            "date": "2027-01-08",
+            "tibetan": "十二月初一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-"
+          },
+          {
+            "date": "2027-02-07",
+            "tibetan": "一月初一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-"
+          },
+          {
+            "date": "2027-03-09",
+            "tibetan": "二月初一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+          },
+          {
+            "date": "2027-04-07",
+            "tibetan": "闰二月初一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "medicine-buddha",
+      "group": "buddha",
+      "title": "药师佛加持日",
+      "sourceLabel": "药师佛加持日",
+      "sourceLabels": [
+        "药师佛加持日"
+      ],
+      "recurrence": "monthly",
+      "ruleLabel": "藏历每月初八",
+      "rule": {
+        "kind": "tibetan-monthly",
+        "day": 8,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "include",
+        "evidence": [
+          {
+            "date": "2026-01-26",
+            "tibetan": "十二月初八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-"
+          },
+          {
+            "date": "2026-02-24",
+            "tibetan": "一月初八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-"
+          },
+          {
+            "date": "2026-03-26",
+            "tibetan": "二月初八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-"
+          },
+          {
+            "date": "2026-04-24",
+            "tibetan": "三月初八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/4/-"
+          },
+          {
+            "date": "2026-05-24",
+            "tibetan": "四月初八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-"
+          },
+          {
+            "date": "2026-06-22",
+            "tibetan": "五月初八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/6/-"
+          },
+          {
+            "date": "2026-07-22",
+            "tibetan": "六月初八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-"
+          },
+          {
+            "date": "2026-08-20",
+            "tibetan": "七月初八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-"
+          },
+          {
+            "date": "2026-09-19",
+            "tibetan": "八月初八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/9/-"
+          },
+          {
+            "date": "2026-10-18",
+            "tibetan": "九月初八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-"
+          },
+          {
+            "date": "2026-11-17",
+            "tibetan": "十月初八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-"
+          },
+          {
+            "date": "2026-12-17",
+            "tibetan": "十一月初八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-"
+          },
+          {
+            "date": "2027-01-15",
+            "tibetan": "十二月初八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-"
+          },
+          {
+            "date": "2027-02-14",
+            "tibetan": "一月初八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-"
+          },
+          {
+            "date": "2027-03-15",
+            "tibetan": "二月初七",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+          },
+          {
+            "date": "2027-04-14",
+            "tibetan": "闰二月初八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "amitabha",
+      "group": "buddha",
+      "title": "阿弥陀佛加持日",
+      "sourceLabel": "阿弥陀佛加持日",
+      "sourceLabels": [
+        "阿弥陀佛加持日"
+      ],
+      "recurrence": "monthly",
+      "ruleLabel": "藏历每月十五",
+      "rule": {
+        "kind": "tibetan-monthly",
+        "day": 15,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "include",
+        "evidence": [
+          {
+            "date": "2026-01-03",
+            "tibetan": "十一月十五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-"
+          },
+          {
+            "date": "2026-02-01",
+            "tibetan": "十二月十五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-"
+          },
+          {
+            "date": "2026-03-03",
+            "tibetan": "一月十五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-"
+          },
+          {
+            "date": "2026-04-01",
+            "tibetan": "二月十五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/4/-"
+          },
+          {
+            "date": "2026-05-01",
+            "tibetan": "三月十五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-"
+          },
+          {
+            "date": "2026-05-31",
+            "tibetan": "四月十五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-"
+          },
+          {
+            "date": "2026-06-29",
+            "tibetan": "五月十五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/6/-"
+          },
+          {
+            "date": "2026-07-29",
+            "tibetan": "六月十五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-"
+          },
+          {
+            "date": "2026-08-28",
+            "tibetan": "七月十五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-"
+          },
+          {
+            "date": "2026-09-26",
+            "tibetan": "八月十五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/9/-"
+          },
+          {
+            "date": "2026-10-26",
+            "tibetan": "九月十五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-"
+          },
+          {
+            "date": "2026-11-24",
+            "tibetan": "十月十五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-"
+          },
+          {
+            "date": "2026-12-23",
+            "tibetan": "十一月十四",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-"
+          },
+          {
+            "date": "2027-01-22",
+            "tibetan": "十二月十五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-"
+          },
+          {
+            "date": "2027-02-20",
+            "tibetan": "一月十五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-"
+          },
+          {
+            "date": "2027-03-22",
+            "tibetan": "二月十五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+          },
+          {
+            "date": "2027-04-20",
+            "tibetan": "闰二月十五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "avalokiteshvara",
+      "group": "buddha",
+      "title": "观音菩萨加持日",
+      "sourceLabel": "观音菩萨加持日",
+      "sourceLabels": [
+        "观音菩萨加持日"
+      ],
+      "recurrence": "monthly",
+      "ruleLabel": "藏历每月十八",
+      "rule": {
+        "kind": "tibetan-monthly",
+        "day": 18,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "include",
+        "evidence": [
+          {
+            "date": "2026-01-06",
+            "tibetan": "十一月十八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-"
+          },
+          {
+            "date": "2026-02-04",
+            "tibetan": "十二月十八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-"
+          },
+          {
+            "date": "2026-03-06",
+            "tibetan": "一月十八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-"
+          },
+          {
+            "date": "2026-04-05",
+            "tibetan": "二月十八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/4/-"
+          },
+          {
+            "date": "2026-05-04",
+            "tibetan": "三月十八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-"
+          },
+          {
+            "date": "2026-06-03",
+            "tibetan": "四月十八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/6/-"
+          },
+          {
+            "date": "2026-07-03",
+            "tibetan": "五月十八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-"
+          },
+          {
+            "date": "2026-08-01",
+            "tibetan": "六月十八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-"
+          },
+          {
+            "date": "2026-08-31",
+            "tibetan": "七月十八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-"
+          },
+          {
+            "date": "2026-09-29",
+            "tibetan": "八月十八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/9/-"
+          },
+          {
+            "date": "2026-10-28",
+            "tibetan": "九月十八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-"
+          },
+          {
+            "date": "2026-11-27",
+            "tibetan": "十月十八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-"
+          },
+          {
+            "date": "2026-12-26",
+            "tibetan": "十一月十八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-"
+          },
+          {
+            "date": "2027-01-25",
+            "tibetan": "十二月十八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-"
+          },
+          {
+            "date": "2027-02-23",
+            "tibetan": "一月十八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-"
+          },
+          {
+            "date": "2027-03-25",
+            "tibetan": "二月十八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+          },
+          {
+            "date": "2027-04-23",
+            "tibetan": "闰二月十八",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "kshitigarbha",
+      "group": "buddha",
+      "title": "地藏菩萨加持日",
+      "sourceLabel": "地藏菩萨加持日",
+      "sourceLabels": [
+        "地藏菩萨加持日"
+      ],
+      "recurrence": "monthly",
+      "ruleLabel": "藏历每月廿一",
+      "rule": {
+        "kind": "tibetan-monthly",
+        "day": 21,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "include",
+        "evidence": [
+          {
+            "date": "2026-01-09",
+            "tibetan": "十一月廿一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-"
+          },
+          {
+            "date": "2026-02-07",
+            "tibetan": "十二月廿一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-"
+          },
+          {
+            "date": "2026-03-09",
+            "tibetan": "一月廿一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-"
+          },
+          {
+            "date": "2026-04-08",
+            "tibetan": "二月廿一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/4/-"
+          },
+          {
+            "date": "2026-05-07",
+            "tibetan": "三月廿一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-"
+          },
+          {
+            "date": "2026-06-06",
+            "tibetan": "四月廿一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/6/-"
+          },
+          {
+            "date": "2026-07-06",
+            "tibetan": "五月廿一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-"
+          },
+          {
+            "date": "2026-08-04",
+            "tibetan": "六月廿一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-"
+          },
+          {
+            "date": "2026-09-02",
+            "tibetan": "七月廿一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/9/-"
+          },
+          {
+            "date": "2026-10-02",
+            "tibetan": "八月廿一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-"
+          },
+          {
+            "date": "2026-10-31",
+            "tibetan": "九月廿一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-"
+          },
+          {
+            "date": "2026-11-29",
+            "tibetan": "十月二十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-"
+          },
+          {
+            "date": "2026-12-29",
+            "tibetan": "十一月廿一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-"
+          },
+          {
+            "date": "2027-01-27",
+            "tibetan": "十二月二十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-"
+          },
+          {
+            "date": "2027-02-26",
+            "tibetan": "一月廿一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-"
+          },
+          {
+            "date": "2027-03-28",
+            "tibetan": "二月廿一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+          },
+          {
+            "date": "2027-04-26",
+            "tibetan": "闰二月廿一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "shakyamuni",
+      "group": "buddha",
+      "title": "释迦牟尼佛加持日",
+      "sourceLabel": "释迦牟尼佛加持日",
+      "sourceLabels": [
+        "释迦牟尼佛加持日"
+      ],
+      "recurrence": "monthly",
+      "ruleLabel": "藏历每月三十",
+      "rule": {
+        "kind": "tibetan-monthly",
+        "day": 30,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "include",
+        "evidence": [
+          {
+            "date": "2026-01-18",
+            "tibetan": "十一月三十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-"
+          },
+          {
+            "date": "2026-02-17",
+            "tibetan": "十二月三十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-"
+          },
+          {
+            "date": "2026-03-18",
+            "tibetan": "一月三十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-"
+          },
+          {
+            "date": "2026-04-17",
+            "tibetan": "二月三十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/4/-"
+          },
+          {
+            "date": "2026-05-16",
+            "tibetan": "三月三十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-"
+          },
+          {
+            "date": "2026-06-15",
+            "tibetan": "四月三十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/6/-"
+          },
+          {
+            "date": "2026-07-14",
+            "tibetan": "五月三十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-"
+          },
+          {
+            "date": "2026-08-12",
+            "tibetan": "六月三十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-"
+          },
+          {
+            "date": "2026-09-11",
+            "tibetan": "七月三十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/9/-"
+          },
+          {
+            "date": "2026-10-10",
+            "tibetan": "八月三十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-"
+          },
+          {
+            "date": "2026-11-09",
+            "tibetan": "九月三十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-"
+          },
+          {
+            "date": "2026-12-08",
+            "tibetan": "十月三十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-"
+          },
+          {
+            "date": "2027-01-07",
+            "tibetan": "十一月三十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-"
+          },
+          {
+            "date": "2027-02-06",
+            "tibetan": "十二月三十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-"
+          },
+          {
+            "date": "2027-03-08",
+            "tibetan": "一月三十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+          },
+          {
+            "date": "2027-04-06",
+            "tibetan": "二月三十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+          },
+          {
+            "date": "2027-05-06",
+            "tibetan": "闰二月三十",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/5/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "parinirvana-assembly-start",
+      "group": "practice",
+      "title": "圣者法王如意宝涅槃法会开始",
+      "sourceLabel": "圣者法王如意宝涅槃法会开始",
+      "sourceLabels": [
+        "圣者法王如意宝涅槃法会开始"
+      ],
+      "recurrence": "published",
+      "ruleLabel": "随历书安排"
+    },
+    {
+      "id": "parinirvana-assembly-end",
+      "group": "practice",
+      "title": "圣者法王如意宝涅槃法会结束",
+      "sourceLabel": "圣者法王如意宝涅槃法会结束",
+      "sourceLabels": [
+        "圣者法王如意宝涅槃法会结束"
+      ],
+      "recurrence": "published",
+      "ruleLabel": "随历书安排"
+    },
+    {
+      "id": "vidyadhara-assembly-start",
+      "group": "practice",
+      "title": "持明法会开始",
+      "sourceLabel": "持明法会开始",
+      "sourceLabels": [
+        "持明法会开始"
+      ],
+      "recurrence": "published",
+      "ruleLabel": "随历书安排"
+    },
+    {
+      "id": "vidyadhara-assembly-end",
+      "group": "practice",
+      "title": "持明法会结束",
+      "sourceLabel": "持明法会结束",
+      "sourceLabels": [
+        "持明法会结束"
+      ],
+      "recurrence": "published",
+      "ruleLabel": "随历书安排"
+    },
+    {
+      "id": "longevity-assembly-start",
+      "group": "practice",
+      "title": "长寿法会开始",
+      "sourceLabel": "长寿法会开始",
+      "sourceLabels": [
+        "长寿法会开始"
+      ],
+      "recurrence": "published",
+      "ruleLabel": "随历书安排"
+    },
+    {
+      "id": "longevity-assembly-end",
+      "group": "practice",
+      "title": "长寿法会结束",
+      "sourceLabel": "长寿法会结束",
+      "sourceLabels": [
+        "长寿法会结束"
+      ],
+      "recurrence": "published",
+      "ruleLabel": "随历书安排"
+    },
+    {
+      "id": "vajrasattva-assembly-start",
+      "group": "practice",
+      "title": "金刚萨埵法会开始",
+      "sourceLabel": "金刚萨埵法会开始",
+      "sourceLabels": [
+        "金刚萨埵法会开始"
+      ],
+      "recurrence": "published",
+      "ruleLabel": "随历书安排"
+    },
+    {
+      "id": "vajrasattva-assembly-end",
+      "group": "practice",
+      "title": "金刚萨埵法会结束",
+      "sourceLabel": "金刚萨埵法会结束",
+      "sourceLabels": [
+        "金刚萨埵法会结束"
+      ],
+      "recurrence": "published",
+      "ruleLabel": "随历书安排"
+    },
+    {
+      "id": "kshitigarbha-assembly-start",
+      "group": "practice",
+      "title": "地藏法会开始",
+      "sourceLabel": "地藏法会开始",
+      "sourceLabels": [
+        "地藏法会开始"
+      ],
+      "recurrence": "published",
+      "ruleLabel": "随历书安排"
+    },
+    {
+      "id": "kshitigarbha-assembly-end",
+      "group": "practice",
+      "title": "地藏法会结束",
+      "sourceLabel": "地藏法会结束",
+      "sourceLabels": [
+        "地藏法会结束"
+      ],
+      "recurrence": "published",
+      "ruleLabel": "随历书安排"
+    },
+    {
+      "id": "sukhavati-assembly-start",
+      "group": "practice",
+      "title": "极乐法会开始",
+      "sourceLabel": "极乐法会开始",
+      "sourceLabels": [
+        "极乐法会开始"
+      ],
+      "recurrence": "published",
+      "ruleLabel": "随历书安排"
+    },
+    {
+      "id": "sukhavati-assembly-end",
+      "group": "practice",
+      "title": "极乐法会结束",
+      "sourceLabel": "极乐法会结束",
+      "sourceLabels": [
+        "极乐法会结束"
+      ],
+      "recurrence": "published",
+      "ruleLabel": "随历书安排"
+    },
+    {
+      "id": "losar",
+      "group": "festivals",
+      "title": "藏历新年",
+      "sourceLabel": "藏历新年",
+      "sourceLabels": [
+        "藏历新年"
+      ],
+      "recurrence": "annual",
+      "ruleLabel": "藏历一月初一",
+      "rule": {
+        "kind": "tibetan-annual",
+        "month": 1,
+        "day": 1,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "exclude",
+        "evidence": [
+          {
+            "date": "2026-02-18",
+            "tibetan": "一月初一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-"
+          },
+          {
+            "date": "2027-02-07",
+            "tibetan": "一月初一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "miracles-month",
+      "group": "practice",
+      "title": "神变月",
+      "sourceLabel": "神变月",
+      "sourceLabels": [
+        "神变月"
+      ],
+      "recurrence": "annual",
+      "ruleLabel": "藏历一月初一",
+      "rule": {
+        "kind": "tibetan-annual",
+        "month": 1,
+        "day": 1,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "exclude",
+        "evidence": [
+          {
+            "date": "2026-02-18",
+            "tibetan": "一月初一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-"
+          },
+          {
+            "date": "2027-02-07",
+            "tibetan": "一月初一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "kalachakra-new-year",
+      "group": "festivals",
+      "title": "时轮金刚新年",
+      "sourceLabel": "时轮金刚新年",
+      "sourceLabels": [
+        "时轮金刚新年"
+      ],
+      "recurrence": "annual",
+      "ruleLabel": "藏历三月初一",
+      "rule": {
+        "kind": "tibetan-annual",
+        "month": 3,
+        "day": 1,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "exclude",
+        "evidence": [
+          {
+            "date": "2026-04-18",
+            "tibetan": "三月初一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/4/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "saga-month-start",
+      "group": "practice",
+      "title": "萨嘎月开始",
+      "sourceLabel": "萨嘎月开始",
+      "sourceLabels": [
+        "萨嘎月开始"
+      ],
+      "recurrence": "annual",
+      "ruleLabel": "藏历四月初一",
+      "rule": {
+        "kind": "tibetan-annual",
+        "month": 4,
+        "day": 1,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "exclude",
+        "evidence": [
+          {
+            "date": "2026-05-17",
+            "tibetan": "四月初一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dharma-wheel-month",
+      "group": "practice",
+      "title": "法轮月开始",
+      "sourceLabel": "法轮月开始",
+      "sourceLabels": [
+        "法轮月开始"
+      ],
+      "recurrence": "annual",
+      "ruleLabel": "藏历六月初一",
+      "rule": {
+        "kind": "tibetan-annual",
+        "month": 6,
+        "day": 1,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "exclude",
+        "evidence": [
+          {
+            "date": "2026-07-15",
+            "tibetan": "六月初一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "lhabab-month",
+      "group": "practice",
+      "title": "天降月",
+      "sourceLabel": "天降月",
+      "sourceLabels": [
+        "天降月"
+      ],
+      "recurrence": "annual",
+      "ruleLabel": "藏历九月初一",
+      "rule": {
+        "kind": "tibetan-annual",
+        "month": 9,
+        "day": 1,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "exclude",
+        "evidence": [
+          {
+            "date": "2026-10-11",
+            "tibetan": "九月初一",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "gesar-birthday",
+      "group": "festivals",
+      "title": "格萨尔王诞辰日",
+      "sourceLabel": "格萨尔王诞辰日",
+      "sourceLabels": [
+        "格萨尔王诞辰日"
+      ],
+      "recurrence": "annual",
+      "ruleLabel": "藏历十二月十五",
+      "rule": {
+        "kind": "tibetan-annual",
+        "month": 12,
+        "day": 15,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "exclude",
+        "evidence": [
+          {
+            "date": "2026-02-01",
+            "tibetan": "十二月十五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-"
+          },
+          {
+            "date": "2027-01-22",
+            "tibetan": "十二月十五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "world-sang",
+      "group": "festivals",
+      "title": "世界煨桑日",
+      "sourceLabel": "世界煨桑日",
+      "sourceLabels": [
+        "世界煨桑日"
+      ],
+      "recurrence": "annual",
+      "ruleLabel": "藏历五月十五",
+      "rule": {
+        "kind": "tibetan-annual",
+        "month": 5,
+        "day": 15,
+        "missing": "previous",
+        "repeated": "first",
+        "leapMonth": "exclude",
+        "evidence": [
+          {
+            "date": "2026-06-29",
+            "tibetan": "五月十五",
+            "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/6/-"
+          }
+        ]
+      }
+    },
+    {
+      "id": "larung-protectors",
+      "group": "festivals",
+      "title": "喇荣供护法节",
+      "sourceLabel": "喇荣供护法节",
+      "sourceLabels": [
+        "喇荣供护法节"
+      ],
+      "recurrence": "published",
+      "ruleLabel": "随历书安排"
+    },
+    {
+      "id": "larung-sang",
+      "group": "festivals",
+      "title": "喇荣煨桑节",
+      "sourceLabel": "喇荣煨桑节",
+      "sourceLabels": [
+        "喇荣煨桑节"
+      ],
+      "recurrence": "published",
+      "ruleLabel": "随历书安排"
+    },
+    {
+      "id": "annular-eclipse",
+      "group": "nature",
+      "title": "日环食",
+      "sourceLabel": "日环食",
+      "sourceLabels": [
+        "日环食",
+        "日环食（北京时间17:56开始-22:27结束）"
+      ],
+      "recurrence": "published",
+      "ruleLabel": "随历书安排",
+      "tags": [
+        "eclipse"
+      ]
+    },
+    {
+      "id": "total-solar-eclipse",
+      "group": "nature",
+      "title": "日全食",
+      "sourceLabel": "日全食（北京时间23:34开始-次日凌晨03:57结束）",
+      "sourceLabels": [
+        "日全食（北京时间23:34开始-次日凌晨03:57结束）"
+      ],
+      "recurrence": "published",
+      "ruleLabel": "随历书安排",
+      "tags": [
+        "eclipse"
+      ]
+    },
+    {
+      "id": "total-lunar-eclipse",
+      "group": "nature",
+      "title": "月全食",
+      "sourceLabel": "月全食（北京时间17:50开始-21:15结束）",
+      "sourceLabels": [
+        "月全食（北京时间17:50开始-21:15结束）"
+      ],
+      "recurrence": "published",
+      "ruleLabel": "随历书安排",
+      "tags": [
+        "eclipse"
+      ]
+    },
+    {
+      "id": "partial-lunar-eclipse",
+      "group": "nature",
+      "title": "月偏食",
+      "sourceLabel": "月偏食",
+      "sourceLabels": [
+        "月偏食",
+        "月偏食（北京时间10：35开始-13：51结束）"
+      ],
+      "recurrence": "published",
+      "ruleLabel": "随历书安排",
+      "tags": [
+        "eclipse"
+      ]
+    },
+    {
+      "id": "spring-equinox",
+      "group": "nature",
+      "title": "春分",
+      "sourceLabel": "春分",
+      "sourceLabels": [
+        "春分"
+      ],
+      "recurrence": "published",
+      "ruleLabel": "随历书安排",
+      "tags": [
+        "solar-term"
+      ]
+    },
+    {
+      "id": "summer-solstice",
+      "group": "nature",
+      "title": "夏至",
+      "sourceLabel": "夏至",
+      "sourceLabels": [
+        "夏至"
+      ],
+      "recurrence": "published",
+      "ruleLabel": "随历书安排",
+      "tags": [
+        "solar-term"
+      ]
+    },
+    {
+      "id": "autumn-equinox",
+      "group": "nature",
+      "title": "秋分",
+      "sourceLabel": "秋分",
+      "sourceLabels": [
+        "秋分"
+      ],
+      "recurrence": "published",
+      "ruleLabel": "随历书安排",
+      "tags": [
+        "solar-term"
+      ]
+    },
+    {
+      "id": "winter-solstice",
+      "group": "nature",
+      "title": "冬至",
+      "sourceLabel": "冬至",
+      "sourceLabels": [
+        "冬至"
+      ],
+      "recurrence": "published",
+      "ruleLabel": "随历书安排",
+      "tags": [
+        "solar-term"
+      ]
+    },
+    {
+      "id": "world-reading-day",
+      "group": "other",
+      "title": "世界阅读日",
+      "sourceLabel": "世界阅读日",
+      "sourceLabels": [
+        "世界阅读日"
+      ],
+      "recurrence": "published",
+      "ruleLabel": "随历书安排"
+    },
+    {
+      "id": "world-vegetarian-day",
+      "group": "other",
+      "title": "世界素食日",
+      "sourceLabel": "世界素食日",
+      "sourceLabels": [
+        "世界素食日"
+      ],
+      "recurrence": "published",
+      "ruleLabel": "随历书安排"
+    }
+  ]
+}

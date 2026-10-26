@@ -1,0 +1,20 @@
+name = "huideng-calendar-local"
+main = "worker.mjs"
+compatibility_date = "2026-10-01"
+workers_dev = false
+
+# Local emulator configuration only. Do not deploy this file.
+[vars]
+PUBLIC_BASE_URL = "http://127.0.0.1:8787"
+ALLOWED_ORIGINS = "http://127.0.0.1:4173,http://127.0.0.1:8787"
+ALLOW_LOCAL_DEV = "true"
+RATE_LIMIT_SALT = "local-emulator-only"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "huideng-calendar-local"
+database_id = "00000000-0000-0000-0000-000000000001"
+migrations_dir = "migrations"
+
+[observability]
+enabled = false

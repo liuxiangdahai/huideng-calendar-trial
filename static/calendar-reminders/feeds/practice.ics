@@ -1,0 +1,352 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Huideng Vancouver//Practice Calendar 1.0//ZH
+CALSCALE:GREGORIAN
+X-WR-CALNAME:慧灯·法会与修行月（仅展示）
+X-WR-TIMEZONE:Asia/Shanghai
+BEGIN:VEVENT
+UID:parinirvana-assembly-start-fohui-00001@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260101
+DTEND;VALUE=DATE:20260102
+SUMMARY:圣者法王如意宝涅槃法会开始
+DESCRIPTION:藏历十一月十三\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：圣者法王如意宝涅
+ 槃法会开始\nhttps://www.fohuifayu.com/index.php/calendar/monthcalenda
+ r/2026/1/-\n仅加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:parinirvana-assembly-end-fohui-00002@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260107
+DTEND;VALUE=DATE:20260108
+SUMMARY:圣者法王如意宝涅槃法会结束
+DESCRIPTION:藏历十一月十九\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：圣者法王如意宝涅
+ 槃法会结束\nhttps://www.fohuifayu.com/index.php/calendar/monthcalenda
+ r/2026/1/-\n仅加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:vidyadhara-assembly-start-fohui-00004@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260218
+DTEND;VALUE=DATE:20260219
+SUMMARY:持明法会开始
+DESCRIPTION:藏历一月初一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：持明法会开始\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:miracles-month-2026-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260218
+DTEND;VALUE=DATE:20260219
+SUMMARY:神变月
+DESCRIPTION:藏历一月初一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：神变月\nhttps://www.fohu
+ ifayu.com/index.php/calendar/monthcalendar/2026/2/-\n仅加入日历；请
+ 关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:vidyadhara-assembly-end-fohui-00006@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260304
+DTEND;VALUE=DATE:20260305
+SUMMARY:持明法会结束
+DESCRIPTION:藏历一月十六\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：持明法会结束\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:longevity-assembly-start-fohui-00008@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260325
+DTEND;VALUE=DATE:20260326
+SUMMARY:长寿法会开始
+DESCRIPTION:藏历二月初七\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：长寿法会开始\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:longevity-assembly-end-fohui-00009@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260328
+DTEND;VALUE=DATE:20260329
+SUMMARY:长寿法会结束
+DESCRIPTION:藏历二月初十\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：长寿法会结束\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:saga-month-start-2026-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260517
+DTEND;VALUE=DATE:20260518
+SUMMARY:萨嘎月开始
+DESCRIPTION:藏历四月初一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：萨嘎月开始\nhttps://ww
+ w.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-\n仅加入日历
+ ；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:vajrasattva-assembly-start-fohui-00011@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260524
+DTEND;VALUE=DATE:20260525
+SUMMARY:金刚萨埵法会开始
+DESCRIPTION:藏历四月初八\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：金刚萨埵法会开始\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:vajrasattva-assembly-end-fohui-00012@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260531
+DTEND;VALUE=DATE:20260601
+SUMMARY:金刚萨埵法会结束
+DESCRIPTION:藏历四月十五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：金刚萨埵法会结束\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:dharma-wheel-month-2026-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260715
+DTEND;VALUE=DATE:20260716
+SUMMARY:法轮月开始
+DESCRIPTION:藏历六月初一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：法轮月开始\nhttps://ww
+ w.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-\n仅加入日历
+ ；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:kshitigarbha-assembly-start-fohui-00014@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260715
+DTEND;VALUE=DATE:20260716
+SUMMARY:地藏法会开始
+DESCRIPTION:藏历六月初一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：地藏法会开始\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:kshitigarbha-assembly-end-fohui-00015@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260722
+DTEND;VALUE=DATE:20260723
+SUMMARY:地藏法会结束
+DESCRIPTION:藏历六月初八\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：地藏法会结束\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:lhabab-month-2026-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261011
+DTEND;VALUE=DATE:20261012
+SUMMARY:天降月
+DESCRIPTION:藏历九月初一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：天降月\nhttps://www.fohu
+ ifayu.com/index.php/calendar/monthcalendar/2026/10/-\n仅加入日历；
+ 请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:sukhavati-assembly-start-fohui-00021@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261028
+DTEND;VALUE=DATE:20261029
+SUMMARY:极乐法会开始
+DESCRIPTION:藏历九月十八\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：极乐法会开始\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:sukhavati-assembly-end-fohui-00022@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261104
+DTEND;VALUE=DATE:20261105
+SUMMARY:极乐法会结束
+DESCRIPTION:藏历九月廿五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：极乐法会结束\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:parinirvana-assembly-start-fohui-00024@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261222
+DTEND;VALUE=DATE:20261223
+SUMMARY:圣者法王如意宝涅槃法会开始
+DESCRIPTION:藏历十一月十三\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：圣者法王如意宝涅
+ 槃法会开始\nhttps://www.fohuifayu.com/index.php/calendar/monthcalenda
+ r/2026/12/-\n仅加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:parinirvana-assembly-end-fohui-00026@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261228
+DTEND;VALUE=DATE:20261229
+SUMMARY:圣者法王如意宝涅槃法会结束
+DESCRIPTION:藏历十一月二十\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：圣者法王如意宝涅
+ 槃法会结束\nhttps://www.fohuifayu.com/index.php/calendar/monthcalenda
+ r/2026/12/-\n仅加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:vidyadhara-assembly-start-fohui-00027@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270207
+DTEND;VALUE=DATE:20270208
+SUMMARY:持明法会开始
+DESCRIPTION:藏历一月初一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：持明法会开始\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:miracles-month-2027-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270207
+DTEND;VALUE=DATE:20270208
+SUMMARY:神变月
+DESCRIPTION:藏历一月初一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：神变月\nhttps://www.fohu
+ ifayu.com/index.php/calendar/monthcalendar/2027/2/-\n仅加入日历；请
+ 关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:vidyadhara-assembly-end-fohui-00029@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270221
+DTEND;VALUE=DATE:20270222
+SUMMARY:持明法会结束
+DESCRIPTION:藏历一月十六\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：持明法会结束\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:longevity-assembly-start-fohui-00031@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270315
+DTEND;VALUE=DATE:20270316
+SUMMARY:长寿法会开始
+DESCRIPTION:藏历二月初七\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：长寿法会开始\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:longevity-assembly-end-fohui-00032@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270318
+DTEND;VALUE=DATE:20270319
+SUMMARY:长寿法会结束
+DESCRIPTION:藏历二月十一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：长寿法会结束\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+END:VCALENDAR

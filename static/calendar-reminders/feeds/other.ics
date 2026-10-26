@@ -1,0 +1,37 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Huideng Vancouver//Practice Calendar 1.0//ZH
+CALSCALE:GREGORIAN
+X-WR-CALNAME:慧灯·其他纪念日（仅展示）
+X-WR-TIMEZONE:Asia/Shanghai
+BEGIN:VEVENT
+UID:world-reading-day-fohui-00010@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260423
+DTEND;VALUE=DATE:20260424
+SUMMARY:世界阅读日
+DESCRIPTION:藏历三月初七\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：世界阅读日\nhttps://ww
+ w.fohuifayu.com/index.php/calendar/monthcalendar/2026/4/-\n仅加入日历
+ ；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/4/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:world-vegetarian-day-fohui-00023@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261125
+DTEND;VALUE=DATE:20261126
+SUMMARY:世界素食日
+DESCRIPTION:藏历十月十六\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：世界素食日\nhttps://ww
+ w.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+END:VCALENDAR

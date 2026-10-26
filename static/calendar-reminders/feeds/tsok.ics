@@ -1,0 +1,502 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Huideng Vancouver//Practice Calendar 1.0//ZH
+CALSCALE:GREGORIAN
+X-WR-CALNAME:慧灯·荟供日（仅展示）
+X-WR-TIMEZONE:Asia/Shanghai
+BEGIN:VEVENT
+UID:dakini-tsok-2025-十一-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260113
+DTEND;VALUE=DATE:20260114
+SUMMARY:空行母荟供日
+DESCRIPTION:藏历十一月廿五\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：空行母荟供日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:guru-tsok-2025-十二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260128
+DTEND;VALUE=DATE:20260129
+SUMMARY:莲师荟供日
+DESCRIPTION:藏历十二月初十\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：莲师荟供日\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:dakini-tsok-2025-十二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260211
+DTEND;VALUE=DATE:20260212
+SUMMARY:空行母荟供日
+DESCRIPTION:藏历十二月廿五\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：空行母荟供日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:guru-tsok-2026-一-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260226
+DTEND;VALUE=DATE:20260227
+SUMMARY:莲师荟供日
+DESCRIPTION:藏历一月初十\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：莲师荟供日\nhttps://ww
+ w.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-\n仅加入日历
+ ；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:dakini-tsok-2026-一-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260313
+DTEND;VALUE=DATE:20260314
+SUMMARY:空行母荟供日
+DESCRIPTION:藏历一月廿五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：空行母荟供日\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:guru-tsok-2026-二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260328
+DTEND;VALUE=DATE:20260329
+SUMMARY:莲师荟供日
+DESCRIPTION:藏历二月初十\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：莲师荟供日\nhttps://ww
+ w.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-\n仅加入日历
+ ；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:dakini-tsok-2026-二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260412
+DTEND;VALUE=DATE:20260413
+SUMMARY:空行母荟供日
+DESCRIPTION:藏历二月廿五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：空行母荟供日\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/4/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/4/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:guru-tsok-2026-三-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260426
+DTEND;VALUE=DATE:20260427
+SUMMARY:莲师荟供日
+DESCRIPTION:藏历三月初十\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：莲师荟供日\nhttps://ww
+ w.fohuifayu.com/index.php/calendar/monthcalendar/2026/4/-\n仅加入日历
+ ；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/4/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:dakini-tsok-2026-三-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260512
+DTEND;VALUE=DATE:20260513
+SUMMARY:空行母荟供日
+DESCRIPTION:藏历三月廿五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：空行母荟供日\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:guru-tsok-2026-四-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260526
+DTEND;VALUE=DATE:20260527
+SUMMARY:莲师荟供日
+DESCRIPTION:藏历四月初十\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：莲师荟供日\nhttps://ww
+ w.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-\n仅加入日历
+ ；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:dakini-tsok-2026-四-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260610
+DTEND;VALUE=DATE:20260611
+SUMMARY:空行母荟供日
+DESCRIPTION:藏历四月廿五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：空行母荟供日\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/6/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/6/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:guru-tsok-2026-五-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260624
+DTEND;VALUE=DATE:20260625
+SUMMARY:莲师荟供日
+DESCRIPTION:藏历五月初十\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：莲师荟供日\nhttps://ww
+ w.fohuifayu.com/index.php/calendar/monthcalendar/2026/6/-\n仅加入日历
+ ；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/6/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:dakini-tsok-2026-五-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260709
+DTEND;VALUE=DATE:20260710
+SUMMARY:空行母荟供日
+DESCRIPTION:藏历五月廿四\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：空行母荟供日\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:guru-tsok-2026-六-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260724
+DTEND;VALUE=DATE:20260725
+SUMMARY:莲师荟供日
+DESCRIPTION:藏历六月初十\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：莲师荟供日\nhttps://ww
+ w.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-\n仅加入日历
+ ；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:dakini-tsok-2026-六-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260808
+DTEND;VALUE=DATE:20260809
+SUMMARY:空行母荟供日
+DESCRIPTION:藏历六月廿五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：空行母荟供日\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:guru-tsok-2026-七-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260822
+DTEND;VALUE=DATE:20260823
+SUMMARY:莲师荟供日
+DESCRIPTION:藏历七月初十\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：莲师荟供日\nhttps://ww
+ w.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-\n仅加入日历
+ ；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:dakini-tsok-2026-七-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260906
+DTEND;VALUE=DATE:20260907
+SUMMARY:空行母荟供日
+DESCRIPTION:藏历七月廿五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：空行母荟供日\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/9/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/9/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:guru-tsok-2026-八-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260921
+DTEND;VALUE=DATE:20260922
+SUMMARY:莲师荟供日
+DESCRIPTION:藏历八月初十\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：莲师荟供日\nhttps://ww
+ w.fohuifayu.com/index.php/calendar/monthcalendar/2026/9/-\n仅加入日历
+ ；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/9/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:dakini-tsok-2026-八-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261005
+DTEND;VALUE=DATE:20261006
+SUMMARY:空行母荟供日
+DESCRIPTION:藏历八月廿五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：空行母荟供日\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:guru-tsok-2026-九-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261021
+DTEND;VALUE=DATE:20261022
+SUMMARY:莲师荟供日
+DESCRIPTION:藏历九月初十\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：莲师荟供日\nhttps://ww
+ w.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:dakini-tsok-2026-九-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261104
+DTEND;VALUE=DATE:20261105
+SUMMARY:空行母荟供日
+DESCRIPTION:藏历九月廿五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：空行母荟供日\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:guru-tsok-2026-十-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261119
+DTEND;VALUE=DATE:20261120
+SUMMARY:莲师荟供日
+DESCRIPTION:藏历十月初十\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：莲师荟供日\nhttps://ww
+ w.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:dakini-tsok-2026-十-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261203
+DTEND;VALUE=DATE:20261204
+SUMMARY:空行母荟供日
+DESCRIPTION:藏历十月廿五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：空行母荟供日\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:guru-tsok-2026-十一-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261219
+DTEND;VALUE=DATE:20261220
+SUMMARY:莲师荟供日
+DESCRIPTION:藏历十一月初十\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：莲师荟供日\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:dakini-tsok-2026-十一-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270102
+DTEND;VALUE=DATE:20270103
+SUMMARY:空行母荟供日
+DESCRIPTION:藏历十一月廿五\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：空行母荟供日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:guru-tsok-2026-十二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270117
+DTEND;VALUE=DATE:20270118
+SUMMARY:莲师荟供日
+DESCRIPTION:藏历十二月初十\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：莲师荟供日\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:dakini-tsok-2026-十二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270201
+DTEND;VALUE=DATE:20270202
+SUMMARY:空行母荟供日
+DESCRIPTION:藏历十二月廿五\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：空行母荟供日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:guru-tsok-2027-一-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270216
+DTEND;VALUE=DATE:20270217
+SUMMARY:莲师荟供日
+DESCRIPTION:藏历一月初十\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：莲师荟供日\nhttps://ww
+ w.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-\n仅加入日历
+ ；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:dakini-tsok-2027-一-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270302
+DTEND;VALUE=DATE:20270303
+SUMMARY:空行母荟供日
+DESCRIPTION:藏历一月廿五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：空行母荟供日\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:guru-tsok-2027-二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270317
+DTEND;VALUE=DATE:20270318
+SUMMARY:莲师荟供日
+DESCRIPTION:藏历二月初十\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：莲师荟供日\nhttps://ww
+ w.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-\n仅加入日历
+ ；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:dakini-tsok-2027-二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270401
+DTEND;VALUE=DATE:20270402
+SUMMARY:空行母荟供日
+DESCRIPTION:藏历二月廿五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：空行母荟供日\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:guru-tsok-2027-闰二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270416
+DTEND;VALUE=DATE:20270417
+SUMMARY:莲师荟供日
+DESCRIPTION:藏历闰二月初十\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：莲师荟供日\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:dakini-tsok-2027-闰二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270501
+DTEND;VALUE=DATE:20270502
+SUMMARY:空行母荟供日
+DESCRIPTION:藏历闰二月廿五\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：空行母荟供日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/5/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/5/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+END:VCALENDAR

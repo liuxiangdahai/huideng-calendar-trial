@@ -1,0 +1,27 @@
+name = "huideng-calendar"
+main = "worker.mjs"
+compatibility_date = "2026-10-01"
+workers_dev = false
+
+# Copy to wrangler.toml and supply the actual domain and D1 database ID.
+# Production deliberately has no wildcard CORS or placeholder public endpoint.
+[vars]
+PUBLIC_BASE_URL = ""
+ALLOWED_ORIGINS = ""
+
+[[d1_databases]]
+binding = "DB"
+database_name = "huideng-calendar"
+database_id = "REPLACE_WITH_CREATED_D1_ID"
+migrations_dir = "migrations"
+
+[triggers]
+crons = ["17 4 * * *"]
+
+[observability]
+enabled = false
+
+# Add the chosen domain after it has been configured in the Cloudflare account.
+# [[routes]]
+# pattern = "calendar.example.org"
+# custom_domain = true

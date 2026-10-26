@@ -1,0 +1,127 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Huideng Vancouver//Practice Calendar 1.0//ZH
+CALSCALE:GREGORIAN
+X-WR-CALNAME:慧灯·藏历节庆（仅展示）
+X-WR-TIMEZONE:Asia/Shanghai
+BEGIN:VEVENT
+UID:gesar-birthday-2025-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260201
+DTEND;VALUE=DATE:20260202
+SUMMARY:格萨尔王诞辰日
+DESCRIPTION:藏历十二月十五\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：格萨尔王诞辰日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:losar-2026-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260218
+DTEND;VALUE=DATE:20260219
+SUMMARY:藏历新年
+DESCRIPTION:藏历一月初一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：藏历新年\nhttps://www.f
+ ohuifayu.com/index.php/calendar/monthcalendar/2026/2/-\n仅加入日历；
+ 请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:kalachakra-new-year-2026-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260418
+DTEND;VALUE=DATE:20260419
+SUMMARY:时轮金刚新年
+DESCRIPTION:藏历三月初一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：时轮金刚新年\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/4/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/4/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:world-sang-2026-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260629
+DTEND;VALUE=DATE:20260630
+SUMMARY:世界煨桑日
+DESCRIPTION:藏历五月十五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：世界煨桑日\nhttps://ww
+ w.fohuifayu.com/index.php/calendar/monthcalendar/2026/6/-\n仅加入日历
+ ；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/6/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:larung-protectors-fohui-00016@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260808
+DTEND;VALUE=DATE:20260809
+SUMMARY:喇荣供护法节
+DESCRIPTION:藏历六月廿五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：喇荣供护法节\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:larung-sang-fohui-00017@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260809
+DTEND;VALUE=DATE:20260810
+SUMMARY:喇荣煨桑节
+DESCRIPTION:藏历六月廿六\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：喇荣煨桑节\nhttps://ww
+ w.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-\n仅加入日历
+ ；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:gesar-birthday-2026-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270122
+DTEND;VALUE=DATE:20270123
+SUMMARY:格萨尔王诞辰日
+DESCRIPTION:藏历十二月十五\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：格萨尔王诞辰日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:losar-2027-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270207
+DTEND;VALUE=DATE:20270208
+SUMMARY:藏历新年
+DESCRIPTION:藏历一月初一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：藏历新年\nhttps://www.f
+ ohuifayu.com/index.php/calendar/monthcalendar/2027/2/-\n仅加入日历；
+ 请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+END:VCALENDAR

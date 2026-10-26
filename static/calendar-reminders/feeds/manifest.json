@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 2,
+  "updatedOn": "2026-10-20",
+  "coverage": {
+    "start": "2026-01-01",
+    "end": "2027-05-06"
+  },
+  "feeds": [
+    {
+      "id": "tsok",
+      "title": "荟供日",
+      "url": "tsok.ics",
+      "mode": "display"
+    },
+    {
+      "id": "buddha",
+      "title": "佛菩萨殊胜日",
+      "url": "buddha.ics",
+      "mode": "display"
+    },
+    {
+      "id": "masters",
+      "title": "上师纪念日",
+      "url": "masters.ics",
+      "mode": "display"
+    },
+    {
+      "id": "practice",
+      "title": "法会与修行月",
+      "url": "practice.ics",
+      "mode": "display"
+    },
+    {
+      "id": "festivals",
+      "title": "藏历节庆",
+      "url": "festivals.ics",
+      "mode": "display"
+    },
+    {
+      "id": "nature",
+      "title": "节气与天象",
+      "url": "nature.ics",
+      "mode": "display"
+    },
+    {
+      "id": "other",
+      "title": "其他纪念日",
+      "url": "other.ics",
+      "mode": "display"
+    }
+  ]
+}

@@ -1,0 +1,175 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Huideng Vancouver//Practice Calendar 1.0//ZH
+CALSCALE:GREGORIAN
+X-WR-CALNAME:慧灯·节气与天象（仅展示）
+X-WR-TIMEZONE:Asia/Shanghai
+BEGIN:VEVENT
+UID:annular-eclipse-fohui-00003@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260217
+DTEND;VALUE=DATE:20260218
+SUMMARY:日环食（北京时间17:56开始-22:27结束）
+DESCRIPTION:藏历十二月三十\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：日环食（北京时间
+ 17:56开始-22:27结束）\nhttps://www.fohuifayu.com/index.php/calendar/m
+ onthcalendar/2026/2/-\n仅加入日历；请关闭此日历的默认通知
+ 。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:total-lunar-eclipse-fohui-00005@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260303
+DTEND;VALUE=DATE:20260304
+SUMMARY:月全食（北京时间17:50开始-21:15结束）
+DESCRIPTION:藏历一月十五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：月全食（北京时间17:
+ 50开始-21:15结束）\nhttps://www.fohuifayu.com/index.php/calendar/mont
+ hcalendar/2026/3/-\n仅加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:spring-equinox-fohui-00007@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260320
+DTEND;VALUE=DATE:20260321
+SUMMARY:春分
+DESCRIPTION:藏历二月初二\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：春分\nhttps://www.fohuifa
+ yu.com/index.php/calendar/monthcalendar/2026/3/-\n仅加入日历；请关
+ 闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:summer-solstice-fohui-00013@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260621
+DTEND;VALUE=DATE:20260622
+SUMMARY:夏至
+DESCRIPTION:藏历五月初七\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：夏至\nhttps://www.fohuifa
+ yu.com/index.php/calendar/monthcalendar/2026/6/-\n仅加入日历；请关
+ 闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/6/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:total-solar-eclipse-fohui-00018@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260812
+DTEND;VALUE=DATE:20260813
+SUMMARY:日全食（北京时间23:34开始-次日凌晨03:57结束）
+DESCRIPTION:藏历六月三十\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：日全食（北京时间23:
+ 34开始-次日凌晨03:57结束）\nhttps://www.fohuifayu.com/index.php/c
+ alendar/monthcalendar/2026/8/-\n仅加入日历；请关闭此日历的默
+ 认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:partial-lunar-eclipse-fohui-00019@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260828
+DTEND;VALUE=DATE:20260829
+SUMMARY:月偏食（北京时间10：35开始-13：51结束）
+DESCRIPTION:藏历七月十五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：月偏食（北京时间10
+ ：35开始-13：51结束）\nhttps://www.fohuifayu.com/index.php/calendar
+ /monthcalendar/2026/8/-\n仅加入日历；请关闭此日历的默认通
+ 知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:autumn-equinox-fohui-00020@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260923
+DTEND;VALUE=DATE:20260924
+SUMMARY:秋分
+DESCRIPTION:藏历八月十二\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：秋分\nhttps://www.fohuifa
+ yu.com/index.php/calendar/monthcalendar/2026/9/-\n仅加入日历；请关
+ 闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/9/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:winter-solstice-fohui-00025@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261222
+DTEND;VALUE=DATE:20261223
+SUMMARY:冬至
+DESCRIPTION:藏历十一月十三\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：冬至\nhttps://www.fohu
+ ifayu.com/index.php/calendar/monthcalendar/2026/12/-\n仅加入日历；
+ 请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:annular-eclipse-fohui-00028@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270207
+DTEND;VALUE=DATE:20270208
+SUMMARY:日环食
+DESCRIPTION:藏历一月初一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：日环食\nhttps://www.fohu
+ ifayu.com/index.php/calendar/monthcalendar/2027/2/-\n仅加入日历；请
+ 关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:partial-lunar-eclipse-fohui-00030@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270221
+DTEND;VALUE=DATE:20270222
+SUMMARY:月偏食
+DESCRIPTION:藏历一月十六\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：月偏食\nhttps://www.fohu
+ ifayu.com/index.php/calendar/monthcalendar/2027/2/-\n仅加入日历；请
+ 关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:spring-equinox-fohui-00033@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270321
+DTEND;VALUE=DATE:20270322
+SUMMARY:春分
+DESCRIPTION:藏历二月十四\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：春分\nhttps://www.fohuifa
+ yu.com/index.php/calendar/monthcalendar/2027/3/-\n仅加入日历；请关
+ 闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+END:VCALENDAR

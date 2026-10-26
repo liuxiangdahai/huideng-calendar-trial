@@ -1,0 +1,312 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Huideng Vancouver//Practice Calendar 1.0//ZH
+CALSCALE:GREGORIAN
+X-WR-CALNAME:慧灯·上师纪念日（仅展示）
+X-WR-TIMEZONE:Asia/Shanghai
+BEGIN:VEVENT
+UID:sakya-pandita-2025-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260102
+DTEND;VALUE=DATE:20260103
+SUMMARY:萨迦班智达圆寂纪念日
+DESCRIPTION:藏历十一月十四\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：萨迦班智达圆寂纪
+ 念日\nhttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/
+ -\n仅加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:jigme-phuntsok-2025-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260103
+DTEND;VALUE=DATE:20260104
+SUMMARY:圣者法王如意宝圆寂纪念日
+DESCRIPTION:藏历十一月十五\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：圣者法王如意宝圆
+ 寂纪念日\nhttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2
+ 026/1/-\n仅加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:muntso-birthday-2025-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260120
+DTEND;VALUE=DATE:20260121
+SUMMARY:门措上师诞生日
+DESCRIPTION:藏历十二月初二\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：门措上师诞生日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:longchenpa-2025-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260204
+DTEND;VALUE=DATE:20260205
+SUMMARY:全知龙钦巴（无垢光）尊者圆寂纪念日
+DESCRIPTION:藏历十二月十八\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：全知龙钦巴（无垢
+ 光）尊者圆寂纪念日\nhttps://www.fohuifayu.com/index.php/calendar/
+ monthcalendar/2026/2/-\n仅加入日历；请关闭此日历的默认通
+ 知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:jigme-phuntsok-birthday-2026-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260220
+DTEND;VALUE=DATE:20260221
+SUMMARY:圣者法王如意宝诞辰纪念日
+DESCRIPTION:藏历一月初三\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：圣者法王如意宝诞辰
+ 纪念日\nhttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026
+ /2/-\n仅加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:milarepa-2026-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260302
+DTEND;VALUE=DATE:20260303
+SUMMARY:米拉日巴尊者圆寂纪念日
+DESCRIPTION:藏历一月十四\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：米拉日巴尊者圆寂纪
+ 念日\nhttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/
+ -\n仅加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:taranatha-anniversary-2026-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260515
+DTEND;VALUE=DATE:20260516
+SUMMARY:觉囊派遍知大师多罗那他尊者的圆寂日
+DESCRIPTION:藏历三月廿八\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：觉囊派遍知大师多罗
+ 那他尊者的圆寂日\nhttps://www.fohuifayu.com/index.php/calendar/mon
+ thcalendar/2026/5/-\n仅加入日历；请关闭此日历的默认通知
+ 。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:mipham-2026-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260614
+DTEND;VALUE=DATE:20260615
+SUMMARY:全知麦彭尊者圆寂纪念日
+DESCRIPTION:藏历四月廿九\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：全知麦彭尊者圆寂纪
+ 念日\nhttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/6/
+ -\n仅加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/6/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:taranatha-birthday-2026-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260722
+DTEND;VALUE=DATE:20260723
+SUMMARY:觉囊派遍知大师多罗那他尊者的诞生日
+DESCRIPTION:藏历六月初八\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：觉囊派遍知大师多罗
+ 那他尊者的诞生日\nhttps://www.fohuifayu.com/index.php/calendar/mon
+ thcalendar/2026/7/-\n仅加入日历；请关闭此日历的默认通知
+ 。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:padmasambhava-birthday-2026-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260724
+DTEND;VALUE=DATE:20260725
+SUMMARY:莲花生大师诞生日
+DESCRIPTION:藏历六月初十\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：莲花生大师诞生日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:jigme-lingpa-2026-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261013
+DTEND;VALUE=DATE:20261014
+SUMMARY:持明无畏洲（吉美林巴）尊者圆寂纪念日
+DESCRIPTION:藏历九月初三\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：持明无畏洲（吉美林
+ 巴）尊者圆寂纪念日\nhttps://www.fohuifayu.com/index.php/calendar/
+ monthcalendar/2026/10/-\n仅加入日历；请关闭此日历的默认通
+ 知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:atisha-2026-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261028
+DTEND;VALUE=DATE:20261029
+SUMMARY:阿底峡尊者圆寂纪念日
+DESCRIPTION:藏历九月十八\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：阿底峡尊者圆寂纪念
+ 日\nhttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-\
+ n仅加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:mipham-birthday-2026-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261114
+DTEND;VALUE=DATE:20261115
+SUMMARY:全知麦彭仁波切诞辰日
+DESCRIPTION:藏历十月初五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：全知麦彭仁波切诞辰
+ 日\nhttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-\
+ n仅加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:tsongkhapa-2026-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261203
+DTEND;VALUE=DATE:20261204
+SUMMARY:宗喀巴大师圆寂纪念日（燃灯节）
+DESCRIPTION:藏历十月廿五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：宗喀巴大师圆寂纪念
+ 日（燃灯节）\nhttps://www.fohuifayu.com/index.php/calendar/monthcale
+ ndar/2026/12/-\n仅加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:sakya-pandita-2026-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261223
+DTEND;VALUE=DATE:20261224
+SUMMARY:萨迦班智达圆寂纪念日
+DESCRIPTION:藏历十一月十四\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：萨迦班智达圆寂纪
+ 念日\nhttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12
+ /-\n仅加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:jigme-phuntsok-2026-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261223
+DTEND;VALUE=DATE:20261224
+SUMMARY:圣者法王如意宝圆寂纪念日
+DESCRIPTION:藏历十一月十四\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：圣者法王如意宝圆
+ 寂纪念日\nhttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2
+ 026/12/-\n仅加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:muntso-birthday-2026-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270109
+DTEND;VALUE=DATE:20270110
+SUMMARY:门措上师诞生日
+DESCRIPTION:藏历十二月初二\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：门措上师诞生日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:longchenpa-2026-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270125
+DTEND;VALUE=DATE:20270126
+SUMMARY:全知龙钦巴（无垢光）尊者圆寂纪念日
+DESCRIPTION:藏历十二月十八\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：全知龙钦巴（无垢
+ 光）尊者圆寂纪念日\nhttps://www.fohuifayu.com/index.php/calendar/
+ monthcalendar/2027/1/-\n仅加入日历；请关闭此日历的默认通
+ 知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:jigme-phuntsok-birthday-2027-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270209
+DTEND;VALUE=DATE:20270210
+SUMMARY:圣者法王如意宝诞辰纪念日
+DESCRIPTION:藏历一月初三\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：圣者法王如意宝诞辰
+ 纪念日\nhttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2027
+ /2/-\n仅加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:milarepa-2027-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270219
+DTEND;VALUE=DATE:20270220
+SUMMARY:米拉日巴尊者圆寂纪念日
+DESCRIPTION:藏历一月十三\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：米拉日巴尊者圆寂纪
+ 念日\nhttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/
+ -\n仅加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+END:VCALENDAR

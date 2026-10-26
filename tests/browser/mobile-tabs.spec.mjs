@@ -1,0 +1,22 @@
+import {test,expect} from '@playwright/test';
+test('mobile sticky tabs preserve independent panel positions, month and focused controls',async({page})=>{
+ const tapTab=async id=>{const b=await page.locator(id).boundingBox();await page.mouse.click(b.x+b.width/2,b.y+b.height/2);};
+ await page.setViewportSize({width:390,height:844});await page.goto('/calendar-reminders/');await expect(page.locator('#app')).toBeVisible();
+ await page.locator('[data-preset="practice"]').click();
+ const group=page.locator('[data-group-id="masters"]');await group.locator('summary').click();
+ await page.locator('.selection-footer').scrollIntoViewIfNeeded();
+ await expect.poll(()=>page.locator('.mobile-tabs').evaluate(n=>Math.round(n.getBoundingClientRect().top))).toBe(0);
+ const saved=await page.evaluate(()=>scrollY);
+ await tapTab('#tab-preview');
+ const toolbar=await page.locator('.cal-control-bar').boundingBox(),tabs=await page.locator('.mobile-tabs').boundingBox();
+ expect(toolbar.y).toBeGreaterThanOrEqual(tabs.y+tabs.height-1);expect(toolbar.y).toBeLessThan(140);
+ await page.locator('[data-cal-action="next"]').click();const month=await page.locator('[data-cal-month]').inputValue();
+ await page.locator('[data-cal-detail]').scrollIntoViewIfNeeded();const preview=await page.evaluate(()=>scrollY);
+ await tapTab('#tab-selection');await expect.poll(()=>page.evaluate(()=>scrollY)).toBeCloseTo(saved,0);
+ await expect(group).toHaveAttribute('open','');
+ await tapTab('#tab-preview');await expect(page.locator('[data-cal-month]')).toHaveValue(month);await expect.poll(()=>page.evaluate(()=>scrollY)).toBeCloseTo(preview,0);
+ await page.locator('#tab-preview').press('ArrowLeft');await expect(page.locator('#tab-selection')).toBeFocused();
+ await page.locator('#subscribe').click();await expect(page.locator('#subscription-dialog')).toBeVisible();
+ await page.keyboard.press('Escape');await expect(page.locator('#subscription-dialog')).toBeHidden();
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});

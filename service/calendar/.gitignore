@@ -1,0 +1,6 @@
+.wrangler/
+wrangler.toml
+.dev.vars
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm

@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#681e19">
+  <meta name="description" content="选择荟供日、殊胜日与纪念日，订阅你的藏历。">
+  <title>藏历 · 慧灯小组</title>
+  <link rel="icon" href="./assets/huideng-logo.png">
+  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./calendar-view.css">
+  <link rel="stylesheet" href="./subscription-guide.css">
+  <script type="module" src="./app.mjs"></script>
+</head>
+<body>
+  <a class="skip" href="#preset-options">跳至选择内容</a>
+  <header class="site-header">
+    <div class="heading"><a href="/" class="brand" aria-label="慧灯小组首页"><span class="brand-seal brand-logo"><img src="./assets/huideng-logo.png" width="144" height="153" alt="慧灯小组" decoding="async"></span><span class="brand-type"><small>慧灯小组</small><h1>藏历</h1></span></a></div>
+    <button id="my-subscription" type="button" class="secondary"><span data-icon="calendar-check" aria-hidden="true"></span>我的订阅<span id="unsaved-dot" class="unsaved-dot" aria-label="有未保存的修改" hidden></span></button>
+  </header>
+  <section class="editorial-masthead" aria-label="今日藏历"><div class="masthead-inner"><div class="masthead-date"><span class="masthead-eyebrow">今日 · 藏历</span><div class="today"><span id="today-gregorian">正在读取日期</span><span id="today-tibetan"></span></div></div><span class="masthead-mark" data-icon="woven-seal" aria-hidden="true"></span></div></section>
+  <main>
+    <p id="load-error" class="notice error" role="alert" hidden></p>
+    <noscript><p class="notice">请启用浏览器 JavaScript，或查看<a href="https://www.fohuifayu.com/index.php/calendar">佛慧法语藏历</a>。</p></noscript>
+    <div id="app" hidden>
+      <div id="device-zone-notice" class="notice zone-change" role="status" hidden><p id="device-zone-message"></p><div class="feed-actions"><button id="keep-zone" class="secondary" type="button">保持原时区</button><button id="use-device-zone" class="primary" type="button">改用设备时区</button></div></div>
+      <div class="region-bar"><div id="time-comparison" class="time-comparison" aria-label="设备与提醒地区时间"></div><div class="region-setting"><span>提醒地区</span><button id="zone-settings" class="text-button" type="button" aria-haspopup="dialog"><span data-icon="globe" aria-hidden="true"></span><span id="zone-summary">选择时区</span><span data-icon="chevron" aria-hidden="true"></span></button></div></div>
+      <div class="mobile-tabs" role="tablist" aria-label="日历设置视图">
+        <button id="tab-selection" type="button" role="tab" aria-selected="true" aria-controls="selection-pane" data-tab="selection">选择内容</button>
+        <button id="tab-preview" type="button" role="tab" aria-selected="false" aria-controls="preview-pane" data-tab="preview" tabindex="-1">日期预览</button>
+      </div>
+      <div class="workspace" data-active-tab="selection">
+        <section id="selection-pane" class="selection-column" aria-labelledby="selection-title">
+          <div class="section-heading selection-heading"><h2 id="selection-title">选择内容</h2></div>
+          <section class="quick-section" aria-labelledby="quick-title"><div class="quick-heading"><h3 id="quick-title">快捷方案</h3><span>一键选好，再按需调整</span></div><div id="preset-options" class="preset-options"></div><p id="preset-scope-note" class="preset-scope-note">全部修行日不含节气及其他纪念日。</p></section>
+          <div class="category-heading"><h3>按分类调整</h3><button id="reminder-settings" type="button" class="text-button"><span data-icon="bell-settings" aria-hidden="true"></span>批量提醒</button></div>
+          <div id="groups"></div>
+          <div class="selection-footer"><a href="https://www.fohuifayu.com/index.php/calendar" target="_blank" rel="noopener noreferrer">佛慧法语原历 <span aria-hidden="true">↗</span></a></div>
+        </section>
+        <aside id="preview-pane" class="preview-column" aria-labelledby="preview-title">
+          <section class="preview-panel">
+            <div class="section-heading preview-heading"><h2 id="preview-title">日期预览</h2></div>
+            <div id="calendar-preview"></div>
+            <div class="preview-footer"><span data-icon="bell" aria-hidden="true"></span><p>日期全天显示，提醒时间由你安排。</p></div>
+          </section>
+          <p id="preview-error" class="notice error" role="alert" hidden></p>
+        </aside>
+      </div>
+  <footer><a href="https://www.huidengvan.org/">慧灯小组</a><span>历法：<a href="https://zangli.pro/" target="_blank" rel="noopener noreferrer">藏历 PRO</a><span class="footer-dot">·</span>节日：<a href="https://www.fohuifayu.com/index.php/calendar" target="_blank" rel="noopener noreferrer">佛慧法语</a></span></footer>
+      <div class="action-bar"><div class="action-inner"><div class="action-summary"><div class="selection-totals"><strong id="selection-count">已选 0 项</strong><span id="reminder-count">0 项提醒</span></div><p id="save-state">随时调整你的选择</p></div><div class="action-buttons"><button id="clear-selection" class="text-button" type="button" aria-label="清空全部选择">清空选择</button><button id="subscribe" type="button" class="primary"><span id="subscribe-label">订阅到日历</span><span data-icon="arrow-right" aria-hidden="true"></span></button></div></div></div>
+    </div>
+  </main>
+
+  <dialog id="reminder-dialog" aria-labelledby="reminder-title">
+    <form id="reminder-form">
+      <div class="dialog-head"><div><p class="overline">提醒设置</p><h2 id="reminder-title">已选日程</h2></div><button type="button" class="icon-button" data-close="reminder-dialog" aria-label="关闭提醒设置"><span data-icon="close" aria-hidden="true"></span></button></div>
+      <p id="reminder-scope-note" class="field-note"></p>
+      <fieldset class="mode-choice"><legend class="sr-only">提醒方式</legend><label><input type="radio" name="reminder-mode" value="display"><span data-icon="calendar" aria-hidden="true"></span>仅显示</label><label><input type="radio" name="reminder-mode" value="remind"><span data-icon="bell" aria-hidden="true"></span>开启提醒</label></fieldset>
+      <div id="reminder-fields"></div>
+      <p class="field-note">日程全天显示，提醒使用页面上方选择的地区时间。夏令时跳过的时间顺延，重复的时间只提醒一次。</p>
+      <p id="reminder-error" class="notice error" role="alert" hidden></p>
+      <div class="dialog-actions"><button type="button" class="secondary" data-close="reminder-dialog">取消</button><button class="primary" type="submit">应用设置</button></div>
+    </form>
+  </dialog>
+  <dialog id="zone-dialog" aria-labelledby="zone-title">
+    <form id="zone-form">
+      <div class="dialog-head"><div><p class="overline">地区与时间</p><h2 id="zone-title">选择提醒时区</h2></div><button type="button" class="icon-button" data-close="zone-dialog" aria-label="关闭时区选择"><span data-icon="close" aria-hidden="true"></span></button></div>
+      <p class="field-note">只调整提醒使用的地区，不改变各项提醒时间或全天日期。顶部的今天始终跟随设备。</p>
+      <div class="search-box"><span data-icon="search" aria-hidden="true"></span><input id="zone-search" type="search" placeholder="搜索国家、城市或时区" aria-label="搜索国家、城市或时区" autocomplete="off"></div>
+      <p id="zone-result-status" class="field-note" role="status"></p>
+      <div id="zone-options" class="zone-options"></div>
+      <p id="zone-error" class="notice error" role="alert" hidden></p>
+      <div class="dialog-actions"><button type="button" class="secondary" data-close="zone-dialog">取消</button><button id="apply-zone" class="primary" type="submit">应用时区</button></div>
+    </form>
+  </dialog>
+  <dialog id="subscription-dialog" aria-labelledby="subscription-title">
+    <div class="dialog-head"><div><p class="overline">我的订阅</p><h2 id="subscription-title">订阅到日历</h2></div><button class="icon-button" type="button" data-close="subscription-dialog" aria-label="关闭订阅"><span data-icon="close" aria-hidden="true"></span></button></div>
+    <p id="subscription-summary" class="field-note"></p>
+    <fieldset class="device-options"><legend>1 · 选择你实际使用的日历应用</legend><label><input type="radio" name="device" value="iphone"><span data-icon="phone" aria-hidden="true"></span><span>Apple 日历<small>iPhone、iPad、Mac</small></span></label><label><input type="radio" name="device" value="google"><span data-icon="calendar" aria-hidden="true"></span><span>Google 日历<small>通过电脑添加订阅</small></span></label><label><input type="radio" name="device" value="other"><span data-icon="phone" aria-hidden="true"></span><span>其他手机日历<small>华为、OPPO、小米等</small></span></label></fieldset>
+    <section class="subscription-entry" aria-labelledby="entry-title">
+    <h3 id="entry-title"><span class="guide-stage-number">2</span>添加到日历</h3>
+    <p id="subscription-error" class="notice error" role="alert" hidden></p>
+    <button id="reload-subscription" type="button" class="secondary" hidden>重新载入已保存设置</button>
+    <div id="subscription-new"><button id="create-subscription" class="primary full" type="button"><span id="create-subscription-label">请先选择日历应用</span><span data-icon="arrow-right" aria-hidden="true"></span></button></div>
+    <div id="subscription-existing" hidden>
+      <div class="feed-actions entry-actions"><a id="iphone-subscribe" class="primary" hidden><span data-icon="calendar-plus" aria-hidden="true"></span>打开 Apple 日历订阅</a><a id="google-subscribe" class="primary" target="_blank" rel="noopener noreferrer" hidden><span data-icon="calendar-plus" aria-hidden="true"></span>打开 Google 日历添加页面</a><button id="copy-feed" class="secondary" type="button"><span data-icon="copy" aria-hidden="true"></span>复制订阅地址</button></div>
+      <label class="url-label">订阅地址<input id="feed-url" readonly aria-label="订阅地址" spellcheck="false"></label>
+      <button id="save-subscription" type="button" class="primary full" hidden>保存修改</button>
+      <p id="subscription-status" class="status-note" role="status"></p>
+    </div>
+    <p id="entry-hint" class="field-note" role="status"></p>
+    <p id="entry-attempt" class="status-note" role="status" hidden></p>
+    </section>
+    <div id="device-guide" class="device-guide"></div>
+    <div id="subscription-management" hidden>
+      <details class="management"><summary>管理这份订阅 · 无需登录</summary><p>同一浏览器、同一网站会自动记住你的订阅。后台匿名保存选择，换设备可通过管理链接恢复。</p><p>管理链接可以修改或停用订阅，请只自己保存。若管理链接丢失且浏览器数据已清除，将无法找回原订阅；需在日历应用移除后重新建立。</p><button id="copy-management" type="button" class="secondary"><span data-icon="copy" aria-hidden="true"></span>复制管理链接</button><button id="stop-subscription" type="button" class="text-button danger">停用订阅</button><div id="stop-confirmation" class="notice" hidden><p>停用后将撤销这份订阅中的日程。手机上的订阅日历需要手动移除。</p><div class="feed-actions"><button id="confirm-stop" type="button" class="secondary danger">确认停用</button><button id="cancel-stop" type="button" class="text-button">保留订阅</button></div></div></details>
+    </div>
+    <details class="download-fallback"><summary>使用文件导入 · 不持续更新</summary><p>这是一次性导入，文件不会持续更新。再次导入前，请先删除旧的专用日历，避免重复。仅显示日程请关闭日历的默认通知。</p><div id="downloads" class="downloads"></div><p id="download-status" class="status-note" role="status"></p></details>
+    <div id="notification-guide"></div>
+    <div class="dialog-actions"><button type="button" class="secondary" data-close="subscription-dialog">返回日历</button></div>
+  </dialog>
+  <div id="toast" class="toast" role="status" hidden></div>
+</body>
+</html>

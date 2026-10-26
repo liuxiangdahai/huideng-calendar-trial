@@ -1,0 +1,1598 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Huideng Vancouver//Practice Calendar 1.0//ZH
+CALSCALE:GREGORIAN
+X-WR-CALNAME:慧灯·佛菩萨殊胜日（仅展示）
+X-WR-TIMEZONE:Asia/Shanghai
+BEGIN:VEVENT
+UID:amitabha-2025-十一-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260103
+DTEND;VALUE=DATE:20260104
+SUMMARY:阿弥陀佛加持日
+DESCRIPTION:藏历十一月十五\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：阿弥陀佛加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:avalokiteshvara-2025-十一-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260106
+DTEND;VALUE=DATE:20260107
+SUMMARY:观音菩萨加持日
+DESCRIPTION:藏历十一月十八\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：观音菩萨加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:kshitigarbha-2025-十一-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260109
+DTEND;VALUE=DATE:20260110
+SUMMARY:地藏菩萨加持日
+DESCRIPTION:藏历十一月廿一\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：地藏菩萨加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:shakyamuni-2025-十一-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260118
+DTEND;VALUE=DATE:20260119
+SUMMARY:释迦牟尼佛加持日
+DESCRIPTION:藏历十一月三十\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：释迦牟尼佛加持日
+ \nhttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-\n仅
+ 加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:meditation-buddha-2025-十二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260119
+DTEND;VALUE=DATE:20260120
+SUMMARY:禅定胜王佛加持日
+DESCRIPTION:藏历十二月初一\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：禅定胜王佛加持日
+ \nhttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-\n仅
+ 加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:medicine-buddha-2025-十二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260126
+DTEND;VALUE=DATE:20260127
+SUMMARY:药师佛加持日
+DESCRIPTION:藏历十二月初八\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：药师佛加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:amitabha-2025-十二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260201
+DTEND;VALUE=DATE:20260202
+SUMMARY:阿弥陀佛加持日
+DESCRIPTION:藏历十二月十五\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：阿弥陀佛加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:avalokiteshvara-2025-十二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260204
+DTEND;VALUE=DATE:20260205
+SUMMARY:观音菩萨加持日
+DESCRIPTION:藏历十二月十八\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：观音菩萨加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:kshitigarbha-2025-十二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260207
+DTEND;VALUE=DATE:20260208
+SUMMARY:地藏菩萨加持日
+DESCRIPTION:藏历十二月廿一\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：地藏菩萨加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:shakyamuni-2025-十二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260217
+DTEND;VALUE=DATE:20260218
+SUMMARY:释迦牟尼佛加持日
+DESCRIPTION:藏历十二月三十\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：释迦牟尼佛加持日
+ \nhttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-\n仅
+ 加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:meditation-buddha-2026-一-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260218
+DTEND;VALUE=DATE:20260219
+SUMMARY:禅定胜王佛加持日
+DESCRIPTION:藏历一月初一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：禅定胜王佛加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:medicine-buddha-2026-一-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260224
+DTEND;VALUE=DATE:20260225
+SUMMARY:药师佛加持日
+DESCRIPTION:藏历一月初八\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：药师佛加持日\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:amitabha-2026-一-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260303
+DTEND;VALUE=DATE:20260304
+SUMMARY:阿弥陀佛加持日
+DESCRIPTION:藏历一月十五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：阿弥陀佛加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:avalokiteshvara-2026-一-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260306
+DTEND;VALUE=DATE:20260307
+SUMMARY:观音菩萨加持日
+DESCRIPTION:藏历一月十八\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：观音菩萨加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:kshitigarbha-2026-一-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260309
+DTEND;VALUE=DATE:20260310
+SUMMARY:地藏菩萨加持日
+DESCRIPTION:藏历一月廿一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：地藏菩萨加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:shakyamuni-2026-一-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260318
+DTEND;VALUE=DATE:20260319
+SUMMARY:释迦牟尼佛加持日
+DESCRIPTION:藏历一月三十\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：释迦牟尼佛加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:meditation-buddha-2026-二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260319
+DTEND;VALUE=DATE:20260320
+SUMMARY:禅定胜王佛加持日
+DESCRIPTION:藏历二月初一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：禅定胜王佛加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:medicine-buddha-2026-二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260326
+DTEND;VALUE=DATE:20260327
+SUMMARY:药师佛加持日
+DESCRIPTION:藏历二月初八\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：药师佛加持日\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:amitabha-2026-二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260401
+DTEND;VALUE=DATE:20260402
+SUMMARY:阿弥陀佛加持日
+DESCRIPTION:藏历二月十五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：阿弥陀佛加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/4/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/4/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:avalokiteshvara-2026-二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260405
+DTEND;VALUE=DATE:20260406
+SUMMARY:观音菩萨加持日
+DESCRIPTION:藏历二月十八\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：观音菩萨加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/4/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/4/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:kshitigarbha-2026-二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260408
+DTEND;VALUE=DATE:20260409
+SUMMARY:地藏菩萨加持日
+DESCRIPTION:藏历二月廿一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：地藏菩萨加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/4/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/4/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:shakyamuni-2026-二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260417
+DTEND;VALUE=DATE:20260418
+SUMMARY:释迦牟尼佛加持日
+DESCRIPTION:藏历二月三十\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：释迦牟尼佛加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/4/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/4/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:meditation-buddha-2026-三-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260418
+DTEND;VALUE=DATE:20260419
+SUMMARY:禅定胜王佛加持日
+DESCRIPTION:藏历三月初一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：禅定胜王佛加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/4/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/4/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:medicine-buddha-2026-三-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260424
+DTEND;VALUE=DATE:20260425
+SUMMARY:药师佛加持日
+DESCRIPTION:藏历三月初八\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：药师佛加持日\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/4/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/4/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:amitabha-2026-三-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260501
+DTEND;VALUE=DATE:20260502
+SUMMARY:阿弥陀佛加持日
+DESCRIPTION:藏历三月十五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：阿弥陀佛加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:kalachakra-teaching-2026-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260501
+DTEND;VALUE=DATE:20260502
+SUMMARY:佛陀传时轮金刚日
+DESCRIPTION:藏历三月十五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：佛陀传时轮金刚日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:avalokiteshvara-2026-三-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260504
+DTEND;VALUE=DATE:20260505
+SUMMARY:观音菩萨加持日
+DESCRIPTION:藏历三月十八\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：观音菩萨加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:kshitigarbha-2026-三-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260507
+DTEND;VALUE=DATE:20260508
+SUMMARY:地藏菩萨加持日
+DESCRIPTION:藏历三月廿一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：地藏菩萨加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:shakyamuni-2026-三-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260516
+DTEND;VALUE=DATE:20260517
+SUMMARY:释迦牟尼佛加持日
+DESCRIPTION:藏历三月三十\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：释迦牟尼佛加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:meditation-buddha-2026-四-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260517
+DTEND;VALUE=DATE:20260518
+SUMMARY:禅定胜王佛加持日
+DESCRIPTION:藏历四月初一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：禅定胜王佛加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:buddha-birth-2026-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260523
+DTEND;VALUE=DATE:20260524
+SUMMARY:释迦牟尼佛诞辰日
+DESCRIPTION:藏历四月初七\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：释迦牟尼佛诞辰日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:medicine-buddha-2026-四-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260524
+DTEND;VALUE=DATE:20260525
+SUMMARY:药师佛加持日
+DESCRIPTION:藏历四月初八\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：药师佛加持日\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:amitabha-2026-四-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260531
+DTEND;VALUE=DATE:20260601
+SUMMARY:阿弥陀佛加持日
+DESCRIPTION:藏历四月十五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：阿弥陀佛加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:saga-dawa-2026-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260531
+DTEND;VALUE=DATE:20260601
+SUMMARY:释迦牟尼佛降魔、成道、涅槃的纪念日
+DESCRIPTION:藏历四月十五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：释迦牟尼佛降魔、成
+ 道、涅槃的纪念日\nhttps://www.fohuifayu.com/index.php/calendar/mon
+ thcalendar/2026/5/-\n仅加入日历；请关闭此日历的默认通知
+ 。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:avalokiteshvara-2026-四-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260603
+DTEND;VALUE=DATE:20260604
+SUMMARY:观音菩萨加持日
+DESCRIPTION:藏历四月十八\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：观音菩萨加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/6/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/6/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:kshitigarbha-2026-四-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260606
+DTEND;VALUE=DATE:20260607
+SUMMARY:地藏菩萨加持日
+DESCRIPTION:藏历四月廿一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：地藏菩萨加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/6/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/6/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:shakyamuni-2026-四-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260615
+DTEND;VALUE=DATE:20260616
+SUMMARY:释迦牟尼佛加持日
+DESCRIPTION:藏历四月三十\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：释迦牟尼佛加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/6/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/6/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:meditation-buddha-2026-五-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260616
+DTEND;VALUE=DATE:20260617
+SUMMARY:禅定胜王佛加持日
+DESCRIPTION:藏历五月初一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：禅定胜王佛加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/6/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/6/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:medicine-buddha-2026-五-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260622
+DTEND;VALUE=DATE:20260623
+SUMMARY:药师佛加持日
+DESCRIPTION:藏历五月初八\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：药师佛加持日\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/6/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/6/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:amitabha-2026-五-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260629
+DTEND;VALUE=DATE:20260630
+SUMMARY:阿弥陀佛加持日
+DESCRIPTION:藏历五月十五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：阿弥陀佛加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/6/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/6/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:avalokiteshvara-2026-五-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260703
+DTEND;VALUE=DATE:20260704
+SUMMARY:观音菩萨加持日
+DESCRIPTION:藏历五月十八\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：观音菩萨加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:kshitigarbha-2026-五-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260706
+DTEND;VALUE=DATE:20260707
+SUMMARY:地藏菩萨加持日
+DESCRIPTION:藏历五月廿一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：地藏菩萨加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:shakyamuni-2026-五-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260714
+DTEND;VALUE=DATE:20260715
+SUMMARY:释迦牟尼佛加持日
+DESCRIPTION:藏历五月三十\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：释迦牟尼佛加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:meditation-buddha-2026-六-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260715
+DTEND;VALUE=DATE:20260716
+SUMMARY:禅定胜王佛加持日
+DESCRIPTION:藏历六月初一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：禅定胜王佛加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:turning-wheel-2026-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260718
+DTEND;VALUE=DATE:20260719
+SUMMARY:佛初转法轮日
+DESCRIPTION:藏历六月初四\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：佛初转法轮日\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:medicine-buddha-2026-六-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260722
+DTEND;VALUE=DATE:20260723
+SUMMARY:药师佛加持日
+DESCRIPTION:藏历六月初八\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：药师佛加持日\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:amitabha-2026-六-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260729
+DTEND;VALUE=DATE:20260730
+SUMMARY:阿弥陀佛加持日
+DESCRIPTION:藏历六月十五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：阿弥陀佛加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:buddha-conception-2026-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260729
+DTEND;VALUE=DATE:20260730
+SUMMARY:释迦牟尼佛入胎日
+DESCRIPTION:藏历六月十五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：释迦牟尼佛入胎日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:avalokiteshvara-2026-六-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260801
+DTEND;VALUE=DATE:20260802
+SUMMARY:观音菩萨加持日
+DESCRIPTION:藏历六月十八\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：观音菩萨加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:kshitigarbha-2026-六-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260804
+DTEND;VALUE=DATE:20260805
+SUMMARY:地藏菩萨加持日
+DESCRIPTION:藏历六月廿一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：地藏菩萨加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:shakyamuni-2026-六-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260812
+DTEND;VALUE=DATE:20260813
+SUMMARY:释迦牟尼佛加持日
+DESCRIPTION:藏历六月三十\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：释迦牟尼佛加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:meditation-buddha-2026-七-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260813
+DTEND;VALUE=DATE:20260814
+SUMMARY:禅定胜王佛加持日
+DESCRIPTION:藏历七月初一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：禅定胜王佛加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:medicine-buddha-2026-七-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260820
+DTEND;VALUE=DATE:20260821
+SUMMARY:药师佛加持日
+DESCRIPTION:藏历七月初八\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：药师佛加持日\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:amitabha-2026-七-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260828
+DTEND;VALUE=DATE:20260829
+SUMMARY:阿弥陀佛加持日
+DESCRIPTION:藏历七月十五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：阿弥陀佛加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:avalokiteshvara-2026-七-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260831
+DTEND;VALUE=DATE:20260901
+SUMMARY:观音菩萨加持日
+DESCRIPTION:藏历七月十八\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：观音菩萨加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:kshitigarbha-2026-七-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260902
+DTEND;VALUE=DATE:20260903
+SUMMARY:地藏菩萨加持日
+DESCRIPTION:藏历七月廿一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：地藏菩萨加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/9/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/9/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:shakyamuni-2026-七-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260911
+DTEND;VALUE=DATE:20260912
+SUMMARY:释迦牟尼佛加持日
+DESCRIPTION:藏历七月三十\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：释迦牟尼佛加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/9/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/9/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:meditation-buddha-2026-八-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260912
+DTEND;VALUE=DATE:20260913
+SUMMARY:禅定胜王佛加持日
+DESCRIPTION:藏历八月初一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：禅定胜王佛加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/9/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/9/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:medicine-buddha-2026-八-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260919
+DTEND;VALUE=DATE:20260920
+SUMMARY:药师佛加持日
+DESCRIPTION:藏历八月初八\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：药师佛加持日\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/9/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/9/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:amitabha-2026-八-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260926
+DTEND;VALUE=DATE:20260927
+SUMMARY:阿弥陀佛加持日
+DESCRIPTION:藏历八月十五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：阿弥陀佛加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/9/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/9/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:avalokiteshvara-2026-八-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20260929
+DTEND;VALUE=DATE:20260930
+SUMMARY:观音菩萨加持日
+DESCRIPTION:藏历八月十八\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：观音菩萨加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/9/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/9/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:kshitigarbha-2026-八-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261002
+DTEND;VALUE=DATE:20261003
+SUMMARY:地藏菩萨加持日
+DESCRIPTION:藏历八月廿一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：地藏菩萨加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:shakyamuni-2026-八-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261010
+DTEND;VALUE=DATE:20261011
+SUMMARY:释迦牟尼佛加持日
+DESCRIPTION:藏历八月三十\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：释迦牟尼佛加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-\n仅
+ 加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:meditation-buddha-2026-九-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261011
+DTEND;VALUE=DATE:20261012
+SUMMARY:禅定胜王佛加持日
+DESCRIPTION:藏历九月初一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：禅定胜王佛加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-\n仅
+ 加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:medicine-buddha-2026-九-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261018
+DTEND;VALUE=DATE:20261019
+SUMMARY:药师佛加持日
+DESCRIPTION:藏历九月初八\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：药师佛加持日\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:amitabha-2026-九-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261026
+DTEND;VALUE=DATE:20261027
+SUMMARY:阿弥陀佛加持日
+DESCRIPTION:藏历九月十五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：阿弥陀佛加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:avalokiteshvara-2026-九-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261028
+DTEND;VALUE=DATE:20261029
+SUMMARY:观音菩萨加持日
+DESCRIPTION:藏历九月十八\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：观音菩萨加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:kshitigarbha-2026-九-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261031
+DTEND;VALUE=DATE:20261101
+SUMMARY:地藏菩萨加持日
+DESCRIPTION:藏历九月廿一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：地藏菩萨加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:lhabab-2026-annual-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261101
+DTEND;VALUE=DATE:20261102
+SUMMARY:天降日
+DESCRIPTION:藏历九月廿二\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：天降日\nhttps://www.fohu
+ ifayu.com/index.php/calendar/monthcalendar/2026/11/-\n仅加入日历；
+ 请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:shakyamuni-2026-九-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261109
+DTEND;VALUE=DATE:20261110
+SUMMARY:释迦牟尼佛加持日
+DESCRIPTION:藏历九月三十\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：释迦牟尼佛加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-\n仅
+ 加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:meditation-buddha-2026-十-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261110
+DTEND;VALUE=DATE:20261111
+SUMMARY:禅定胜王佛加持日
+DESCRIPTION:藏历十月初一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：禅定胜王佛加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-\n仅
+ 加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:medicine-buddha-2026-十-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261117
+DTEND;VALUE=DATE:20261118
+SUMMARY:药师佛加持日
+DESCRIPTION:藏历十月初八\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：药师佛加持日\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:amitabha-2026-十-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261124
+DTEND;VALUE=DATE:20261125
+SUMMARY:阿弥陀佛加持日
+DESCRIPTION:藏历十月十五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：阿弥陀佛加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:avalokiteshvara-2026-十-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261127
+DTEND;VALUE=DATE:20261128
+SUMMARY:观音菩萨加持日
+DESCRIPTION:藏历十月十八\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：观音菩萨加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:kshitigarbha-2026-十-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261129
+DTEND;VALUE=DATE:20261130
+SUMMARY:地藏菩萨加持日
+DESCRIPTION:藏历十月二十\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：地藏菩萨加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:shakyamuni-2026-十-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261208
+DTEND;VALUE=DATE:20261209
+SUMMARY:释迦牟尼佛加持日
+DESCRIPTION:藏历十月三十\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：释迦牟尼佛加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-\n仅
+ 加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:meditation-buddha-2026-十一-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261209
+DTEND;VALUE=DATE:20261210
+SUMMARY:禅定胜王佛加持日
+DESCRIPTION:藏历十一月初一\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：禅定胜王佛加持日
+ \nhttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-\n
+ 仅加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:medicine-buddha-2026-十一-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261217
+DTEND;VALUE=DATE:20261218
+SUMMARY:药师佛加持日
+DESCRIPTION:藏历十一月初八\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：药师佛加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:amitabha-2026-十一-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261223
+DTEND;VALUE=DATE:20261224
+SUMMARY:阿弥陀佛加持日
+DESCRIPTION:藏历十一月十四\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：阿弥陀佛加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-\n仅
+ 加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:avalokiteshvara-2026-十一-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261226
+DTEND;VALUE=DATE:20261227
+SUMMARY:观音菩萨加持日
+DESCRIPTION:藏历十一月十八\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：观音菩萨加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-\n仅
+ 加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:kshitigarbha-2026-十一-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20261229
+DTEND;VALUE=DATE:20261230
+SUMMARY:地藏菩萨加持日
+DESCRIPTION:藏历十一月廿一\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：地藏菩萨加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-\n仅
+ 加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:shakyamuni-2026-十一-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270107
+DTEND;VALUE=DATE:20270108
+SUMMARY:释迦牟尼佛加持日
+DESCRIPTION:藏历十一月三十\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：释迦牟尼佛加持日
+ \nhttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-\n仅
+ 加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:meditation-buddha-2026-十二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270108
+DTEND;VALUE=DATE:20270109
+SUMMARY:禅定胜王佛加持日
+DESCRIPTION:藏历十二月初一\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：禅定胜王佛加持日
+ \nhttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-\n仅
+ 加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:medicine-buddha-2026-十二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270115
+DTEND;VALUE=DATE:20270116
+SUMMARY:药师佛加持日
+DESCRIPTION:藏历十二月初八\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：药师佛加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:amitabha-2026-十二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270122
+DTEND;VALUE=DATE:20270123
+SUMMARY:阿弥陀佛加持日
+DESCRIPTION:藏历十二月十五\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：阿弥陀佛加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:avalokiteshvara-2026-十二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270125
+DTEND;VALUE=DATE:20270126
+SUMMARY:观音菩萨加持日
+DESCRIPTION:藏历十二月十八\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：观音菩萨加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:kshitigarbha-2026-十二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270127
+DTEND;VALUE=DATE:20270128
+SUMMARY:地藏菩萨加持日
+DESCRIPTION:藏历十二月二十\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：地藏菩萨加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:shakyamuni-2026-十二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270206
+DTEND;VALUE=DATE:20270207
+SUMMARY:释迦牟尼佛加持日
+DESCRIPTION:藏历十二月三十\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：释迦牟尼佛加持日
+ \nhttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-\n仅
+ 加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:meditation-buddha-2027-一-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270207
+DTEND;VALUE=DATE:20270208
+SUMMARY:禅定胜王佛加持日
+DESCRIPTION:藏历一月初一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：禅定胜王佛加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:medicine-buddha-2027-一-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270214
+DTEND;VALUE=DATE:20270215
+SUMMARY:药师佛加持日
+DESCRIPTION:藏历一月初八\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：药师佛加持日\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:amitabha-2027-一-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270220
+DTEND;VALUE=DATE:20270221
+SUMMARY:阿弥陀佛加持日
+DESCRIPTION:藏历一月十五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：阿弥陀佛加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:avalokiteshvara-2027-一-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270223
+DTEND;VALUE=DATE:20270224
+SUMMARY:观音菩萨加持日
+DESCRIPTION:藏历一月十八\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：观音菩萨加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:kshitigarbha-2027-一-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270226
+DTEND;VALUE=DATE:20270227
+SUMMARY:地藏菩萨加持日
+DESCRIPTION:藏历一月廿一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：地藏菩萨加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:shakyamuni-2027-一-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270308
+DTEND;VALUE=DATE:20270309
+SUMMARY:释迦牟尼佛加持日
+DESCRIPTION:藏历一月三十\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：释迦牟尼佛加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:meditation-buddha-2027-二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270309
+DTEND;VALUE=DATE:20270310
+SUMMARY:禅定胜王佛加持日
+DESCRIPTION:藏历二月初一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：禅定胜王佛加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:medicine-buddha-2027-二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270315
+DTEND;VALUE=DATE:20270316
+SUMMARY:药师佛加持日
+DESCRIPTION:藏历二月初七\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：药师佛加持日\nhttps:/
+ /www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-\n仅加入日
+ 历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:amitabha-2027-二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270322
+DTEND;VALUE=DATE:20270323
+SUMMARY:阿弥陀佛加持日
+DESCRIPTION:藏历二月十五\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：阿弥陀佛加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:avalokiteshvara-2027-二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270325
+DTEND;VALUE=DATE:20270326
+SUMMARY:观音菩萨加持日
+DESCRIPTION:藏历二月十八\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：观音菩萨加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:kshitigarbha-2027-二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270328
+DTEND;VALUE=DATE:20270329
+SUMMARY:地藏菩萨加持日
+DESCRIPTION:藏历二月廿一\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：地藏菩萨加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:shakyamuni-2027-二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270406
+DTEND;VALUE=DATE:20270407
+SUMMARY:释迦牟尼佛加持日
+DESCRIPTION:藏历二月三十\n日期换算：藏历 PRO；节日名称与
+ 安排：佛慧法语藏历。\n原站标注：释迦牟尼佛加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:meditation-buddha-2027-闰二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270407
+DTEND;VALUE=DATE:20270408
+SUMMARY:禅定胜王佛加持日
+DESCRIPTION:藏历闰二月初一\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：禅定胜王佛加持日
+ \nhttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-\n仅
+ 加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:medicine-buddha-2027-闰二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270414
+DTEND;VALUE=DATE:20270415
+SUMMARY:药师佛加持日
+DESCRIPTION:藏历闰二月初八\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：药师佛加持日\nhttp
+ s://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-\n仅加入
+ 日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:amitabha-2027-闰二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270420
+DTEND;VALUE=DATE:20270421
+SUMMARY:阿弥陀佛加持日
+DESCRIPTION:藏历闰二月十五\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：阿弥陀佛加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:avalokiteshvara-2027-闰二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270423
+DTEND;VALUE=DATE:20270424
+SUMMARY:观音菩萨加持日
+DESCRIPTION:藏历闰二月十八\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：观音菩萨加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:kshitigarbha-2027-闰二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270426
+DTEND;VALUE=DATE:20270427
+SUMMARY:地藏菩萨加持日
+DESCRIPTION:藏历闰二月廿一\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：地藏菩萨加持日\nh
+ ttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-\n仅加
+ 入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:shakyamuni-2027-闰二-1@calendar.huidengvan.org
+DTSTAMP:20261020T000000Z
+DTSTART;VALUE=DATE:20270506
+DTEND;VALUE=DATE:20270507
+SUMMARY:释迦牟尼佛加持日
+DESCRIPTION:藏历闰二月三十\n日期换算：藏历 PRO；节日名称
+ 与安排：佛慧法语藏历。\n原站标注：释迦牟尼佛加持日
+ \nhttps://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/5/-\n仅
+ 加入日历；请关闭此日历的默认通知。
+URL:https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/5/-
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+END:VCALENDAR

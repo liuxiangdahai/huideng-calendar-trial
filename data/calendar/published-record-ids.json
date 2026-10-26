@@ -1,0 +1,204 @@
+{
+  "schemaVersion": 1,
+  "note": "Published-only occurrences keep these IDs permanently. When the source corrects a date or title, edit that record without changing recordId. Allocate a new unused ID only for a genuinely new occurrence.",
+  "records": [
+    {
+      "recordId": "fohui-00001",
+      "eventId": "parinirvana-assembly-start",
+      "date": "2026-01-01",
+      "sourceLabel": "圣者法王如意宝涅槃法会开始"
+    },
+    {
+      "recordId": "fohui-00002",
+      "eventId": "parinirvana-assembly-end",
+      "date": "2026-01-07",
+      "sourceLabel": "圣者法王如意宝涅槃法会结束"
+    },
+    {
+      "recordId": "fohui-00003",
+      "eventId": "annular-eclipse",
+      "date": "2026-02-17",
+      "sourceLabel": "日环食（北京时间17:56开始-22:27结束）"
+    },
+    {
+      "recordId": "fohui-00004",
+      "eventId": "vidyadhara-assembly-start",
+      "date": "2026-02-18",
+      "sourceLabel": "持明法会开始"
+    },
+    {
+      "recordId": "fohui-00005",
+      "eventId": "total-lunar-eclipse",
+      "date": "2026-03-03",
+      "sourceLabel": "月全食（北京时间17:50开始-21:15结束）"
+    },
+    {
+      "recordId": "fohui-00006",
+      "eventId": "vidyadhara-assembly-end",
+      "date": "2026-03-04",
+      "sourceLabel": "持明法会结束"
+    },
+    {
+      "recordId": "fohui-00007",
+      "eventId": "spring-equinox",
+      "date": "2026-03-20",
+      "sourceLabel": "春分"
+    },
+    {
+      "recordId": "fohui-00008",
+      "eventId": "longevity-assembly-start",
+      "date": "2026-03-25",
+      "sourceLabel": "长寿法会开始"
+    },
+    {
+      "recordId": "fohui-00009",
+      "eventId": "longevity-assembly-end",
+      "date": "2026-03-28",
+      "sourceLabel": "长寿法会结束"
+    },
+    {
+      "recordId": "fohui-00010",
+      "eventId": "world-reading-day",
+      "date": "2026-04-23",
+      "sourceLabel": "世界阅读日"
+    },
+    {
+      "recordId": "fohui-00011",
+      "eventId": "vajrasattva-assembly-start",
+      "date": "2026-05-24",
+      "sourceLabel": "金刚萨埵法会开始"
+    },
+    {
+      "recordId": "fohui-00012",
+      "eventId": "vajrasattva-assembly-end",
+      "date": "2026-05-31",
+      "sourceLabel": "金刚萨埵法会结束"
+    },
+    {
+      "recordId": "fohui-00013",
+      "eventId": "summer-solstice",
+      "date": "2026-06-21",
+      "sourceLabel": "夏至"
+    },
+    {
+      "recordId": "fohui-00014",
+      "eventId": "kshitigarbha-assembly-start",
+      "date": "2026-07-15",
+      "sourceLabel": "地藏法会开始"
+    },
+    {
+      "recordId": "fohui-00015",
+      "eventId": "kshitigarbha-assembly-end",
+      "date": "2026-07-22",
+      "sourceLabel": "地藏法会结束"
+    },
+    {
+      "recordId": "fohui-00016",
+      "eventId": "larung-protectors",
+      "date": "2026-08-08",
+      "sourceLabel": "喇荣供护法节"
+    },
+    {
+      "recordId": "fohui-00017",
+      "eventId": "larung-sang",
+      "date": "2026-08-09",
+      "sourceLabel": "喇荣煨桑节"
+    },
+    {
+      "recordId": "fohui-00018",
+      "eventId": "total-solar-eclipse",
+      "date": "2026-08-12",
+      "sourceLabel": "日全食（北京时间23:34开始-次日凌晨03:57结束）"
+    },
+    {
+      "recordId": "fohui-00019",
+      "eventId": "partial-lunar-eclipse",
+      "date": "2026-08-28",
+      "sourceLabel": "月偏食（北京时间10：35开始-13：51结束）"
+    },
+    {
+      "recordId": "fohui-00020",
+      "eventId": "autumn-equinox",
+      "date": "2026-09-23",
+      "sourceLabel": "秋分"
+    },
+    {
+      "recordId": "fohui-00021",
+      "eventId": "sukhavati-assembly-start",
+      "date": "2026-10-28",
+      "sourceLabel": "极乐法会开始"
+    },
+    {
+      "recordId": "fohui-00022",
+      "eventId": "sukhavati-assembly-end",
+      "date": "2026-11-04",
+      "sourceLabel": "极乐法会结束"
+    },
+    {
+      "recordId": "fohui-00023",
+      "eventId": "world-vegetarian-day",
+      "date": "2026-11-25",
+      "sourceLabel": "世界素食日"
+    },
+    {
+      "recordId": "fohui-00024",
+      "eventId": "parinirvana-assembly-start",
+      "date": "2026-12-22",
+      "sourceLabel": "圣者法王如意宝涅槃法会开始"
+    },
+    {
+      "recordId": "fohui-00025",
+      "eventId": "winter-solstice",
+      "date": "2026-12-22",
+      "sourceLabel": "冬至"
+    },
+    {
+      "recordId": "fohui-00026",
+      "eventId": "parinirvana-assembly-end",
+      "date": "2026-12-28",
+      "sourceLabel": "圣者法王如意宝涅槃法会结束"
+    },
+    {
+      "recordId": "fohui-00027",
+      "eventId": "vidyadhara-assembly-start",
+      "date": "2027-02-07",
+      "sourceLabel": "持明法会开始"
+    },
+    {
+      "recordId": "fohui-00028",
+      "eventId": "annular-eclipse",
+      "date": "2027-02-07",
+      "sourceLabel": "日环食"
+    },
+    {
+      "recordId": "fohui-00029",
+      "eventId": "vidyadhara-assembly-end",
+      "date": "2027-02-21",
+      "sourceLabel": "持明法会结束"
+    },
+    {
+      "recordId": "fohui-00030",
+      "eventId": "partial-lunar-eclipse",
+      "date": "2027-02-21",
+      "sourceLabel": "月偏食"
+    },
+    {
+      "recordId": "fohui-00031",
+      "eventId": "longevity-assembly-start",
+      "date": "2027-03-15",
+      "sourceLabel": "长寿法会开始"
+    },
+    {
+      "recordId": "fohui-00032",
+      "eventId": "longevity-assembly-end",
+      "date": "2027-03-18",
+      "sourceLabel": "长寿法会结束"
+    },
+    {
+      "recordId": "fohui-00033",
+      "eventId": "spring-equinox",
+      "date": "2027-03-21",
+      "sourceLabel": "春分"
+    }
+  ]
+}
