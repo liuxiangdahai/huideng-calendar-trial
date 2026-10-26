@@ -60,3 +60,31 @@ jobs:
       - run: node tools/calendar/ci-remote.mjs trial health
       - run: npx wrangler pages deploy dist/trial/site --project-name huideng-calendar-trial --branch main
       - run: node tools/calendar/ci-remote.mjs trial verify
+  remote-acceptance:
+    needs: checks
+    if: github.ref == 'refs/heads/main' && vars.CALENDAR_REMOTE_CHECK_ENABLED == 'true' && vars.CALENDAR_DEPLOY_ENABLED != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Verify the explicitly deployed acceptance version
+        env:
+          API_URL: ${{ vars.CALENDAR_ACCEPTANCE_URL }}
+          EXPECTED: ${{ vars.CALENDAR_ACCEPTANCE_VERSION }}
+        run: node tools/calendar/verify-release.mjs "$API_URL" "" "$EXPECTED"
+      - name: Subscription lifecycle from GitHub hosted network
+        env:
+          API_URL: ${{ vars.CALENDAR_ACCEPTANCE_URL }}
+          SITE_ORIGIN: ${{ vars.CALENDAR_SITE_ORIGIN }}
+          CALENDAR_EXPECTED_VERSION: ${{ vars.CALENDAR_ACCEPTANCE_VERSION }}
+        run: node tools/calendar/smoke-remote.mjs "$API_URL" "$SITE_ORIGIN"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: isolated-remote-check
+          path: artifacts/remote-smoke.json
+          retention-days: 7

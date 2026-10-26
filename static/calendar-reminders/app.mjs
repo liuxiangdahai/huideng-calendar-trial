@@ -135,8 +135,7 @@ function renderReminderFields() {
   $('#reminder-fields').hidden = !enabled;
   $('#reminder-fields').innerHTML = reminderDraft.reminders.map((reminder,index) => `<div class="reminder-row"><label>第 ${index+1} 次提醒<select data-reminder-index="${index}" data-reminder-field="daysBefore" aria-label="第${index+1}次提醒日期" ${!enabled ? 'disabled' : ''}>${[[0,'当天'],[1,'提前一天'],[2,'提前两天'],[7,'提前一周']].map(([value,label]) => `<option value="${value}" ${reminder.daysBefore === value ? 'selected' : ''}>${label}</option>`).join('')}</select></label><label>具体时间<input type="time" required value="${esc(reminder.time)}" data-reminder-index="${index}" data-reminder-field="time" aria-label="第${index+1}次提醒时间" ${!enabled ? 'disabled' : ''}></label><button type="button" class="icon-button" data-remove-reminder="${index}" aria-label="删除第${index+1}次提醒" ${reminderDraft.reminders.length === 1 ? 'disabled' : ''}>${icon('close')}</button></div>`).join('') + (reminderDraft.reminders.length < 2 ? `<button type="button" class="text-button" id="add-reminder">${icon('plus')}再加一次提醒</button>` : '');
 }
-function openReminders(ids, title) {
-  const trigger=document.activeElement;
+function openReminders(ids, title, trigger=document.activeElement) {
   const key=['data-cal-focus','data-reminder-event','data-reminder-group'].find(name=>trigger?.hasAttribute(name));
   reminderReturnSelector=key ? `[${key}="${CSS.escape(trigger.getAttribute(key))}"]` : trigger?.id ? `#${CSS.escape(trigger.id)}` : null;
   reminderTarget = ids.filter(id => settings.events[id]?.mode !== 'off');
@@ -391,7 +390,7 @@ function attachEvents() {
     const groupId = button.dataset.selectGroup || button.dataset.clearGroup || button.dataset.reminderGroup;
     if (groupId) {
       const items = data.catalog.events.filter(item => item.group === groupId);
-      if (button.dataset.reminderGroup) { openReminders(items.map(item => item.id),data.catalog.groups.find(group => group.id === groupId).name); return; }
+      if (button.dataset.reminderGroup) { openReminders(items.map(item => item.id),data.catalog.groups.find(group => group.id === groupId).name,button); return; }
       for (const item of items) {
         const pref = settings.events[item.id];
         if (button.dataset.clearGroup) { if (pref.mode !== 'off') lastActive.set(item.id,clone(pref)); pref.mode = 'off'; }
@@ -400,10 +399,10 @@ function attachEvents() {
       stopped = false; refresh();
     } else if (button.dataset.reminderEvent) {
       const item = data.catalog.events.find(item => item.id === button.dataset.reminderEvent);
-      openReminders([item.id],item.title);
+      openReminders([item.id],item.title,button);
     }
   });
-  const allReminders = () => openReminders(data.catalog.events.map(event => event.id),'已选日程');
+  const allReminders = event => openReminders(data.catalog.events.map(event => event.id),'已选日程',event.currentTarget);
   $('#reminder-settings').addEventListener('click',allReminders);
   $('#reminder-dialog').addEventListener('change',event => {
     if (event.target.name === 'reminder-mode') { reminderDraft.mode = event.target.value; renderReminderFields(); }
@@ -525,7 +524,7 @@ async function init() {
   }});
   calendarView=createCalendarView($('#calendar-preview'),{initialView:ui.view==='list'?'list':'month',today,
     onViewChange:view=>{ui.view=view;persistUI();},
-    onEditEvent:id=>{const item=data.catalog.events.find(event=>event.id===id);if(item)openReminders([id],item.title);}});
+    onEditEvent:(id,trigger)=>{const item=data.catalog.events.find(event=>event.id===id);if(item)openReminders([id],item.title,trigger);}});
   guide=createSubscriptionGuide($('#device-guide'),{notificationRoot:$('#notification-guide'),initialState:ui.guide,
     onStateChange:state=>{ui.guide=state;persistUI();},onTestReminder:downloadReminderTest});
   const savedApp=['iphone','google','other'].includes(ui.app) ? ui.app : ui.guide?.app;

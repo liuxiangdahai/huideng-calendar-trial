@@ -258,7 +258,7 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     const button = event.target.closest('button');
     if (!button || !root.contains(button)) return;
     if (button.dataset.calView) return setView(button.dataset.calView);
-    if (button.dataset.calEvent) return onEditEvent(button.dataset.calEvent);
+    if (button.dataset.calEvent) return onEditEvent(button.dataset.calEvent, button);
     if (button.dataset.calDate) {
       selected = button.dataset.calDate; focusDate = selected; month = selected.slice(0, 7);
       renderMonth(); restoreFocus('date-' + focusDate);

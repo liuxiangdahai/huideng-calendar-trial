@@ -129,10 +129,17 @@ test('remembered Google choice overrides Apple recommendation and desktop opens 
   } finally { await context.close(); }
 });
 
-test('Android Google uses a computer handoff and other calendars expose explicit copy and import actions', async ({ browser }) => {
+test('Android Google uses a computer handoff and other calendars expose explicit copy and import actions', async ({ browser, browserName }) => {
   const context = await deviceContext(browser, devices.android);
   try {
-    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    if (browserName === 'chromium') await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    else await context.addInitScript(() => {
+      // Firefox/WebKit automation cannot grant Chromium clipboard permissions.
+      // Check the UI's exact copy payload with an explicit clipboard adapter;
+      // real OS clipboard behavior remains a device acceptance item.
+      let copied='';
+      Object.defineProperty(navigator,'clipboard',{value:{writeText:async text=>{copied=text;},readText:async()=>copied},configurable:true});
+    });
     const page = await context.newPage(); const service = await httpsService(page);
     await openSelected(page); await page.locator('#subscribe').click();
     expect(service.posts).toBe(0);

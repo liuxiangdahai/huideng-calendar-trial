@@ -22,9 +22,10 @@ test('Chinese guide keeps self-confirmation separate from subscription and per c
   await expect(page.locator('#guide-seen')).not.toBeChecked();
   await expect(page.locator('#guide-reminders')).not.toBeChecked();
   await page.locator('[data-guide-expand] > summary').click();
-  await expect(page.locator('.guide-notification-body')).toContainText('日程提醒');
+  const mac=await page.evaluate(()=>/Macintosh/i.test(navigator.userAgent));
+  await expect(page.locator('.guide-notification-body')).toContainText(mac?'忽略提醒':'日程提醒');
   await expect(page.locator('.guide-notification-body')).toContainText('允许通知');
-  await expect(page.locator('.guide-notification-body')).toContainText('请拿起手机');
+  await expect(page.locator('.guide-notification-body')).toContainText(mac?'在电脑上操作':'请拿起手机');
   await expect(page.locator('a[href^="https://support.apple.com/"]').first()).toHaveAttribute('href', /\/zh-cn\//);
   await page.locator('#guide-seen').check();
   await page.locator('#guide-reminders').check();
