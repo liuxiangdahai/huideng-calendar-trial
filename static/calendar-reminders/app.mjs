@@ -530,13 +530,30 @@ async function init() {
   const savedApp=['iphone','google','other'].includes(ui.app) ? ui.app : ui.guide?.app;
   if(['iphone','google','other'].includes(savedApp)) $(`input[name="device"][value="${savedApp}"]`).checked=true;
   attachEvents(); $('#app').hidden = false; renderGroups(); renderPresets();renderPreview(); persist();persistUI();checkDeviceTime();
+  // Reuse the browser's completed layout. Writing a root variable between two
+  // bounding-box reads forced the whole document to lay out twice on startup.
+  const actionBar=$('.action-bar'), previewColumn=$('.preview-column');
+  let barHeight=86, previewHeight=Infinity;
   const resizeLayout=()=>{
-    const bar=$('.action-bar').getBoundingClientRect().height;
-    document.documentElement.style.setProperty('--action-height',`${bar}px`);
-    $('.preview-column').classList.toggle('can-stick',$('.preview-column').getBoundingClientRect().height<innerHeight-bar-40);
+    const value=`${barHeight}px`;
+    if(document.documentElement.style.getPropertyValue('--action-height')!==value)
+      document.documentElement.style.setProperty('--action-height',value);
+    previewColumn.classList.toggle('can-stick',previewHeight<innerHeight-barHeight-40);
   };
-  if(window.ResizeObserver){const observer=new ResizeObserver(resizeLayout);observer.observe($('.action-bar'));observer.observe($('.preview-column'));}
-  window.addEventListener('resize',resizeLayout);resizeLayout();
+  if(window.ResizeObserver){
+    const observer=new ResizeObserver(entries=>{
+      for(const entry of entries){
+        const height=entry.borderBoxSize?.[0]?.blockSize ?? entry.target.getBoundingClientRect().height;
+        if(entry.target===actionBar)barHeight=height;else previewHeight=height;
+      }
+      resizeLayout();
+    });
+    observer.observe(actionBar);observer.observe(previewColumn);
+    window.addEventListener('resize',resizeLayout);
+  }else{
+    const measureLayout=()=>{barHeight=actionBar.getBoundingClientRect().height;previewHeight=previewColumn.getBoundingClientRect().height;resizeLayout();};
+    window.addEventListener('resize',measureLayout);requestAnimationFrame(measureLayout);
+  }
   const resizeDialogs=()=>{
     document.documentElement.style.setProperty('--available-height',`${window.visualViewport?.height||innerHeight}px`);
     document.documentElement.style.setProperty('--viewport-top',`${window.visualViewport?.offsetTop||0}px`);

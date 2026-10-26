@@ -44,7 +44,7 @@ test('compact selection fits phone first screen and preview starts directly with
 
 test('breakpoints preserve readable selection, complete month grid and reachable bottom content',async({page})=>{
   await page.goto(route);await expect(page.locator('#app')).toBeVisible();
-  for(const width of [320,390,768,1024,1440]){
+  for(const width of [320,390,545,585,768,1024,1440]){
     await page.setViewportSize({width,height:844});
     if(width<1024){await page.locator('#tab-selection').click();await expect(page.locator('#preview-pane')).toBeHidden();}
     else{await expect(page.locator('#preview-pane')).toBeVisible();await expect(page.locator('.mobile-tabs')).toBeHidden();}

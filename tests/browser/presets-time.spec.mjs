@@ -6,6 +6,14 @@ async function open(page){await page.goto('/calendar-reminders/');await expect(p
 test('presets replace choices without undo and clearing preserves local timezone and reminder times',async({page})=>{
   await open(page);await expect(page.locator('[data-event]:checked')).toHaveCount(0);await expect(page.locator('[data-preset][aria-pressed="true"]')).toHaveCount(0);
   await page.locator('[data-preset="guru"]').click();await expect(page.locator('[data-preset="guru"]')).toHaveAttribute('aria-pressed','true');
+  // A later generic preset rule once replaced the dark selected background,
+  // leaving pale text on paper. Check the rendered state, not only aria-pressed.
+  const selected=await page.locator('[data-preset="guru"]').evaluate(node=>{
+    const s=getComputedStyle(node);return {background:s.backgroundImage,text:getComputedStyle(node.querySelector('strong')).color};
+  });
+  expect(selected.background).toContain('gradient');
+  expect(selected.background).not.toBe(await page.locator('[data-preset="tsok"]').evaluate(node=>getComputedStyle(node).backgroundImage));
+  expect(selected.text).not.toBe('rgb(48, 37, 31)');
   await expect(page.locator('#undo-preset,#preset-undo')).toHaveCount(0);
   await expect(page.locator('#search,#reset')).toHaveCount(0);
   await page.locator('[data-reminder-event="guru-tsok"]').click();await page.locator('[data-reminder-field="time"]').fill('06:30');await page.locator('#add-reminder').click();await page.locator('#reminder-form button[type="submit"]').click();

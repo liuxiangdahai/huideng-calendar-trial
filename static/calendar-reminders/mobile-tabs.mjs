@@ -49,8 +49,14 @@ export function createMobileTabs({onLayout = () => {}} = {}) {
     event.preventDefault();
     switchTo(event.key === 'Home' ? 'selection' : event.key === 'End' ? 'preview' : current === 'selection' ? 'preview' : 'selection', {focus: true});
   });
-  const updateHeight = () => document.documentElement.style.setProperty('--tabs-height', `${tabHeight()}px`);
-  if (globalThis.ResizeObserver) new ResizeObserver(updateHeight).observe(tabs);
-  addEventListener('resize', updateHeight); updateHeight();
+  const storeHeight = height => {
+    const value=`${height}px`;
+    if(document.documentElement.style.getPropertyValue('--tabs-height')!==value)
+      document.documentElement.style.setProperty('--tabs-height',value);
+  };
+  if (globalThis.ResizeObserver) new ResizeObserver(entries => {
+    const entry=entries[0];storeHeight(entry.borderBoxSize?.[0]?.blockSize ?? tabHeight());
+  }).observe(tabs);
+  else {const updateHeight=()=>storeHeight(tabHeight());addEventListener('resize',updateHeight);requestAnimationFrame(updateHeight);}
   return {switchTo};
 }

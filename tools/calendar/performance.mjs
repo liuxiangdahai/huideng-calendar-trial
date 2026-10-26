@@ -48,7 +48,14 @@ async function prepare(){
  await cdp.send('Emulation.setCPUThrottlingRate',{rate:4});
  await cdp.send('Network.enable');await cdp.send('Network.setCacheDisabled',{cacheDisabled:true});
  await cdp.send('Network.emulateNetworkConditions',{offline:false,latency:150,downloadThroughput:200000,uploadThroughput:93750,connectionType:'cellular3g'});
+ if(process.argv.includes('--profile-cold')){await cdp.send('Profiler.enable');await cdp.send('Profiler.start');}
+ if(process.argv.includes('--trace-cold'))await cdp.send('Tracing.start',{categories:'devtools.timeline,v8,blink.user_timing',transferMode:'ReturnAsStream'});
  await page.goto(url);await page.locator('#app:not([hidden])').waitFor();
+ if(process.argv.includes('--profile-cold')){const {profile}=await cdp.send('Profiler.stop');await fs.writeFile(path.join(directory,`${label}-cold.cpuprofile`),JSON.stringify(profile));}
+ if(process.argv.includes('--trace-cold')){
+  const finished=new Promise(resolve=>cdp.once('Tracing.tracingComplete',resolve));await cdp.send('Tracing.end');const {stream}=await finished;let text='';
+  for(;;){const part=await cdp.send('IO.read',{handle:stream});text+=part.data;if(part.eof)break;}await cdp.send('IO.close',{handle:stream});await fs.writeFile(path.join(directory,`${label}-cold.trace.json`),text);
+ }
  return {context,page,cdp};
 }
 async function sample(page,name,index,action,type='click'){
@@ -63,7 +70,7 @@ async function series(page,name,action,type='click',after=async()=>{}){
  console.log(name,JSON.stringify({frame:report.interactions[name].frameEstimate,eventTiming:report.interactions[name].eventTiming,longTask:report.interactions[name].longTaskMaximumMs}));
 }
 try{
- for(let index=0;index<5;index++){
+ for(let index=0;index<(process.argv.includes('--trace-cold')?1:5);index++){
   const {context,page}=await prepare();await page.waitForTimeout(1200);
   const metric=await page.evaluate(()=>{flushMeasures();let max=0,sum=0,first=0,last=0;for(const shift of measure.shifts.filter(s=>!s.recentInput)){if(!last||shift.start-last>1000||shift.start-first>5000){sum=0;first=shift.start}sum+=shift.value;last=shift.start;max=Math.max(max,sum)}return {lcp:measure.lcp.at(-1),cls:max,shifts:measure.shifts,longTasks:measure.longTasks,navigation:performance.getEntriesByType('navigation')[0].toJSON()}});
   report.cold.push(metric);await context.close();console.log('cold',index+1,metric.lcp?.start,metric.cls);
