@@ -1,0 +1,3 @@
+# RFC 5545 feeds must keep the CRLF bytes emitted by the serializer on every OS.
+# Treat as non-normalized text so Git cannot silently convert them to LF.
+*.ics -text
