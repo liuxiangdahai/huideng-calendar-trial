@@ -24,14 +24,15 @@ async function deviceContext(browser, device, savedApp) {
 
 // Retain the real local API and capability generation. Only replace the returned
 // feed origin, so the HTTPS-only native entry can be exercised without deploying.
-async function httpsService(page, { failFirst = false, holdFirst = false } = {}) {
+async function httpsService(page, { failFirst = false, holdFirst = false, loseFirstResponse = false } = {}) {
   let release;
   const gate = holdFirst ? new Promise(resolve => { release = resolve; }) : Promise.resolve();
-  const state = { posts: 0, received: false, release: () => release?.() };
+  const state = { posts: 0, received: false, attempts: [], firstCreated: null, release: () => release?.() };
   await page.route('**/api/subscriptions**', async route => {
     const creation = route.request().method() === 'POST';
     if (creation) {
       state.posts += 1;
+      state.attempts.push({key:route.request().headers()['idempotency-key'],body:route.request().postDataJSON()});
       if (failFirst && state.posts === 1) {
         await route.fulfill({ status: 503, json: { error: '暂时无法连接订阅服务，请重试。' } });
         return;
@@ -39,7 +40,11 @@ async function httpsService(page, { failFirst = false, holdFirst = false } = {})
     }
     const response = await route.fetch();
     const body = await response.json();
-    if (creation && state.posts === 1) { state.received = true; await gate; }
+    if (creation && state.posts === 1) {
+      state.firstCreated=body;state.received = true;await gate;
+      // Real POST already committed. Only the response is lost in transit.
+      if(loseFirstResponse) {await route.abort('failed');return;}
+    }
     if (body.feedUrl) {
       const url = new URL(body.feedUrl);
       body.feedUrl = `https://calendar.example${url.pathname}${url.search}`;
@@ -204,6 +209,18 @@ test('failed preparation preserves choices and explicit retry creates one usable
     await page.locator('input[name="device"][value="google"]').check();
     await page.locator('input[name="device"][value="iphone"]').check();
     expect(service.posts).toBe(1);
+    const pendingKey=(await read(page,'huideng.calendar.creation')).key;
+    for(const status of [200,503]) {
+      const emptyResponse=route=>route.fulfill({status,contentType:'application/json',body:'null'});
+      await page.route('**/api/subscriptions',emptyResponse);
+      await page.locator('#create-subscription').click();
+      await expect(page.locator('#subscription-error')).toContainText('返回的信息不完整');
+      await expect(page.locator('#create-subscription')).toBeEnabled();
+      await expect(page.locator('#restart-creation')).toBeHidden();
+      expect((await read(page,'huideng.calendar.creation')).key===pendingKey).toBe(true);
+      expect(await read(page, 'huideng.calendar.v2')).toEqual(draft);
+      await page.unroute('**/api/subscriptions',emptyResponse);
+    }
     await page.locator('#create-subscription').click();
     await ready(page);
     await expect(page.locator('#subscription-error')).toBeHidden();
@@ -212,6 +229,78 @@ test('failed preparation preserves choices and explicit retry creates one usable
     expect(service.posts).toBe(2);
     expect(await read(page, 'huideng.calendar.v2')).toEqual(draft);
   } finally { await context.close(); }
+});
+
+test('a lost creation response survives reload and draft edits, recovers one feed, then saves edits with PATCH', async ({ browser }) => {
+  const context=await deviceContext(browser,devices.iphone);
+  try {
+    const page=await context.newPage();const service=await httpsService(page,{loseFirstResponse:true});
+    await openSelected(page);await page.locator('#subscribe').click();
+    await expect(page.locator('#subscription-error')).toContainText('暂时无法连接');
+    expect(service.posts).toBe(1);expect(service.firstCreated?.id).toBeTruthy();
+    const pending=await read(page,'huideng.calendar.creation');
+    expect(Boolean(pending?.key)).toBe(true);
+    expect(await read(page)).toBeNull();
+    await expect(page.locator('#restart-creation')).toBeHidden();
+    await page.locator('[data-close="subscription-dialog"]').first().click();
+    await page.locator('[data-preset="tsok"]').click();
+    const changedDraft=await read(page,'huideng.calendar.v2');
+    expect(changedDraft.events['dakini-tsok'].mode).toBe('remind');
+    await page.reload();await expect(page.locator('#app')).toBeVisible();
+    expect(service.posts).toBe(1);
+    expect((await read(page,'huideng.calendar.creation'))?.key===pending.key).toBe(true);
+    await page.locator('#subscribe').click();
+    await expect(page.locator('#subscription-existing')).toBeVisible();
+    await expect(page.locator('#save-subscription')).toBeEnabled();
+    expect(service.posts).toBe(2);
+    expect(service.attempts[0].key===service.attempts[1].key).toBe(true);
+    expect(JSON.stringify(service.attempts[0].body)===JSON.stringify(service.attempts[1].body)).toBe(true);
+    const restored=await read(page);
+    expect(restored.id===service.firstCreated.id).toBe(true);
+    expect(restored.manageToken===service.firstCreated.manageToken).toBe(true);
+    expect(restored.revision).toBe(1);
+    expect(restored.savedSettings.events['dakini-tsok'].mode).toBe('off');
+    expect(await read(page,'huideng.calendar.v2')).toEqual(changedDraft);
+    expect(await read(page,'huideng.calendar.creation')).toBeNull();
+    await expect(page.locator('#subscription-status')).toContainText('当前修改尚未保存');
+    await expect(page.locator('#iphone-subscribe')).not.toHaveAttribute('href',/^webcal:/);
+    await page.locator('#save-subscription').click();await ready(page);
+    const saved=await read(page);
+    expect(saved.id===restored.id).toBe(true);expect(saved.feedUrl===restored.feedUrl).toBe(true);
+    expect(saved.revision).toBe(2);expect(saved.savedSettings).toEqual(changedDraft);
+    expect(service.posts).toBe(2);
+  } finally {await context.close();}
+});
+
+test('expired creation requires an explicit new attempt and preserves that choice across a reload', async ({ browser }) => {
+  const context=await deviceContext(browser,devices.iphone);
+  try {
+    const page=await context.newPage();const service=await httpsService(page);
+    let rejectedKey;
+    const expire=async route=>{
+      if(route.request().method()!=='POST'){await route.fallback();return;}
+      rejectedKey=route.request().headers()['idempotency-key'];
+      await route.fulfill({status:410,json:{code:'creation_expired',error:'这次创建已超过七天恢复期限。原订阅不会自动停用；请检查管理链接，或明确重新开始。'}});
+    };
+    await page.route('**/api/subscriptions',expire);
+    await openSelected(page);await page.locator('#subscribe').click();
+    await expect(page.locator('#subscription-error')).toContainText('七天恢复期限');
+    await expect(page.locator('#create-subscription')).toBeDisabled();
+    await expect(page.locator('#restart-creation')).toBeVisible();
+    await page.unroute('**/api/subscriptions',expire);
+    await page.reload();await expect(page.locator('#app')).toBeVisible();await page.locator('#my-subscription').click();
+    await expect(page.locator('#subscription-error')).toContainText('七天恢复期限');
+    await expect(page.locator('#create-subscription')).toBeDisabled();
+    await page.locator('input[name="device"][value="google"]').check();
+    await page.locator('input[name="device"][value="iphone"]').check();
+    expect(service.posts).toBe(0);
+    await page.locator('#restart-creation').click();await ready(page);
+    expect(service.posts).toBe(1);
+    expect(service.attempts[0].key!==rejectedKey).toBe(true);
+    expect(await read(page,'huideng.calendar.creation')).toBeNull();
+    await expect(page.locator('#restart-creation')).toBeHidden();
+    await expect(page.locator('#subscription-error')).toBeHidden();
+  } finally {await context.close();}
 });
 
 test('unsaved and failed settings disable Apple launch until saving the same subscription succeeds', async ({ browser }) => {

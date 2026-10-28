@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-27",
+  "site": "https://huideng-calendar-trial.pages.dev",
+  "expectedVersion": "35f4fdbecbfb4587543edeb7f4b505c055ed3352",
+  "network": "existing system proxy; not direct network acceptance",
+  "screens": [
+    {
+      "width": 390,
+      "pageVersion": "35f4fdbecbfb4587543edeb7f4b505c055ed3352",
+      "apiStatus": 200,
+      "health": {
+        "status": "ok",
+        "version": "35f4fdbecbfb4587543edeb7f4b505c055ed3352",
+        "dataVersion": "0a6b1e7eb64f73f5f4d1bf86527df628e6e1b8ed91f5c917ecf8fcb38813d46b",
+        "environment": "trial"
+      },
+      "defaultSelection": "已选 0 项",
+      "calendarCells": 42,
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "pageVersion": "35f4fdbecbfb4587543edeb7f4b505c055ed3352",
+      "apiStatus": 200,
+      "health": {
+        "status": "ok",
+        "version": "35f4fdbecbfb4587543edeb7f4b505c055ed3352",
+        "dataVersion": "0a6b1e7eb64f73f5f4d1bf86527df628e6e1b8ed91f5c917ecf8fcb38813d46b",
+        "environment": "trial"
+      },
+      "defaultSelection": "已选 0 项",
+      "calendarCells": 42,
+      "overflow": false
+    }
+  ],
+  "errors": [],
+  "status": "passed"
+}

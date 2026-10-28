@@ -7,6 +7,7 @@ const ID_PATTERN = /^[a-f0-9-]{36}$/;
 const MAX_BODY_BYTES = 65536;
 const RETENTION_MS = 90 * 86400000;
 const SNAPSHOT_TTL_MS = 60 * 60 * 1000;
+const CREATION_REPLAY_MS = 7 * 86400000;
 const DEVELOPMENT_RELEASE = Object.freeze({version: 'development', dataVersion: '',
   rendererVersion: 'snapshot-v1', environment: 'local'});
 const utf8 = new TextEncoder();
@@ -27,9 +28,17 @@ export async function digest(value) {
   return [...new Uint8Array(await crypto.subtle.digest('SHA-256', utf8.encode(value)))]
     .map(byte => byte.toString(16).padStart(2, '0')).join('');
 }
-function token() {
-  return btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32))))
+function base64url(bytes) {
+  return btoa(String.fromCharCode(...bytes))
     .replaceAll('+', '-').replaceAll('/', '_').replaceAll('=', '');
+}
+function token() { return base64url(crypto.getRandomValues(new Uint8Array(32))); }
+async function creationCredential(key, salt) {
+  if (!salt) throw new HttpError(503, '订阅服务尚未配置。');
+  const secret = await crypto.subtle.importKey('raw', utf8.encode(salt),
+    {name: 'HMAC', hash: 'SHA-256'}, false, ['sign']);
+  return base64url(new Uint8Array(await crypto.subtle.sign('HMAC', secret,
+    utf8.encode(`huideng-calendar:create-management:v1:${key}`))));
 }
 function equalHash(left, right) {
   if (typeof left !== 'string' || typeof right !== 'string' || left.length !== right.length) return false;
@@ -75,7 +84,7 @@ function secureHeaders(response, origin) {
     response.headers.set('Access-Control-Allow-Origin', origin);
     response.headers.set('Vary', 'Origin');
     response.headers.set('Access-Control-Allow-Methods', 'GET, HEAD, POST, PATCH, DELETE, OPTIONS');
-    response.headers.set('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+    response.headers.set('Access-Control-Allow-Headers', 'Authorization, Content-Type, Idempotency-Key');
     response.headers.set('Access-Control-Expose-Headers', 'ETag, Last-Modified');
   }
   return response;
@@ -185,9 +194,11 @@ export function createCalendarService({getData, validateSettings, selectOccurren
       serviceOrigin(env);
       if (!env.DB || !origins(env).size || !env.RATE_LIMIT_SALT ||
           !release.version || !release.dataVersion || !release.rendererVersion || !release.environment) throw new Error();
-      await env.DB.prepare(`SELECT s.id, s.render_version, f.settings_revision, f.expires_at,
+      await env.DB.prepare(`SELECT s.id, s.render_version, s.creation_key_hash, s.creation_body_hash,
+          f.settings_revision, f.expires_at,
           e.uid, e.sequence, l.bucket, l.expires_at
-        FROM subscriptions s LEFT JOIN feed_snapshots f ON f.subscription_id = s.id
+        FROM subscriptions s INDEXED BY subscriptions_creation_key
+        LEFT JOIN feed_snapshots f ON f.subscription_id = s.id
         LEFT JOIN calendar_entries e ON e.subscription_id = s.id
         LEFT JOIN creation_limits l ON 0 LIMIT 0`).all();
     } catch { ready = false; }
@@ -201,30 +212,80 @@ export function createCalendarService({getData, validateSettings, selectOccurren
     try { return validateSettings(body.settings, data.catalog); }
     catch (error) { throw new HttpError(400, error.message || '日历设置无效。'); }
   }
-  async function limitCreation(request, env, time) {
+  async function creationBucket(request, env, time) {
     // Cloudflare supplies this header; the Node preview explicitly overwrites it.
     const address = request.headers.get('CF-Connecting-IP');
-    if (!address) return;
+    if (!address) return null;
     if (!env.RATE_LIMIT_SALT) throw new HttpError(503, '订阅服务尚未配置。');
     const day = time.toISOString().slice(0, 10);
     const bucket = await digest(`${env.RATE_LIMIT_SALT}:${day}:${address}`);
     const expires = new Date(time.getTime() + 2 * 86400000).toISOString();
-    const row = await env.DB.prepare(`INSERT INTO creation_limits(bucket, count, expires_at) VALUES (?, 1, ?)
-      ON CONFLICT(bucket) DO UPDATE SET count = count + 1 RETURNING count`).bind(bucket, expires).first();
-    if (row.count > 20) throw new HttpError(429, '今天创建的订阅较多，请稍后再试。');
+    return {bucket, expires};
+  }
+  function replayCreation(record, bodyHash, manageToken, manageHash, time, baseUrl, status = 200) {
+    // The nonce is a recovery capability. Neither it nor the derived management
+    // token is stored. Salt rotation explicitly fails closed for old attempts.
+    if (!equalHash(manageHash, record.manage_token_hash)) {
+      throw new HttpError(410, '这次创建已无法恢复。请先检查已保存的管理链接；如需新订阅，请明确重新开始。',
+        {code: 'creation_unrecoverable'});
+    }
+    if (!equalHash(bodyHash, record.creation_body_hash)) {
+      throw new HttpError(409, '这次创建提交的内容不一致，未新建订阅。请先恢复原提交，或明确重新开始。',
+        {code: 'creation_body_mismatch'});
+    }
+    if (record.disabled) throw new HttpError(410, '这次创建的订阅已停用；如需新订阅，请重新开始。',
+      {code: 'creation_disabled'});
+    if (time.getTime() >= Date.parse(record.created_at) + CREATION_REPLAY_MS) {
+      throw new HttpError(410, '这次创建已超过七天恢复期限。原订阅不会自动停用；请检查管理链接，或明确重新开始。',
+        {code: 'creation_expired'});
+    }
+    // Return current settings/revision after edits, never the original revision.
+    return json({...recordView(record, baseUrl), manageToken}, status);
   }
   async function create(request, env, baseUrl) {
-    const body = await readBody(request), data = await getData();
-    const settings = await parseSettings(body, data), time = now();
+    const key = request.headers.get('Idempotency-Key');
+    // Canonical base64url for exactly 32 random bytes (including the last pad bits).
+    if (key !== null && !/^[A-Za-z0-9_-]{42}[AEIMQUYcgkosw048]$/.test(key)) {
+      throw new HttpError(400, '创建标识无效，请重新开始创建。', {code: 'creation_key_invalid'});
+    }
+    const body = await readBody(request), time = now();
+    if (!Object.hasOwn(body, 'settings')) throw new HttpError(400, '缺少日历设置。');
+    const keyHash = key === null ? null : await digest(`huideng-calendar:create-key:v1:${key}`);
+    // Fingerprint the original request, allowing recovery even after catalog
+    // retirement. Replays must not depend on today's validation or date rules.
+    const bodyHash = key === null ? null : await digest(canonical(body.settings));
+    const manageToken = key === null ? token() : await creationCredential(key, env.RATE_LIMIT_SALT);
+    const manageHash = await digest(manageToken);
+    if (keyHash) {
+      const existing = await env.DB.prepare('SELECT * FROM subscriptions WHERE creation_key_hash = ?').bind(keyHash).first();
+      if (existing) return replayCreation(existing, bodyHash, manageToken, manageHash, time, baseUrl);
+    }
+    const data = await getData(), settings = await parseSettings(body, data);
     // Resolve alerts before persisting, including DST gaps in the rolling window.
     try { exportICS(selectOccurrences(data, settings, rollingWindow(time, settings.zone)), {zone: settings.zone, generatedAt: time}); }
     catch (error) { throw new HttpError(400, error.message || '提醒时间无效。'); }
-    await limitCreation(request, env, time);
-    const id = crypto.randomUUID(), feedToken = token(), manageToken = token();
+    const limit = await creationBucket(request, env, time);
+    const id = crypto.randomUUID(), feedToken = token();
     const timestamp = time.toISOString();
-    await env.DB.prepare(`INSERT INTO subscriptions
-      (id, feed_token, manage_token_hash, settings_json, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)`)
-      .bind(id, feedToken, await digest(manageToken), canonical(settings), timestamp, timestamp).run();
+    // D1 batch is transactional. Check quota, win the unique key, and charge
+    // exactly the winning INSERT together; concurrent retries cost no quota.
+    const insert = env.DB.prepare(`INSERT INTO subscriptions
+      (id, feed_token, manage_token_hash, settings_json, created_at, updated_at, creation_key_hash, creation_body_hash)
+      SELECT ?, ?, ?, ?, ?, ?, ?, ?
+      WHERE COALESCE((SELECT count FROM creation_limits WHERE bucket = ?), 0) < 20
+      ON CONFLICT(creation_key_hash) DO NOTHING`)
+      .bind(id, feedToken, manageHash, canonical(settings), timestamp, timestamp, keyHash, bodyHash, limit?.bucket ?? null);
+    const statements = [insert];
+    if (limit) statements.push(env.DB.prepare(`INSERT INTO creation_limits(bucket, count, expires_at)
+      SELECT ?, 1, ? WHERE EXISTS (SELECT 1 FROM subscriptions WHERE id = ?)
+      ON CONFLICT(bucket) DO UPDATE SET count = count + 1`).bind(limit.bucket, limit.expires, id));
+    const results = await env.DB.batch(statements);
+    if (keyHash) {
+      const record = await env.DB.prepare('SELECT * FROM subscriptions WHERE creation_key_hash = ?').bind(keyHash).first();
+      if (record) return replayCreation(record, bodyHash, manageToken, manageHash, time, baseUrl,
+        results[0].meta.changes === 1 ? 201 : 200);
+    }
+    if (results[0].meta.changes !== 1) throw new HttpError(429, '今天创建的订阅较多，请稍后再试。');
     return json({id, feedUrl: `${baseUrl}/calendar/${feedToken}.ics`, manageToken, settings, revision: 1}, 201);
   }
   async function manage(request, env, baseUrl, id) {

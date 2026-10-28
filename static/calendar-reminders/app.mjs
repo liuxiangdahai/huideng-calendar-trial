@@ -17,6 +17,7 @@ import {createMobileTabs} from './mobile-tabs.mjs';
 const $ = selector => document.querySelector(selector);
 const storageKey = 'huideng.calendar.v2', subscriptionKey = 'huideng.calendar.subscription';
 const uiKey = 'huideng.calendar.interface';
+const creationKey = 'huideng.calendar.creation';
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 const defaultReminders = () => [{daysBefore:0,time:'08:00'}];
 const readStored = key => { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } };
@@ -28,6 +29,7 @@ let managementAttempt = 0;
 let managementRestoring = false;
 let subscriptionVersion = 0, pendingWrite = null;
 let entryError = false;
+let pendingCreation = null, creationBlocked = false;
 const calendarDevice = calendarEnvironment();
 const countSelected = () => Object.values(settings.events).filter(pref => pref.mode !== 'off').length;
 const dirty = () => Boolean(subscription && JSON.stringify(settings) !== JSON.stringify(subscription.savedSettings));
@@ -46,6 +48,28 @@ function persist() {
     if (subscription) localStorage.setItem(subscriptionKey,JSON.stringify(subscription));
     else localStorage.removeItem(subscriptionKey);
   } catch { notify('浏览器未能保存本机设置；本次仍可使用，请保存管理链接。'); }
+}
+function storeCreationAttempt() {
+  try {
+    if (pendingCreation) localStorage.setItem(creationKey,JSON.stringify(pendingCreation));
+    else localStorage.removeItem(creationKey);
+  } catch { notify('浏览器未能保存创建进度，请保持此页面打开并重试；完成后请保存管理链接。'); }
+}
+function creationAttempt() {
+  if (pendingCreation) return pendingCreation;
+  // Read again for a retry from another tab. A retry always sends the original
+  // body; later edits stay in the draft and are saved with PATCH after recovery.
+  const stored=readStored(creationKey);
+  if (stored?.apiBaseUrl===apiBaseUrl && /^[A-Za-z0-9_-]{43}$/.test(stored.key) &&
+      stored.settings && typeof stored.settings==='object' && !Array.isArray(stored.settings)) {
+    pendingCreation=stored;
+  } else {
+    const key=btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32))))
+      .replaceAll('+','-').replaceAll('/','_').replaceAll('=','');
+    pendingCreation={apiBaseUrl,key,settings:clone(settings)};
+    storeCreationAttempt();
+  }
+  return pendingCreation;
 }
 function safeHTTP(value) {
   try {
@@ -166,9 +190,11 @@ function deviceGuide() {
   $('#copy-feed').classList.toggle('primary',app==='other'||app==='google'&&calendarDevice.mobile||app==='iphone'&&!calendarDevice.apple);
   $('#copy-feed').classList.toggle('secondary',!$('#copy-feed').classList.contains('primary'));
   $('#entry-hint').textContent=managementRestoring ? '正在恢复订阅，请稍候。' : !app ? '选择日历应用后，查看对应的添加方式。' : requestPending ? '正在保存你的选择，请稍候。' : !subscription ? '选好日历应用后，我们会准备你的订阅。' : !ready ? '先保存修改，再继续添加到日历。' : app==='iphone' ? calendarDevice.apple ? '将在系统日历中打开订阅确认，请按提示添加。' : '请把订阅地址传到你的 iPhone、iPad 或 Mac 上添加。' : app==='google' ? calendarDevice.mobile ? '请将订阅地址传到电脑，在 Google 日历网页中添加。' : '先复制订阅地址，再打开 Google 日历的“通过网址添加”页面。' : '应用有网址订阅入口时可粘贴此地址；否则请查看下方文件导入方式。';
-  $('#create-subscription').disabled = !app || !countSelected() || requestPending || managementRestoring || !settings.zone;
+  $('#create-subscription').disabled = !app || !countSelected() || requestPending || managementRestoring || !settings.zone || creationBlocked;
   $('#create-subscription-label').textContent=managementRestoring ? '正在恢复订阅…' : requestPending ? '正在准备订阅…' : entryError ? '重试准备订阅' : app ? '继续订阅' : '请先选择日历应用';
   $('#subscription-new').setAttribute('aria-busy',String(requestPending||managementRestoring));
+  $('#restart-creation').hidden=Boolean(subscription)||!creationBlocked;
+  $('#restart-creation').disabled=requestPending||managementRestoring;
 }
 function renderSubscription() {
   $('#subscription-summary').textContent = `已选 ${countSelected()} 项 · 全天显示 · ${zoneLabel()}`;
@@ -205,35 +231,44 @@ function openSubscription({prepare=false}={}) {
   }
 }
 async function prepareSubscription({retry=false}={}) {
-  if(subscription || requestPending || managementRestoring || !currentApp() || !countSelected() || !settings.zone) return;
+  if(subscription || requestPending || managementRestoring || creationBlocked || !currentApp() || !countSelected() || !settings.zone) return;
   // Changing the target app must not silently retry a failed/expired creation.
   if(entryError&&!retry) return;
   await saveSubscription(true);
 }
-async function api(method, path, body, manageToken = subscription?.manageToken) {
+async function api(method, path, body, manageToken = subscription?.manageToken, creationNonce) {
   if (!apiBaseUrl) throw new Error('暂时无法完成订阅，请稍后重试。你的选择已保留，也可以使用下方文件导入。');
   const headers = {'Accept':'application/json'};
   if (body !== undefined) headers['Content-Type'] = 'application/json';
   if (manageToken) headers.Authorization = `Bearer ${manageToken}`;
+  if (creationNonce) headers['Idempotency-Key']=creationNonce;
   let response, result;
   try { ({response,result} = await fetchJSON(`${apiBaseUrl}${path}`,{method,headers,body:body === undefined ? undefined : JSON.stringify(body),cache:'no-store'})); }
   catch { throw new Error('暂时无法连接订阅服务。你的本机选择已保留，请稍后重试。'); }
+  if (!result || typeof result !== 'object' || Array.isArray(result)) {
+    throw new Error('订阅服务返回的信息不完整。你的选择和创建进度已保留，请稍后重试。');
+  }
   if (!response.ok) {
     const error = new Error(typeof result.error === 'string' ? result.error : result.error?.message || result.message || '订阅服务暂时无法完成此操作。');
-    error.status = response.status; throw error;
+    error.status = response.status; error.code=result.code; throw error;
   }
   return result;
 }
 function showSubscriptionError(error) {
   entryError=true;
-  if (error.status === 409) {
+  if (pendingCreation && !subscription && (String(error.code||'').startsWith('creation_') || [400,413,415].includes(error.status))) {
+    creationBlocked=true;
+    pendingCreation.blocked={message:error.message,status:error.status,code:error.code||'creation_rejected'};
+    storeCreationAttempt();
+  }
+  if (error.status === 409 && !String(error.code||'').startsWith('creation_')) {
     conflict = true;
     $('#subscription-error').textContent = '这份订阅已在其他设备修改。请重新载入已保存设置后再调整，避免覆盖另一台设备的修改。';
   } else $('#subscription-error').textContent = error.message;
   $('#subscription-error').hidden = false; renderSubscription();
 }
 function clearSubscriptionError() {
-  entryError=false;
+  entryError=false; creationBlocked=false;
   $('#subscription-error').hidden=true;
 }
 function acceptRemote(result, force = false) {
@@ -284,13 +319,27 @@ async function performSaveSubscription(create) {
   try {
     // Validate the complete feed before sending settings. DST changes use the
     // same compatible resolution policy as the subscription service.
-    exportICS(selectOccurrences(data,settings),{zone:settings.zone,name:'藏历'});
-    const submitted = clone(settings);
+    if (!create || !pendingCreation) exportICS(selectOccurrences(data,settings),{zone:settings.zone,name:'藏历'});
+    if(create && !apiBaseUrl) throw new Error('暂时无法完成订阅，请稍后重试。你的选择已保留，也可以使用下方文件导入。');
+    const attempt=create ? creationAttempt() : null;
+    const submitted = clone(attempt ? attempt.settings : settings);
     const result = await api(create ? 'POST' : 'PATCH',create ? '/api/subscriptions' : `/api/subscriptions/${encodeURIComponent(subscription.id)}`,
-      create ? {settings:submitted} : {settings:submitted,revision:subscription.revision});
+      create ? {settings:submitted} : {settings:submitted,revision:subscription.revision},undefined,attempt?.key);
+    if(create && (!/^[a-f0-9-]{36}$/.test(result.id) || !/^[A-Za-z0-9_-]{43}$/.test(result.manageToken) ||
+        !Number.isSafeInteger(result.revision) || result.revision<1 || !result.settings || result.disabled)) {
+      throw new Error('订阅服务返回的信息不完整。创建进度已保留，请重试恢复同一份订阅。');
+    }
     const changedDuringSave = JSON.stringify(settings) !== JSON.stringify(submitted);
     const latestDraft = clone(settings);
     acceptRemote(result,true);
+    if(create) {
+      const saved=readStored(subscriptionKey);
+      // Do not discard the recovery capability if saving the returned credentials
+      // failed (for example, storage quota). Reload can still recover this feed.
+      if(saved?.id===subscription.id && saved.manageToken===subscription.manageToken) {
+        pendingCreation=null;storeCreationAttempt();
+      }
+    }
     if (changedDuringSave) {
       settings = latestDraft; refresh(); renderSubscription();
       notify('已保存上次提交的设置；后续修改仍待保存。');
@@ -430,6 +479,13 @@ function attachEvents() {
   $('#my-subscription').addEventListener('click',()=>openSubscription());
   $('#subscribe').addEventListener('click',() => openSubscription({prepare:true}));
   $('#create-subscription').addEventListener('click',()=>prepareSubscription({retry:true}));
+  $('#restart-creation').addEventListener('click',()=>{
+    if(requestPending||managementRestoring||subscription||!creationBlocked)return;
+    // Only this explicit action abandons an unrecoverable attempt. Ordinary
+    // network failures keep the nonce, even if the user changes their draft.
+    pendingCreation=null;storeCreationAttempt();clearSubscriptionError();
+    void prepareSubscription({retry:true});
+  });
   $('#save-subscription').addEventListener('click',() => saveSubscription());
   $('#reload-subscription').addEventListener('click',async() => {
     try { if(await loadSubscription(true)){ $('#subscription-error').hidden = true; notify('已载入最新设置'); } }
@@ -518,6 +574,9 @@ async function init() {
   if (credentials?.id && credentials.manageToken && credentials.savedSettings && safeHTTP(credentials.feedUrl)) {
     subscription = {...credentials,feedUrl:safeHTTP(credentials.feedUrl),savedSettings:normalizeSettings(credentials.savedSettings,data.catalog)};
   }
+  const storedCreation=readStored(creationKey);
+  if(!subscription && storedCreation?.apiBaseUrl===apiBaseUrl && /^[A-Za-z0-9_-]{43}$/.test(storedCreation.key) &&
+      storedCreation.settings && typeof storedCreation.settings==='object' && !Array.isArray(storedCreation.settings)) pendingCreation=storedCreation;
   zonePicker=createZonePicker($('#zone-dialog'),{onApply:zone=>{
     settings.zone=zone;stopped=false;ui.lastDeviceZone=observedZone;persistUI();refresh(false);
     notify(subscription?'提醒地区已调整；点击保存修改后同步。':'提醒地区已调整。');
@@ -530,6 +589,7 @@ async function init() {
   const savedApp=['iphone','google','other'].includes(ui.app) ? ui.app : ui.guide?.app;
   if(['iphone','google','other'].includes(savedApp)) $(`input[name="device"][value="${savedApp}"]`).checked=true;
   attachEvents(); $('#app').hidden = false; renderGroups(); renderPresets();renderPreview(); persist();persistUI();checkDeviceTime();
+  if(pendingCreation?.blocked) showSubscriptionError(pendingCreation.blocked);
   // Reuse the browser's completed layout. Writing a root variable between two
   // bounding-box reads forced the whole document to lay out twice on startup.
   const actionBar=$('.action-bar'), previewColumn=$('.preview-column');

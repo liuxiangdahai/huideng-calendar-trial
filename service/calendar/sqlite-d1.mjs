@@ -13,6 +13,9 @@ export class SQLiteD1 {
     // migration independently so reopening never silently omits newer tables.
     const snapshots = this.database.prepare("SELECT name FROM sqlite_master WHERE name = 'feed_snapshots'").get();
     if (!snapshots) this.database.exec(readFileSync(new URL('./migrations/0002_feed_snapshots.sql', import.meta.url), 'utf8'));
+    const creationKey = this.database.prepare('PRAGMA table_info(subscriptions)').all()
+      .some(column => column.name === 'creation_key_hash');
+    if (!creationKey) this.database.exec(readFileSync(new URL('./migrations/0003_creation_idempotency.sql', import.meta.url), 'utf8'));
   }
   prepare(sql) { return new Statement(this, sql, []); }
   async batch(statements) {

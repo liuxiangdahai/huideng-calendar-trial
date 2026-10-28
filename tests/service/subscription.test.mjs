@@ -15,6 +15,7 @@ const makeSettings = (mode = 'remind', time = '08:00') => ({
   version: 2, zone: 'Asia/Shanghai',
   events: {test: {mode, reminders: [{daysBefore: 0, time}]}}
 });
+const newCreationKey = () => Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString('base64url');
 function fixture(t, alarmResolver = resolveAlarmInstants) {
   const temporaryRoot = realpathSync(tmpdir());
   const directory = mkdtempSync(join(temporaryRoot, 'huideng-calendar-sqlite-'));
@@ -86,6 +87,115 @@ test('real SQLite persists a subscription; read and management credentials are s
   assert.equal(Object.hasOwn(restored, 'manageToken'), false);
   assert.equal((await f.api(`/api/subscriptions/${created.id}`, 'GET', undefined, feedToken)).status, 401);
   assert.equal((await f.fetch(`/api/subscriptions/${created.id}`)).status, 401);
+});
+
+test('a committed creation with a lost response recovers its capability and current revision without another write', async t => {
+  const f=fixture(t), key=newCreationKey(), original=makeSettings();
+  const headers={'Idempotency-Key':key,'CF-Connecting-IP':'192.0.2.1'};
+  const first=await f.api('/api/subscriptions','POST',{settings:original},undefined,headers);
+  assert.equal(first.status,201);
+  // Deliberately discard the HTTP response body and reopen the persisted DB.
+  const before=await f.db.prepare('SELECT * FROM subscriptions').first();
+  assert.equal(JSON.stringify(before).includes(key),false);
+  f.reopen();
+  const retry=await f.api('/api/subscriptions','POST',{settings:original},undefined,headers);
+  assert.equal(retry.status,200);
+  const recovered=await retry.json();
+  assert.equal(recovered.id,before.id);
+  assert.equal(await digest(recovered.manageToken),before.manage_token_hash);
+  assert.equal(recovered.feedUrl,`${BASE}/calendar/${before.feed_token}.ics`);
+  assert.equal(JSON.stringify(before).includes(recovered.manageToken),false);
+  assert.equal((await f.db.prepare('SELECT count(*) AS total FROM subscriptions').first()).total,1);
+  assert.equal((await f.db.prepare('SELECT count FROM creation_limits').first()).count,1);
+  const edited=makeSettings('display');
+  assert.equal((await f.api(`/api/subscriptions/${recovered.id}`,'PATCH',{settings:edited,revision:1},recovered.manageToken)).status,200);
+  const replay=await f.api('/api/subscriptions','POST',{settings:original},undefined,headers);
+  assert.equal(replay.status,200);
+  const current=await replay.json();
+  assert.equal(current.id,recovered.id);assert.equal(current.manageToken,recovered.manageToken);
+  assert.equal(current.feedUrl,recovered.feedUrl);assert.equal(current.revision,2);
+  assert.deepEqual(current.settings,edited);
+  // Recovery does not revalidate retired content or rebuild the whole calendar.
+  f.data.catalog.events=[];
+  const exports=f.calls.export;
+  assert.equal((await f.api('/api/subscriptions','POST',{settings:original},undefined,headers)).status,200);
+  assert.equal(f.calls.export,exports);
+});
+
+test('concurrent same-key creations have one winner and consume one creation allowance', async t => {
+  const f=fixture(t), headers={'Idempotency-Key':newCreationKey(),'CF-Connecting-IP':'192.0.2.2'};
+  const responses=await Promise.all(Array.from({length:5},()=>f.api('/api/subscriptions','POST',{settings:makeSettings()},undefined,headers)));
+  assert.equal(responses.filter(response=>response.status===201).length,1);
+  assert.equal(responses.filter(response=>response.status===200).length,4);
+  const bodies=await Promise.all(responses.map(response=>response.json()));
+  for(const body of bodies) {
+    assert.equal(body.id,bodies[0].id);assert.equal(body.feedUrl,bodies[0].feedUrl);
+    assert.equal(body.manageToken,bodies[0].manageToken);assert.equal(body.revision,1);
+  }
+  assert.equal((await f.db.prepare('SELECT count(*) AS total FROM subscriptions').first()).total,1);
+  assert.equal((await f.db.prepare('SELECT count FROM creation_limits').first()).count,1);
+});
+
+test('same-key requests with different bodies are rejected, including racing first requests', async t => {
+  const f=fixture(t), headers={'Idempotency-Key':newCreationKey(),'CF-Connecting-IP':'192.0.2.3'};
+  const responses=await Promise.all(['08:00','09:00'].map(time=>f.api('/api/subscriptions','POST',{settings:makeSettings('remind',time)},undefined,headers)));
+  assert.deepEqual(responses.map(response=>response.status).sort(),[201,409]);
+  assert.equal((await responses.find(response=>response.status===409).json()).code,'creation_body_mismatch');
+  assert.equal((await f.db.prepare('SELECT count(*) AS total FROM subscriptions').first()).total,1);
+  assert.equal((await f.db.prepare('SELECT count FROM creation_limits').first()).count,1);
+});
+
+test('disabled, expired and salt-rotated creation attempts fail explicitly and never create or revive subscriptions', async t => {
+  const f=fixture(t), create=async()=>{
+    const headers={'Idempotency-Key':newCreationKey()};
+    const response=await f.api('/api/subscriptions','POST',{settings:makeSettings()},undefined,headers);
+    assert.equal(response.status,201);return {headers,body:await response.json()};
+  };
+  const stopped=await create();
+  await f.api(`/api/subscriptions/${stopped.body.id}`,'DELETE',undefined,stopped.body.manageToken);
+  const disabled=await f.api('/api/subscriptions','POST',{settings:makeSettings()},undefined,stopped.headers);
+  assert.equal(disabled.status,410);assert.equal((await disabled.json()).code,'creation_disabled');
+  const expiring=await create();
+  f.tick(7*86400000-1);
+  assert.equal((await f.api('/api/subscriptions','POST',{settings:makeSettings()},undefined,expiring.headers)).status,200);
+  f.tick(1);
+  const expired=await f.api('/api/subscriptions','POST',{settings:makeSettings()},undefined,expiring.headers);
+  assert.equal(expired.status,410);assert.equal((await expired.json()).code,'creation_expired');
+  const rotated=await create();f.env.RATE_LIMIT_SALT='another-test-only-secret';
+  const changed=await f.api('/api/subscriptions','POST',{settings:makeSettings()},undefined,rotated.headers);
+  assert.equal(changed.status,410);assert.equal((await changed.json()).code,'creation_unrecoverable');
+  assert.equal((await f.db.prepare('SELECT count(*) AS total FROM subscriptions').first()).total,3);
+  const row=await f.db.prepare('SELECT * FROM subscriptions WHERE id = ?').bind(stopped.body.id).first();
+  assert.equal(row.disabled,1);assert.equal(row.settings_json,'{}');assert.equal(row.revision,2);
+});
+
+test('idempotency validates keys, keeps legacy creation working and permits replay after the create limit', async t => {
+  const f=fixture(t), headers={'CF-Connecting-IP':'192.0.2.4'};
+  for(const key of ['', 'x'.repeat(42), 'A'.repeat(42)+'B', 'A'.repeat(44)]) {
+    const bad=await f.api('/api/subscriptions','POST',{settings:makeSettings()},undefined,{...headers,'Idempotency-Key':key});
+    assert.equal(bad.status,400);assert.equal((await bad.json()).code,'creation_key_invalid');
+  }
+  assert.equal((await f.db.prepare('SELECT count(*) AS total FROM creation_limits').first()).total,0);
+  const key=newCreationKey();
+  const first=await f.api('/api/subscriptions','POST',{settings:makeSettings()},undefined,{...headers,'Idempotency-Key':key});
+  assert.equal(first.status,201);
+  const original=await first.json();
+  for(let index=0;index<19;index++) assert.equal((await f.api('/api/subscriptions','POST',{settings:makeSettings()},undefined,headers)).status,201);
+  assert.equal((await f.api('/api/subscriptions','POST',{settings:makeSettings()},undefined,headers)).status,429);
+  const replay=await f.api('/api/subscriptions','POST',{settings:makeSettings()},undefined,{...headers,'Idempotency-Key':key});
+  assert.equal(replay.status,200);assert.equal((await replay.json()).id,original.id);
+  assert.equal((await f.db.prepare('SELECT count FROM creation_limits').first()).count,20);
+  assert.equal((await f.db.prepare('SELECT count(*) AS total FROM subscriptions WHERE creation_key_hash IS NULL').first()).total,19);
+  const cors=await f.fetch('/api/subscriptions',{method:'OPTIONS',headers:{Origin:ORIGIN,'Access-Control-Request-Headers':'idempotency-key,content-type'}});
+  assert.equal(cors.status,204);assert.match(cors.headers.get('Access-Control-Allow-Headers'),/Idempotency-Key/);
+});
+
+test('idempotent creation does not disguise a database failure as a valid replay', async t => {
+  const f=fixture(t), headers={'Idempotency-Key':newCreationKey()};
+  f.db.batch=async()=>{throw new Error('synthetic storage failure');};
+  const response=await f.api('/api/subscriptions','POST',{settings:makeSettings()},undefined,headers);
+  assert.equal(response.status,503);
+  assert.equal((await f.db.prepare('SELECT count(*) AS total FROM subscriptions').first()).total,0);
 });
 
 test('creation and edits reject invalid data and unconfigured, absent, or null browser origins', async t => {
@@ -531,6 +641,21 @@ test('an older database gains the additive snapshot table without changing subsc
   assert.equal((await f.db.prepare('SELECT count(*) AS count FROM feed_snapshots').first()).count, 0);
   assert.equal((await f.fetch(created.feedUrl)).status, 200);
   assert.equal((await f.db.prepare('SELECT sequence FROM calendar_entries').first()).sequence, before.sequence);
+});
+
+test('an older database gains creation idempotency without changing credentials, revisions or published entries', async t => {
+  const f=fixture(t), created=await f.create();await f.fetch(created.feedUrl);
+  const before=await f.db.prepare('SELECT * FROM calendar_entries').first();
+  const subscription=await f.db.prepare('SELECT * FROM subscriptions').first();
+  await f.db.exec('DROP INDEX subscriptions_creation_key; ALTER TABLE subscriptions DROP COLUMN creation_key_hash; ALTER TABLE subscriptions DROP COLUMN creation_body_hash;');
+  assert.equal((await f.fetch('/healthz')).status,503);
+  f.reopen();
+  assert.equal((await f.fetch('/healthz')).status,200);
+  assert.deepEqual(await f.db.prepare('SELECT * FROM subscriptions').first(),subscription);
+  assert.deepEqual(await f.db.prepare('SELECT * FROM calendar_entries').first(),before);
+  assert.equal((await f.api(`/api/subscriptions/${created.id}`,'GET',undefined,created.manageToken)).status,200);
+  await f.db.exec('DROP INDEX subscriptions_creation_key');
+  assert.equal((await f.fetch('/healthz')).status,503);
 });
 
 test('scheduled cleanup expires snapshots while retaining current snapshots and stable publication history', async t => {

@@ -90,25 +90,47 @@ export async function buildStandalone({output,release,config={apiBaseUrl:''}} = 
   };
   for (const match of [...html.matchAll(/<link rel="stylesheet" href="\.\/([a-z-]+\.css)">/g)]) {
     let css = await fs.readFile(path.join(sourceRoot,match[1]),'utf8');
-    for (const asset of [...css.matchAll(/url\(['"]?(\.\/assets\/[^)'"\s]+)['"]?\)/g)]) css = css.replaceAll(asset[0],`url('${await dataURI(asset[1])}')`);
-    html = html.replace(match[0],`<style>${css.replace(/<\/style/gi,'<\\/style')}</style>`);
+    for (const asset of [...css.matchAll(/url\(['"]?(\.\/assets\/[^)'"\s]+)['"]?\)/g)]) {
+      const uri=await dataURI(asset[1]);
+      css = css.replaceAll(asset[0],()=>`url('${uri}')`);
+    }
+    html = html.replace(match[0],()=>`<style>${css.replace(/<\/style/gi,'<\\/style')}</style>`);
   }
-  for (const match of [...html.matchAll(/(?:src|href)="(\.\/assets\/[^"\s]+)"/g)]) html = html.replaceAll(match[0],match[0].replace(match[1],await dataURI(match[1])));
+  for (const match of [...html.matchAll(/(?:src|href)="(\.\/assets\/[^"\s]+)"/g)]) {
+    const uri=await dataURI(match[1]);
+    html = html.replaceAll(match[0],()=>match[0].replace(match[1],()=>uri));
+  }
   // The same formal HTML/CSS/app entry is used; no alternate theme is injected.
+  // Callback replacements keep literal dollar sequences intact. A minified
+  // identifier such as `$` followed by && must never expand `$&` to the old tag.
   const embedded = value => JSON.stringify(value).replaceAll('<','\\u003c');
   html = html.replace('<script type="module" src="./app.mjs"></script>',
-    `<script id="calendar-inline-data" type="application/json">${embedded(JSON.parse(bytes))}</script>\n` +
+    ()=>`<script id="calendar-inline-data" type="application/json">${embedded(JSON.parse(bytes))}</script>\n` +
     `<script id="calendar-inline-config" type="application/json">${embedded(config)}</script>\n` +
     `<script type="module">${bundle.outputFiles[0].text.replace(/<\/script/gi,'<\\/script')}</script>`)
-    .replace('</head>',`${releaseTag(release)}\n</head>`);
+    .replace('</head>',()=>`${releaseTag(release)}\n</head>`);
   if (/\b(?:src|href)="\.\/|url\(['"]?\.\/assets\//.test(html)) throw new Error('单文件仍引用本地外部资源。');
   await fs.mkdir(path.dirname(output),{recursive:true});
   await fs.writeFile(output,html);
   return {output,release,bytes:Buffer.byteLength(html)};
 }
 
+export function assertReleaseInputs(version, cwd=projectRoot) {
+    const paths=['static/calendar-reminders','service/calendar','data/calendar','tools/calendar','package.json','package-lock.json'];
+    try {
+      execFileSync('git',['diff','--exit-code',version,'--',...paths],{cwd,stdio:'pipe'});
+      const untracked=execFileSync('git',['ls-files','--others','--exclude-standard','--',...paths],{cwd,encoding:'utf8'});
+      if(untracked.trim())throw new Error('untracked release inputs');
+    } catch {throw new Error('发布源码或生成日期资料与指定提交不一致；请先核对并提交，再重新构建。');}
+}
+
 export async function buildRelease(options = {}, env = process.env) {
   const config = resolveBuildOptions(options,env);
+  // Validate and regenerate on every delivery path, including an independent
+  // CI checkout; tested source records must not be replaced by stale JSON.
+  execFileSync(process.execPath,[path.join(projectRoot,'tools/calendar/build.mjs')],
+    {cwd:projectRoot,stdio:['ignore','pipe','pipe']});
+  if(config.remote)assertReleaseInputs(config.version);
   const data = await fs.readFile(path.join(sourceRoot,'calendar-data.json'));
   const release = {version:config.version,dataVersion:hash(data),rendererVersion:`snapshot-v1-${config.version}`,environment:config.mode};
   // The exact absolute target has been verified inside this project's dist.

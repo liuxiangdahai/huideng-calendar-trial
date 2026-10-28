@@ -4,6 +4,8 @@
 
 项目当前处于技术验收阶段。真实手机通知、国内网络和七天试用必须分别取得证据，浏览器模拟不能代替。
 
+当前技术验收站：[打开慧灯藏历](https://huideng-calendar-trial.pages.dev/calendar-reminders/)。发布应用提交`35f4fdb`；代码检查、三引擎浏览器检查及同版本隔离云端生命周期通过。GitHub自动部署仍待专用Cloudflare API Token，首发使用Wrangler。冷启动长任务、云端CPU及真实设备等未完成项见验收台账。
+
 ## 本地开发
 
 需要 Node.js 24。安装后运行：

@@ -2,6 +2,9 @@ name: Calendar checks and trial release
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
   pull_request:
   workflow_dispatch:
 permissions:
@@ -20,6 +23,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run check:calendar
+      - name: Require committed generated date data
+        run: git diff --exit-code HEAD -- static/calendar-reminders/calendar-data.json static/calendar-reminders/feeds
       - run: npx playwright install --with-deps chromium firefox webkit
       - run: npm run test:browser:all
       - uses: actions/upload-artifact@v4
@@ -45,21 +50,37 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
+      - run: npm run build:calendar
+      - name: Verify release date data matches the checked commit
+        run: git diff --exit-code HEAD -- static/calendar-reminders/calendar-data.json static/calendar-reminders/feeds
       - name: Write environment binding configuration
         env:
           DEPLOY_CONFIG: ${{ secrets.CALENDAR_DEPLOY_CONFIG }}
         run: node -e "require('fs').writeFileSync('deployment.local.json',process.env.DEPLOY_CONFIG)"
+      - name: Verify Cloudflare credential permissions without mutations
+        run: node tools/calendar/cloudflare-metrics.mjs --preflight --output artifacts/cloudflare-preflight.json
       - run: node tools/calendar/build-environment.mjs acceptance
       - run: npx wrangler d1 migrations apply DB --remote --config dist/acceptance/worker/wrangler.json
       - run: npx wrangler deploy --config dist/acceptance/worker/wrangler.json
       - name: Test only the isolated service
         run: node tools/calendar/ci-remote.mjs acceptance smoke
+      - name: Collect isolated service CPU evidence
+        run: node tools/calendar/cloudflare-metrics.mjs --smoke-report artifacts/remote-smoke.json
       - run: node tools/calendar/build-environment.mjs trial
       - run: npx wrangler d1 migrations apply DB --remote --config dist/trial/worker/wrangler.json
       - run: npx wrangler deploy --config dist/trial/worker/wrangler.json
       - run: node tools/calendar/ci-remote.mjs trial health
       - run: npx wrangler pages deploy dist/trial/site --project-name huideng-calendar-trial --branch main
       - run: node tools/calendar/ci-remote.mjs trial verify
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: release-evidence
+          path: |
+            artifacts/remote-smoke.json
+            artifacts/cloudflare-metrics.json
+            artifacts/cloudflare-preflight.json
+          retention-days: 30
   remote-acceptance:
     needs: checks
     if: github.ref == 'refs/heads/main' && vars.CALENDAR_REMOTE_CHECK_ENABLED == 'true' && vars.CALENDAR_DEPLOY_ENABLED != 'true'
