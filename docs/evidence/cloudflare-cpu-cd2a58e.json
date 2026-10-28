@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-28T03:14:51.640Z",
+  "mode": "metrics",
+  "environment": "acceptance",
+  "status": "measured",
+  "probes": [
+    {
+      "kind": "worker",
+      "status": "passed"
+    },
+    {
+      "kind": "database",
+      "status": "passed"
+    },
+    {
+      "kind": "pages",
+      "status": "passed"
+    }
+  ],
+  "analytics": {
+    "status": "available",
+    "requests": 70,
+    "errors": 0,
+    "subrequests": 0,
+    "cpu": {
+      "sourceUnit": "microseconds",
+      "raw": {
+        "p50": 11608,
+        "p95": 65549,
+        "p99": 83787
+      },
+      "milliseconds": {
+        "p50": 11.608,
+        "p95": 65.549,
+        "p99": 83.787
+      },
+      "p95Available": true,
+      "unitVerified": true
+    },
+    "sampling": {
+      "dataset": "workersInvocationsAdaptive",
+      "adaptive": true,
+      "averageSampleInterval": 1,
+      "rawSampleCount": null,
+      "note": "请求数可能为自适应采样估计；平均采样间隔不能用于还原精确原始样本数。"
+    },
+    "outcomes": [
+      {
+        "status": "success",
+        "requests": 70,
+        "errors": 0
+      }
+    ],
+    "performanceAcceptance": "pending",
+    "note": "这是隔离服务时间窗口的汇总。未按冷生成、快照命中或修改分别分组；不代表逐请求 CPU 或免费额度已通过。无数据也不能视为零耗时。"
+  },
+  "releaseAcceptance": "pending",
+  "note": "只读预检证明读取权限与资源可达，不能证明写权限、正式部署、费用或真实手机通知通过。",
+  "version": "cd2a58ef9f90f5962a53c6e1302aa78439b4e6af",
+  "window": {
+    "start": "2026-10-28T03:13:37.259Z",
+    "end": "2026-10-28T03:14:51.379Z",
+    "purpose": "isolated_smoke_window"
+  },
+  "clientRecordedRequests": 106
+}

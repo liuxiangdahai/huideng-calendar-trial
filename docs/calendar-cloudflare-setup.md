@@ -23,6 +23,10 @@
 
 ## 唯一发布链路
 
+2026-10-28：`CALENDAR_DEPLOY_ENABLED=true`，首次完整自动发布[40624756309](https://github.com/liuxiangdahai/huideng-calendar-trial/actions/runs/40624756309)成功，应用为`cd2a58ef9f90f5962a53c6e1302aa78439b4e6af`。两套Worker/D1（含0003迁移）与Pages已经更新，实际HTTPS前后端版本校验通过。Token的资源读取和Analytics读取通过，部署操作也验证所需写权限。前节35f4fdb记录为首发历史。
+
+CPU诊断已可读取，但首批p95=65.549ms，未达到8ms目标。流水线完成不代表性能、免费额度或试用邀请门槛完成；不自动付费。仅更新docs或README不会重新发布应用。
+
 `.github/workflows/calendar-trial.yml`：检查 → 三引擎浏览器回归 → 隔离 Worker/D1 → 隔离远端联调 → 试用 Worker/健康检查 → Pages → 前后端版本校验。
 
 初期 `CALENDAR_DEPLOY_ENABLED` 不开启，避免配置未就绪自动部署。GitHub Actions 需要单独的账号 API Token；不把会过期的本机 OAuth 凭证复制到 CI。配置：
