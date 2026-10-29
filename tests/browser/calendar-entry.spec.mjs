@@ -24,7 +24,7 @@ async function deviceContext(browser, device, savedApp) {
 
 // Retain the real local API and capability generation. Only replace the returned
 // feed origin, so the HTTPS-only native entry can be exercised without deploying.
-async function httpsService(page, { failFirst = false, holdFirst = false, loseFirstResponse = false } = {}) {
+async function httpsService(page, { failFirst = false, holdFirst = false, loseFirstResponse = false, preserveOrigin = false } = {}) {
   let release;
   const gate = holdFirst ? new Promise(resolve => { release = resolve; }) : Promise.resolve();
   const state = { posts: 0, received: false, attempts: [], firstCreated: null, release: () => release?.() };
@@ -45,7 +45,7 @@ async function httpsService(page, { failFirst = false, holdFirst = false, loseFi
       // Real POST already committed. Only the response is lost in transit.
       if(loseFirstResponse) {await route.abort('failed');return;}
     }
-    if (body.feedUrl) {
+    if (body.feedUrl && !preserveOrigin) {
       const url = new URL(body.feedUrl);
       body.feedUrl = `https://calendar.example${url.pathname}${url.search}`;
     }
@@ -60,10 +60,10 @@ async function openSelected(page) {
   await page.locator('[data-preset="guru"]').click();
 }
 
-async function ready(page) {
+async function ready(page, local = false) {
   await expect(page.locator('#subscription-existing')).toBeVisible();
   await expect(page.locator('#copy-feed')).toBeEnabled();
-  await expect(page.locator('#feed-url')).toHaveValue(/^https:\/\/calendar\.example\/calendar\/.+\.ics$/);
+  await expect(page.locator('#feed-url')).toHaveValue(local ? /^http:\/\/127\.0\.0\.1:4173\/calendar\/.+\.ics$/ : /^https:\/\/calendar\.example\/calendar\/.+\.ics$/);
   await expect(page.locator('#subscription-status')).toContainText('设置已保存');
   return read(page);
 }
@@ -124,6 +124,17 @@ test('remembered Google choice overrides Apple recommendation and desktop opens 
     expect(await page.locator('#google-subscribe').getAttribute('href')).not.toContain(sub.manageToken);
     await page.locator('input[name="device"][value="iphone"]').check();
     await expect(page.locator('#iphone-subscribe')).toBeVisible();
+    await page.locator('input[name="device"][value="outlook"]').check();
+    await expect(page.locator('#outlook-subscribe')).toBeVisible();
+    await expect(page.locator('#outlook-subscribe')).toHaveAttribute('href','https://outlook.live.com/calendar/');
+    await page.locator('[data-guide-help="adding-outlook"] > summary').click();
+    await expect(page.locator('#device-guide')).toContainText('从 Web 订阅');
+    await page.locator('[data-guide-help="outlook-classic"] > summary').click();
+    await expect(page.locator('[data-guide-help="outlook-classic"]')).toContainText('从 Internet');
+    await page.locator('[data-guide-expand] > summary').click();
+    await expect(page.locator('.guide-notification-body')).toContainText('在电脑上操作');
+    await expect(page.locator('.guide-notification-body')).not.toContainText('请拿起手机');
+    await expect(page.locator('#guide-seen')).not.toBeChecked();
     await page.locator('input[name="device"][value="other"]').check();
     await expect(page.locator('#iphone-subscribe,#google-subscribe').filter({ visible: true })).toHaveCount(0);
     expect(service.posts).toBe(1);
@@ -134,8 +145,9 @@ test('remembered Google choice overrides Apple recommendation and desktop opens 
   } finally { await context.close(); }
 });
 
-test('Android Google uses a computer handoff and other calendars expose explicit copy and import actions', async ({ browser, browserName }) => {
+test('Android handoff keeps copy and import available while actual ICS checks fail or become stale', async ({ browser, browserName }) => {
   const context = await deviceContext(browser, devices.android);
+  let releaseCheck;
   try {
     if (browserName === 'chromium') await context.grantPermissions(['clipboard-read', 'clipboard-write']);
     else await context.addInitScript(() => {
@@ -145,11 +157,24 @@ test('Android Google uses a computer handoff and other calendars expose explicit
       let copied='';
       Object.defineProperty(navigator,'clipboard',{value:{writeText:async text=>{copied=text;},readText:async()=>copied},configurable:true});
     });
-    const page = await context.newPage(); const service = await httpsService(page);
+    const page = await context.newPage(); const service = await httpsService(page,{preserveOrigin:true});
+    let probes=0,mode='real';
+    const publicRequests=[];
+    await page.route('**/calendar/*.ics',async route=>{
+      probes++;publicRequests.push(route.request());
+      if(mode==='real'){await route.fallback();return;}
+      if(mode==='hold') await new Promise(resolve=>{releaseCheck=resolve;});
+      await route.fulfill({status:200,contentType:'text/html',body:'<html>unavailable</html>'}).catch(()=>{});
+    });
     await openSelected(page); await page.locator('#subscribe').click();
     expect(service.posts).toBe(0);
     await page.locator('input[name="device"][value="google"]').check();
-    const sub = await ready(page);
+    const sub = await ready(page,true);
+    await expect(page.locator('#connection-result')).toHaveText('本次连接检查正常');
+    await expect(page.locator('#connection-time')).toBeVisible();
+    expect(probes).toBe(1);
+    expect(publicRequests[0].headers().authorization).toBeUndefined();
+    expect(publicRequests[0].url()).not.toContain(sub.manageToken);
     await expect(page.locator('#google-subscribe')).toBeHidden();
     await expect(page.locator('#device-guide')).toContainText('电脑');
     await expect(page.locator('#device-guide')).toContainText('手机');
@@ -165,8 +190,26 @@ test('Android Google uses a computer handoff and other calendars expose explicit
     await page.locator('.download-fallback > summary').click();
     await expect(page.locator('[data-download="remind"]')).toBeVisible();
     await expect(page.locator('#guide-seen')).not.toBeChecked();
+    mode='html';await page.locator('#check-connection').click();
+    await expect(page.locator('#connection-result')).toHaveText('本次连接检查失败');
+    await expect(page.locator('#connection-note')).toContainText('不是日历文件');
+    await expect(page.locator('#copy-feed')).toBeEnabled();
+    await expect(page.locator('[data-download="remind"]')).toBeEnabled();
+    await page.locator('[data-close="subscription-dialog"]').first().click();
+    await page.locator('#my-subscription').click();
+    expect(probes).toBe(2); // Reopening never starts polling or another automatic check.
+    mode='hold';await page.locator('#check-connection').click();
+    await expect.poll(()=>Boolean(releaseCheck)).toBe(true);
+    await page.locator('[data-close="subscription-dialog"]').first().click();
+    await page.locator('[data-preset="tsok"]').click();await page.locator('#subscribe').click();
+    await expect(page.locator('#connection-title')).toHaveText('设置已保存，等待日历同步');
+    releaseCheck();
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    await expect(page.locator('#connection-result')).not.toContainText('失败');
+    expect((await read(page)).feedUrl).toBe(sub.feedUrl);
+    expect(probes).toBe(3);
     expect(service.posts).toBe(1);
-  } finally { await context.close(); }
+  } finally { releaseCheck?.();await context.close(); }
 });
 
 test('slow preparation survives closing and app changes without duplicate creation or automatic navigation', async ({ browser }) => {
@@ -352,18 +395,63 @@ test('clipboard denial offers a selectable read-only URL without implying subscr
 test('in-app browser help is explicit and never fabricates an external-browser or calendar success callback', async ({ browser }) => {
   const context = await deviceContext(browser, { ...devices.iphone, userAgent: devices.iphone.userAgent + ' MicroMessenger/8.0.50' });
   try {
-    const page = await context.newPage(); await httpsService(page);
-    await openSelected(page); await page.locator('#subscribe').click(); await ready(page);
+    const page = await context.newPage(); const service=await httpsService(page);
+    await openSelected(page);await page.locator('#my-subscription').click();
+    const notice=page.locator('#apple-browser-notice');
+    await expect(notice).toBeVisible();
+    await expect(notice).toContainText('请先在 Safari 中打开');
+    await expect(notice).toContainText('右上角');
+    expect(service.posts).toBe(0);
+    await page.locator('[data-close="subscription-dialog"]').first().click();
+    await page.locator('#subscribe').click();
+    await expect(page.locator('#create-subscription')).toBeHidden();
+    await expect(page.locator('#connection-title')).toHaveText('尚未准备');
+    await expect(page.locator('#entry-hint')).toContainText('不会自动同步');
+    await expect(page.locator('#copy-page')).toBeVisible();
+    expect(service.posts).toBe(0);
+    // An existing subscription can still be recovered or managed in WeChat.
+    // Prepare through an explicitly chosen supported app, then return to Apple.
+    await page.locator('input[name="device"][value="google"]').check();
+    const sub=await ready(page);
+    await page.locator('input[name="device"][value="iphone"]').check();
+    await expect(page.locator('#iphone-subscribe')).toBeHidden();
+    await expect(page.locator('#iphone-subscribe')).not.toHaveAttribute('href');
+    await expect(page.locator('#copy-feed')).toBeVisible();
+    await expect(page.locator('#copy-feed')).toBeEnabled();
+    await expect(page.locator('#feed-url')).toHaveValue(sub.feedUrl);
+    await expect(page.locator('#entry-hint')).toContainText('HTTPS');
     const help = page.locator('[data-guide-help="open-failed"]');
-    await help.locator('summary').click();
+    await page.locator('#apple-browser-help').click();
+    await expect(help).toHaveAttribute('open','');
+    await expect(help.locator('summary')).toBeFocused();
     await expect(help).toContainText('微信');
     await expect(help).toContainText('浏览器');
     await expect(help).toContainText('Safari');
+    await expect(help).toContainText('本机设置不互通');
+    await expect(help).toContainText('请勿转发管理链接');
+    expect((await notice.innerText()).includes(sub.manageToken)).toBe(false);
     await expect(page.locator('a[href^="app-settings:"],a[href^="intent:"],a[href^="x-safari-"]')).toHaveCount(0);
+    await expect(page.locator('a[href^="webcal:"],a[href^="webcals:"]')).toHaveCount(0);
+    const connectionHelp=page.locator('[data-guide-help="apple-connection"]');
+    await connectionHelp.locator('summary').click();
+    await expect(connectionHelp).toContainText('https://');
+    await expect(connectionHelp).toContainText('不要关闭 SSL');
+    await expect(connectionHelp).toContainText('查找／Find');
+    await expect(connectionHelp).toContainText('不代表日历应用能够连接订阅服务');
     await page.locator('#copy-feed').click();
     await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
     await expect(page.locator('#guide-seen')).not.toBeChecked();
     await expect(page.locator('#guide-reminders')).not.toBeChecked();
+    await page.locator('input[name="device"][value="google"]').check();
+    await expect(notice).toBeHidden();
+    await page.locator('input[name="device"][value="iphone"]').check();
+    await expect(notice).toBeVisible();
+    expect(service.posts).toBe(1);
+    expect((await read(page)).feedUrl===sub.feedUrl).toBe(true);
+    await page.setViewportSize({width:320,height:640});
+    expect(await page.locator('#subscription-dialog').evaluate(dialog=>dialog.scrollWidth<=dialog.clientWidth+1)).toBe(true);
+    await page.locator('#apple-browser-help').click();
+    await expect(help.locator('summary')).toBeFocused();
   } finally { await context.close(); }
 });
 
@@ -426,6 +514,7 @@ test('management restore waits for a delayed save and keeps B id, token, draft a
     const page = await context.newPage(); await httpsService(page);
     await openSelected(page); await page.locator('#subscribe').click(); const a = await ready(page);
     const b = await createRemoteB(context, a);
+    await page.locator('#guide-seen').check();await page.locator('#guide-reminders').check();
     const order = [], bRequests = [], leaked = [];
     page.on('request', request => {
       if (request.url().endsWith(`/api/subscriptions/${b.id}`)) {
@@ -445,6 +534,7 @@ test('management restore waits for a delayed save and keeps B id, token, draft a
     await expect(page.locator('#subscribe')).toBeDisabled();
     await expect(page.locator('#my-subscription')).toBeEnabled();
     held.release(); await expectB(page, b);
+    await expect(page.locator('#guide-seen')).not.toBeChecked();
     expect(order.indexOf('GET B')).toBeGreaterThan(order.indexOf('release PATCH A'));
     expect((await context.request.get(`${origin}/api/subscriptions/${a.id}`, { headers: { Authorization: `Bearer ${a.manageToken}` } })).ok()).toBe(true);
     await page.locator('[data-close="subscription-dialog"]').first().click();
@@ -514,6 +604,7 @@ test('successful stop clears a previous error and allows a new explicit subscrip
   try {
     const page = await context.newPage(); const service = await httpsService(page);
     await openSelected(page); await page.locator('#subscribe').click(); const a = await ready(page);
+    await page.locator('#guide-seen').check();await page.locator('#guide-reminders').check();
     await page.evaluate(() => { location.hash = 'manage=incomplete'; });
     await expect(page.locator('#subscription-error')).toContainText('管理链接不完整');
     await page.locator('.management > summary').click();

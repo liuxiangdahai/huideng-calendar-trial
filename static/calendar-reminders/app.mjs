@@ -10,7 +10,8 @@ import {reminderTestICS} from './reminder-test.mjs';
 import {PRESETS,presetIds,applyPreset,matchingPreset} from './presets.mjs';
 import {timeComparison} from './time-comparison.mjs';
 import {eventPresentation,eventIcon} from './event-presentation.mjs';
-import {calendarEnvironment,appleSubscriptionUrl,GOOGLE_ADD_URL} from './calendar-entry.mjs';
+import {calendarEnvironment,appleSubscriptionUrl,GOOGLE_ADD_URL,OUTLOOK_URL} from './calendar-entry.mjs';
+import {checkSubscriptionConnection} from './connection-check.mjs';
 import {cloneSettings as clone,fetchJSON} from './runtime.mjs';
 import {createMobileTabs} from './mobile-tabs.mjs';
 
@@ -30,6 +31,7 @@ let managementRestoring = false;
 let subscriptionVersion = 0, pendingWrite = null;
 let entryError = false;
 let pendingCreation = null, creationBlocked = false;
+let connection = {state:'idle'}, connectionController = null, lastWriteKind = '';
 const calendarDevice = calendarEnvironment();
 const countSelected = () => Object.values(settings.events).filter(pref => pref.mode !== 'off').length;
 const dirty = () => Boolean(subscription && JSON.stringify(settings) !== JSON.stringify(subscription.savedSettings));
@@ -173,28 +175,72 @@ function openReminders(ids, title, trigger=document.activeElement) {
 }
 function deviceGuide() {
   const app=currentApp();
+  const inAppApple=app==='iphone' && calendarDevice.apple && Boolean(calendarDevice.inAppBrowser);
   const appleUrl=appleSubscriptionUrl(subscription?.feedUrl);
   const ready=Boolean(subscription && !requestPending && !managementRestoring && !dirty() && !conflict);
   guide?.update({app,hasReminders:hasReminders(),hasSubscription:Boolean(subscription),preparing:requestPending||managementRestoring,entryReady:ready});
   const apple=$('#iphone-subscribe');
-  apple.hidden = app !== 'iphone' || !calendarDevice.apple || !appleUrl;
+  apple.hidden = app !== 'iphone' || !calendarDevice.apple || !appleUrl || inAppApple;
   if(ready) apple.removeAttribute('aria-disabled'); else apple.setAttribute('aria-disabled','true');
   apple.tabIndex=ready ? 0 : -1;
-  if(ready && appleUrl) apple.href=appleUrl; else apple.removeAttribute('href');
+  if(ready && appleUrl && !inAppApple) apple.href=appleUrl; else apple.removeAttribute('href');
+  $('#apple-browser-notice').hidden=!inAppApple;
+  $('#apple-browser-title').textContent=calendarDevice.appleMobile ? '请先在 Safari 中打开' : '请先在系统浏览器中打开';
+  $('#apple-browser-message').textContent=inAppApple ? `当前在${calendarDevice.inAppBrowser}中，日历跳转可能被拦截。请点右上角“…”菜单，选择“在浏览器中打开”或“在 Safari 中打开”。` : '';
   const google=$('#google-subscribe');
   google.hidden=app!=='google'||calendarDevice.mobile||!subscription;
   if(ready) google.removeAttribute('aria-disabled'); else google.setAttribute('aria-disabled','true');
   google.tabIndex=ready ? 0 : -1;
   if(ready) google.href=GOOGLE_ADD_URL; else google.removeAttribute('href');
+  const outlook=$('#outlook-subscribe');
+  outlook.hidden=app!=='outlook'||calendarDevice.mobile||!subscription;
+  outlook.tabIndex=ready ? 0 : -1;
+  if(ready) {outlook.href=OUTLOOK_URL;outlook.removeAttribute('aria-disabled');}
+  else {outlook.removeAttribute('href');outlook.setAttribute('aria-disabled','true');}
   $('#copy-feed').disabled=!ready;
-  $('#copy-feed').classList.toggle('primary',app==='other'||app==='google'&&calendarDevice.mobile||app==='iphone'&&!calendarDevice.apple);
+  $('#copy-feed').classList.toggle('primary',app==='other'||['google','outlook'].includes(app)&&calendarDevice.mobile||app==='iphone'&&(!calendarDevice.apple||inAppApple));
   $('#copy-feed').classList.toggle('secondary',!$('#copy-feed').classList.contains('primary'));
-  $('#entry-hint').textContent=managementRestoring ? '正在恢复订阅，请稍候。' : !app ? '选择日历应用后，查看对应的添加方式。' : requestPending ? '正在保存你的选择，请稍候。' : !subscription ? '选好日历应用后，我们会准备你的订阅。' : !ready ? '先保存修改，再继续添加到日历。' : app==='iphone' ? calendarDevice.apple ? '将在系统日历中打开订阅确认，请按提示添加。' : '请把订阅地址传到你的 iPhone、iPad 或 Mac 上添加。' : app==='google' ? calendarDevice.mobile ? '请将订阅地址传到电脑，在 Google 日历网页中添加。' : '先复制订阅地址，再打开 Google 日历的“通过网址添加”页面。' : '应用有网址订阅入口时可粘贴此地址；否则请查看下方文件导入方式。';
+  $('#entry-hint').textContent=managementRestoring ? '正在恢复订阅，请稍候。' : !app ? '选择日历应用后，查看对应的添加方式。' : requestPending ? '正在保存你的选择，请稍候。' : !subscription ? '选好日历应用后，我们会准备你的订阅。' : !ready ? '先保存修改，再继续添加到日历。' : inAppApple ? '也可复制上方的 HTTPS 订阅地址，在 Apple 日历中手动添加。复制后仍需到日历中确认。' : app==='iphone' ? calendarDevice.apple ? '将在系统日历中打开订阅确认，请按提示添加。' : '请把订阅地址传到你的 iPhone、iPad 或 Mac 上添加。' : app==='google' ? calendarDevice.mobile ? '请将订阅地址传到电脑，在 Google 日历网页中添加。' : '先复制订阅地址，再打开 Google 日历的“通过网址添加”页面。' : '应用有网址订阅入口时可粘贴此地址；否则请查看下方文件导入方式。';
+  if(app==='outlook') $('#entry-hint').textContent=ready ? '先复制订阅地址，在 Outlook 网页版选择“添加日历 → 从 Web 订阅”；也可查看经典桌面版步骤。' : $('#entry-hint').textContent;
+  if(inAppApple && !subscription) $('#entry-hint').textContent='请先在 Safari 或系统浏览器打开本页，再选择内容并准备订阅。微信与浏览器的本机草稿不会自动同步。';
+  $('#create-subscription').hidden=inAppApple && !subscription;
+  $('#copy-page').hidden=!inAppApple;
   $('#create-subscription').disabled = !app || !countSelected() || requestPending || managementRestoring || !settings.zone || creationBlocked;
   $('#create-subscription-label').textContent=managementRestoring ? '正在恢复订阅…' : requestPending ? '正在准备订阅…' : entryError ? '重试准备订阅' : app ? '继续订阅' : '请先选择日历应用';
   $('#subscription-new').setAttribute('aria-busy',String(requestPending||managementRestoring));
-  $('#restart-creation').hidden=Boolean(subscription)||!creationBlocked;
+  $('#restart-creation').hidden=Boolean(subscription)||!creationBlocked||inAppApple;
   $('#restart-creation').disabled=requestPending||managementRestoring;
+}
+function resetConnection() {
+  connectionController?.abort(); connectionController=null; connection={state:'idle'};
+}
+function renderConnection() {
+  const busy=requestPending||managementRestoring;
+  const title=busy ? (managementRestoring ? '正在恢复订阅' : subscription ? '正在保存设置' : '正在准备订阅') : stopped ? '已停用' :
+    !subscription ? '尚未准备' : lastWriteKind==='saved' ? '设置已保存，等待日历同步' : '地址已生成';
+  $('#connection-title').textContent=title;
+  const checking=connection.state==='checking';
+  $('#connection-status').setAttribute('aria-busy',String(checking||busy));
+  $('#connection-symbol').innerHTML=icon(stopped?'bell-off':connection.state==='ok'?'check':connection.state==='error'?'globe':'calendar');
+  $('#connection-result').textContent=stopped ? '请在日历应用中移除这份订阅。' : !subscription ? '选择日历应用后，按步骤准备订阅。' : checking ? '正在检查服务与日历内容…' :
+    connection.state==='ok' ? '本次连接检查正常' : connection.state==='error' ? '本次连接检查失败' : '可直接添加到日历，也可检查当前网络连接。';
+  $('#connection-note').textContent=busy ? '你的选择会保留，请稍候。' : connection.message || '';
+  $('#connection-time').textContent=connection.checkedAt ? `检查时间：${new Intl.DateTimeFormat('zh-CN',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(new Date(connection.checkedAt))}（设备时间）` : '';
+  $('#connection-time').hidden=!connection.checkedAt;
+  if(connection.checkedAt) $('#connection-time').dateTime=connection.checkedAt; else $('#connection-time').removeAttribute('datetime');
+  $('#check-connection').hidden=!subscription;
+  $('#check-connection').disabled=checking||busy;
+  $('#check-connection').textContent=checking ? '正在检查…' : connection.state==='error' ? '重试检查' : '检查连接';
+}
+async function checkConnection() {
+  if(!subscription || requestPending || managementRestoring || connectionController) return;
+  const controller=new AbortController(), expected={id:subscription.id,revision:subscription.revision,feedUrl:subscription.feedUrl,version:subscriptionVersion};
+  connectionController=controller;connection={state:'checking'};renderConnection();
+  const result=await checkSubscriptionConnection({apiBaseUrl,feedUrl:expected.feedUrl,signal:controller.signal});
+  if(controller!==connectionController || expected.version!==subscriptionVersion || expected.id!==subscription?.id || expected.revision!==subscription?.revision || expected.feedUrl!==subscription?.feedUrl) return;
+  connectionController=null;
+  if(result.state!=='cancelled') connection=result;
+  renderConnection();
 }
 function renderSubscription() {
   $('#subscription-summary').textContent = `已选 ${countSelected()} 项 · 全天显示 · ${zoneLabel()}`;
@@ -213,7 +259,7 @@ function renderSubscription() {
     const count = upcoming.filter(event => event.preference.mode === mode).length;
     return count ? `<button class="secondary" type="button" data-download="${mode}">${icon('download')}下载${mode === 'remind' ? '提醒' : '仅显示'}日历 · ${count} 项日程</button>` : '';
   }).join('') || '<p>近期没有可下载的已选日程。</p>';
-  deviceGuide(); renderSaveState();
+  deviceGuide(); renderSaveState(); renderConnection();
 }
 function openSubscription({prepare=false}={}) {
   if(!entryError) $('#subscription-error').hidden = true;
@@ -232,6 +278,7 @@ function openSubscription({prepare=false}={}) {
 }
 async function prepareSubscription({retry=false}={}) {
   if(subscription || requestPending || managementRestoring || creationBlocked || !currentApp() || !countSelected() || !settings.zone) return;
+  if(currentApp()==='iphone' && calendarDevice.apple && calendarDevice.inAppBrowser) return;
   // Changing the target app must not silently retry a failed/expired creation.
   if(entryError&&!retry) return;
   await saveSubscription(true);
@@ -273,6 +320,7 @@ function clearSubscriptionError() {
 }
 function acceptRemote(result, force = false) {
   if (result.disabled) {
+    resetConnection();lastWriteKind='';
     clearSubscriptionError();
     subscription = null; conflict = false; stopped = true; persist(); renderSaveState(); renderSubscription();
     notify('这份订阅已停用。请在手机日历中移除原订阅。');
@@ -282,6 +330,8 @@ function acceptRemote(result, force = false) {
   const feedUrl=safeHTTP(result.feedUrl || subscription?.feedUrl);
   if(!feedUrl) throw new Error('订阅服务返回的地址无效。你的选择已保留，请稍后重试。');
   clearSubscriptionError();
+  if(result.id && result.id!==subscription?.id) guide?.resetConfirmations();
+  if(subscription && (result.id && result.id!==subscription.id || result.revision!==subscription.revision || feedUrl!==subscription.feedUrl)) {resetConnection();lastWriteKind='';}
   if (force || !dirty()) {settings = clone(remote);}
   subscription = {...subscription,id:result.id || subscription?.id,manageToken:result.manageToken || subscription?.manageToken,
     feedUrl,revision:result.revision,savedSettings:remote};
@@ -315,6 +365,8 @@ function saveSubscription(create = false) {
 async function performSaveSubscription(create) {
   if (conflict) { openSubscription(); showSubscriptionError({status:409}); return; }
   subscriptionVersion++;
+  resetConnection();
+  let createdSuccessfully=false;
   requestPending = true; entryError=false; renderSubscription(); $('#subscription-error').hidden = true;
   try {
     // Validate the complete feed before sending settings. DST changes use the
@@ -332,6 +384,7 @@ async function performSaveSubscription(create) {
     const changedDuringSave = JSON.stringify(settings) !== JSON.stringify(submitted);
     const latestDraft = clone(settings);
     acceptRemote(result,true);
+    lastWriteKind=create?'created':'saved';createdSuccessfully=create;
     if(create) {
       const saved=readStored(subscriptionKey);
       // Do not discard the recovery capability if saving the returned credentials
@@ -347,6 +400,7 @@ async function performSaveSubscription(create) {
   } catch (error) { showSubscriptionError(error); }
   finally {
     requestPending = false; renderSubscription();
+    if(createdSuccessfully) void checkConnection();
     // Keep the next real click close to the user's focus after the disappearing
     // preparation control. Never launch a protocol from this async callback.
     if(create && subscription && $('#subscription-dialog').open &&
@@ -360,6 +414,7 @@ function stopSubscription() {
   if(requestPending || managementRestoring || !subscription) return;
   const current={id:subscription.id,manageToken:subscription.manageToken};
   subscriptionVersion++;
+  resetConnection();
   requestPending=true; $('#confirm-stop').disabled=true; renderSubscription();
   return trackWrite((async()=>{
     try {
@@ -493,11 +548,21 @@ function attachEvents() {
   });
   document.querySelectorAll('input[name="device"]').forEach(input => input.addEventListener('change',()=>{ui.app=input.value;persistUI();$('#entry-attempt').hidden=true;deviceGuide();void prepareSubscription();}));
   $('#copy-feed').addEventListener('click',() => {if(subscription && !requestPending && !managementRestoring && !dirty() && !conflict) void copy(subscription.feedUrl,'订阅地址');});
-  for(const selector of ['#iphone-subscribe','#google-subscribe']) $(selector).addEventListener('click',event=>{
+  $('#check-connection').addEventListener('click',checkConnection);
+  $('#copy-page').addEventListener('click',()=>{const url=new URL(location.href);url.hash='';url.search='';void copy(url.href,'网页地址');});
+  $('#apple-browser-help').addEventListener('click',()=>{
+    const help=$('[data-guide-help="open-failed"]');
+    if(!help || currentApp()!=='iphone')return;
+    help.open=true;
+    const summary=help.querySelector('summary');
+    summary?.scrollIntoView({block:'center',behavior:'auto'});
+    summary?.focus({preventScroll:true});
+  });
+  for(const selector of ['#iphone-subscribe','#google-subscribe','#outlook-subscribe']) $(selector).addEventListener('click',event=>{
     if(!subscription || requestPending || managementRestoring || dirty() || conflict || !event.currentTarget.hasAttribute('href')) {event.preventDefault();return;}
     // No success signal: only the user can confirm seeing the events.
     $('#entry-attempt').hidden=false;
-    $('#entry-attempt').textContent=selector==='#iphone-subscribe' ? '请在日历中确认添加。若没有打开，可查看下方帮助或复制订阅地址。' : '请在 Google 日历网页中粘贴订阅地址并确认添加。';
+    $('#entry-attempt').textContent=selector==='#iphone-subscribe' ? '请在日历中确认添加。若没有打开，可查看下方帮助或复制订阅地址。' : selector==='#outlook-subscribe' ? '请在 Outlook 网页版的“从 Web 订阅”中粘贴地址并确认添加。工作或学校账号也可使用所在组织的 Outlook 网页版。' : '请在 Google 日历网页中粘贴订阅地址并确认添加。';
   });
   $('#copy-management').addEventListener('click',() => {
     const url = new URL(location.href); url.hash = `manage=${subscription.id}.${subscription.manageToken}`;
@@ -522,6 +587,7 @@ async function restoreManagementLink() {
   if (manage === null) return;
   const attempt = ++managementAttempt;
   subscriptionVersion++;
+  resetConnection();lastWriteKind='';
   managementRestoring=false;
   // Remove the management capability before making any request. A fragment-only
   // navigation must work as well as opening the link in a new browser tab.
@@ -544,6 +610,7 @@ async function restoreManagementLink() {
     if (attempt !== managementAttempt) return;
     if (result.disabled) throw new Error('此管理链接对应的订阅已停用。原有设置已保留。');
     if (!safeHTTP(result.feedUrl)) throw new Error('此管理链接无法读取有效的订阅地址。原有设置已保留。');
+    if(candidate.id!==subscription?.id) guide?.resetConfirmations();
     subscription = {...candidate,savedSettings:clone(settings)};
     acceptRemote(result,true);
   } catch (error) { if (attempt === managementAttempt) showSubscriptionError(error); }
@@ -586,8 +653,8 @@ async function init() {
     onEditEvent:(id,trigger)=>{const item=data.catalog.events.find(event=>event.id===id);if(item)openReminders([id],item.title,trigger);}});
   guide=createSubscriptionGuide($('#device-guide'),{notificationRoot:$('#notification-guide'),initialState:ui.guide,
     onStateChange:state=>{ui.guide=state;persistUI();},onTestReminder:downloadReminderTest});
-  const savedApp=['iphone','google','other'].includes(ui.app) ? ui.app : ui.guide?.app;
-  if(['iphone','google','other'].includes(savedApp)) $(`input[name="device"][value="${savedApp}"]`).checked=true;
+  const savedApp=['iphone','google','outlook','other'].includes(ui.app) ? ui.app : ui.guide?.app;
+  if(['iphone','google','outlook','other'].includes(savedApp)) $(`input[name="device"][value="${savedApp}"]`).checked=true;
   attachEvents(); $('#app').hidden = false; renderGroups(); renderPresets();renderPreview(); persist();persistUI();checkDeviceTime();
   if(pendingCreation?.blocked) showSubscriptionError(pendingCreation.blocked);
   // Reuse the browser's completed layout. Writing a root variable between two

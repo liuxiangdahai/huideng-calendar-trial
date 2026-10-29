@@ -1,14 +1,19 @@
 {
-  "siteOrigin": "https://huideng-calendar-trial.pages.dev",
   "acceptance": {
+    "siteOrigin": "https://huideng-calendar-acceptance.pages.dev",
+    "publicApiOrigin": "https://huideng-calendar-acceptance.pages.dev",
+    "workerOrigin": "https://huideng-calendar-acceptance.YOUR-SUBDOMAIN.workers.dev",
+    "pagesProjectName": "huideng-calendar-acceptance",
     "workerName": "huideng-calendar-acceptance",
-    "apiBaseUrl": "https://huideng-calendar-acceptance.YOUR-SUBDOMAIN.workers.dev",
     "databaseName": "huideng-calendar-acceptance",
     "databaseId": "REPLACE_WITH_ACCEPTANCE_DATABASE_UUID"
   },
   "trial": {
+    "siteOrigin": "https://huideng-calendar-trial.pages.dev",
+    "publicApiOrigin": "https://huideng-calendar-trial.pages.dev",
+    "workerOrigin": "https://huideng-calendar-trial.YOUR-SUBDOMAIN.workers.dev",
+    "pagesProjectName": "huideng-calendar-trial",
     "workerName": "huideng-calendar-trial",
-    "apiBaseUrl": "https://huideng-calendar-trial.YOUR-SUBDOMAIN.workers.dev",
     "databaseName": "huideng-calendar-trial",
     "databaseId": "REPLACE_WITH_TRIAL_DATABASE_UUID"
   }

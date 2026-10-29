@@ -5,6 +5,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {pagesMetrics} from './pages-metrics.mjs';
 
 const root=fileURLToPath(new URL('../../',import.meta.url));
 const API='https://api.cloudflare.com/client/v4';
@@ -108,9 +109,11 @@ export async function run(args=process.argv.slice(2),env=process.env){
   if(target?.workerName!=='huideng-calendar-acceptance'||!trial||target.databaseId===trial.databaseId||target.workerName===trial.workerName||!/^[a-f0-9-]{36}$/i.test(target.databaseId||''))throw failure('invalid_config','隔离资源配置无效。');
   const probes=[['worker',`/accounts/${account}/workers/scripts/${target.workerName}/script-settings`],
    ['database',`/accounts/${account}/d1/database/${target.databaseId}`],
-   ['pages',`/accounts/${account}/pages/projects/huideng-calendar-trial`]];
+   ['pages-trial',`/accounts/${account}/pages/projects/huideng-calendar-trial`],
+   ['pages-acceptance',`/accounts/${account}/pages/projects/huideng-calendar-acceptance`]];
+  let pagesProject;
   for(const [kind,url] of probes){
-   try{await request(token,url);report.probes.push({kind,status:'passed'});}
+   try{const resource=await request(token,url);if(kind==='pages-acceptance')pagesProject=resource.result;report.probes.push({kind,status:'passed'});}
    catch(error){report.probes.push({kind,status:'failed'});throw error;}
   }
   if(opt.preflight){
@@ -123,6 +126,8 @@ export async function run(args=process.argv.slice(2),env=process.env){
    report.clientRecordedRequests=smoke.timing.length;
   }
   report.analytics=await metrics(token,account,target,report.window);
+  try{report.gatewayAnalytics=await pagesMetrics((q)=>graphql(token,q),account,pagesProject,report.window,summarizeMetrics,cpuSchema);}
+  catch{report.gatewayAnalytics={status:'pending',reason:'Pages指标查询尚未完成，不能以后台指标替代。',performanceAcceptance:'pending'};}
   report.status=opt.preflight?'read_access_verified':report.analytics.status==='available'?'measured':'data_pending';
  }catch(error){
   report.status='failed';report.failure=error instanceof ProbeError?{code:error.code,message:error.message,httpStatus:error.status}:{code:'unexpected',message:'诊断未完成；原始错误不输出，以保护凭证和资源信息。'};

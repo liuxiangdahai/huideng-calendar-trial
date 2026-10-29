@@ -62,15 +62,19 @@ jobs:
       - run: node tools/calendar/build-environment.mjs acceptance
       - run: npx wrangler d1 migrations apply DB --remote --config dist/acceptance/worker/wrangler.json
       - run: npx wrangler deploy --config dist/acceptance/worker/wrangler.json
-      - name: Test only the isolated service
+      - run: node tools/calendar/ci-remote.mjs acceptance worker-health
+      - name: Deploy isolated Pages and its service binding
+        run: npx wrangler pages deploy --cwd dist/acceptance/pages --project-name huideng-calendar-acceptance --branch main
+      - run: node tools/calendar/ci-remote.mjs acceptance verify
+      - name: Test only the isolated Pages public service
         run: node tools/calendar/ci-remote.mjs acceptance smoke
       - name: Collect isolated service CPU evidence
         run: node tools/calendar/cloudflare-metrics.mjs --smoke-report artifacts/remote-smoke.json
       - run: node tools/calendar/build-environment.mjs trial
       - run: npx wrangler d1 migrations apply DB --remote --config dist/trial/worker/wrangler.json
       - run: npx wrangler deploy --config dist/trial/worker/wrangler.json
-      - run: node tools/calendar/ci-remote.mjs trial health
-      - run: npx wrangler pages deploy dist/trial/site --project-name huideng-calendar-trial --branch main
+      - run: node tools/calendar/ci-remote.mjs trial worker-health
+      - run: npx wrangler pages deploy --cwd dist/trial/pages --project-name huideng-calendar-trial --branch main
       - run: node tools/calendar/ci-remote.mjs trial verify
       - uses: actions/upload-artifact@v4
         if: always()
@@ -100,7 +104,7 @@ jobs:
       - name: Subscription lifecycle from GitHub hosted network
         env:
           API_URL: ${{ vars.CALENDAR_ACCEPTANCE_URL }}
-          SITE_ORIGIN: ${{ vars.CALENDAR_SITE_ORIGIN }}
+          SITE_ORIGIN: https://huideng-calendar-acceptance.pages.dev
           CALENDAR_EXPECTED_VERSION: ${{ vars.CALENDAR_ACCEPTANCE_VERSION }}
         run: node tools/calendar/smoke-remote.mjs "$API_URL" "$SITE_ORIGIN"
       - uses: actions/upload-artifact@v4

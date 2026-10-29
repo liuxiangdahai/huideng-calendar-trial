@@ -32,6 +32,7 @@ export function resolveBuildOptions(options = {}, env = process.env) {
   const apiBaseUrl = mode === 'offline' ? '' : origin(options.apiBaseUrl || env.CALENDAR_API_BASE_URL ||
     (mode === 'local' ? 'http://127.0.0.1:4173' : ''), {local:mode === 'local'});
   const siteOrigin = remote ? origin(options.siteOrigin || env.CALENDAR_SITE_ORIGIN || '') : mode === 'local' ? apiBaseUrl : '';
+  if (remote && apiBaseUrl !== siteOrigin) throw new Error('公开接口与网页必须使用同一个 Pages 地址。');
   let version = options.version || env.CALENDAR_BUILD_VERSION || env.GITHUB_SHA;
   if (!version) {
     try { version = execFileSync('git',['rev-parse','HEAD'],{cwd:projectRoot,encoding:'utf8',stdio:['ignore','pipe','ignore']}).trim(); }
@@ -58,7 +59,7 @@ async function filesWithin(directory, prefix = '') {
 }
 
 export function isPublicFile(relative) {
-  if (['index.html','version.json','_headers','_redirects'].includes(relative)) return true;
+  if (['index.html','version.json','_headers','_redirects','_worker.js','_routes.json'].includes(relative)) return true;
   if (!relative.startsWith('calendar-reminders/')) return false;
   const file = relative.slice('calendar-reminders/'.length);
   return publicFiles.has(file) || /^app-[a-zA-Z0-9]+\.js$/.test(file) ||
@@ -116,7 +117,7 @@ export async function buildStandalone({output,release,config={apiBaseUrl:''}} = 
 }
 
 export function assertReleaseInputs(version, cwd=projectRoot) {
-    const paths=['static/calendar-reminders','service/calendar','data/calendar','tools/calendar','package.json','package-lock.json'];
+    const paths=['static/calendar-reminders','service/calendar','service/gateway','data/calendar','tools/calendar','.github/workflows','package.json','package-lock.json'];
     try {
       execFileSync('git',['diff','--exit-code',version,'--',...paths],{cwd,stdio:'pipe'});
       const untracked=execFileSync('git',['ls-files','--others','--exclude-standard','--',...paths],{cwd,encoding:'utf8'});
@@ -124,8 +125,41 @@ export function assertReleaseInputs(version, cwd=projectRoot) {
     } catch {throw new Error('发布源码或生成日期资料与指定提交不一致；请先核对并提交，再重新构建。');}
 }
 
+export function resolveDeploymentConfig(configuration, mode) {
+  if (!['acceptance','trial'].includes(mode)) throw new Error('明确指定 acceptance 或 trial。');
+  const targets = {};
+  for (const environment of ['acceptance','trial']) {
+    const item = configuration?.[environment];
+    const name = `huideng-calendar-${environment}`;
+    if (!item || item.workerName !== name || item.pagesProjectName !== name ||
+        item.databaseName !== name || !/^[a-f0-9-]{36}$/.test(item.databaseId || '')) throw new Error('环境的 Pages、Worker 与 D1 名称或标识无效。');
+    const siteOrigin = origin(item.siteOrigin), publicApiOrigin = origin(item.publicApiOrigin), workerOrigin = origin(item.workerOrigin);
+    if (siteOrigin !== `https://${name}.pages.dev` || publicApiOrigin !== siteOrigin ||
+        !new URL(workerOrigin).hostname.startsWith(name + '.') || !new URL(workerOrigin).hostname.endsWith('.workers.dev')) throw new Error('公开 Pages 地址或内部 Worker 地址不属于指定环境。');
+    const allowedOrigins = (item.allowedOrigins || []).map(value => origin(value));
+    if (allowedOrigins.some(value => value !== siteOrigin)) throw new Error('试用和验收不允许交叉的网页来源。');
+    targets[environment] = {...item, siteOrigin, publicApiOrigin, workerOrigin, allowedOrigins};
+  }
+  if (targets.acceptance.databaseId === targets.trial.databaseId) throw new Error('试用和验收必须使用独立 D1。');
+  return targets[mode];
+}
+
+export function pagesConfiguration(target) {
+  const vars = {PUBLIC_BASE_URL:target.publicApiOrigin};
+  return {name:target.pagesProjectName, pages_build_output_dir:'../site', compatibility_date:'2026-10-29',
+    vars, services:[], env:{production:{vars,services:[{binding:'CALENDAR_SERVICE',service:target.workerName}]},preview:{vars,services:[]}}};
+}
+
 export async function buildRelease(options = {}, env = process.env) {
   const config = resolveBuildOptions(options,env);
+  if (config.remote) {
+    const target = options.deployment;
+    if (!target || target.publicApiOrigin !== config.apiBaseUrl || target.siteOrigin !== config.siteOrigin ||
+        target.pagesProjectName !== `huideng-calendar-${config.mode}` || target.workerName !== target.pagesProjectName ||
+        target.databaseName !== target.workerName || !/^[a-f0-9-]{36}$/.test(target.databaseId || '')) {
+      throw new Error('线上构建须通过 build-environment.mjs 使用已核对的 Pages、Worker 与 D1 环境配置。');
+    }
+  }
   // Validate and regenerate on every delivery path, including an independent
   // CI checkout; tested source records must not be replaced by stale JSON.
   execFileSync(process.execPath,[path.join(projectRoot,'tools/calendar/build.mjs')],
@@ -173,10 +207,19 @@ export async function buildRelease(options = {}, env = process.env) {
       vars:{PUBLIC_BASE_URL:config.apiBaseUrl,ALLOWED_ORIGINS:origins.join(',')},
       d1_databases:[{binding:'DB',database_name:databaseName,database_id:databaseId,migrations_dir:'migrations'}],
       triggers:{crons:['17 4 * * *']},observability:{enabled:false}}));
+    const target = options.deployment;
+    await build({entryPoints:[path.join(projectRoot,'service/gateway/worker.mjs')],outfile:path.join(site,'_worker.js'),bundle:true,
+      format:'esm',platform:'neutral',target:'es2022',minify:true,legalComments:'inline',plugins:[{name:'gateway-release',setup(plugin) {
+        plugin.onLoad({filter:/[\\/]service[\\/]calendar[\\/]release\.json$/},()=>({contents:json(release),loader:'json'}));
+      }}]});
+    await fs.writeFile(path.join(site,'_routes.json'),json({version:1,include:['/api/*','/calendar/*','/healthz'],exclude:[]}));
+    const pages = path.join(config.output,'pages');
+    await fs.mkdir(pages,{recursive:true});
+    await fs.writeFile(path.join(pages,'wrangler.json'),json(pagesConfiguration(target)));
   }
   const files = await filesWithin(site);
   for(const file of files) if(!isPublicFile(file)) throw new Error(`发布目录含未批准文件：${file}`);
-  const manifest = {release,apiBaseUrl:config.apiBaseUrl,files:[]};
+  const manifest = {release,apiBaseUrl:config.apiBaseUrl,workerOrigin:options.deployment?.workerOrigin || null,files:[]};
   for(const file of files) { const bytes=await fs.readFile(path.join(site,file)); manifest.files.push({path:file,bytes:bytes.length,sha256:hash(bytes)}); }
   await fs.writeFile(path.join(config.output,'manifest.json'),json(manifest));
   await buildStandalone({output:path.join(config.output,'藏历日历.html'),release:{...release,environment:'offline'}});

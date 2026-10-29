@@ -28,8 +28,9 @@ function fixture(t, alarmResolver = resolveAlarmInstants) {
   };
   const release = {version: 'test-commit', dataVersion: '', rendererVersion: 'snapshot-v1', environment: 'acceptance'};
   const calls = {selection: 0, export: 0};
+  let dataReads = 0;
   const service = createCalendarService({
-    getData: () => data, getRelease: () => release, validateSettings,
+    getData: () => { dataReads++; return data; }, getRelease: () => release, validateSettings,
     exportICS: (...args) => { calls.export++; return exportICS(...args); },
     resolveAlarmInstants: alarmResolver, now: () => current,
     // The service's publication state is tested independently of the date engine.
@@ -63,12 +64,117 @@ function fixture(t, alarmResolver = resolveAlarmInstants) {
   const entries = text => new ICAL.Component(ICAL.parse(text)).getAllSubcomponents('vevent');
   return {
     data, release, calls, env, fetch, api, create, entries, service,
+    get dataReads() { return dataReads; },
     get db() { return DB; },
     tick(milliseconds) { current = new Date(current.getTime() + milliseconds); },
     setTime(instant) { current = new Date(instant); },
     reopen() { DB.close(); DB = new SQLiteD1(dbPath); env.DB = DB; }
   };
 }
+
+test('production HTTP reads redirect to the configured HTTPS host without touching data or D1', async t => {
+  const f = fixture(t);
+  f.env.DB = new Proxy({}, {get() { assert.fail('HTTP transport handling must not access D1'); }});
+  for (const method of ['GET', 'HEAD']) {
+    for (const path of ['/healthz?test=1', '//untrusted.example/calendar/example.ics?check=1']) {
+      const response = await f.service.fetch(new Request(`http://incoming.example${path}`, {method}), f.env);
+      assert.equal(response.status, 308);
+      const target = new URL(response.headers.get('Location'));
+      assert.equal(target.origin, BASE);
+      assert.equal(target.pathname + target.search, path);
+      assert.equal(response.headers.get('Strict-Transport-Security'), null);
+      assert.equal(response.headers.get('Cache-Control'), 'no-store');
+      assert.equal(await response.text(), '');
+    }
+  }
+  assert.equal(f.dataReads, 0);
+});
+
+test('HTTP writes fail before reading credentials, request bodies or D1; the local exception stays on loopback', async t => {
+  const f = fixture(t);
+  f.env.DB = new Proxy({}, {get() { assert.fail('HTTP writes must not access D1'); }});
+  f.env.ALLOW_LOCAL_DEV = 'true';
+  for (const method of ['POST', 'PATCH', 'DELETE', 'OPTIONS']) {
+    const request = new Request('http://incoming.example/api/subscriptions', {
+      method, headers: {Origin: ORIGIN, 'Content-Type': 'application/json'}, body: '{invalid'
+    });
+    const response = await f.service.fetch(request, f.env);
+    assert.equal(response.status, 426);
+    assert.equal(request.bodyUsed, false);
+    assert.match((await response.json()).error, /HTTPS/);
+  }
+  assert.equal(f.dataReads, 0);
+});
+
+test('HTTPS applies HSTS to health, errors, API, calendar, HEAD and 304 while preserving CORS', async t => {
+  const f = fixture(t), created = await f.create();
+  const feed = await f.fetch(created.feedUrl);
+  const responses = [feed, await f.fetch('/healthz'), await f.fetch('/missing'),
+    await f.fetch('/api/subscriptions', {method: 'POST'}),
+    await f.api(`/api/subscriptions/${created.id}`, 'GET', undefined, created.manageToken),
+    await f.fetch(created.feedUrl, {method: 'HEAD'}),
+    await f.fetch(created.feedUrl, {headers: {'If-None-Match': feed.headers.get('ETag')}})];
+  for (const response of responses) assert.equal(response.headers.get('Strict-Transport-Security'), 'max-age=31536000');
+  assert.equal(responses.at(-1).status, 304);
+  assert.equal(responses[4].headers.get('Access-Control-Allow-Origin'), ORIGIN);
+  assert.equal(responses[4].headers.get('Vary'), 'Origin');
+  f.env.PUBLIC_BASE_URL = 'bad configuration';
+  const broken = await f.fetch('/healthz');
+  assert.equal(broken.status, 503);
+  assert.equal(broken.headers.get('Strict-Transport-Security'), 'max-age=31536000');
+});
+
+test('explicit loopback HTTP development still creates and reads subscriptions without HSTS', async t => {
+  const f = fixture(t), local = 'http://127.0.0.1:8787';
+  Object.assign(f.env, {ALLOW_LOCAL_DEV: 'true', PUBLIC_BASE_URL: local, ALLOWED_ORIGINS: local});
+  const request = new Request(`${local}/api/subscriptions`, {method: 'POST',
+    headers: {Origin: local, 'Content-Type': 'application/json'}, body: JSON.stringify({settings: makeSettings()})});
+  const response = await f.service.fetch(request, f.env);
+  assert.equal(response.status, 201);
+  assert.equal(response.headers.get('Strict-Transport-Security'), null);
+  const created = await response.json();
+  assert.equal(new URL(created.feedUrl).origin, local);
+  assert.equal((await f.service.fetch(new Request(created.feedUrl), f.env)).status, 200);
+});
+
+test('creation and edits validate alarms without discarded ICS; unchanged settings do not regenerate dates', async t => {
+  let invalid = false, resolutions = 0;
+  const f = fixture(t, (event, zone) => {
+    resolutions++;
+    if (invalid) throw new Error('提醒时间无法转换。');
+    return resolveAlarmInstants(event, zone);
+  });
+  const created = await f.create();
+  assert.equal(resolutions, 1);
+  assert.equal(f.calls.export, 0);
+  const before = {...f.calls};
+  const same = await f.api(`/api/subscriptions/${created.id}`, 'PATCH',
+    {settings: makeSettings(), revision: 1}, created.manageToken);
+  assert.equal(same.status, 200);
+  assert.equal((await same.json()).revision, 1);
+  assert.deepEqual(f.calls, before);
+  assert.equal(resolutions, 1);
+  invalid = true;
+  assert.equal((await f.api('/api/subscriptions', 'POST', {settings: makeSettings()})).status, 400);
+  assert.equal((await f.api(`/api/subscriptions/${created.id}`, 'PATCH',
+    {settings: makeSettings('remind', '09:00'), revision: 1}, created.manageToken)).status, 400);
+  assert.equal((await f.db.prepare('SELECT count(*) AS total FROM subscriptions').first()).total, 1);
+  assert.equal((await f.db.prepare('SELECT revision FROM subscriptions').first()).revision, 1);
+});
+
+test('validation without ICS still rejects invalid dates and duplicate or absent publication identifiers', async t => {
+  const f = fixture(t), original = {...f.data.occurrences[0]};
+  for (const occurrences of [
+    [original, {...original}],
+    [{...original, uid: ''}],
+    [{...original, date: '2027-03-invalid'}]
+  ]) {
+    f.data.occurrences = occurrences;
+    const response = await f.api('/api/subscriptions', 'POST', {settings: makeSettings('display')});
+    assert.equal(response.status, 400);
+    assert.equal((await f.db.prepare('SELECT count(*) AS total FROM subscriptions').first()).total, 0);
+  }
+});
 
 test('real SQLite persists a subscription; read and management credentials are separate', async t => {
   const f = fixture(t), created = await f.create();
@@ -520,6 +626,23 @@ test('snapshots expire exactly at one hour without changing stable event version
   assert.equal(f.calls.export, before.export + 1);
   assert.equal((await f.db.prepare('SELECT sequence FROM calendar_entries').first()).sequence, 0);
   assert.equal((await f.db.prepare('SELECT render_version FROM subscriptions').first()).render_version, 2);
+});
+
+test('a deployed snapshot digest avoids full calendar data loading on GET, HEAD, 304 and health', async t => {
+  const f = fixture(t);
+  f.release.dataVersion = 'audited-build-data-digest';
+  const created = await f.create(), first = await f.fetch(created.feedUrl);
+  const reads = f.dataReads, calls = {...f.calls};
+  for (const options of [{}, {method: 'HEAD'}, {headers: {'If-None-Match': first.headers.get('ETag')}}]) {
+    assert.ok([200, 304].includes((await f.fetch(created.feedUrl, options)).status));
+  }
+  assert.equal((await f.fetch('/healthz')).status, 200);
+  assert.equal(f.dataReads, reads);
+  assert.deepEqual(f.calls, calls);
+  f.release.dataVersion = 'updated-build-data-digest';
+  assert.equal((await f.fetch(created.feedUrl)).status, 200);
+  assert.equal(f.dataReads, reads + 1);
+  assert.equal(f.calls.export, calls.export + 1);
 });
 
 test('snapshot rolling-day invalidation uses the reminder zone, including Vancouver daylight time', async t => {

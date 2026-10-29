@@ -6,24 +6,25 @@ import {defaults} from '../../static/calendar-reminders/core.mjs';
 import {applyPreset} from '../../static/calendar-reminders/presets.mjs';
 const base=new URL(process.argv[2]);
 const site=new URL(process.argv[3]);
-if(base.protocol!=='https:' || site.protocol!=='https:' || !base.hostname.startsWith('huideng-calendar-acceptance.'))throw new Error('远端写入测试仅允许独立 acceptance 服务。');
+if(base.origin!=='https://huideng-calendar-acceptance.pages.dev' || site.origin!==base.origin)throw new Error('远端写入测试仅允许独立 acceptance Pages 入口。');
 const health=await (await fetch(new URL('/healthz',base))).json();
 assert.equal(health.environment,'acceptance','拒绝对试用数据进行自动写入测试');
+assert.equal(health.gatewayVersion,health.version,'验收必须经过同版本Pages网关');
 if(process.env.CALENDAR_EXPECTED_VERSION)assert.equal(health.version,process.env.CALENDAR_EXPECTED_VERSION);
 const data=JSON.parse(await fs.readFile('static/calendar-reminders/calendar-data.json','utf8'));
 const parse=text=>new ICAL.Component(ICAL.parse(text)).getAllSubcomponents('vevent');
 const startedAt=new Date().toISOString();
-const timing=[];let created;
+const timing=[];let created;let scenario='create';
 async function call(method,pathname,body,extraHeaders={}){
- const started=performance.now();
+ const started=performance.now(),startTime=new Date().toISOString();
  const response=await fetch(new URL(pathname,base),{method,headers:{Origin:site.origin,...(body?{'Content-Type':'application/json'}:{}),...(created?{Authorization:`Bearer ${created.manageToken}`}:{ }),...extraHeaders},body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(30000)}).catch(()=>{throw new Error(`${method} 验收请求未完成，请检查隔离服务与网络。`)});
- timing.push({operation:method,status:response.status,wallMs:performance.now()-started});
+ timing.push({scenario,operation:method,status:response.status,startedAt:startTime,finishedAt:new Date().toISOString(),wallMs:performance.now()-started});
  assert.ok(response.ok,`${method} 请求返回 ${response.status}`);
  return response.json();
 }
 async function feed(options={}){
- const started=performance.now();const response=await fetch(created.feedUrl,{...options,signal:AbortSignal.timeout(30000)}).catch(()=>{throw new Error('日历验收请求未完成，请检查隔离服务与网络。')});
- timing.push({operation:options.method||'feed',status:response.status,wallMs:performance.now()-started});return response;
+ const started=performance.now(),startTime=new Date().toISOString();const response=await fetch(created.feedUrl,{...options,redirect:'error',signal:AbortSignal.timeout(30000)}).catch(()=>{throw new Error('日历验收请求未完成，请检查隔离服务与网络。')});
+ timing.push({scenario,operation:options.method||'feed',status:response.status,startedAt:startTime,finishedAt:new Date().toISOString(),wallMs:performance.now()-started});return response;
 }
 try{
  let settings=applyPreset(defaults(data.catalog,'Asia/Shanghai'),data.catalog,'guru');
@@ -37,6 +38,7 @@ try{
  }
  let managed=await call('GET',`/api/subscriptions/${created.id}`);
  for(const preset of ['guru','tsok','practice','dual']){
+  scenario=preset;
   settings=applyPreset(settings,data.catalog,preset==='dual'?'practice':preset);
   if(preset==='dual')for(const value of Object.values(settings.events))if(value.mode!=='off'){value.mode='remind';value.reminders=[{daysBefore:0,time:'08:00'},{daysBefore:1,time:'20:00'}];}
   managed=await call('PATCH',`/api/subscriptions/${created.id}`,{settings,revision:managed.revision});
@@ -47,6 +49,8 @@ try{
    assert.ok(JSON.stringify(recovered.settings)===JSON.stringify(managed.settings),'恢复创建必须返回当前设置，不覆盖已保存修改');
   }
   const first=await feed();assert.equal(first.status,200);
+  assert.match(first.headers.get('content-type')||'',/^text\/calendar\b/i);
+  assert.ok(first.headers.has('strict-transport-security'));
   const content=await first.text();assert.ok(!content.includes(created.manageToken));
   const entries=parse(content);assert.ok(entries.length>20);
   assert.equal(new Set(entries.map(e=>e.getFirstPropertyValue('uid'))).size,entries.length);
@@ -57,11 +61,13 @@ try{
   for(const response of parallel){assert.equal(response.status,200);assert.equal(response.headers.get('etag'),etag);await response.arrayBuffer();}
   console.log(JSON.stringify({preset,events:entries.length,status:'passed'}));
  }
+ scenario='modify-read-30';
  for(let i=0;i<30;i++){
   settings.events['guru-tsok'].reminders[0].time=i%2?'08:00':'09:00';
   managed=await call('PATCH',`/api/subscriptions/${created.id}`,{settings,revision:managed.revision});
   const response=await feed();assert.equal(response.status,200);await response.arrayBuffer();
  }
+ scenario='cancel-disable';
  for(const value of Object.values(settings.events))value.mode='off';
  managed=await call('PATCH',`/api/subscriptions/${created.id}`,{settings,revision:managed.revision});
  const cancelled=parse(await (await feed()).text());

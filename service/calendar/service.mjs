@@ -1,5 +1,5 @@
 import {civilDateInZone} from '../../static/calendar-reminders/timezones.mjs';
-import {resolveAlarmInstants as defaultAlarmInstants} from '../../static/calendar-reminders/core.mjs';
+import {addDays, resolveAlarmInstants as defaultAlarmInstants} from '../../static/calendar-reminders/core.mjs';
 
 const JSON_HEADERS = {'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store'};
 const TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/;
@@ -76,10 +76,11 @@ function checkOrigin(request, env, required = false) {
   }
   return origin;
 }
-function secureHeaders(response, origin) {
+function secureHeaders(response, origin, secure = false) {
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('Referrer-Policy', 'no-referrer');
   response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+  if (secure) response.headers.set('Strict-Transport-Security', 'max-age=31536000');
   if (origin) {
     response.headers.set('Access-Control-Allow-Origin', origin);
     response.headers.set('Vary', 'Origin');
@@ -182,7 +183,7 @@ export function createCalendarService({getData, validateSettings, selectOccurren
   resolveAlarmInstants = defaultAlarmInstants, now = () => new Date(), getRelease = () => DEVELOPMENT_RELEASE}) {
   async function releaseFor(data) {
     const release = getRelease();
-    return {...release, dataVersion: release.dataVersion || await digest(canonical(data))};
+    return {...release, dataVersion: release.dataVersion || await digest(canonical(data ?? await getData()))};
   }
   async function health(request, env) {
     // Only allow-listed build metadata is public. Configuration values, database
@@ -190,7 +191,7 @@ export function createCalendarService({getData, validateSettings, selectOccurren
     let release = getRelease();
     let ready = true;
     try {
-      release = await releaseFor(await getData());
+      release = await releaseFor();
       serviceOrigin(env);
       if (!env.DB || !origins(env).size || !env.RATE_LIMIT_SALT ||
           !release.version || !release.dataVersion || !release.rendererVersion || !release.environment) throw new Error();
@@ -211,6 +212,20 @@ export function createCalendarService({getData, validateSettings, selectOccurren
     if (!Object.hasOwn(body, 'settings')) throw new HttpError(400, '缺少日历设置。');
     try { return validateSettings(body.settings, data.catalog); }
     catch (error) { throw new HttpError(400, error.message || '日历设置无效。'); }
+  }
+  function validateSelection(data, settings, time) {
+    // Validate before persisting without building, escaping and folding an ICS
+    // document that would be discarded. Publication still uses the same resolver
+    // and stores its final UTC instants in the content digest and serializer.
+    const ids = new Set();
+    try {
+      for (const event of selectOccurrences(data, settings, rollingWindow(time, settings.zone))) {
+        if (!event.uid || ids.has(event.uid)) throw new Error('日程标识无效或重复。');
+        ids.add(event.uid);
+        addDays(event.date, 1);
+        resolveAlarmInstants(event, settings.zone);
+      }
+    } catch (error) { throw new HttpError(400, error.message || '提醒时间无效。'); }
   }
   async function creationBucket(request, env, time) {
     // Cloudflare supplies this header; the Node preview explicitly overwrites it.
@@ -262,8 +277,7 @@ export function createCalendarService({getData, validateSettings, selectOccurren
     }
     const data = await getData(), settings = await parseSettings(body, data);
     // Resolve alerts before persisting, including DST gaps in the rolling window.
-    try { exportICS(selectOccurrences(data, settings, rollingWindow(time, settings.zone)), {zone: settings.zone, generatedAt: time}); }
-    catch (error) { throw new HttpError(400, error.message || '提醒时间无效。'); }
+    validateSelection(data, settings, time);
     const limit = await creationBucket(request, env, time);
     const id = crypto.randomUUID(), feedToken = token();
     const timestamp = time.toISOString();
@@ -297,10 +311,9 @@ export function createCalendarService({getData, validateSettings, selectOccurren
       if (!Number.isSafeInteger(body.revision) || body.revision < 1) throw new HttpError(400, '缺少有效的设置版本。');
       if (body.revision !== record.revision) throw new HttpError(409, '设置已在其他页面修改，请重新载入。', {revision: record.revision});
       const data = await getData(), settings = await parseSettings(body, data), time = now();
-      try { exportICS(selectOccurrences(data, settings, rollingWindow(time, settings.zone)), {zone: settings.zone, generatedAt: time}); }
-      catch (error) { throw new HttpError(400, error.message || '提醒时间无效。'); }
       const settingsJson = canonical(settings);
       if (settingsJson === record.settings_json) return json(recordView(record, baseUrl));
+      validateSelection(data, settings, time);
       const results = await env.DB.batch([
         env.DB.prepare(`UPDATE subscriptions SET settings_json = ?, revision = revision + 1,
           updated_at = ? WHERE id = ? AND revision = ? AND disabled = 0`)
@@ -339,9 +352,14 @@ export function createCalendarService({getData, validateSettings, selectOccurren
   async function materialize(env, feedToken, attempt = 0) {
     const record = await env.DB.prepare('SELECT * FROM subscriptions WHERE feed_token = ?').bind(feedToken).first();
     if (!record) throw new HttpError(404, '订阅不存在。');
-    const time = now(), timestamp = time.toISOString(), data = await getData();
+    const time = now(), timestamp = time.toISOString();
     const stored = JSON.parse(record.settings_json);
-    const release = await releaseFor(data);
+    let data;
+    const deployedRelease = getRelease();
+    // Production build metadata already contains the audited data digest. A hit
+    // must not deserialize the entire calendar dataset just to compare it.
+    // Development fixtures without a digest still detect in-place data changes.
+    const release = deployedRelease.dataVersion ? deployedRelease : await releaseFor(data = await getData());
     const localDay = civilDateInZone(time, record.disabled ? 'UTC' : stored.zone);
     const snapshot = await env.DB.prepare('SELECT * FROM feed_snapshots WHERE subscription_id = ?').bind(record.id).first();
     if (snapshot && snapshot.settings_revision === record.revision && snapshot.data_version === release.dataVersion &&
@@ -350,6 +368,7 @@ export function createCalendarService({getData, validateSettings, selectOccurren
         time.getTime() - Date.parse(snapshot.generated_at) < SNAPSHOT_TTL_MS && Date.parse(snapshot.expires_at) > time.getTime()) {
       return {ics: snapshot.ics, etag: snapshot.etag, modified: snapshot.last_modified};
     }
+    data ??= await getData();
     // Catalog retirement can remove a previously valid choice. New API input is
     // still strictly validated; an old saved choice must not break its feed.
     const currentIds = new Set(data.catalog.events.map(event => event.id));
@@ -382,11 +401,9 @@ export function createCalendarService({getData, validateSettings, selectOccurren
         if (!old.cancelled_at) changes.push(entry);
       }
     }
-    const entries = [...next.values()].sort((a, b) => {
-      const aa = JSON.parse(a.event_json), bb = JSON.parse(b.event_json);
-      return aa.date.localeCompare(bb.date) || a.uid.localeCompare(b.uid);
-    });
-    const events = entries.map(publishedEvent);
+    const entries = [...next.values()];
+    const events = entries.map(publishedEvent).sort((a, b) =>
+      a.date.localeCompare(b.date) || a.uid.localeCompare(b.uid));
     const modified = entries.reduce((latest, entry) => entry.modified_at > latest ? entry.modified_at : latest, record.updated_at);
     const ics = exportICS(events, {zone: settings.zone, name: '慧灯藏历',
       generatedAt: new Date(modified), sourceVersion: data.sourceVersion || data.updatedOn || '',
@@ -445,15 +462,32 @@ export function createCalendarService({getData, validateSettings, selectOccurren
   }
   async function fetch(request, env) {
     let origin;
+    const secure = request.url.startsWith('https:');
+    const protect = response => secureHeaders(response, origin, secure);
     try {
       const url = new URL(request.url), isAPI = url.pathname.startsWith('/api/');
+      const local = env.ALLOW_LOCAL_DEV === 'true' &&
+        ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname);
+      if (url.protocol !== 'https:' && !(local && url.protocol === 'http:')) {
+        // Never forward writes, inspect credentials, or touch D1 over HTTP.
+        if (url.protocol !== 'http:' || !['GET', 'HEAD'].includes(request.method)) {
+          throw new HttpError(426, '请使用 HTTPS 安全地址重新打开或保存订阅。');
+        }
+        const target = new URL(serviceOrigin(env));
+        if (target.protocol !== 'https:') throw new HttpError(503, '订阅服务地址配置无效。');
+        // Assign path and query separately: a path beginning with // must never
+        // replace the trusted public host or redirect a capability to a third party.
+        target.pathname = url.pathname;
+        target.search = url.search;
+        return protect(new Response(null, {status: 308, headers: {Location: target.href, 'Cache-Control': 'no-store'}}));
+      }
       origin = checkOrigin(request, env, isAPI && ['POST', 'PATCH', 'DELETE', 'OPTIONS'].includes(request.method));
       if (url.pathname === '/healthz' && ['GET', 'HEAD'].includes(request.method)) {
-        return secureHeaders(await health(request, env), origin);
+        return protect(await health(request, env));
       }
       const baseUrl = serviceOrigin(env);
       if (!env.DB) throw new HttpError(503, '订阅服务尚未连接资料库。');
-      if (request.method === 'OPTIONS') return secureHeaders(new Response(null, {status: 204}), origin);
+      if (request.method === 'OPTIONS') return protect(new Response(null, {status: 204}));
       let response;
       if (url.pathname === '/api/subscriptions' && request.method === 'POST') {
         response = await create(request, env, baseUrl);
@@ -466,12 +500,12 @@ export function createCalendarService({getData, validateSettings, selectOccurren
           response = await feed(request, env, subscription[1]);
         } else throw new HttpError(404, '没有找到此页面。');
       }
-      return secureHeaders(response, origin);
+      return protect(response);
     } catch (error) {
       // Do not log request URLs, authorization headers, settings, or raw SQL errors.
       const status = error instanceof HttpError ? error.status : 503;
       const message = error instanceof HttpError ? error.message : '订阅服务暂时不可用，请稍后再试。';
-      return secureHeaders(json({error: message, ...(error.details || {})}, status), origin);
+      return protect(json({error: message, ...(error.details || {})}, status));
     }
   }
   async function scheduled(_controller, env) {

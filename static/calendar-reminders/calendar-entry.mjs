@@ -24,3 +24,5 @@ export function appleSubscriptionUrl(feedUrl) {
 // Linked by Google's own "通过网址添加日历" help. No external feed, OAuth token,
 // or management capability is passed to Google through the navigation URL.
 export const GOOGLE_ADD_URL = 'https://calendar.google.com/calendar/u/0/r/settings/addbyurl';
+// This opens the public calendar entry only; no personal feed is appended.
+export const OUTLOOK_URL = 'https://outlook.live.com/calendar/';

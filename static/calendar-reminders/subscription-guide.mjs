@@ -3,7 +3,7 @@ import { calendarEnvironment } from './calendar-entry.mjs';
 
 // Guide progress belongs to this browser. It is never evidence of a successful
 // subscription or of a notification delivered by a calendar application.
-const APPS = ['iphone', 'google', 'other'];
+const APPS = ['iphone', 'google', 'outlook', 'other'];
 const HELP = {
   apple: 'https://support.apple.com/zh-cn/guide/iphone/iph3d1110d4/ios',
   appleNotifications: 'https://support.apple.com/zh-cn/guide/iphone/iph7c3d96bab/ios',
@@ -12,6 +12,8 @@ const HELP = {
   appleMacNotifications: 'https://support.apple.com/zh-cn/guide/calendar/icl1025/mac',
   googleAdd: 'https://support.google.com/calendar/answer/37100?co=GENIE.Platform%3DDesktop&hl=zh-Hans',
   googleNotifications: 'https://support.google.com/calendar/answer/37242?co=GENIE.Platform%3DAndroid&hl=zh-Hans',
+  outlookWeb: 'https://support.microsoft.com/zh-cn/outlook/import-or-subscribe-to-a-calendar-in-outlook-com-or-outlook-on-the-web',
+  outlookClassic: 'https://support.microsoft.com/zh-cn/outlook/training/import-calendars-into-outlook',
   huaweiNotifications: 'https://consumer.huawei.com/cn/support/content/zh-cn16080985/',
   huaweiImport: 'https://consumer.huawei.com/cn/support/content/zh-cn16070813/',
   oneplusCalendar: 'https://oasisstatics.oneplus.cn/content/dam/support/gsppics/user-guide/OnePlus_9RT_User_Manual_CN.pdf#page=37'
@@ -31,7 +33,8 @@ export function normalizeGuideState(raw = {}) {
   return state;
 }
 
-function preparationText(context) {
+function preparationText(context, device) {
+  if (context.app === 'iphone' && device?.apple && device.inAppBrowser && !context.hasSubscription) return '请先在 Safari 或系统浏览器中打开本页，再选择内容并准备订阅。当前草稿不会自动跨浏览器同步。';
   if (context.preparing) return '正在准备订阅，请稍候。';
   if (context.entryReady) return '使用上方按钮继续添加。已经添加过这份日历时，无需重复订阅。';
   if (context.hasSubscription) return '修改过选择时，请先在上方保存修改，再继续添加。';
@@ -44,21 +47,34 @@ function openingHelp(device) {
   if (!device.apple) return `<details class="guide-help" data-guide-help="open-failed"><summary>没有打开？</summary><div class="guide-add-body"><p>当前设备可能无法打开 Apple 日历。请复制上方的订阅地址，发送给自己的 iPhone、iPad 或 Mac，再按“查看添加步骤”中的手动方法添加。</p><p>若实际使用的是 Google 日历或其他手机日历，可在上方改选应用，已选的修行日会保留。</p></div></details>`;
   return `<details class="guide-help" data-guide-help="open-failed"><summary>没有打开？</summary><div class="guide-add-body">
     ${device.inAppBrowser ? `<p class="guide-handoff">当前可能在${escape(device.inAppBrowser)}的内置浏览器中，日历跳转可能被拦截。</p>${steps([
-      ['sliders', '打开当前页面右上角的菜单。'],
+      ['sliders', '点按当前页面右上角的“…”菜单。'],
       ['globe', '若有“在浏览器打开”或“在 Safari 中打开”，选择这个入口。'],
       ['calendar-plus', '在浏览器中返回本页的订阅入口，再点按“打开 Apple 日历订阅”。']
-    ])}<p>若没有外部浏览器入口，可复制当前网页地址，在 Safari 或系统浏览器中打开。更换浏览器后若没有原来的选择，请使用自己保存的管理链接恢复；也可直接复制订阅地址，在日历中手动添加。</p>` : '<p>若浏览器询问是否打开“日历”，请选择允许。若没有弹出窗口，可在 Safari 或系统浏览器中打开本页后重试。</p>'}
+    ])}<p>若没有外部浏览器入口，可复制当前网页地址，在 Safari 或系统浏览器中打开。</p><p>微信与 Safari 保存的本机设置不互通。若已准备好订阅，可在下方“管理这份订阅”中复制管理链接，只在自己的 Safari 中打开，继续管理同一份订阅；请勿转发管理链接。也可复制上方的 HTTPS 订阅地址，在日历中手动添加。</p>` : '<p>若浏览器询问是否打开“日历”，请选择允许。若没有弹出窗口，可在 Safari 或系统浏览器中打开本页后重试。</p>'}
     <p>也可以复制上方的订阅地址，按“查看添加步骤”中的手动方法添加。复制地址本身不会完成订阅。</p>
     <p class="guide-note">若已在系统窗口取消，可再次点按打开按钮；如果已经添加，请先到日历中检查，避免重复添加。</p>
   </div></details>`;
 }
 
+function appleConnectionHelp() {
+  return `<details class="guide-help" data-guide-help="apple-connection"><summary>连接失败或提示不安全？</summary><div class="guide-add-body">
+    ${steps([
+      ['copy', '重新复制本页的订阅地址，确认以 https:// 开头。'],
+      ['calendar-plus', '在 Apple 日历的“添加订阅日历”中粘贴该地址，再尝试添加。']
+    ])}
+    <p>出现“不安全连接”或证书警告时，请先停止添加，不要关闭 SSL 或忽略证书警告。记录提示原文，便于核查原因。</p>
+    <p>若“查找／Find”长时间没有结果，先取消；可切换 Wi-Fi 或移动网络后重试。网页能打开，不代表日历应用能够连接订阅服务。</p>
+    <p class="guide-note">地址已复制、页面已打开，都不代表订阅已经成功。请以日历中实际出现的日程为准。</p>
+  </div></details>`;
+}
+
 function addition(app, context, device) {
-  const prepare = preparationText(context);
+  const prepare = preparationText(context, device);
   if (app === 'iphone') {
     const direct = device.appleMobile || device.mac;
     const directSteps = direct
-      ? [['calendar-plus', '点按上方“打开 Apple 日历订阅”。'], ['calendar-check', '在系统打开的日历窗口中确认添加。']]
+      ? device.inAppBrowser ? [['globe', '先按上方提示，在 Safari 或系统浏览器中打开本页。'], ['calendar-plus', '在浏览器中点按“打开 Apple 日历订阅”。'], ['calendar-check', '在系统打开的日历窗口中确认添加。']]
+      : [['calendar-plus', '点按上方“打开 Apple 日历订阅”。'], ['calendar-check', '在系统打开的日历窗口中确认添加。']]
       : [['copy', '复制上方的订阅地址。'], ['phone', '将地址发送给自己的 iPhone、iPad 或 Mac。']];
     return addSteps(app, `${location(device.mac ? '在电脑上操作 · Mac' : device.appleMobile ? '在手机上操作 · iPhone / iPad' : '当前设备用于准备，下一步转到 Apple 设备', device.mac ? 'calendar' : 'phone')}
       <p>${prepare}</p>${steps(directSteps)}
@@ -77,7 +93,7 @@ function addition(app, context, device) {
         ['copy', '粘贴订阅地址。'],
         ['calendar-plus', '点按“订阅”。'],
         ['calendar-check', '按屏幕提示完成订阅。']
-      ])}<p class="guide-note">需要在其他 Apple 设备查看时，可在“位置”选择 iCloud，并在这些设备使用同一 Apple 账户。</p><p class="guide-links">${link(HELP.appleMacSubscription, 'Mac 中文订阅帮助')} ${link(HELP.appleMac, 'Apple 中文多设备帮助')}</p></details>`) + openingHelp(device);
+      ])}<p class="guide-note">需要在其他 Apple 设备查看时，可在“位置”选择 iCloud，并在这些设备使用同一 Apple 账户。</p><p class="guide-links">${link(HELP.appleMacSubscription, 'Mac 中文订阅帮助')} ${link(HELP.appleMac, 'Apple 中文多设备帮助')}</p></details>`) + openingHelp(device) + appleConnectionHelp();
   }
   if (app === 'google') return `${device.mobile ? '<p class="guide-handoff">手机应用无法通过网址添加订阅。请把订阅地址发给自己，下一步转到电脑。</p>' : ''}${addSteps(app, `${location('在电脑上操作 · Google 日历网页', 'calendar')}
     <p>${prepare}</p>${steps([
@@ -87,6 +103,30 @@ function addition(app, context, device) {
       ['calendar-check', '点按“添加日历”。']
     ])}<p class="guide-note">若打开后没有出现添加页面，在 ${link('https://calendar.google.com/', 'Google 日历网页')}左侧找到“其他日历”，点按旁边的加号，再选择“通过网址添加”。请确认当前登录的是手机使用的 Google 账号。</p><p class="guide-links">${link(HELP.googleAdd, 'Google 中文订阅帮助')}</p>`)}
     <p class="guide-caution">本网页逐项设置的提醒时间可能不会生效，请在 Google 日历中检查实际提供的通知选项。</p>`;
+  if (app === 'outlook') return `${device.mobile ? '<p class="guide-handoff">请先在电脑网页版或经典桌面版添加订阅，再在需要使用的设备中检查日程。</p>' : ''}${addSteps(app, `${location('在电脑上操作 · Outlook 网页版', 'calendar')}
+    <p>${prepare}</p>${steps([
+      ['copy', '复制上方的订阅地址。'],
+      ['calendar', '打开 Outlook 网页日历；工作或学校账号请使用所在组织的 Outlook 网页。'],
+      ['calendar-plus', '在日历侧栏选择“添加日历”。'],
+      ['globe', '选择“从 Web 订阅”。'],
+      ['copy', '粘贴订阅地址，并按页面要求填写日历名称。'],
+      ['calendar-check', '点按“导入”或页面显示的确认按钮。']
+    ])}<p class="guide-links">${link(HELP.outlookWeb, 'Outlook 中文网址订阅帮助')}</p>
+    <details class="guide-help" data-guide-help="outlook-classic"><summary>经典 Outlook 桌面版 · Windows</summary>${location('在电脑上操作 · 经典 Outlook', 'calendar')}${steps([
+      ['copy', '复制上方的订阅地址。'],
+      ['calendar', '打开 Outlook 的日历视图。'],
+      ['calendar-plus', '在“开始”选项卡中打开“添加日历”菜单。'],
+      ['globe', '选择“从 Internet”。'],
+      ['copy', '粘贴订阅地址，点按“确定”。'],
+      ['calendar-check', '在询问是否订阅更新的窗口中选择“是”。']
+    ])}<p class="guide-note">适用于具有上述入口的经典 Outlook。新版 Outlook 或菜单不同时，请使用网页版步骤。</p><p class="guide-links">${link(HELP.outlookClassic, 'Outlook 中文桌面版帮助')}</p></details>
+    <details class="guide-help" data-guide-help="outlook-import"><summary>无法订阅时：使用文件导入</summary>${steps([
+      ['download', '在本页“使用文件导入”中下载 .ics 文件。'],
+      ['calendar-plus', '在 Outlook 网页日历的“添加日历”中选择“从文件上传”。'],
+      ['search', '选择下载的文件和接收日程的日历。'],
+      ['calendar-check', '点按“导入”。']
+    ])}<button type="button" class="secondary" data-guide-jump="file">${icon('download')}前往下载文件</button><p class="guide-note">文件导入不会持续更新。重复导入前请删除旧的专用日历，避免日程重复。</p></details>`)}
+    <p class="guide-caution">Outlook 自行决定同步时间，更新可能超过 24 小时；本网页的逐项提醒不保证被保留，请检查应用实际提供的提醒。</p>`;
   return `${location('在手机上操作 · 你实际使用的日历应用')}
     ${!device.mobile ? '<p class="guide-handoff">电脑上可以准备地址或文件，添加和通知设置请转到手机完成。</p>' : ''}
     <p>先确认日历应用支持网址订阅或文件导入，再选择对应方式。不同应用的入口可能不同。</p>
@@ -150,6 +190,12 @@ function addition(app, context, device) {
 }
 
 function notificationSteps(app, device) {
+  if (app === 'outlook') return `${location(device.mobile ? '在手机上操作 · Outlook' : '在电脑上操作 · Outlook', device.mobile ? 'phone' : 'calendar')}${steps([
+    ['calendar', '在 Outlook 中确认“慧灯藏历”已显示，并打开一项日程。'],
+    ['bell', '查看该日程是否有提醒时间，以及订阅日历是否提供提醒设置。'],
+    ['sliders', '在 Outlook 设置中查找通知或提醒选项，检查实际可用的设置。'],
+    ['bell', device.mobile ? '在手机系统设置中检查 Outlook 的通知权限。' : '在电脑系统设置中检查 Outlook 的通知权限；使用网页版时检查浏览器对 Outlook 网站的通知权限。']
+  ])}<p class="guide-caution">不同 Outlook 版本及账号提供的提醒能力可能不同。若订阅日历没有提醒选项，本页无法强制开启；请以实际收到的通知为准。无需为慧灯藏历网页开启浏览器通知。</p>`;
   if (app === 'iphone' && device.mac) return `${location('在电脑上操作 · Mac', 'calendar')}
     <h4>保留这份日历的提醒</h4>${steps([
       ['calendar', '打开 Mac 的“日历”应用。'],
@@ -251,15 +297,17 @@ export function createSubscriptionGuide(root, { notificationRoot = root, initial
     const app = state.app;
     const progress = state.progress[app];
     const onMac = app === 'iphone' && device.mac;
+    const onComputer = onMac || (app === 'outlook' && !device.mobile);
+    const deviceName = onMac ? 'Mac' : onComputer ? '电脑' : '手机';
     const addHtml = `<section class="guide-add" aria-label="中文添加帮助">${addition(app, context, device)}</section>`;
     const notificationHtml = `<section class="guide-check" aria-labelledby="guide-check-title"><h3 id="guide-check-title"><span class="guide-stage-number">3</span>${context.hasReminders ? '检查日历提醒' : '确认日程显示'}</h3>
-      ${location(onMac ? '在电脑上操作 · Mac · 添加之后' : '在手机上操作 · 添加之后', onMac ? 'calendar' : 'phone')}
+      ${location(onMac ? '在电脑上操作 · Mac · 添加之后' : onComputer ? '在电脑上操作 · 添加之后' : '在手机上操作 · 添加之后', onComputer ? 'calendar' : 'phone')}
       <label class="guide-confirm"><input id="guide-seen" data-guide-confirm="seen" type="checkbox"${progress.seen ? ' checked' : ''}><span>我已看到日程<small>已在自己的日历应用中确认日期与内容。</small></span></label>
       ${context.hasReminders ? `<details class="guide-notifications" data-guide-expand${state.expanded[app] ? ' open' : ''}><summary>${icon('bell')}<span>查看开启步骤</span>${icon('chevron')}</summary><div class="guide-notification-body">${notificationSteps(app, device)}
-        <details class="guide-help" data-guide-help="notification-missing"><summary>找不到这个入口</summary><p>${onMac ? '在 Mac“系统设置”的搜索框中输入“通知”，找到“日历”的通知设置。日历列表未显示时，可在日历的“显示”菜单中选择“显示日历列表”。' : '在手机“设置”的搜索框中输入日历应用名称，打开这个应用的设置，查找通知权限。'}若日历内没有对应选项，请查看该应用的帮助；不同版本的名称可能不同。</p><p>如果日程尚未出现，请先检查是否勾选显示这份日历，并等待日历应用同步。</p></details>
+        <details class="guide-help" data-guide-help="notification-missing"><summary>找不到这个入口</summary><p>${onMac ? '在 Mac“系统设置”的搜索框中输入“通知”，找到“日历”的通知设置。日历列表未显示时，可在日历的“显示”菜单中选择“显示日历列表”。' : onComputer ? '在电脑系统设置中搜索“通知”，找到 Outlook 或你使用的浏览器，再检查通知权限。' : '在手机“设置”的搜索框中输入日历应用名称，打开这个应用的设置，查找通知权限。'}若日历内没有对应选项，请查看该应用的帮助；不同版本的名称可能不同。</p><p>如果日程尚未出现，请先检查是否勾选显示这份日历，并等待日历应用同步。</p></details>
       </div></details>
-      <label class="guide-confirm"><input id="guide-reminders" data-guide-confirm="reminders" type="checkbox"${progress.reminders ? ' checked' : ''}><span>我已检查提醒<small>已检查日历提醒和${onMac ? 'Mac' : '手机'}系统通知权限。</small></span></label>
-      <details class="guide-help guide-test" data-guide-help="test-reminder"><summary>可选：测试一次提醒</summary><p>下载后将测试日程导入要使用的${onMac ? 'Mac' : '手机'}日历，提醒时间为生成后约十分钟。文件导入的测试结果不代表订阅日历也会采用同样的提醒。</p><p>${onMac ? '请将文件导入 Mac 的日历；如果耗时超过十分钟，请重新生成。' : device.mobile ? '请立即导入；如果手机不支持导入文件，可在该日历中手动建立十分钟后的测试日程。' : '请把文件传到手机并立即导入；如果耗时超过十分钟，请重新生成。'}</p><button id="test-reminder" class="secondary" type="button">${icon('bell')}下载十分钟提醒测试</button><p id="test-status" class="status-note" role="status">${escape(testStatus)}</p></details>` : '<p class="guide-note">你选择的日程均为“仅显示”，已跳过通知设置。若日历应用自带默认提醒，请关闭这份日历的默认通知。</p>'}
+      <label class="guide-confirm"><input id="guide-reminders" data-guide-confirm="reminders" type="checkbox"${progress.reminders ? ' checked' : ''}><span>我已检查提醒<small>已检查日历提醒和${deviceName}系统通知权限。</small></span></label>
+      <details class="guide-help guide-test" data-guide-help="test-reminder"><summary>可选：测试一次提醒</summary><p>下载后将测试日程导入要使用的${deviceName}日历，提醒时间为生成后约十分钟。文件导入的测试结果不代表订阅日历也会采用同样的提醒。</p><p>${onComputer ? '请将文件导入电脑上的日历；如果耗时超过十分钟，请重新生成。' : device.mobile ? '请立即导入；如果手机不支持导入文件，可在该日历中手动建立十分钟后的测试日程。' : '请把文件传到手机并立即导入；如果耗时超过十分钟，请重新生成。'}</p><button id="test-reminder" class="secondary" type="button">${icon('bell')}下载十分钟提醒测试</button><p id="test-status" class="status-note" role="status">${escape(testStatus)}</p></details>` : '<p class="guide-note">你选择的日程均为“仅显示”，已跳过通知设置。若日历应用自带默认提醒，请关闭这份日历的默认通知。</p>'}
       <p class="guide-progress" data-guide-status role="status">${progressText(progress, context.hasReminders)}</p>
     </section>`;
     if (notificationRoot === root) root.innerHTML = addHtml + notificationHtml;
@@ -346,6 +394,10 @@ export function createSubscriptionGuide(root, { notificationRoot = root, initial
       render();
     },
     getState: snapshot,
+    resetConfirmations() {
+      for(const app of APPS) state.progress[app]={seen:false,reminders:false};
+      renderedKey='';notify();render();
+    },
     setTestStatus,
     destroy() {
       for (const container of containers) {

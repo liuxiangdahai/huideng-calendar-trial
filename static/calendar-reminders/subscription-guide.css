@@ -1,4 +1,23 @@
 /* Shared surfaces and type scale, with fallbacks for the standalone guide. */
+.device-options{grid-template-columns:repeat(2,minmax(0,1fr))}
+.connection-status{margin:0 0 16px;padding:14px 16px;background:var(--card,#fffcf6);border:1px solid var(--line,#dbcbb0);border-radius:var(--radius,4px);font-size:14px;line-height:1.65;overflow-wrap:anywhere}
+.connection-heading{display:flex;gap:9px;align-items:flex-start;color:var(--teal-dark,#173b40)}
+.connection-heading>span{display:flex;flex:0 0 20px;margin-top:2px}
+.connection-heading .icon{width:20px;height:20px}
+.connection-heading strong{font-size:15px;font-weight:600}
+.connection-message p{margin:7px 0 0}
+.connection-message p:empty{display:none}
+#connection-note,.connection-actions time{color:var(--muted,#706357);font-size:13px}
+.connection-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.connection-actions:has(button:not([hidden])){margin-top:4px}
+.connection-actions button{min-height:44px;margin-left:auto;padding:8px 0 8px 12px}
+.browser-handoff #copy-page{margin:12px 8px 4px 0;min-height:44px;white-space:normal}
+.browser-handoff{margin:0 0 16px;padding:14px 16px;border:1px solid var(--line,#dbcbb0);border-left:3px solid var(--gold,#a47a3d);border-radius:var(--radius,4px);background:var(--teal-soft,#e9eeea);color:var(--ink,#30251f);font-size:14px;line-height:1.75}
+.browser-handoff-heading{display:flex;align-items:center;gap:9px;color:var(--teal-dark,#173b40);margin-bottom:6px}
+.browser-handoff-heading strong{font-weight:600}
+.browser-handoff-heading .icon{width:19px;height:19px}
+.browser-handoff p{margin:0;overflow-wrap:anywhere}
+.browser-handoff>.text-button{margin:6px 0 -4px;padding-inline:0;text-align:left;min-height:44px}
 .guide-add,.guide-check{min-width:0;font-size:15px;line-height:1.75;overflow-wrap:anywhere;color:var(--ink,#302a25)}
 .guide-add .icon,.guide-check .icon{display:block;width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 .guide-add h3,.guide-check h3{display:flex;align-items:center;gap:10px;margin:20px 0 12px;font-size:17px;line-height:1.5;font-weight:600}
@@ -61,6 +80,6 @@
 .guide-notification-body h4{margin:20px 0 10px;font-size:15px;font-weight:600}
 .guide-progress{font-size:14px;color:var(--muted,#706357);padding:10px 0}
 .guide-add :focus-visible,.guide-check :focus-visible{outline:2px solid var(--focus,#79383a);outline-offset:3px;border-radius:3px}
-@media(max-width:620px){.guide-methods{grid-template-columns:1fr;gap:12px}.guide-method{padding:12px 0}.guide-steps li{gap:12px}}
+@media(max-width:620px){.device-options{grid-template-columns:1fr}.guide-methods{grid-template-columns:1fr;gap:12px}.guide-method{padding:12px 0}.guide-steps li{gap:12px}.connection-status{padding:12px}}
 @media(max-width:480px){.guide-add,.guide-check{font-size:14px}.guide-links{display:grid;gap:2px}.guide-notification-body{padding-left:12px;padding-right:12px}.guide-handoff,.guide-caution{padding:10px 12px}.guide-test>button{width:calc(100% - 8px)}}
 @media(prefers-reduced-motion:reduce){.guide-notifications>summary>.icon:last-child,.guide-help>summary::after{transition:none}}

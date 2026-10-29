@@ -76,15 +76,26 @@
   <dialog id="subscription-dialog" aria-labelledby="subscription-title">
     <div class="dialog-head"><div><p class="overline">我的订阅</p><h2 id="subscription-title">订阅到日历</h2></div><button class="icon-button" type="button" data-close="subscription-dialog" aria-label="关闭订阅"><span data-icon="close" aria-hidden="true"></span></button></div>
     <p id="subscription-summary" class="field-note"></p>
-    <fieldset class="device-options"><legend>1 · 选择你实际使用的日历应用</legend><label><input type="radio" name="device" value="iphone"><span data-icon="phone" aria-hidden="true"></span><span>Apple 日历<small>iPhone、iPad、Mac</small></span></label><label><input type="radio" name="device" value="google"><span data-icon="calendar" aria-hidden="true"></span><span>Google 日历<small>通过电脑添加订阅</small></span></label><label><input type="radio" name="device" value="other"><span data-icon="phone" aria-hidden="true"></span><span>其他手机日历<small>华为、OPPO、小米等</small></span></label></fieldset>
+    <fieldset class="device-options"><legend>1 · 选择你实际使用的日历应用</legend><label><input type="radio" name="device" value="iphone"><span data-icon="phone" aria-hidden="true"></span><span>Apple 日历<small>iPhone、iPad、Mac</small></span></label><label><input type="radio" name="device" value="google"><span data-icon="calendar" aria-hidden="true"></span><span>Google 日历<small>通过电脑添加订阅</small></span></label><label><input type="radio" name="device" value="outlook"><span data-icon="calendar" aria-hidden="true"></span><span>Outlook<small>网页版、经典桌面版</small></span></label><label><input type="radio" name="device" value="other"><span data-icon="phone" aria-hidden="true"></span><span>其他日历<small>华为、OPPO、小米等</small></span></label></fieldset>
     <section class="subscription-entry" aria-labelledby="entry-title">
     <h3 id="entry-title"><span class="guide-stage-number">2</span>添加到日历</h3>
+    <aside id="apple-browser-notice" class="browser-handoff" aria-labelledby="apple-browser-title" hidden>
+      <div class="browser-handoff-heading"><span data-icon="globe" aria-hidden="true"></span><strong id="apple-browser-title">请先在 Safari 中打开</strong></div>
+      <p id="apple-browser-message"></p>
+      <button id="copy-page" type="button" class="secondary" hidden><span data-icon="copy" aria-hidden="true"></span>复制网页地址</button>
+      <button id="apple-browser-help" type="button" class="text-button">查看浏览器打开步骤<span data-icon="arrow-right" aria-hidden="true"></span></button>
+    </aside>
+    <section id="connection-status" class="connection-status" aria-labelledby="connection-title" aria-busy="false">
+      <div class="connection-heading"><span id="connection-symbol" aria-hidden="true"></span><strong id="connection-title">尚未准备</strong></div>
+      <div class="connection-message" role="status" aria-live="polite" aria-atomic="true"><p id="connection-result">请先完成选择，再准备订阅地址。</p><p id="connection-note"></p></div>
+      <div class="connection-actions"><time id="connection-time" hidden></time><button id="check-connection" type="button" class="text-button" hidden>检查连接</button></div>
+    </section>
     <p id="subscription-error" class="notice error" role="alert" hidden></p>
     <button id="restart-creation" class="secondary" type="button" hidden>重新开始创建</button>
     <button id="reload-subscription" type="button" class="secondary" hidden>重新载入已保存设置</button>
     <div id="subscription-new"><button id="create-subscription" class="primary full" type="button"><span id="create-subscription-label">请先选择日历应用</span><span data-icon="arrow-right" aria-hidden="true"></span></button></div>
     <div id="subscription-existing" hidden>
-      <div class="feed-actions entry-actions"><a id="iphone-subscribe" class="primary" hidden><span data-icon="calendar-plus" aria-hidden="true"></span>打开 Apple 日历订阅</a><a id="google-subscribe" class="primary" target="_blank" rel="noopener noreferrer" hidden><span data-icon="calendar-plus" aria-hidden="true"></span>打开 Google 日历添加页面</a><button id="copy-feed" class="secondary" type="button"><span data-icon="copy" aria-hidden="true"></span>复制订阅地址</button></div>
+      <div class="feed-actions entry-actions"><a id="iphone-subscribe" class="primary" hidden><span data-icon="calendar-plus" aria-hidden="true"></span>打开 Apple 日历订阅</a><a id="google-subscribe" class="primary" target="_blank" rel="noopener noreferrer" hidden><span data-icon="calendar-plus" aria-hidden="true"></span>打开 Google 日历添加页面</a><a id="outlook-subscribe" class="primary" target="_blank" rel="noopener noreferrer" hidden><span data-icon="calendar-plus" aria-hidden="true"></span>打开 Outlook 网页日历</a><button id="copy-feed" class="secondary" type="button"><span data-icon="copy" aria-hidden="true"></span>复制订阅地址</button></div>
       <label class="url-label">订阅地址<input id="feed-url" readonly aria-label="订阅地址" spellcheck="false"></label>
       <button id="save-subscription" type="button" class="primary full" hidden>保存修改</button>
       <p id="subscription-status" class="status-note" role="status"></p>
