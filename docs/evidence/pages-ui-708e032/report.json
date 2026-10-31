@@ -1,0 +1,139 @@
+{
+  "version": "708e03204d2bb5b24433d83ab78f425e5f23f31c",
+  "dataVersion": "0a6b1e7eb64f73f5f4d1bf86527df628e6e1b8ed91f5c917ecf8fcb38813d46b",
+  "date": "2026-10-31T04:39:33.932Z",
+  "environment": "Local formal dist/site; Chrome browser simulation; not real devices or public network",
+  "status": "passed",
+  "screenshots": [
+    "outlook-options-390.png",
+    "connected-390.png",
+    "outlook-guide-390.png",
+    "outlook-steps-390.png",
+    "outlook-classic-390.png",
+    "outlook-options-1440.png",
+    "connected-1440.png",
+    "outlook-guide-1440.png",
+    "outlook-steps-1440.png",
+    "outlook-classic-1440.png",
+    "failed-390x844.png",
+    "failed-1440x1000.png",
+    "failed-320x568.png",
+    "failed-585x320.png",
+    "wechat-handoff-390.png",
+    "wechat-handoff-320.png"
+  ],
+  "checks": [
+    {
+      "name": "A real local health and ICS read does not automatically confirm a native subscription",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Connected dialog fits 390",
+      "passed": true,
+      "detail": "{\"viewport\":{\"width\":390,\"height\":844},\"pageOverflow\":false,\"dialogOverflow\":false,\"bounds\":{\"left\":19,\"right\":371,\"top\":10,\"bottom\":834}}"
+    },
+    {
+      "name": "Expanded Outlook guide fits 390",
+      "passed": true,
+      "detail": "{\"viewport\":{\"width\":390,\"height\":844},\"pageOverflow\":false,\"dialogOverflow\":false,\"bounds\":{\"left\":19,\"right\":371,\"top\":10,\"bottom\":834}}"
+    },
+    {
+      "name": "Connected dialog fits 1440",
+      "passed": true,
+      "detail": "{\"viewport\":{\"width\":1440,\"height\":1000},\"pageOverflow\":false,\"dialogOverflow\":false,\"bounds\":{\"left\":410,\"right\":1030,\"top\":50,\"bottom\":950}}"
+    },
+    {
+      "name": "Expanded Outlook guide fits 1440",
+      "passed": true,
+      "detail": "{\"viewport\":{\"width\":1440,\"height\":1000},\"pageOverflow\":false,\"dialogOverflow\":false,\"bounds\":{\"left\":410,\"right\":1030,\"top\":50,\"bottom\":950}}"
+    },
+    {
+      "name": "Outlook Chinese guide has distinct web and classic desktop guidance",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Invalid ICS HTML shows failure while copy and file import remain enabled",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Error dialog fits 390x844",
+      "passed": true,
+      "detail": "{\"viewport\":{\"width\":390,\"height\":844},\"pageOverflow\":false,\"dialogOverflow\":false,\"bounds\":{\"left\":19,\"right\":371,\"top\":10,\"bottom\":834}}"
+    },
+    {
+      "name": "Return action reachable 390x844",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Error dialog fits 1440x1000",
+      "passed": true,
+      "detail": "{\"viewport\":{\"width\":1440,\"height\":1000},\"pageOverflow\":false,\"dialogOverflow\":false,\"bounds\":{\"left\":410,\"right\":1030,\"top\":50,\"bottom\":950}}"
+    },
+    {
+      "name": "Return action reachable 1440x1000",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Error dialog fits 320x568",
+      "passed": true,
+      "detail": "{\"viewport\":{\"width\":320,\"height\":568},\"pageOverflow\":false,\"dialogOverflow\":false,\"bounds\":{\"left\":19,\"right\":301,\"top\":8,\"bottom\":560}}"
+    },
+    {
+      "name": "Return action reachable 320x568",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Error dialog fits 585x320",
+      "passed": true,
+      "detail": "{\"viewport\":{\"width\":585,\"height\":320},\"pageOverflow\":false,\"dialogOverflow\":false,\"bounds\":{\"left\":19,\"right\":566,\"top\":8,\"bottom\":312}}"
+    },
+    {
+      "name": "Return action reachable 585x320",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "WeChat on simulated iPhone displays Safari handoff before preparation and sends no create request",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "WeChat handoff fits 390",
+      "passed": true,
+      "detail": "{\"viewport\":{\"width\":390,\"height\":844},\"pageOverflow\":false,\"dialogOverflow\":false,\"bounds\":{\"left\":19,\"right\":371,\"top\":10,\"bottom\":834}}"
+    },
+    {
+      "name": "WeChat handoff fits 320",
+      "passed": true,
+      "detail": "{\"viewport\":{\"width\":320,\"height\":568},\"pageOverflow\":false,\"dialogOverflow\":false,\"bounds\":{\"left\":19,\"right\":301,\"top\":8,\"bottom\":560}}"
+    },
+    {
+      "name": "No browser script errors",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "pageErrors": [],
+  "visualReview": {
+    "reviewed": [
+      "connected-390.png",
+      "outlook-guide-1440.png",
+      "failed-320x568.png",
+      "wechat-handoff-390.png",
+      "outlook-steps-390.png",
+      "outlook-classic-1440.png",
+      "failed-585x320.png"
+    ],
+    "blockingLayoutFindings": [],
+    "followUp": "手机首次弹窗四个日历应用入口占据较大高度，新建成功后的添加及复制操作需要继续滚动；留作下一轮流程精简建议。",
+    "aestheticApproval": "pending user review",
+    "serverCleanup": "local in-memory server stopped; port 4173 no longer accepts requests",
+    "limitations": "Browser simulation does not verify actual native subscription, public network, sync or notifications."
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-29T23:24:24.044Z",
+  "mode": "metrics",
+  "environment": "acceptance",
+  "status": "measured",
+  "probes": [
+    {
+      "kind": "worker",
+      "status": "passed"
+    },
+    {
+      "kind": "database",
+      "status": "passed"
+    },
+    {
+      "kind": "pages-trial",
+      "status": "passed"
+    },
+    {
+      "kind": "pages-acceptance",
+      "status": "passed"
+    }
+  ],
+  "analytics": {
+    "status": "available",
+    "requests": 70,
+    "errors": 0,
+    "subrequests": 0,
+    "cpu": {
+      "sourceUnit": "microseconds",
+      "raw": {
+        "p50": 21385,
+        "p95": 74825,
+        "p99": 97405
+      },
+      "milliseconds": {
+        "p50": 21.385,
+        "p95": 74.825,
+        "p99": 97.405
+      },
+      "p95Available": true,
+      "unitVerified": true
+    },
+    "sampling": {
+      "dataset": "workersInvocationsAdaptive",
+      "adaptive": true,
+      "averageSampleInterval": 1,
+      "rawSampleCount": null,
+      "note": "请求数可能为自适应采样估计；平均采样间隔不能用于还原精确原始样本数。"
+    },
+    "outcomes": [
+      {
+        "status": "success",
+        "requests": 70,
+        "errors": 0
+      }
+    ],
+    "performanceAcceptance": "pending",
+    "note": "这是隔离服务时间窗口的汇总。未按冷生成、快照命中或修改分别分组；不代表逐请求 CPU 或免费额度已通过。无数据也不能视为零耗时。"
+  },
+  "releaseAcceptance": "pending",
+  "note": "只读预检证明读取权限与资源可达，不能证明写权限、正式部署、费用或真实手机通知通过。",
+  "version": "708e03204d2bb5b24433d83ab78f425e5f23f31c",
+  "window": {
+    "start": "2026-10-29T23:23:12.535Z",
+    "end": "2026-10-29T23:24:23.792Z",
+    "purpose": "isolated_smoke_window"
+  },
+  "clientRecordedRequests": 106,
+  "gatewayAnalytics": {
+    "status": "pending",
+    "reason": "账号未提供Pages指标数据集，不能用Worker指标替代。",
+    "performanceAcceptance": "pending"
+  }
+}

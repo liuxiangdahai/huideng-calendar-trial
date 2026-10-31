@@ -38,6 +38,8 @@
 
 ## 唯一发布链路
 
+2026-10-31复核：当前应用为`708e032`，[Actions 40972003462](https://github.com/liuxiangdahai/huideng-calendar-trial/actions/runs/40972003462)完整成功。两套Pages动态入口及对应Worker已部署，新订阅使用Pages地址；三层版本、资料及同源配置一致。下列旧发布数据仅供历史追踪。CPU本轮p95 74.825ms仍未通过；网关独立指标、真机和网络待验收，不扩大邀请。
+
 历史记录，2026-10-28：`CALENDAR_DEPLOY_ENABLED=true`，首次完整自动发布[40624756309](https://github.com/liuxiangdahai/huideng-calendar-trial/actions/runs/40624756309)成功，应用为`cd2a58ef9f90f5962a53c6e1302aa78439b4e6af`。当时两套 Worker/D1（含 0003 迁移）与单一 Pages 更新，HTTPS 前后端版本校验通过。该记录不含本轮新增的验收 Pages 和动态网关。Token 当时的资源读取、Analytics 读取和部署写入通过；本轮继续预检。
 
 历史首批 CPU p95=65.549ms，未达到 8ms 目标。本轮须重新分别测量 Worker 与 Pages 动态入口，不能沿用历史结果标通过。流水线完成不代表性能、免费额度或试用邀请门槛完成；不自动付费。仅更新 docs 或 README 不会重新发布应用。

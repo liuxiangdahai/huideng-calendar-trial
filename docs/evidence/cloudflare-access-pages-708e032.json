@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-29T23:22:51.600Z",
+  "mode": "preflight",
+  "environment": "acceptance",
+  "status": "read_access_verified",
+  "probes": [
+    {
+      "kind": "worker",
+      "status": "passed"
+    },
+    {
+      "kind": "database",
+      "status": "passed"
+    },
+    {
+      "kind": "pages-trial",
+      "status": "passed"
+    },
+    {
+      "kind": "pages-acceptance",
+      "status": "passed"
+    }
+  ],
+  "analytics": {
+    "status": "data_pending",
+    "requests": null,
+    "errors": null,
+    "subrequests": null,
+    "cpu": {
+      "sourceUnit": "microseconds",
+      "raw": {
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "milliseconds": {
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "p95Available": true,
+      "unitVerified": true
+    },
+    "sampling": {
+      "dataset": "workersInvocationsAdaptive",
+      "adaptive": true,
+      "averageSampleInterval": null,
+      "rawSampleCount": null,
+      "note": "请求数可能为自适应采样估计；平均采样间隔不能用于还原精确原始样本数。"
+    },
+    "outcomes": [],
+    "performanceAcceptance": "pending",
+    "note": "这是隔离服务时间窗口的汇总。未按冷生成、快照命中或修改分别分组；不代表逐请求 CPU 或免费额度已通过。无数据也不能视为零耗时。"
+  },
+  "releaseAcceptance": "pending",
+  "note": "只读预检证明读取权限与资源可达，不能证明写权限、正式部署、费用或真实手机通知通过。",
+  "window": {
+    "start": "2026-10-29T22:52:53.472Z",
+    "end": "2026-10-29T23:22:53.472Z",
+    "purpose": "permission_probe_only"
+  },
+  "gatewayAnalytics": {
+    "status": "pending",
+    "reason": "账号未提供Pages指标数据集，不能用Worker指标替代。",
+    "performanceAcceptance": "pending"
+  }
+}
