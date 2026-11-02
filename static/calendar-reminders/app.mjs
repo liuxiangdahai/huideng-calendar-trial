@@ -1,4 +1,4 @@
-import {defaults, normalizeSettings, selectOccurrences, exportICS, reminderLabel, addDays, rangeEnd} from './core.mjs';
+import {defaults, normalizeSettings, selectOccurrences, selectCalendarOccurrences, exportICS, reminderLabel, addDays, rangeEnd} from './core.mjs';
 import {getTibetanDate} from './engine.mjs';
 import {icon, fillIcons} from './icons.mjs';
 import {deviceTimeZone,resolveTimeZone,zoneInfo,wallTimeInZone} from './timezones.mjs';
@@ -32,8 +32,11 @@ let subscriptionVersion = 0, pendingWrite = null;
 let entryError = false;
 let pendingCreation = null, creationBlocked = false;
 let connection = {state:'idle'}, connectionController = null, lastWriteKind = '';
+let downloadCache = {key:'',events:[]};
 const calendarDevice = calendarEnvironment();
 const countSelected = () => Object.values(settings.events).filter(pref => pref.mode !== 'off').length;
+const hasSelectedContent = () => countSelected() > 0 || settings.includeDailyDates === true;
+const selectionSummary = () => !countSelected() && settings.includeDailyDates ? '每日藏历 · 仅显示' : `已选 ${countSelected()} 项${settings.includeDailyDates ? ' · 含每日藏历' : ''}`;
 const dirty = () => Boolean(subscription && JSON.stringify(settings) !== JSON.stringify(subscription.savedSettings));
 const zoneLabel = () => settings.zone ? zoneInfo(settings.zone)?.label || settings.zone : '尚未选择时区';
 const currentApp = () => $('input[name="device"]:checked')?.value || '';
@@ -105,7 +108,8 @@ function checkDeviceTime() {
 function renderPresets() {
   const current=matchingPreset(settings,data.catalog);
   $('#preset-options').innerHTML=PRESETS.map(preset=>`<button class="preset-card" type="button" data-preset="${preset.id}" aria-pressed="${current===preset.id}"${preset.id==='practice'?' aria-describedby="preset-scope-note"':''}><span class="preset-icon">${icon(preset.icon)}</span><span class="preset-copy"><strong>${preset.title}<small>${presetIds(data.catalog,preset.id).length} 项</small></strong><span>${preset.description}</span><em>提醒：${preset.reminder}</em></span><span class="preset-check" aria-hidden="true">${current===preset.id?icon('check'):''}</span></button>`).join('');
-  $('#clear-selection').disabled=!countSelected();
+  $('#clear-selection').disabled=!hasSelectedContent();
+  $('#include-daily-dates').checked=settings.includeDailyDates===true;
 }
 function renderGroups() {
   openGroups = new Set([...document.querySelectorAll('.group-card[open]')].map(item => item.dataset.groupId).concat($('#groups').children.length ? [] : [...openGroups]));
@@ -139,13 +143,15 @@ function renderPreview() {
 }
 function renderSaveState() {
   const changed = dirty(), count = countSelected();
-  $('#selection-count').textContent = `已选 ${count} 项`;
-  $('#reminder-count').textContent = `${Object.values(settings.events).filter(pref=>pref.mode==='remind').length} 项提醒`;
+  const dailyOnly=settings.includeDailyDates && !count;
+  $('#selection-count').textContent = dailyOnly ? '每日藏历' : `已选 ${count} 项`;
+  $('#reminder-count').textContent = dailyOnly ? '仅显示' : `${Object.values(settings.events).filter(pref=>pref.mode==='remind').length} 项提醒`;
+  $('#daily-date-count').hidden=!settings.includeDailyDates || !count;
   $('#subscribe').setAttribute('aria-busy',String(requestPending||managementRestoring));
   $('#save-state').textContent = stopped ? '已停用，请在手机移除订阅日历' : conflict ? '设置已在其他设备修改' : changed ? '有未保存的修改' : subscription ? '设置已保存，等待日历同步' : '随时调整你的选择';
   $('#unsaved-dot').hidden = !changed;
   $('#subscribe-label').textContent = managementRestoring ? '正在恢复订阅…' : requestPending ? '正在保存…' : subscription ? (changed ? '保存修改' : '查看订阅') : '订阅到日历';
-  $('#subscribe').disabled = requestPending || managementRestoring || (!subscription && !count);
+  $('#subscribe').disabled = requestPending || managementRestoring || (!subscription && !hasSelectedContent());
   // This opens the existing panel only. Keep it available while saving so a
   // user who closed the panel can return to progress, help or a failure state.
   $('#my-subscription').disabled = false;
@@ -205,7 +211,7 @@ function deviceGuide() {
   if(inAppApple && !subscription) $('#entry-hint').textContent='请先在 Safari 或系统浏览器打开本页，再选择内容并准备订阅。微信与浏览器的本机草稿不会自动同步。';
   $('#create-subscription').hidden=inAppApple && !subscription;
   $('#copy-page').hidden=!inAppApple;
-  $('#create-subscription').disabled = !app || !countSelected() || requestPending || managementRestoring || !settings.zone || creationBlocked;
+  $('#create-subscription').disabled = !app || !hasSelectedContent() || requestPending || managementRestoring || !settings.zone || creationBlocked;
   $('#create-subscription-label').textContent=managementRestoring ? '正在恢复订阅…' : requestPending ? '正在准备订阅…' : entryError ? '重试准备订阅' : app ? '继续订阅' : '请先选择日历应用';
   $('#subscription-new').setAttribute('aria-busy',String(requestPending||managementRestoring));
   $('#restart-creation').hidden=Boolean(subscription)||!creationBlocked||inAppApple;
@@ -243,11 +249,11 @@ async function checkConnection() {
   renderConnection();
 }
 function renderSubscription() {
-  $('#subscription-summary').textContent = `已选 ${countSelected()} 项 · 全天显示 · ${zoneLabel()}`;
+  $('#subscription-summary').textContent = `${selectionSummary()} · 全天显示 · ${zoneLabel()}`;
   $('#subscription-new').hidden = Boolean(subscription);
   $('#subscription-existing').hidden = !subscription;
   $('#subscription-management').hidden = !subscription;
-  $('#create-subscription').disabled = !countSelected() || requestPending;
+  $('#create-subscription').disabled = !hasSelectedContent() || requestPending;
   $('#save-subscription').hidden = !dirty();
   $('#save-subscription').disabled = requestPending || managementRestoring || conflict;
   $('#reload-subscription').hidden = !conflict;
@@ -255,8 +261,9 @@ function renderSubscription() {
     $('#feed-url').value = subscription.feedUrl;
     $('#subscription-status').textContent = dirty() ? '当前修改尚未保存；日历仍使用上次保存的设置。' : '设置已保存，等待日历同步。订阅地址保持不变。';
   }
+  const downloadable=downloadOccurrences();
   $('#downloads').innerHTML = ['remind','display'].map(mode => {
-    const count = upcoming.filter(event => event.preference.mode === mode).length;
+    const count = downloadable.filter(event => event.preference.mode === mode).length;
     return count ? `<button class="secondary" type="button" data-download="${mode}">${icon('download')}下载${mode === 'remind' ? '提醒' : '仅显示'}日历 · ${count} 项日程</button>` : '';
   }).join('') || '<p>近期没有可下载的已选日程。</p>';
   deviceGuide(); renderSaveState(); renderConnection();
@@ -277,7 +284,7 @@ function openSubscription({prepare=false}={}) {
   }
 }
 async function prepareSubscription({retry=false}={}) {
-  if(subscription || requestPending || managementRestoring || creationBlocked || !currentApp() || !countSelected() || !settings.zone) return;
+  if(subscription || requestPending || managementRestoring || creationBlocked || !currentApp() || !hasSelectedContent() || !settings.zone) return;
   if(currentApp()==='iphone' && calendarDevice.apple && calendarDevice.inAppBrowser) return;
   // Changing the target app must not silently retry a failed/expired creation.
   if(entryError&&!retry) return;
@@ -371,7 +378,7 @@ async function performSaveSubscription(create) {
   try {
     // Validate the complete feed before sending settings. DST changes use the
     // same compatible resolution policy as the subscription service.
-    if (!create || !pendingCreation) exportICS(selectOccurrences(data,settings),{zone:settings.zone,name:'藏历'});
+    if (!create || !pendingCreation) exportICS(selectCalendarOccurrences(data,settings),{zone:settings.zone,name:'藏历'});
     if(create && !apiBaseUrl) throw new Error('暂时无法完成订阅，请稍后重试。你的选择已保留，也可以使用下方文件导入。');
     const attempt=create ? creationAttempt() : null;
     const submitted = clone(attempt ? attempt.settings : settings);
@@ -447,26 +454,35 @@ function download(content, filename) {
   const link = document.createElement('a'); link.href = url; link.download = filename; document.body.append(link); link.click(); link.remove();
   setTimeout(() => URL.revokeObjectURL(url),60000);
 }
+function downloadOccurrences() {
+  if(!settings.includeDailyDates) return upcoming;
+  const key=JSON.stringify([today,settings]);
+  if(downloadCache.key!==key) downloadCache={key,events:selectCalendarOccurrences(data,settings,{start:today,end:rangeEnd(today,24)})};
+  return downloadCache.events;
+}
 function downloadCalendar(mode) {
   try {
-    const events = upcoming.filter(event => event.preference.mode === mode);
+    const events = downloadOccurrences().filter(event => event.preference.mode === mode);
     download(exportICS(events,{zone:settings.zone,name:mode === 'remind' ? '慧灯藏历 · 修行提醒' : '慧灯藏历 · 仅显示',sourceVersion:data.updatedOn}),`藏历-${mode === 'remind' ? '提醒' : '仅显示'}.ics`);
     $('#download-status').textContent = '已发起下载。请继续在日历应用中导入，并检查通知设置。';
   } catch (error) { $('#download-status').textContent = error.message; }
 }
 function attachEvents() {
+  $('#include-daily-dates').addEventListener('change',event=>{
+    settings.includeDailyDates=event.target.checked;stopped=false;refresh(false);
+  });
   $('#preset-options').addEventListener('click',event=>{
     const button=event.target.closest('[data-preset]');if(!button)return;
     settings=applyPreset(settings,data.catalog,button.dataset.preset);lastActive.clear();stopped=false;
     refresh();$('#preset-options').querySelector(`[data-preset="${button.dataset.preset}"]`)?.focus({preventScroll:true});
   });
   $('#clear-selection').addEventListener('click',()=>{
-    if(!countSelected())return;
+    if(!hasSelectedContent())return;
     for(const [id,pref] of Object.entries(settings.events)) {
       if(pref.mode!=='off')lastActive.set(id,clone(pref));
       pref.mode='off';
     }
-    stopped=false;refresh();
+    settings.includeDailyDates=false;stopped=false;refresh();
     if($('.workspace').dataset.activeTab==='preview' && matchMedia('(max-width:1023px)').matches) $('[data-cal-view="month"]').focus({preventScroll:true});
     else $('#preset-options button').focus({preventScroll:true});
     notify(subscription?'已清空选择；保存修改后更新订阅。':'已清空选择，可以重新挑选。');

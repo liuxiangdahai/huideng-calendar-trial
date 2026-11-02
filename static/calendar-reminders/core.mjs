@@ -1,4 +1,4 @@
-import {generateOccurrences} from './engine.mjs';
+import {ENGINE, generateOccurrences, dailyDateOccurrences} from './engine.mjs';
 import {resolveTimeZone, deviceTimeZone, ZONE_LABELS, civilDateInZone, wallTimeInZone} from './timezones.mjs';
 
 export const MODES = {off: '不添加', display: '仅加入日历', remind: '加入并提醒'};
@@ -17,7 +17,7 @@ const oldGroups = {
 };
 export function defaults(catalog, zone = deviceTimeZone()) {
   zone = resolveTimeZone(zone);
-  return {version: 2, zone, events: Object.fromEntries(catalog.events.map(e =>
+  return {version: 2, zone, includeDailyDates: false, events: Object.fromEntries(catalog.events.map(e =>
     [e.id, {mode: 'off', reminders: initialReminders()}]))};
 }
 export function validateReminders(reminders) {
@@ -37,6 +37,7 @@ function cleanPreference(pref) {
 export function normalizeSettings(raw, catalog) {
   const base = defaults(catalog, raw?.zone);
   if (!raw || ![1,2].includes(raw.version)) return base;
+  base.includeDailyDates = raw.version === 2 && raw.includeDailyDates === true;
   for (const event of catalog.events) {
     // Only the ten events present in v1 inherit v1 group choices. Newly added
     // observances must never be selected by an old broad category setting.
@@ -59,8 +60,11 @@ export function validateSettings(raw, catalog) {
     throw new Error('日历设置格式无效，请刷新页面后重试。');
   }
   const ids = new Set(catalog.events.map(e => e.id));
+  if (Object.hasOwn(raw, 'includeDailyDates') && typeof raw.includeDailyDates !== 'boolean') {
+    throw new Error('每日藏历选项必须为开启或关闭。');
+  }
   for (const id of Object.keys(raw.events)) if (!ids.has(id)) throw new Error('节日目录已更新，请刷新页面后重试。');
-  return {version: 2, zone, events: Object.fromEntries(catalog.events.map(e =>
+  return {version: 2, zone, includeDailyDates: raw.includeDailyDates === true, events: Object.fromEntries(catalog.events.map(e =>
     [e.id, raw.events[e.id] ? cleanPreference(raw.events[e.id]) : {mode: 'off', reminders: initialReminders()}]))};
 }
 export function eventPreference(event, settings) {
@@ -73,7 +77,7 @@ export function rangeEnd(start, months) {
   d.setUTCDate(Math.min(day, last));
   return addDays(d.toISOString().slice(0, 10), -1);
 }
-export function selectOccurrences(data, settings, {start, end} = {}) {
+function occurrenceWindow(settings, {start, end} = {}) {
   if (!start || !end) {
     // Preview remains usable before manual timezone selection. This local date
     // fallback is only for the preview window; it never changes reminder zone.
@@ -82,12 +86,27 @@ export function selectOccurrences(data, settings, {start, end} = {}) {
     start ||= addDays(today, -90);
     end ||= rangeEnd(today, 24);
   }
+  return {start, end};
+}
+export function selectOccurrences(data, settings, range = {}) {
+  const {start, end} = occurrenceWindow(settings, range);
   const definitions = new Map(data.catalog.events.map(e => [e.id, e]));
   return generateOccurrences(data, {start,end}).map(o => {
     const definition = definitions.get(o.eventId);
     return {...definition, ...o, id: definition.id, title: o.title || definition.title,
       preference: eventPreference(definition, settings)};
   }).filter(o => o.preference.mode !== 'off');
+}
+
+// The grid's festival selection remains separate from the optional everyday
+// layer. Both browser exports and the service compose the same final calendar.
+// The injectable selector preserves the service's isolated publication tests.
+export function selectCalendarOccurrences(data, settings, range = {}, festivalSelector = selectOccurrences) {
+  const window = occurrenceWindow(settings, range);
+  const festivals = festivalSelector(data, settings, window);
+  if (settings.includeDailyDates !== true) return festivals;
+  return [...festivals, ...dailyDateOccurrences(window.start, window.end)]
+    .sort((a, b) => a.date.localeCompare(b.date) || a.uid.localeCompare(b.uid));
 }
 
 // Resolve recurring wall-clock alarms with IANA rules. Like calendar-compatible
@@ -114,7 +133,7 @@ export function zonedInstant(date, time, zone) {
 // one place. A runtime timezone-data update may change these without changing
 // the user's wall-clock preference or the all-day festival date.
 export function resolveAlarmInstants(event, zone) {
-  if (event.status === 'CANCELLED' || event.preference.mode !== 'remind') return [];
+  if (event.kind === 'daily-date' || event.status === 'CANCELLED' || event.preference.mode !== 'remind') return [];
   return validateReminders(event.preference.reminders).map(reminder =>
     zonedInstant(addDays(event.date, -reminder.daysBefore), reminder.time, zone).toISOString());
 }
@@ -150,7 +169,9 @@ export function exportICS(events, {zone, name = '慧灯·藏历修行日', gener
   for (const event of events) {
     if (ids.has(event.uid)) throw new Error('日程标识重复。');
     ids.add(event.uid);
-    const description = [`藏历${event.tibetan}`, '日期换算：藏历 PRO；节日名称与安排：佛慧法语藏历。',
+    const daily = event.kind === 'daily-date';
+    const description = daily ? [event.description, ENGINE.url, '仅加入日历；请关闭此日历的默认通知。'] :
+      [`藏历${event.tibetan}`, '日期换算：藏历 PRO；节日名称与安排：佛慧法语藏历。',
       `原站标注：${event.sourceLabel || event.title}`, event.source,
       event.preference.mode === 'remind' ? `提醒时区：${zone}。提醒时间不代表共修开始时间。` : '仅加入日历；请关闭此日历的默认通知。'];
     const asDate = value => value instanceof Date ? value : new Date(value);
@@ -161,10 +182,10 @@ export function exportICS(events, {zone, name = '慧灯·藏历修行日', gener
       `DTSTART;VALUE=DATE:${event.date.replaceAll('-', '')}`,
       `DTEND;VALUE=DATE:${addDays(event.date, 1).replaceAll('-', '')}`,
       `SUMMARY:${escapeICS(event.title)}`, `DESCRIPTION:${escapeICS(description.join('\n'))}`,
-      `URL:${event.source}`, `STATUS:${status}`, 'TRANSP:TRANSPARENT', `SEQUENCE:${sequence}`);
+      `URL:${daily ? ENGINE.url : event.source}`, `STATUS:${status}`, 'TRANSP:TRANSPARENT', `SEQUENCE:${sequence}`);
     if (event.createdAt) lines.push(`CREATED:${stamp(asDate(event.createdAt))}`);
     if (event.lastModified) lines.push(`LAST-MODIFIED:${stamp(asDate(event.lastModified))}`);
-    if (status !== 'CANCELLED' && event.preference.mode === 'remind') {
+    if (!daily && status !== 'CANCELLED' && event.preference.mode === 'remind') {
       // Only the server explicitly opts into its own publication ledger. Direct
       // exports ignore arbitrary alarmInstants copied into browser event data.
       const alarms = usePublishedAlarmInstants ? publishedAlarmInstants(event) : resolveAlarmInstants(event, zone);

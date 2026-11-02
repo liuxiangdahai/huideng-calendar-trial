@@ -33,8 +33,8 @@ test('calendar marks both real repeated days and only the actual first-day event
   assert.equal(second.repeatNumber, 2);
   assert.equal(first.tibetan.day, 25);
   assert.equal(second.tibetan.day, 25);
-  assert.match(first.tibetan.fullLabel, /重日第一次/);
-  assert.match(second.tibetan.fullLabel, /重日第二次/);
+  assert.match(first.tibetan.fullLabel, /重日1/);
+  assert.match(second.tibetan.fullLabel, /重日2/);
   assert.match(second.tibetanShort, /重/);
   assert.equal(first.count, 1);
   assert.equal(second.count, 0);

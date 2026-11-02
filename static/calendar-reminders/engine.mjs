@@ -45,6 +45,61 @@ export function getTibetanDate(date) {
   return {...result};
 }
 
+const sameMonth = (left, right) => left.year === right.year && left.month === right.month &&
+  left.monthLeap === right.monthLeap;
+const monthDayLabel = (month, day) => `${month.monthLeap ? '闰' : ''}${MONTHS[month.month]}月${DAYS[day]}`;
+
+/** Omitted lunar slots between two adjacent real civil days, including month boundaries. */
+export function omittedTibetanDays(previous, tibetan) {
+  const missingBefore = [];
+  const omitted = (month, start, end) => {
+    for (let day = start; day <= end; day++) {
+      const display = monthDayLabel(month, day);
+      missingBefore.push({year: month.year, yearName: month.yearName, month: month.month,
+        monthLeap: month.monthLeap, day, display, fullLabel: `藏历${month.yearName}年${display}`});
+    }
+  };
+  if (previous) {
+    if (sameMonth(previous, tibetan)) omitted(tibetan, previous.day + 1, tibetan.day - 1);
+    else {
+      // PRO's raw dayMiss flag alone cannot identify an omitted day 30 at the
+      // end of the previous month/year. Compare the two real adjacent civil days.
+      omitted(previous, previous.day + 1, 30);
+      omitted(tibetan, 1, tibetan.day - 1);
+    }
+  }
+  return missingBefore;
+}
+
+/** Shared civil-day detail for the month grid and the optional exported date layer. */
+export function tibetanDayDetails(date) {
+  const tibetan = getTibetanDate(date);
+  const previous = date > ENGINE.supported.start ? getTibetanDate(shift(date, -1)) : null;
+  const next = date < ENGINE.supported.end ? getTibetanDate(shift(date, 1)) : null;
+  const repeatNumber = previous && sameMonth(previous, tibetan) && previous.day === tibetan.day ? 2
+    : next && sameMonth(next, tibetan) && next.day === tibetan.day ? 1 : 0;
+  const missingBefore = omittedTibetanDays(previous, tibetan);
+  const fullLabel = `藏历${tibetan.yearName}年${tibetan.display}${repeatNumber ? `（重日${repeatNumber}）` : ''}`;
+  const missingLabel = missingBefore.length ? `缺日：${missingBefore.map(day => day.fullLabel).join('、')}，已跳过。` : '';
+  return {...tibetan, repeatNumber, missingBefore, missingLabel, fullLabel};
+}
+
+/** One display-only event per real Gregorian day; omitted days get no phantom event. */
+export function dailyDateOccurrences(start, end) {
+  validateDate(start); validateDate(end);
+  if (start > end) throw new RangeError('结束日期不能早于开始日期。');
+  const result = [];
+  for (let date = start; date <= end; date = shift(date, 1)) {
+    const day = tibetanDayDetails(date);
+    result.push({id: 'daily-dates', eventId: 'daily-dates', kind: 'daily-date', origin: 'engine',
+      uid: `daily-date-${date}`, date, title: `藏历${day.display}${day.repeatNumber ? `（重日${day.repeatNumber}）` : ''}`,
+      tibetan: day.display, description: [day.fullLabel, day.missingLabel,
+        '日期换算：藏历 PRO。每日藏历为全天记录，不设置提醒。'].filter(Boolean).join('\n'),
+      source: ENGINE.url, sourceLabel: '藏历 PRO 日期换算', preference: {mode: 'display', reminders: []}});
+  }
+  return result;
+}
+
 function uidFor(definition, bucket) {
   // Keep v1's ten existing event identifiers and lunar-slot UIDs. A correction
   // to the Gregorian day or to the display title must not duplicate an event.

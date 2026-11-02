@@ -1,0 +1,17 @@
+diff --git a/config.toml b/config.toml
+--- a/config.toml
++++ b/config.toml
+@@ -238,6 +238,13 @@
+   identifier = "zangli"
+   name = "藏历"
+   title = "藏历"
+   url = "https://zangli.pro/"
+   weight = 5.2
++
++[[menu.main]]
++  identifier = "zangli-subscription"
++  name = "藏历订阅"
++  title = "藏历日期与修行日日历订阅"
++  url = "https://huideng-calendar-trial.pages.dev/calendar-reminders/"
++  weight = 5.3
+ 

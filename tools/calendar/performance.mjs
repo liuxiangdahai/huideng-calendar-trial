@@ -81,6 +81,7 @@ try{
  await series(page,'preset',i=>page.locator(`[data-preset=${i%2?'guru':'practice'}]`).click());
  await series(page,'checkbox',()=>page.locator('#event-dakini-tsok').click());
  await series(page,'category',()=>page.locator('[data-group-id="masters"]>summary').click());
+ if(process.argv.includes('--daily'))await series(page,'daily-dates',()=>page.locator('#include-daily-dates').click());
  await page.locator('[data-preset=practice]').click();await page.locator('#tab-preview').click();
  await series(page,'month',i=>page.locator(`[data-cal-action=${i%2?'previous':'next'}]`).click());
  await series(page,'view',i=>page.locator(`[data-cal-view=${i%2?'month':'list'}]`).click());
@@ -95,6 +96,7 @@ try{
  await page.locator('[data-preset=practice]').click();await page.locator('#reminder-settings').click();
  await page.locator('input[name="reminder-mode"][value="remind"]').check();await page.locator('#add-reminder').click();
  await page.locator('#reminder-form button[type="submit"]').click();
+ if(process.argv.includes('--daily'))await page.locator('#include-daily-dates').check();
  const before=await page.evaluate(()=>localStorage.getItem('huideng.calendar.v2'));
  const preferences=Object.values(JSON.parse(before).events).filter(value=>value.mode!=='off');
  if(preferences.length!==54||!preferences.every(value=>value.mode==='remind'&&value.reminders.length===2))throw new Error('54项双提醒测试前置状态不正确');
@@ -102,7 +104,7 @@ try{
  for(let index=0;index<100;index++)stress.push(await sample(page,'continuous-dual',index,()=>page.locator('#event-dakini-tsok').click()));
  const after=await page.evaluate(()=>localStorage.getItem('huideng.calendar.v2'));
  if(before!==after)throw new Error('连续操作后设置发生丢失');
- report.stability={actions:100,selected:54,remindersPerEvent:2,settingsRetained:before===after,eventTiming:stats(stress.flatMap(s=>s.nativeMs===null?[]:[s.nativeMs])),longTaskMaximumMs:Math.max(0,...stress.flatMap(s=>s.longTasks.map(t=>t.duration)))};
+ report.stability={actions:100,selected:54,remindersPerEvent:2,includeDailyDates:JSON.parse(before).includeDailyDates===true,settingsRetained:before===after,eventTiming:stats(stress.flatMap(s=>s.nativeMs===null?[]:[s.nativeMs])),longTaskMaximumMs:Math.max(0,...stress.flatMap(s=>s.longTasks.map(t=>t.duration)))};
  console.log('stability',JSON.stringify(report.stability));
  await context.close();
  }

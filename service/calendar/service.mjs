@@ -1,5 +1,5 @@
 import {civilDateInZone} from '../../static/calendar-reminders/timezones.mjs';
-import {addDays, resolveAlarmInstants as defaultAlarmInstants} from '../../static/calendar-reminders/core.mjs';
+import {addDays, selectCalendarOccurrences, resolveAlarmInstants as defaultAlarmInstants} from '../../static/calendar-reminders/core.mjs';
 
 const JSON_HEADERS = {'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store'};
 const TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/;
@@ -155,15 +155,17 @@ function sqlGuard(record) {
 const GUARD = 'EXISTS (SELECT 1 FROM subscriptions WHERE id = ? AND revision = ? AND render_version = ?)';
 function publicEvent(event, zone, alarmInstants) {
   // Keep the publication ledger small; never store tokens, UI state, or unused catalog metadata in it.
+  const remind = event.kind !== 'daily-date' && event.preference.mode === 'remind';
   return {
     uid: event.uid, id: event.id || event.eventId, eventId: event.eventId || event.id,
     title: event.title, date: event.date, tibetan: event.tibetan,
     source: event.source, sourceLabel: event.sourceLabel,
-    preference: event.preference.mode === 'remind'
+    ...(event.kind === 'daily-date' ? {kind: 'daily-date', description: event.description} : {}),
+    preference: remind
       ? {mode: 'remind', reminders: event.preference.reminders}
       : {mode: 'display', reminders: []},
-    reminderZone: event.preference.mode === 'remind' ? zone : undefined,
-    alarmInstants: event.preference.mode === 'remind' ? alarmInstants : []
+    reminderZone: remind ? zone : undefined,
+    alarmInstants: remind ? alarmInstants : []
   };
 }
 function publishedEvent(entry) {
@@ -219,7 +221,7 @@ export function createCalendarService({getData, validateSettings, selectOccurren
     // and stores its final UTC instants in the content digest and serializer.
     const ids = new Set();
     try {
-      for (const event of selectOccurrences(data, settings, rollingWindow(time, settings.zone))) {
+      for (const event of selectCalendarOccurrences(data, settings, rollingWindow(time, settings.zone), selectOccurrences)) {
         if (!event.uid || ids.has(event.uid)) throw new Error('日程标识无效或重复。');
         ids.add(event.uid);
         addDays(event.date, 1);
@@ -310,6 +312,12 @@ export function createCalendarService({getData, validateSettings, selectOccurren
       const body = await readBody(request);
       if (!Number.isSafeInteger(body.revision) || body.revision < 1) throw new HttpError(400, '缺少有效的设置版本。');
       if (body.revision !== record.revision) throw new HttpError(409, '设置已在其他页面修改，请重新载入。', {revision: record.revision});
+      // Older clients do not know this optional v2 field. Preserve the server's
+      // current choice unless a client explicitly submits a strict boolean.
+      if (body.settings && typeof body.settings === 'object' && !Array.isArray(body.settings) &&
+          !Object.hasOwn(body.settings, 'includeDailyDates')) {
+        body.settings = {...body.settings, includeDailyDates: JSON.parse(record.settings_json).includeDailyDates === true};
+      }
       const data = await getData(), settings = await parseSettings(body, data), time = now();
       const settingsJson = canonical(settings);
       if (settingsJson === record.settings_json) return json(recordView(record, baseUrl));
@@ -375,7 +383,7 @@ export function createCalendarService({getData, validateSettings, selectOccurren
     if (stored.events) stored.events = Object.fromEntries(
       Object.entries(stored.events).filter(([id]) => currentIds.has(id)));
     const settings = record.disabled ? {zone: 'UTC'} : validateSettings(stored, data.catalog);
-    const selection = record.disabled ? [] : selectOccurrences(data, settings, rollingWindow(time, settings.zone));
+    const selection = record.disabled ? [] : selectCalendarOccurrences(data, settings, rollingWindow(time, settings.zone), selectOccurrences);
     const prior = (await env.DB.prepare('SELECT * FROM calendar_entries WHERE subscription_id = ?')
       .bind(record.id).all()).results;
     const previous = new Map(prior.map(entry => [entry.uid, entry])), next = new Map(), changes = [];

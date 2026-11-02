@@ -86,6 +86,17 @@ main { max-width: 1280px; margin: auto; padding: 16px 32px 40px; padding-top: 0;
 .preset-copy>span { font-size: 13px; color: var(--muted); line-height: 1.65; font-style: normal; }
 .preset-copy em { font-size: 13px; color: var(--red); line-height: 1.65; font-style: normal; }
 .preset-scope-note { margin-top: 8px; font-size: 13px; line-height: 1.5; color: var(--muted); }
+.daily-date-option { margin: 10px 0 18px; padding: 8px 0; border-block: 1px solid var(--line); }
+.daily-date-option .event-label { align-items: flex-start; gap: 12px; }
+.daily-date-option .event-label input { margin-top: 5px; }
+.daily-date-option strong { display: block; color: var(--teal-dark); font-size: 16px; font-family: var(--font-title); }
+.daily-date-option #daily-date-note { display: block; margin-top: 4px; color: var(--muted); font-size: 13px; line-height: 1.7; }
+.daily-date-option details { margin-left: 30px; font-size: 13px; line-height: 1.7; color: var(--muted); }
+.daily-date-option summary { min-height: 44px; display: flex; align-items: center; color: var(--red); cursor: pointer; }
+.daily-date-option summary::after { content: '＋'; margin-left: 6px; }
+.daily-date-option details[open] summary::after { content: '−'; }
+.daily-date-option details p { margin: 0 0 4px; }
+.selection-totals #daily-date-count::before { content: '·'; margin-right: 8px; }
 .preset-check { display: grid; place-items: center; width: 17px; height: 17px; border: 1.5px solid var(--control-line); border-radius: 50%; flex: none; color: var(--card); }
 .preset-card[aria-pressed=true] .preset-check { background: #ebcc91; border-color: #ebcc91; color: #681e19; }
 .preset-check .icon { width: 14px; height: 14px; }

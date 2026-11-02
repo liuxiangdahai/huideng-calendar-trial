@@ -1,4 +1,4 @@
-import {ENGINE, getTibetanDate} from './engine.mjs';
+import {ENGINE, tibetanDayDetails, dailyDateOccurrences} from './engine.mjs';
 import {addDays, reminderLabel, zonedInstant} from './core.mjs';
 import {icon} from './icons.mjs';
 import {eventPresentation, eventIcon} from './event-presentation.mjs';
@@ -45,15 +45,7 @@ export function navigateDate(date, key, {start = ENGINE.supported.start, end = E
 
 function tibetanDetails(date) {
   if (date < ENGINE.supported.start || date > ENGINE.supported.end) return null;
-  const tibetan = getTibetanDate(date);
-  let repeatNumber = tibetan.dayLeap ? 2 : 0;
-  if (!repeatNumber && date < ENGINE.supported.end) {
-    const next = getTibetanDate(addDays(date, 1));
-    if (next.dayLeap && next.year === tibetan.year && next.month === tibetan.month &&
-        next.monthLeap === tibetan.monthLeap && next.day === tibetan.day) repeatNumber = 1;
-  }
-  return {...tibetan, repeatNumber,
-    fullLabel: `藏历${tibetan.yearName}年${tibetan.display}${repeatNumber ? `（重日第${repeatNumber === 1 ? '一' : '二'}次）` : ''}`};
+  return tibetanDayDetails(date);
 }
 
 /** Exactly six Monday-first weeks. Missing Tibetan days do not create cells. */
@@ -64,7 +56,7 @@ export function monthCells(month, {start = ENGINE.supported.start, end = ENGINE.
   const first = addDays(month + '-01', -weekIndex(month + '-01'));
   const byDate = new Map();
   for (const event of events) {
-    if (event.preference?.mode === 'off') continue;
+    if (event.kind === 'daily-date' || event.preference?.mode === 'off') continue;
     if (!byDate.has(event.date)) byDate.set(event.date, []);
     byDate.get(event.date).push(event);
   }
@@ -112,6 +104,11 @@ function eventMarkup(event, location, state) {
     <button type="button" class="cal-reminder${event.preference?.mode === 'remind' ? ' is-active' : ''}" data-cal-event="${escape(id)}" data-cal-focus="${escape(location + '-' + event.uid)}" aria-label="调整${escape(event.title)}的提醒">${icon(event.preference?.mode === 'remind' ? 'bell' : 'bell-off')}<span>${escape(reminderText(event))}</span><span class="cal-edit">调整提醒</span></button>${converted}</article>`;
 }
 
+function dailyMarkup(date) {
+  const event=dailyDateOccurrences(date,date)[0], day=tibetanDetails(date);
+  return `<article class="cal-daily-entry" data-cal-daily-date="${date}"><span class="cal-daily-icon" aria-hidden="true">${icon('calendar')}</span><div><h4>${escape(event.title)}</h4><p class="cal-daily-meta">每日藏历<span>全天 · 不设置提醒</span></p><p class="cal-daily-source">日期换算：<a href="${escape(ENGINE.url)}" target="_blank" rel="noopener noreferrer">藏历 PRO</a></p>${day.missingLabel ? `<p class="cal-daily-note">${escape(day.missingLabel)}</p>` : ''}</div></article>`;
+}
+
 /**
  * Browser controller. Caller owns the device-local today, settings and occurrences.
  * All view/navigation state stays here and never modifies subscription settings.
@@ -121,7 +118,7 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
   validDate(today);
   const doc = root.ownerDocument, win = doc.defaultView;
   let view = initialView === 'list' ? 'list' : 'month';
-  let month = today.slice(0, 7), selected = today, focusDate = today, shown = 5;
+  let month = today.slice(0, 7), selected = today, focusDate = today, shown = 5, dailyShown = 30;
   let state = {data: null, settings: null, events: [], today,
     start: ENGINE.supported.start, end: ENGINE.supported.end};
   const scrollByView = {};
@@ -196,27 +193,32 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     const tibetan = tibetanDetails(selected), events = state.events.filter(event => event.date === selected);
     const available = previewAvailability(state.data, state.settings, {start: selected, end: selected});
     let content;
-    if (!available.selectedCount) content = empty('还没有选择日程，请在“选择内容”中勾选你关注的日子。');
+    if (state.settings?.includeDailyDates) content = dailyMarkup(selected) + events.map(event => eventMarkup(event, 'day', state)).join('');
+    else if (!available.selectedCount) content = empty('还没有选择日程，请在“选择内容”中勾选你关注的日子。');
     else if (!events.length) content = empty(available.hasUnconfirmed
       ? '当天暂无已确认的所选日程；部分法会、节日或天象的安排尚待确认。'
       : '当天没有已选日程。可点选其他日期，或继续添加关注的日子。');
     else content = events.map(event => eventMarkup(event, 'day', state)).join('');
-    $('[data-cal-detail]').innerHTML = `<div class="cal-detail-heading"><h3>${escape(dateTitle(selected))}<span>星期${WEEKDAYS[weekIndex(selected)]}</span></h3><p>${escape(tibetan?.fullLabel || '')}</p></div>${content}${events.length && available.hasUnconfirmed ? `<p class="cal-data-note">${unknownNote()}</p>` : ''}`;
+    $('[data-cal-detail]').innerHTML = `<div class="cal-detail-heading"><h3>${escape(dateTitle(selected))}<span>星期${WEEKDAYS[weekIndex(selected)]}</span></h3><p>${escape(tibetan?.fullLabel || '')}</p></div>${content}${(events.length || state.settings?.includeDailyDates) && available.hasUnconfirmed ? `<p class="cal-data-note">${unknownNote()}</p>` : ''}`;
   }
 
   function renderList() {
-    const dates = [...new Set(state.events.filter(event => event.date >= state.today).map(event => event.date))].sort();
+    const daily=state.settings?.includeDailyDates===true;
+    const dates = daily ? Array.from({length:dailyShown},(_,index)=>addDays(state.today,index)).filter(date=>date>=state.start && date<=state.end)
+      : [...new Set(state.events.filter(event => event.date >= state.today).map(event => event.date))].sort();
     const available = previewAvailability(state.data, state.settings, {start: state.today, end: state.end});
     const list = $('[data-cal-list]');
-    if (!available.selectedCount) list.innerHTML = empty('还没有选择日程，请在“选择内容”中勾选你关注的日子。');
+    $('.cal-list-caption').textContent=daily ? '从今天起，每天显示藏历日期；当天已选的节日列在下方。' : '从今天起，查看已选择的日程。';
+    if (!daily && !available.selectedCount) list.innerHTML = empty('还没有选择日程，请在“选择内容”中勾选你关注的日子。');
     else if (!dates.length) list.innerHTML = empty(available.hasUnconfirmed
       ? '所选日程的后续安排尚待确认。确认后会随订阅更新。'
       : '近期没有已选日程。可以选择其他关注的日子。');
-    else list.innerHTML = dates.slice(0, shown).map(date => {
+    else list.innerHTML = dates.slice(0, daily ? dailyShown : shown).map(date => {
       const tibetan = tibetanDetails(date);
-      return `<section class="cal-list-day" data-cal-list-date="${date}"><div class="cal-list-date"><span>${Number(date.slice(5, 7))}月</span><strong>${Number(date.slice(8))}</strong><span>${date.slice(0, 4)}年</span></div><div class="cal-list-content"><h3>星期${WEEKDAYS[weekIndex(date)]}${date === state.today ? '<span class="cal-today-label">今天</span>' : ''}</h3><p class="cal-list-tibetan">${escape(tibetan?.fullLabel || '')}</p>${state.events.filter(event => event.date === date).map(event => eventMarkup(event, 'list', state)).join('')}</div></section>`;
+      return `<section class="cal-list-day" data-cal-list-date="${date}"><div class="cal-list-date"><span>${Number(date.slice(5, 7))}月</span><strong>${Number(date.slice(8))}</strong><span>${date.slice(0, 4)}年</span></div><div class="cal-list-content"><h3>星期${WEEKDAYS[weekIndex(date)]}${date === state.today ? '<span class="cal-today-label">今天</span>' : ''}</h3>${daily ? dailyMarkup(date) : `<p class="cal-list-tibetan">${escape(tibetan?.fullLabel || '')}</p>`}${state.events.filter(event => event.date === date).map(event => eventMarkup(event, 'list', state)).join('')}</div></section>`;
     }).join('');
-    $('[data-cal-action="more"]').hidden = dates.length <= shown;
+    $('[data-cal-action="more"]').hidden = daily ? !dates.length || dates.at(-1)>=state.end : dates.length <= shown;
+    $('[data-cal-action="more"]').textContent = daily ? '再显示 30 天' : '查看更多日期';
     const note = $('[data-cal-list-note]');
     note.hidden = !available.hasUnconfirmed || !dates.length;
     note.textContent = unknownNote();
@@ -271,7 +273,8 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
       selected = state.today; focusDate = selected; month = selected.slice(0, 7);
       renderMonth(); restoreFocus('today'); announce(`今天，${dateTitle(selected)}`);
     } else if (button.dataset.calAction === 'more') {
-      shown += 5; renderList();
+      if(state.settings?.includeDailyDates) dailyShown += 30; else shown += 5;
+      renderList();
       // Keep the current viewport and offer the next newly displayed date to keyboard users.
       if (!$('[data-cal-action="more"]').hidden) restoreFocus('more');
       else [...$('[data-cal-list]').querySelectorAll('button')].at(-1)?.focus({preventScroll: true});
@@ -306,7 +309,7 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
       state.end = state.end > ENGINE.supported.end ? ENGINE.supported.end : state.end;
       if (state.start > state.end) throw new RangeError('预览日期范围无效。');
       state.events = (state.events || []).map(event => ({...event, preference: event.preference || state.settings?.events?.[idOf(event)]}))
-        .filter(event => event.date >= state.start && event.date <= state.end && event.preference?.mode !== 'off');
+        .filter(event => event.kind !== 'daily-date' && event.date >= state.start && event.date <= state.end && event.preference?.mode !== 'off');
       month = clamp(month, state.start.slice(0, 7), state.end.slice(0, 7));
       selected = clamp(selected, state.start, state.end); focusDate = clamp(focusDate, state.start, state.end);
       // A rolling-boundary update can remove the previously focused day from this month.

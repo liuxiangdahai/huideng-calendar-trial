@@ -3,16 +3,21 @@ const route='/calendar-reminders/';
 const fits=async page=>expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 async function dialogFits(page,id){expect(await page.locator(id).evaluate(node=>node.scrollWidth<=node.clientWidth)).toBe(true);}
 
-test('compact selection fits phone first screen and preview starts directly with calendar controls',async({page})=>{
+test('presets and independent daily dates fit phone first screen and preview starts directly with calendar controls',async({page})=>{
   await page.setViewportSize({width:390,height:844});
   await page.goto(route);await expect(page.locator('#app')).toBeVisible();
   await expect(page.locator('.action-buttons #clear-selection')).toBeVisible();
   await expect(page.locator('#selection-pane #preset-options')).toBeVisible();
   const layout=await page.evaluate(()=>({
-    category:document.querySelector('.group-card>summary').getBoundingClientRect().bottom,
+    daily:document.querySelector('.daily-date-option').getBoundingClientRect().bottom,
     bar:document.querySelector('.action-bar').getBoundingClientRect().top
   }));
-  expect(layout.category).toBeLessThan(layout.bar);
+  // The new, explicitly requested independent date layer precedes categories.
+  // Keep its complete controls in the first screen, without shrinking type or
+  // touch targets to force the first category into the same viewport.
+  expect(layout.daily).toBeLessThan(layout.bar);
+  await page.locator('.group-card>summary').first().scrollIntoViewIfNeeded();
+  await expect(page.locator('.group-card>summary').first()).toBeInViewport();
   await expect(page.locator('#search,#reset')).toHaveCount(0);
   await page.locator('[data-preset="practice"]').click();
   await expect(page.locator('#selection-count')).toHaveText('已选 54 项');

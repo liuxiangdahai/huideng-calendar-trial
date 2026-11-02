@@ -7,6 +7,7 @@ import ICAL from 'ical.js';
 import {SQLiteD1} from '../../service/calendar/sqlite-d1.mjs';
 import {createCalendarService, digest} from '../../service/calendar/service.mjs';
 import {validateSettings, exportICS, selectOccurrences, defaults, addDays, rangeEnd, resolveAlarmInstants} from '../../static/calendar-reminders/core.mjs';
+import {dailyDateOccurrences} from '../../static/calendar-reminders/engine.mjs';
 
 const ORIGIN = 'https://www.example.org';
 const BASE = 'https://calendar.example.org';
@@ -71,6 +72,190 @@ function fixture(t, alarmResolver = resolveAlarmInstants) {
     reopen() { DB.close(); DB = new SQLiteD1(dbPath); env.DB = DB; }
   };
 }
+
+test('daily layer v2 input is opt-in and rejects non-boolean API values before persistence', async t => {
+  const f = fixture(t);
+  const created = await f.create(makeSettings('off'));
+  assert.equal(created.settings.includeDailyDates, false);
+  assert.equal(f.entries(await (await f.fetch(created.feedUrl)).text()).length, 0);
+  for (const includeDailyDates of [null, 'true', 'false', 0, 1, [], {}]) {
+    const settings = {...makeSettings('off'), includeDailyDates};
+    assert.equal((await f.api('/api/subscriptions', 'POST', {settings})).status, 400);
+    assert.equal((await f.api(`/api/subscriptions/${created.id}`, 'PATCH',
+      {settings, revision: 1}, created.manageToken)).status, 400);
+  }
+  const record = await f.db.prepare('SELECT * FROM subscriptions').first();
+  assert.equal(record.revision, 1);
+  assert.equal(JSON.parse(record.settings_json).includeDailyDates, false);
+  assert.equal((await f.db.prepare('SELECT count(*) AS total FROM subscriptions').first()).total, 1);
+});
+
+test('daily layer enable, disable, re-enable and subscription stop preserve URL and UID with monotonic versions', async t => {
+  const f = fixture(t), created = await f.create();
+  const initial = f.entries(await (await f.fetch(created.feedUrl)).text());
+  assert.equal(initial.length, 1);
+  const festivalUid = initial[0].getFirstPropertyValue('uid');
+  let revision = 1;
+  const change = async includeDailyDates => {
+    f.tick(1000);
+    const response = await f.api(`/api/subscriptions/${created.id}`, 'PATCH',
+      {settings: {...makeSettings(), includeDailyDates}, revision}, created.manageToken);
+    assert.equal(response.status, 200);
+    const saved = await response.json();
+    assert.equal(saved.feedUrl, created.feedUrl);
+    assert.equal(saved.revision, ++revision);
+    assert.equal((await f.db.prepare('SELECT count(*) AS total FROM feed_snapshots').first()).total, 0);
+    return f.fetch(created.feedUrl);
+  };
+  const first = await change(true), firstText = await first.text(), enabled = f.entries(firstText);
+  const daily = enabled.filter(event => event.getFirstPropertyValue('uid').startsWith('daily-date-'));
+  const firstDay = addDays('2026-10-20', -90), finalDay = rangeEnd('2026-10-20', 24);
+  assert.equal(daily.length, (Date.parse(finalDay) - Date.parse(firstDay)) / 86400000 + 1);
+  assert.equal(enabled.length, daily.length + 1);
+  assert.equal(new Set(enabled.map(event => event.getFirstPropertyValue('uid'))).size, enabled.length);
+  for (const event of daily) {
+    const civil = event.getFirstPropertyValue('dtstart');
+    assert.equal(civil.isDate, true);
+    assert.equal(event.getFirstPropertyValue('uid'), `daily-date-${civil.toString()}@calendar.huidengvan.org`);
+    assert.equal(event.getFirstPropertyValue('sequence'), 0);
+    assert.equal(event.getAllSubcomponents('valarm').length, 0);
+    assert.doesNotMatch(event.getFirstPropertyValue('description'), /佛慧法语|fohuifayu/);
+  }
+  const trackedUid = 'daily-date-2026-10-20@calendar.huidengvan.org';
+  const repeated = enabled.find(event => event.getFirstPropertyValue('uid') === trackedUid);
+  assert.match(repeated.getFirstPropertyValue('summary'), /重日2/);
+  assert.equal(enabled.find(event => event.getFirstPropertyValue('uid') === festivalUid).getFirstPropertyValue('sequence'), 0);
+  const snapshotCalls = {...f.calls};
+  const renderVersion = (await f.db.prepare('SELECT render_version FROM subscriptions').first()).render_version;
+  assert.equal((await f.fetch(created.feedUrl, {headers: {'If-None-Match': first.headers.get('ETag')}})).status, 304);
+  assert.deepEqual(f.calls, snapshotCalls);
+  assert.equal((await f.db.prepare('SELECT render_version FROM subscriptions').first()).render_version, renderVersion);
+
+  const removed = await change(false), removedEvents = f.entries(await removed.text());
+  assert.notEqual(removed.headers.get('ETag'), first.headers.get('ETag'));
+  const cancelled = removedEvents.filter(event => event.getFirstPropertyValue('uid').startsWith('daily-date-'));
+  assert.equal(cancelled.length, daily.length);
+  for (const event of cancelled) {
+    assert.equal(event.getFirstPropertyValue('status'), 'CANCELLED');
+    assert.equal(event.getFirstPropertyValue('sequence'), 1);
+    assert.equal(event.getAllSubcomponents('valarm').length, 0);
+  }
+  assert.equal(removedEvents.find(event => event.getFirstPropertyValue('uid') === festivalUid).getFirstPropertyValue('sequence'), 0);
+  const restored = f.entries(await (await change(true)).text());
+  for (const event of restored.filter(event => event.getFirstPropertyValue('uid').startsWith('daily-date-'))) {
+    assert.equal(event.getFirstPropertyValue('status'), 'CONFIRMED');
+    assert.equal(event.getFirstPropertyValue('sequence'), 2);
+    assert.equal(event.getAllSubcomponents('valarm').length, 0);
+  }
+  assert.equal(restored.find(event => event.getFirstPropertyValue('uid') === trackedUid).getFirstPropertyValue('sequence'), 2);
+  f.tick(1000);
+  assert.equal((await f.api(`/api/subscriptions/${created.id}`, 'DELETE', undefined, created.manageToken)).status, 200);
+  const stoppedText = await (await f.fetch(created.feedUrl)).text(), stopped = f.entries(stoppedText);
+  assert.doesNotMatch(stoppedText, /BEGIN:VALARM/);
+  assert.equal(stopped.length, enabled.length);
+  assert.ok(stopped.every(event => event.getFirstPropertyValue('status') === 'CANCELLED'));
+  assert.equal(stopped.find(event => event.getFirstPropertyValue('uid') === trackedUid).getFirstPropertyValue('sequence'), 3);
+  assert.equal((await f.db.prepare('SELECT settings_json FROM subscriptions').first()).settings_json, '{}');
+});
+
+test('legacy PATCH omission preserves current daily choice while explicit false removes it', async t => {
+  const f = fixture(t), created = await f.create({...makeSettings('off'), includeDailyDates: true});
+  await f.fetch(created.feedUrl);
+  const path = `/api/subscriptions/${created.id}`;
+  const same = await f.api(path, 'PATCH', {settings: makeSettings('off'), revision: 1}, created.manageToken);
+  assert.equal(same.status, 200);
+  const sameValue = await same.json();
+  assert.equal(sameValue.revision, 1);
+  assert.equal(sameValue.settings.includeDailyDates, true);
+  const edited = await f.api(path, 'PATCH', {settings: makeSettings('display'), revision: 1}, created.manageToken);
+  const updated = await edited.json();
+  assert.equal(updated.revision, 2);
+  assert.equal(updated.settings.includeDailyDates, true);
+  assert.equal(updated.feedUrl, created.feedUrl);
+  const feed = f.entries(await (await f.fetch(created.feedUrl)).text());
+  assert.ok(feed.some(event => event.getFirstPropertyValue('uid').startsWith('daily-date-')));
+  assert.ok(feed.every(event => event.getAllSubcomponents('valarm').length === 0));
+  const explicit = await f.api(path, 'PATCH',
+    {settings: {...makeSettings('display'), includeDailyDates: false}, revision: 2}, created.manageToken);
+  assert.equal((await explicit.json()).settings.includeDailyDates, false);
+  const omitted = await f.api(path, 'PATCH', {settings: makeSettings('display'), revision: 3}, created.manageToken);
+  const last = await omitted.json();
+  assert.equal(last.settings.includeDailyDates, false);
+  assert.equal(last.revision, 3);
+});
+
+test('timezone edits leave overlapping daily dates, titles and versions unchanged and never introduce alarms', async t => {
+  const f = fixture(t), settings = {...makeSettings('off'), includeDailyDates: true};
+  const created = await f.create(settings);
+  const first = f.entries(await (await f.fetch(created.feedUrl)).text());
+  const byUid = new Map(first.map(event => [event.getFirstPropertyValue('uid'), event]));
+  f.tick(1000);
+  const response = await f.api(`/api/subscriptions/${created.id}`, 'PATCH',
+    {settings: {...settings, zone: 'America/Vancouver'}, revision: 1}, created.manageToken);
+  assert.equal(response.status, 200);
+  assert.equal((await response.json()).feedUrl, created.feedUrl);
+  const body = await (await f.fetch(created.feedUrl)).text();
+  assert.doesNotMatch(body, /BEGIN:VALARM/);
+  const changed = f.entries(body).filter(event => event.getFirstPropertyValue('status') === 'CONFIRMED');
+  let overlaps = 0;
+  for (const event of changed) {
+    const previous = byUid.get(event.getFirstPropertyValue('uid'));
+    if (!previous) continue;
+    overlaps++;
+    for (const field of ['summary', 'description', 'sequence', 'dtstamp'])
+      assert.equal(String(event.getFirstPropertyValue(field)), String(previous.getFirstPropertyValue(field)), field);
+    assert.equal(event.getFirstPropertyValue('dtstart').toString(), previous.getFirstPropertyValue('dtstart').toString());
+  }
+  assert.ok(overlaps > 800);
+});
+
+test('persisted pre-extension v2 settings need no migration and omitted PATCH preserves the new server choice', async t => {
+  const f = fixture(t), created = await f.create(makeSettings('display'));
+  // Model an actual pre-extension row, not just a legacy request sent to the new validator.
+  await f.db.prepare("UPDATE subscriptions SET settings_json = json_remove(settings_json, '$.includeDailyDates') WHERE id = ?")
+    .bind(created.id).run();
+  const original = await f.db.prepare('SELECT settings_json FROM subscriptions').first();
+  assert.equal(Object.hasOwn(JSON.parse(original.settings_json), 'includeDailyDates'), false);
+  const oldFeed = f.entries(await (await f.fetch(created.feedUrl)).text());
+  assert.equal(oldFeed.length, 1);
+  assert.ok(!oldFeed[0].getFirstPropertyValue('uid').startsWith('daily-date-'));
+  const path = `/api/subscriptions/${created.id}`;
+  const legacy = await f.api(path, 'PATCH', {settings: makeSettings('remind', '09:00'), revision: 1}, created.manageToken);
+  assert.equal(legacy.status, 200);
+  const saved = await legacy.json();
+  assert.equal(saved.settings.includeDailyDates, false);
+  assert.equal(saved.feedUrl, created.feedUrl);
+  const enabled = await f.api(path, 'PATCH', {settings: {...saved.settings, includeDailyDates: true}, revision: saved.revision}, created.manageToken);
+  const changed = await enabled.json();
+  assert.equal(changed.settings.includeDailyDates, true);
+  const omitted = await f.api(path, 'PATCH', {settings: makeSettings('display'), revision: changed.revision}, created.manageToken);
+  assert.equal(omitted.status, 200);
+  assert.equal((await omitted.json()).settings.includeDailyDates, true);
+  assert.ok(f.entries(await (await f.fetch(created.feedUrl)).text()).some(event => event.getFirstPropertyValue('uid').startsWith('daily-date-')));
+});
+
+test('a daily date label correction retains the civil UID and publishes a higher sequence and fresh ETag', async t => {
+  const f = fixture(t);
+  // The injected selector simulates a future PRO correction on one real date.
+  // The production selector generates this same event shape from the shared helper.
+  f.data.occurrences = [{...dailyDateOccurrences(date, date)[0], id: 'test', eventId: 'test'}];
+  const created = await f.create(makeSettings('display'));
+  const first = await f.fetch(created.feedUrl), before = f.entries(await first.text())[0];
+  f.tick(1000);
+  Object.assign(f.data.occurrences[0], {title: '藏历二月十一（历法校订）', tibetan: '二月十一',
+    description: '藏历日期校订。日期换算：藏历 PRO。'});
+  const updated = await f.fetch(created.feedUrl), after = f.entries(await updated.text())[0];
+  assert.equal(before.getFirstPropertyValue('uid'), `daily-date-${date}@calendar.huidengvan.org`);
+  assert.equal(after.getFirstPropertyValue('uid'), before.getFirstPropertyValue('uid'));
+  assert.equal(after.getFirstPropertyValue('dtstart').toString(), date);
+  assert.equal(after.getFirstPropertyValue('sequence'), before.getFirstPropertyValue('sequence') + 1);
+  assert.match(after.getFirstPropertyValue('summary'), /校订/);
+  assert.match(after.getFirstPropertyValue('description'), /日期校订/);
+  assert.notEqual(after.getFirstPropertyValue('last-modified').toString(), before.getFirstPropertyValue('last-modified').toString());
+  assert.notEqual(updated.headers.get('ETag'), first.headers.get('ETag'));
+  assert.equal(after.getAllSubcomponents('valarm').length, 0);
+  assert.doesNotMatch(after.getFirstPropertyValue('description'), /佛慧法语/);
+});
 
 test('production HTTP reads redirect to the configured HTTPS host without touching data or D1', async t => {
   const f = fixture(t);
@@ -220,7 +405,7 @@ test('a committed creation with a lost response recovers its capability and curr
   const current=await replay.json();
   assert.equal(current.id,recovered.id);assert.equal(current.manageToken,recovered.manageToken);
   assert.equal(current.feedUrl,recovered.feedUrl);assert.equal(current.revision,2);
-  assert.deepEqual(current.settings,edited);
+  assert.deepEqual(current.settings,{...edited,includeDailyDates:false});
   // Recovery does not revalidate retired content or rebuild the whole calendar.
   f.data.catalog.events=[];
   const exports=f.calls.export;

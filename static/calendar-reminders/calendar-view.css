@@ -84,6 +84,16 @@
 .cal-device-time { margin: 2px 0 0 42px; color: var(--muted); font-size: 13px; line-height: 1.7; overflow-wrap: anywhere; }
 .cal-device-time>span { display: block; color: var(--ink); font-variant-numeric: tabular-nums; }
 .cal-empty { padding: 18px 0; color: var(--muted); font-size: 14px; line-height: 1.9; }
+.cal-daily-entry { display: flex; align-items: flex-start; gap: 12px; padding: 15px 0; color: var(--teal-dark); border-bottom: 1px solid var(--line); }
+.cal-daily-entry>div { min-width: 0; }
+.cal-daily-icon { display: inline-flex; width: 28px; height: 28px; flex: none; justify-content: center; align-items: center; color: var(--teal-dark); }
+.cal-daily-icon .icon { width: 20px; height: 20px; }
+.cal-daily-entry h4 { color: var(--ink); font: 500 16px/1.6 var(--font-title); overflow-wrap: anywhere; }
+.cal-daily-meta { display: flex; flex-wrap: wrap; gap: 2px 10px; font-size: 13px; line-height: 1.7; color: var(--muted); }
+.cal-daily-source,.cal-daily-note { margin-top: 3px; font-size: 13px; line-height: 1.7; color: var(--muted); overflow-wrap: anywhere; }
+.cal-daily-source a { color: var(--teal-dark); text-decoration: underline; text-underline-offset: 3px; }
+.cal-daily-note { color: var(--teal-dark); }
+.cal-list-content>.cal-daily-entry:only-of-type { border-bottom: 0; padding-bottom: 0; }
 .cal-data-note { margin: 14px 0 0; padding: 12px; border-left: 2px solid var(--gold); border-radius: 0 8px 8px 0; background: #eee2c9; color: var(--muted); font-size: 13px; line-height: 1.8; overflow-wrap: anywhere; border-color: #ac8548; }
 .cal-list-caption { margin: 0 0 4px; color: var(--muted); font-size: 14px; }
 .cal-list-day { display: grid; grid-template-columns: 44px minmax(0,1fr); gap: 16px; padding: 20px 0; border-bottom: 1px solid var(--line); }

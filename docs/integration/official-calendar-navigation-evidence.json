@@ -1,0 +1,22 @@
+{
+  "checkedOn": "2026-11-02",
+  "repository": "huidengvan/site1",
+  "branch": "master",
+  "commit": "a1f0039285b120716e4c8f3e1ce0e94fc9541530",
+  "configBlob": "73d77cc2883e71dacc5e39bb31fe8e02d6c88250",
+  "originalSha256": "21fc7c99e78715adfb02e72558a51092b2621d1d3683f9a3f22a9b81297d3c2c",
+  "patchedSha256": "b9189a4c3c9226c22fcd47e8a8309d4678c2376a4192821d7497e803b9d72530",
+  "addedLines": 7,
+  "removedLines": 0,
+  "patchApplies": true,
+  "tomlParsed": true,
+  "onlyNewMenuItem": true,
+  "originalCalendarUnchanged": true,
+  "mainMenuTemplateBlob": "d145d0e789bf5dde3d5982afa2516d1af1b705cb",
+  "sidebarMenuTemplateBlob": "55a58217b0436243ce02281ed7db4a32ce7cc7a6",
+  "templatesHaveNoTarget": true,
+  "hugoPreview": "pending: local Hugo 0.87.0 cannot start because Windows reports invalid system DLL relocation",
+  "officialBrowserClick": "pending until isolated official preview is built",
+  "officialPublication": "not performed; existing acceptance gates remain",
+  "dirtyOfficialCheckoutModified": false
+}

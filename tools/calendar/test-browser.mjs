@@ -9,8 +9,9 @@ import {buildRelease} from './release-build.mjs';
 const require=createRequire(import.meta.url);
 const cli=require.resolve('@playwright/test/cli');
 const files=readdirSync('tests/browser').filter(name=>name.endsWith('.spec.mjs')).sort();
-const entry='calendar-entry.spec.mjs';
-const batches=[files.filter(name=>name!==entry),files.filter(name=>name===entry)];
+const independent=['calendar-entry.spec.mjs','calendar-daily.spec.mjs'];
+const batches=[files.filter(name=>!independent.includes(name)),
+  ...independent.map(name=>files.filter(file=>file===name))];
 const browsers=process.argv.includes('--all') ? ['chromium','firefox','webkit'] : ['chromium'];
 await buildRelease({mode:'local'});
 for(const browser of browsers) for(const [index,batch] of batches.entries()) {

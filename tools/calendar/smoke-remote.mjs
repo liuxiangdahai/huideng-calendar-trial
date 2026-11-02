@@ -14,7 +14,23 @@ if(process.env.CALENDAR_EXPECTED_VERSION)assert.equal(health.version,process.env
 const data=JSON.parse(await fs.readFile('static/calendar-reminders/calendar-data.json','utf8'));
 const parse=text=>new ICAL.Component(ICAL.parse(text)).getAllSubcomponents('vevent');
 const startedAt=new Date().toISOString();
-const timing=[];let created;let scenario='create';
+const timing=[],dailyMeasurements=[];let created;let scenario='create';
+const dailyEntries=entries=>entries.filter(event=>String(event.getFirstPropertyValue('uid')).startsWith('daily-date-'));
+const active=entries=>entries.filter(event=>event.getFirstPropertyValue('status')!=='CANCELLED');
+function verifyDaily(entries){
+ const daily=dailyEntries(active(entries));
+ assert.ok(daily.length>=819 && daily.length<=823,'滚动窗口应每天恰有一条日期');
+ assert.equal(new Set(daily.map(e=>e.getFirstPropertyValue('dtstart').toString())).size,daily.length);
+ for(const event of daily){
+  assert.equal(event.getAllSubcomponents('valarm').length,0);
+  assert.equal(event.getFirstPropertyValue('transp'),'TRANSPARENT');
+  assert.ok(event.getFirstPropertyValue('dtstart').isDate);
+  assert.match(event.getFirstPropertyValue('summary'),/^藏历/);
+  assert.match(event.getFirstPropertyValue('description'),/藏历 PRO/);
+  assert.ok(!event.getFirstPropertyValue('description').includes('原站标注'));
+ }
+ return daily;
+}
 async function call(method,pathname,body,extraHeaders={}){
  const started=performance.now(),startTime=new Date().toISOString();
  const response=await fetch(new URL(pathname,base),{method,headers:{Origin:site.origin,...(body?{'Content-Type':'application/json'}:{}),...(created?{Authorization:`Bearer ${created.manageToken}`}:{ }),...extraHeaders},body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(30000)}).catch(()=>{throw new Error(`${method} 验收请求未完成，请检查隔离服务与网络。`)});
@@ -67,7 +83,47 @@ try{
   managed=await call('PATCH',`/api/subscriptions/${created.id}`,{settings,revision:managed.revision});
   const response=await feed();assert.equal(response.status,200);await response.arrayBuffer();
  }
+ // Daily dates use the same public feed. Test actual deployment, not only a
+ // synthetic file; no personal address or credential is written to evidence.
+ let dailyBaseline;
+ for(const mode of ['daily-only','practice-daily','dual-daily']){
+  scenario=mode;
+  settings=mode==='daily-only'?defaults(data.catalog,'Asia/Shanghai'):applyPreset(settings,data.catalog,'practice');
+  settings.includeDailyDates=true;
+  if(mode==='dual-daily')for(const value of Object.values(settings.events))if(value.mode!=='off'){
+   value.mode='remind';value.reminders=[{daysBefore:0,time:'08:00'},{daysBefore:1,time:'20:00'}];
+  }
+  managed=await call('PATCH',`/api/subscriptions/${created.id}`,{settings,revision:managed.revision});
+  assert.equal(managed.feedUrl,created.feedUrl);
+  const first=await feed();assert.equal(first.status,200);
+  const content=await first.text(),entries=parse(content),daily=verifyDaily(entries);
+  if(mode==='daily-only')assert.equal(active(entries).length,daily.length);
+  dailyBaseline=new Map(daily.map(e=>[e.getFirstPropertyValue('uid'),Number(e.getFirstPropertyValue('sequence'))]));
+  const etag=first.headers.get('etag');
+  scenario=mode+'-snapshot';const cached=await feed();assert.equal(cached.status,200);assert.equal(cached.headers.get('etag'),etag);await cached.arrayBuffer();
+  const head=await feed({method:'HEAD'});assert.equal(head.status,200);assert.equal(await head.text(),'');
+  scenario=mode+'-304';assert.equal((await feed({headers:{'If-None-Match':etag}})).status,304);
+  scenario=mode+'-concurrent';
+  for(const response of await Promise.all(Array.from({length:5},()=>feed()))){assert.equal(response.status,200);assert.equal(response.headers.get('etag'),etag);await response.arrayBuffer();}
+  dailyMeasurements.push({scenario:mode,dailyEvents:daily.length,activeEvents:active(entries).length,totalEvents:entries.length,icsBytes:Buffer.byteLength(content),status:'passed'});
+ }
+ scenario='daily-legacy-patch';
+ const legacy=structuredClone(settings);delete legacy.includeDailyDates;
+ managed=await call('PATCH',`/api/subscriptions/${created.id}`,{settings:legacy,revision:managed.revision});
+ assert.equal(managed.settings.includeDailyDates,true);
+ verifyDaily(parse(await (await feed()).text()));
+ scenario='daily-disable';settings.includeDailyDates=false;
+ managed=await call('PATCH',`/api/subscriptions/${created.id}`,{settings,revision:managed.revision});
+ const cancelledDaily=dailyEntries(parse(await (await feed()).text()));
+ assert.equal(cancelledDaily.length,dailyBaseline.size);
+ for(const event of cancelledDaily){assert.equal(event.getFirstPropertyValue('status'),'CANCELLED');assert.equal(event.getAllSubcomponents('valarm').length,0);assert.ok(Number(event.getFirstPropertyValue('sequence'))>dailyBaseline.get(event.getFirstPropertyValue('uid')));}
+ scenario='daily-reenable';settings.includeDailyDates=true;
+ managed=await call('PATCH',`/api/subscriptions/${created.id}`,{settings,revision:managed.revision});
+ const reopened=verifyDaily(parse(await (await feed()).text()));
+ for(const event of reopened)assert.ok(Number(event.getFirstPropertyValue('sequence'))>dailyBaseline.get(event.getFirstPropertyValue('uid'))+1);
+ assert.equal(managed.feedUrl,created.feedUrl);
  scenario='cancel-disable';
+ settings.includeDailyDates=false;
  for(const value of Object.values(settings.events))value.mode='off';
  managed=await call('PATCH',`/api/subscriptions/${created.id}`,{settings,revision:managed.revision});
  const cancelled=parse(await (await feed()).text());
@@ -76,5 +132,5 @@ try{
  await call('DELETE',`/api/subscriptions/${created.id}`);
  assert.ok(parse(await (await feed()).text()).every(e=>e.getFirstPropertyValue('status')==='CANCELLED'));
  console.log(JSON.stringify({status:'passed',requests:timing.length,version:health.version,note:'wallMs is network latency, not Worker CPU'}));
- await fs.mkdir('artifacts',{recursive:true});await fs.writeFile('artifacts/remote-smoke.json',JSON.stringify({version:health.version,dataVersion:health.dataVersion,startedAt,finishedAt:new Date().toISOString(),timing},null,2));
+ await fs.mkdir('artifacts',{recursive:true});await fs.writeFile('artifacts/remote-smoke.json',JSON.stringify({version:health.version,dataVersion:health.dataVersion,startedAt,finishedAt:new Date().toISOString(),timing,dailyMeasurements},null,2));
 }finally{if(created)await call('DELETE',`/api/subscriptions/${created.id}`).catch(()=>console.error('验收订阅清理失败，请在隔离环境检查。'));}
