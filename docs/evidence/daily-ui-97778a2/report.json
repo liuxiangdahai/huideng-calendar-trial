@@ -1,0 +1,27 @@
+{
+  "version": "97778a2e6b4ff17216a85d31f155693bd406de3e",
+  "checks": [
+    "390 first screen contains complete daily option",
+    "30 real daily rows",
+    "320: no overflow, daily touch target >=44, footer reachable",
+    "390: no overflow, daily touch target >=44, footer reachable",
+    "545: no overflow, daily touch target >=44, footer reachable",
+    "585: no overflow, daily touch target >=44, footer reachable",
+    "768: no overflow, daily touch target >=44, footer reachable",
+    "1024: no overflow, daily touch target >=44, footer reachable",
+    "1440: no overflow, daily touch target >=44, footer reachable",
+    "585x320 reminder action reachable",
+    "official return link"
+  ],
+  "screenshots": [
+    "mobile-selection.png",
+    "mobile-daily-month.png",
+    "mobile-daily-list.png",
+    "selection-320.png",
+    "selection-390.png",
+    "preview-390.png",
+    "selection-1440.png",
+    "preview-1440.png"
+  ],
+  "errors": []
+}

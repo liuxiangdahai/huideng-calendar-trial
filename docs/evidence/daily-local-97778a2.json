@@ -1,0 +1,431 @@
+{
+  "generatedAt": "2026-11-02T09:15:31.097Z",
+  "version": "97778a2e6b4ff17216a85d31f155693bd406de3e",
+  "environment": "local-node-sqlite",
+  "note": "本机耗时，不是云端 CPU。readRowsReturned 为查询返回行数，不是 D1 计费扫描行数；writeRowsChanged 为 SQLite 实际修改行数。每个场景独立进程、空库及日期缓存。",
+  "measurements": [
+    {
+      "scenario": "daily-only",
+      "today": "2026-11-02",
+      "dailyEvents": 821,
+      "totalEvents": 821,
+      "icsBytes": 455344,
+      "ledgerRows": 821,
+      "ledgerJsonCharacters": 283007,
+      "samples": [
+        {
+          "operation": "create",
+          "status": 201,
+          "wallMs": 51.876599999999996,
+          "bytes": 5108,
+          "readQueries": 0,
+          "readRowsReturned": 0,
+          "writeQueries": 1,
+          "writeRowsChanged": 1
+        },
+        {
+          "operation": "cold-feed",
+          "status": 200,
+          "wallMs": 85.04400000000001,
+          "bytes": 455344,
+          "readQueries": 3,
+          "readRowsReturned": 1,
+          "writeQueries": 4,
+          "writeRowsChanged": 823
+        },
+        {
+          "operation": "snapshot-feed",
+          "status": 200,
+          "wallMs": 9.119,
+          "bytes": 455344,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        },
+        {
+          "operation": "304",
+          "status": 304,
+          "wallMs": 4.16070000000002,
+          "bytes": 0,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        },
+        {
+          "operation": "snapshot-feed",
+          "status": 200,
+          "wallMs": 5.650900000000007,
+          "bytes": 455344,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        },
+        {
+          "operation": "304",
+          "status": 304,
+          "wallMs": 4.536399999999986,
+          "bytes": 0,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        },
+        {
+          "operation": "snapshot-feed",
+          "status": 200,
+          "wallMs": 6.352599999999995,
+          "bytes": 455344,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        },
+        {
+          "operation": "304",
+          "status": 304,
+          "wallMs": 3.576599999999985,
+          "bytes": 0,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        },
+        {
+          "operation": "snapshot-feed",
+          "status": 200,
+          "wallMs": 4.874599999999987,
+          "bytes": 455344,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        },
+        {
+          "operation": "304",
+          "status": 304,
+          "wallMs": 4.414600000000007,
+          "bytes": 0,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        },
+        {
+          "operation": "snapshot-feed",
+          "status": 200,
+          "wallMs": 6.533999999999992,
+          "bytes": 455344,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        },
+        {
+          "operation": "304",
+          "status": 304,
+          "wallMs": 3.344300000000004,
+          "bytes": 0,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        },
+        {
+          "operation": "HEAD",
+          "status": 200,
+          "wallMs": 4.2867999999999995,
+          "bytes": 0,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        }
+      ]
+    },
+    {
+      "scenario": "practice-daily",
+      "today": "2026-11-02",
+      "dailyEvents": 821,
+      "totalEvents": 1115,
+      "icsBytes": 647183,
+      "ledgerRows": 1115,
+      "ledgerJsonCharacters": 373117,
+      "samples": [
+        {
+          "operation": "create",
+          "status": 201,
+          "wallMs": 50.5934,
+          "bytes": 5322,
+          "readQueries": 0,
+          "readRowsReturned": 0,
+          "writeQueries": 1,
+          "writeRowsChanged": 1
+        },
+        {
+          "operation": "cold-feed",
+          "status": 200,
+          "wallMs": 117.71159999999999,
+          "bytes": 647183,
+          "readQueries": 3,
+          "readRowsReturned": 1,
+          "writeQueries": 4,
+          "writeRowsChanged": 1117
+        },
+        {
+          "operation": "snapshot-feed",
+          "status": 200,
+          "wallMs": 14.54819999999998,
+          "bytes": 647183,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        },
+        {
+          "operation": "304",
+          "status": 304,
+          "wallMs": 5.919600000000003,
+          "bytes": 0,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        },
+        {
+          "operation": "snapshot-feed",
+          "status": 200,
+          "wallMs": 7.442100000000039,
+          "bytes": 647183,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        },
+        {
+          "operation": "304",
+          "status": 304,
+          "wallMs": 5.2812000000000126,
+          "bytes": 0,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        },
+        {
+          "operation": "snapshot-feed",
+          "status": 200,
+          "wallMs": 10.780500000000018,
+          "bytes": 647183,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        },
+        {
+          "operation": "304",
+          "status": 304,
+          "wallMs": 5.841099999999983,
+          "bytes": 0,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        },
+        {
+          "operation": "snapshot-feed",
+          "status": 200,
+          "wallMs": 6.95010000000002,
+          "bytes": 647183,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        },
+        {
+          "operation": "304",
+          "status": 304,
+          "wallMs": 4.613299999999981,
+          "bytes": 0,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        },
+        {
+          "operation": "snapshot-feed",
+          "status": 200,
+          "wallMs": 7.286400000000015,
+          "bytes": 647183,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        },
+        {
+          "operation": "304",
+          "status": 304,
+          "wallMs": 4.446199999999976,
+          "bytes": 0,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        },
+        {
+          "operation": "HEAD",
+          "status": 200,
+          "wallMs": 3.9793000000000234,
+          "bytes": 0,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        }
+      ]
+    },
+    {
+      "scenario": "dual-daily",
+      "today": "2026-11-02",
+      "dailyEvents": 821,
+      "totalEvents": 1115,
+      "icsBytes": 715914,
+      "ledgerRows": 1115,
+      "ledgerJsonCharacters": 411169,
+      "samples": [
+        {
+          "operation": "create",
+          "status": 201,
+          "wallMs": 64.48689999999999,
+          "bytes": 6998,
+          "readQueries": 0,
+          "readRowsReturned": 0,
+          "writeQueries": 1,
+          "writeRowsChanged": 1
+        },
+        {
+          "operation": "cold-feed",
+          "status": 200,
+          "wallMs": 133.29489999999998,
+          "bytes": 715914,
+          "readQueries": 3,
+          "readRowsReturned": 1,
+          "writeQueries": 4,
+          "writeRowsChanged": 1117
+        },
+        {
+          "operation": "snapshot-feed",
+          "status": 200,
+          "wallMs": 8.657999999999959,
+          "bytes": 715914,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        },
+        {
+          "operation": "304",
+          "status": 304,
+          "wallMs": 9.62719999999996,
+          "bytes": 0,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        },
+        {
+          "operation": "snapshot-feed",
+          "status": 200,
+          "wallMs": 10.211799999999982,
+          "bytes": 715914,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        },
+        {
+          "operation": "304",
+          "status": 304,
+          "wallMs": 4.547799999999995,
+          "bytes": 0,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        },
+        {
+          "operation": "snapshot-feed",
+          "status": 200,
+          "wallMs": 7.365400000000022,
+          "bytes": 715914,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        },
+        {
+          "operation": "304",
+          "status": 304,
+          "wallMs": 4.527499999999975,
+          "bytes": 0,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        },
+        {
+          "operation": "snapshot-feed",
+          "status": 200,
+          "wallMs": 7.386900000000026,
+          "bytes": 715914,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        },
+        {
+          "operation": "304",
+          "status": 304,
+          "wallMs": 5.292699999999968,
+          "bytes": 0,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        },
+        {
+          "operation": "snapshot-feed",
+          "status": 200,
+          "wallMs": 7.683400000000006,
+          "bytes": 715914,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        },
+        {
+          "operation": "304",
+          "status": 304,
+          "wallMs": 6.415900000000022,
+          "bytes": 0,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        },
+        {
+          "operation": "HEAD",
+          "status": 200,
+          "wallMs": 3.876100000000008,
+          "bytes": 0,
+          "readQueries": 2,
+          "readRowsReturned": 2,
+          "writeQueries": 0,
+          "writeRowsChanged": 0
+        }
+      ]
+    }
+  ]
+}

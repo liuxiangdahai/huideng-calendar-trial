@@ -4,7 +4,7 @@
 
 项目当前处于技术验收阶段。真实手机通知、国内网络和七天试用必须分别取得证据，浏览器模拟不能代替。
 
-当前技术验收站：[打开慧灯藏历](https://huideng-calendar-trial.pages.dev/calendar-reminders/)。应用`708e032`已通过唯一流水线发布：120项规则/服务/构建检查、52项×三引擎、106次隔离Pages请求检查通过。网页、API和ICS统一从Pages访问，内部服务绑定Worker。云端CPU p95为74.825ms，未达到8ms目标；网关CPU、前端长任务、真实设备和网络等门槛仍未完成，暂不扩大邀请。详见[验收台账](docs/calendar-trial-acceptance.md)。
+当前技术验收站：[打开慧灯藏历](https://huideng-calendar-trial.pages.dev/calendar-reminders/)。应用`97778a2`已通过唯一流水线发布：134项规则/服务/构建检查、55项×三引擎、142次隔离Pages请求检查通过，含可选每日藏历日期。网页、API和ICS统一从Pages访问，内部服务绑定Worker。云端CPU p95为60.463ms，未达到8ms目标；网关CPU、前端长任务、真实设备和网络等门槛仍未完成，暂不扩大邀请。详见[本阶段报告](docs/calendar-daily-acceptance.md)及[验收台账](docs/calendar-trial-acceptance.md)。
 
 ## 本地开发
 
