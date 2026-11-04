@@ -5,13 +5,20 @@
 ## 现状与用户反馈
 
 - 上一技术发布 97778a2：日程显示正常；用户反馈各日历详情未见提醒时间。
-- 本轮确认：iPhone iOS 27.0.1，Event Alerts 已开启；日程详情仍未见具体提醒字段。尚无单/双提醒按时弹出的记录。
+- 本轮确认：用户的 iPhone iOS 27.0.1，Event Alerts 已开启；日程详情未见具体提醒字段。不能据此推断手机不执行提醒。
+- 2026-11-04 用户转述：朋友的 iOS 设备今天实际收到了空行母荟供日提醒。后续确认使用 iPhone 自带“日历”，iOS约26或27，时间与所选中国时区一致。记为一次正向真机反馈（用户报告时间匹配）；确切系统小版本与设定/实收的分钟记录未提供。不能把用户自己的 iOS 27.0.1 自动归给朋友，也不能据此判定双提醒、改期、静默和撤销全部通过。
 - 现有正式链路按保存的 `mode=remind` 生成全天事件和绝对 UTC `VALARM`。本轮未以猜测更换正式提醒格式。
 - “十分钟导入文件”只是导入/系统权限辅助检查，不能代替持续订阅验收。
 
 ## 隔离测试入口与操作
 
-入口（部署验证后方可交付）：https://huideng-calendar-acceptance.pages.dev/calendar-reminders/reminder-check.html
+已部署并验证的隔离测试入口：https://huideng-calendar-acceptance.pages.dev/calendar-reminders/reminder-check.html
+
+实现提交：5a02d6f65902ed706d4f76cc2a5cd3b38a36d262。流水线：https://github.com/liuxiangdahai/huideng-calendar-trial/actions/runs/41756027798 。本地截图 `evidence/reminder-probe-5a02d6f/390.png`、`1440.png`（同提交的正式构建；只作布局证据，订阅地址已遮盖）。
+
+先前候选8580c86被CI窄屏检查阻止发布：Linux浏览器原生时间输入框的最小内容宽度造成横向溢出。已采用允许收缩的网格列和表单控件约束，未隐藏溢出或放宽验收。5a02d6f 已通过 Chromium、Firefox、WebKit 各60项浏览器检查（每类含5项提醒专项）。验收 Worker/Pages 同版本部署和读取通过，正式试用环境仍为97778a2：完整远端负载检查出现503，流水线阻止继续发布，没有绕过门槛。
+
+2026-11-04 09:58（新加坡时间）单独通过真实 Pages 提醒专项15个请求：六项日程、五个提醒、保存读取、HEAD/304、改期、静默、取消、停用。10:02 使用已发布页面完成390px浏览器实际创建/检查/停用，无脚本错误或横向溢出。该浏览器经过开发机网络代理，只作功能与布局证据，不算大陆/海外直连或真机通知证据。归档在 `evidence/reminder-probe-5a02d6f/`。
 
 1. 在 iPhone Safari 打开，填写设备版本，检查设备时区。点击准备后约30分钟开始；用户自己决定何时开始，不提前创建会过期的个人测试地址。
 2. 添加“慧灯提醒测试”独立日历，确认 Event Alerts 和系统通知；不要为整个日历统一开启默认通知。
@@ -35,13 +42,15 @@ B 的相对 DATE 提醒按客户端时区解释，不能替代固定提醒时区
 
 | 项目 | 结果 | 证据 |
 |---|---|---|
-| 原正式设置保存到 ICS 的逐项提醒核对 | 待线上 | 扩展 smoke-remote，对各方案每条实际事件比较 UTC 时刻 |
+| 原正式设置保存到 ICS 的逐项提醒核对 | 四个设置场景逐项通过，完整压力检查未通过 | guru、tsok、practice、dual 真实 Pages 文件中的 UTC 提醒与保存设置一致；后续连续修改/读取出现503 |
 | 测试保存、六种项目、静默与格式 | 本地通过 | tests/service/reminder-probe.test.mjs |
-| 地址/UID稳定、SEQUENCE递增、取消/停用/到期、缓存 | 本地通过 | 同上；到期精确失效测试 |
-| 三类浏览器、窄屏、断线重试、管理恢复 | 进行中 | 正式构建产物上的 Playwright 检查 |
-| Pages 真实链路 | 待发布 | artifacts/reminder-probe-remote.json，随后归档摘要 |
+| 地址/UID稳定、SEQUENCE递增、取消/停用/到期、缓存 | 专项本地及线上通过；72小时到期为本地模拟 | 7项服务专项；线上提醒专项证据 |
+| 三类浏览器、窄屏、断线重试、管理恢复 | 三类各60项通过，含各5项提醒专项 | CI 41756027798 checks；320–1440px布局；不等于真机通知 |
+| Pages 提醒对照真实链路 | 已发布，专项通过 | evidence/reminder-probe-5a02d6f/remote-probe.json 和 live-ui.json |
+| 完整负载与试用发布 | 未通过，试用仍用上一发布 | CI出现503；开发机连续修改取数复现，分类为gateway_unavailable，根因尚未确认，不能称为CPU超限已定位 |
 | iOS 27.0.1 实际单/双提醒、跨天、静默、更新撤销 | 待真机 | 用户填表；不能从服务端取数推断 |
-| Google、Mac、其他日历 | 待实机 | 完成 iPhone 对照后分别记录 |
+| 朋友的 iOS 空行母荟供日提醒 | 一次成功反馈；用户报告时间与中国时区一致 | 用户2026-11-04转述；自带日历，iOS约26或27；确切版本/分钟记录未提供 |
+| Google、Outlook、Mac、其他日历 | 待实机通知 | Google电脑订阅显示成功的旧反馈不等于通知成功 |
 
 验收要求：至少三轮，含一次跨天；正常系统设置下目标时间误差≤60秒。单、双提醒按次数出现；静默项目零通知。改期、取消和停用须先确认手机已同步相应版本，再判断是否存在旧通知。48小时未同步则该项目不通过。观察四个时刻：网页保存、服务端更新时间/检查、手机确认同步、实际通知。网页确认按钮是用户报告，并不是后台已获知客户端状态。
 
@@ -57,5 +66,14 @@ B 的相对 DATE 提醒按客户端时区解释，不能替代固定提醒时区
 ## 已知限制
 
 当前没有代码可从网页读取 iPhone 的日历详情或系统通知结果。必须由持有真机的测试者观察反馈。CPU、冷启动、免费额度等既有未达标项没有因本轮测试而变为通过。不增加账号授权、额外通知渠道、付费服务。
+
+## 跨应用能力复核（2026-11-04）
+
+- Apple：官方支持订阅日历的“日程提醒”。一次朋友成功反馈提高了现有方案可行性的证据强度，仍须验证指定时间、双提醒和修改关闭。详情字段是否出现不作为失败的单独依据。
+- Google：网址订阅显示与账号通知是不同能力。官方说明通知设置属于用户账号；不能承诺外部 ICS 的逐项绝对时刻和双提醒会被保留。不得指导给含“每日藏历”的整份日历统一加提醒。
+- Outlook：官方支持网址订阅，但客户端需轮询，可能超过24小时。Microsoft 的 Exchange iCalendar 转换规范只列0或1个 VALARM；此规范不能推断所有 Outlook 版本结果，却足以否定“各版本均支持双提醒”的承诺。网页版、新版、经典版、手机需分别记录。
+- 其他安卓日历：按应用和版本验证，不能由 Android 系统名称推断能力；文件导入与持续订阅分别标注。
+
+参考：[Apple日程提醒](https://support.apple.com/zh-cn/guide/iphone/iph3d1110d4/27/ios/27)、[Google账号通知](https://support.google.com/calendar/answer/37242?co=GENIE.Platform%3DAndroid&hl=zh-Hans)、[Outlook网址订阅](https://support.microsoft.com/zh-cn/outlook/import-or-subscribe-to-a-calendar-in-outlook-com-or-outlook-on-the-web)、[Microsoft VALARM转换规范](https://learn.microsoft.com/en-us/openspecs/exchange_server_protocols/ms-oxcical/9710b22c-ba2e-4581-be59-e143a952708a)。
 
 依据：[Apple 订阅日历日程提醒](https://support.apple.com/zh-cn/guide/iphone/iph3d1110d4/ios)、[iCalendar TRIGGER 标准](https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.6.3)。标准允许某种格式，不等于具体系统版本执行了通知。
