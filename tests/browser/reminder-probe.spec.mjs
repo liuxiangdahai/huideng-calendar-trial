@@ -36,7 +36,9 @@ test('phone and desktop forms remain reachable with no horizontal overflow',asyn
   await create(page);
   for(const width of [320,390,585,768,1024,1440]){
     await page.setViewportSize({width,height:640});
-    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+    const layout=await page.evaluate(()=>({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,
+      overflow:[...document.querySelectorAll('body *')].filter(e=>e.getBoundingClientRect().right>innerWidth+1).map(e=>e.id||e.tagName).slice(0,8)}));
+    expect(layout.scrollWidth,JSON.stringify(layout)).toBeLessThanOrEqual(width);
     await page.locator('#stop').scrollIntoViewIfNeeded();await expect(page.locator('#stop')).toBeInViewport();
     if([390,1440].includes(width)){
       await page.evaluate(()=>scrollTo(0,0));await fs.mkdir('artifacts/reminder-probe-screenshots',{recursive:true});
