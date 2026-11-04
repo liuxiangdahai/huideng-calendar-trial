@@ -64,7 +64,7 @@ export function reminderProbeAdapters({enabled = false, now = () => new Date()} 
             block = block.replace(/^DTSTART;VALUE=DATE:[^\r\n]*\r\n/m,`DTSTART:${stamp(event.probe.startAt)}\r\n`)
               .replace(/^DTEND;VALUE=DATE:[^\r\n]*\r\n/m,`DTEND:${stamp(Date.parse(event.probe.startAt)+5*60000)}\r\n`)
               .replace(/^TRIGGER;VALUE=DATE-TIME:[^\r\n]*\r\n/gm,'TRIGGER:PT0S\r\n');
-          } else if (event.probe.variant === 'relative') {
+          } else if (event.probe.variant === 'relative' && event.preference.mode === 'remind' && event.status !== 'CANCELLED') {
             // DATE-relative alarms follow the client's timezone, not a fixed
             // UTC instant. This is an experiment, never a production fallback.
             const r=event.preference.reminders[0], [h,m]=r.time.split(':').map(Number);

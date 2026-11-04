@@ -91,6 +91,14 @@ test('probe creation response replay does not duplicate subscriptions or reset t
   assert.equal(a.feedUrl,b.feedUrl);assert.equal(a.manageToken,b.manageToken);
   assert.equal((await f.DB.prepare('SELECT COUNT(*) AS n FROM subscriptions').first()).n,1);
 });
+test('all diagnostic variants can be made silent without breaking export',async t=>{
+  const f=fixture(t),c=await f.create();await f.fetch(c.feedUrl);
+  const settings=c.settings;settings.reminderProbe.silent=['a','b','c','d','e','f'];
+  const response=await f.api(`/api/subscriptions/${c.id}`,'PATCH',{settings,revision:1},c.manageToken);
+  assert.equal(response.status,200);
+  const feed=await f.fetch(c.feedUrl);assert.equal(feed.status,200);
+  assert.doesNotMatch(await feed.text(),/BEGIN:VALARM/);
+});
 test('probe absolute alarms retain instants across midnight, year end and Vancouver DST boundary',()=>{
   for(const zone of ['Asia/Shanghai','America/Vancouver','Asia/Kathmandu'])for(const anchor of ['2026-12-31T15:25:00Z','2027-03-14T09:25:00Z','2027-11-07T08:25:00Z']) {
     const now=new Date(anchor),settings=makeProbeSettings(zone,now);
