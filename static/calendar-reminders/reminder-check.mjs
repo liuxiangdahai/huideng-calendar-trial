@@ -45,7 +45,8 @@ function render(){
   $('feed').value=s.feedUrl;
   $('saved').textContent=s.disabled?'测试已停用；先核对手机撤销，再在手机移除此日历。':expired?'测试已到期，服务端取数将返回撤销。请在手机移除测试日历，或准备新的测试。':`设置版本 ${s.revision} · 有效至 ${fmt(probeExpiry(p))}。已保存，等待手机同步。`;
   $('round').textContent=`第 ${p.round} 轮 · A 预定 ${fmt(p.startAt)}；以下时间均为 ${s.settings.zone}。`;
-  $('sync').textContent=state.phoneSeenAt?`你确认手机已看到本轮日程：${fmt(state.phoneSeenAt)}。这仍不代表通知已出现。`:'尚未确认手机收到本轮日程。';
+  $('sync').textContent=state.phoneSeenAt?`你确认手机已同步本轮${s.disabled?'撤销':'日程'}：${fmt(state.phoneSeenAt)}。这仍不代表通知已通过。`:'尚未确认手机收到本轮日程或撤销。';
+  $('seen').textContent=s.disabled?'我已在手机确认测试日程撤销':'我已在手机确认本轮日程及变更';
   const apple=appleSubscriptionUrl(s.feedUrl);
   $('open-calendar').hidden=!apple || Boolean(environment.inAppBrowser) || !active;
   if(apple)$('open-calendar').href=apple;
@@ -58,7 +59,8 @@ function render(){
       <div class="results">${Array.from({length:item.id==='d'?2:1},(_,i)=>`<label>实际通知时间${item.id==='d'?i+1:''}<input type="datetime-local" step="1" data-time="${item.id}" data-index="${i}" value="${escape(result.times?.[i]||'')}"></label>`).join('')}</div></article>`;
   }).join('');
   for(const select of document.querySelectorAll('[data-result]'))select.value=state.results?.[select.dataset.result]?.status||'pending';
-  for(const id of ['repeat','tomorrow','silent','remove','stop','seen'])$(id).disabled=busy||!active;
+  for(const id of ['repeat','tomorrow','silent','remove','stop'])$(id).disabled=busy||!active;
+  $('seen').disabled=busy;
 }
 async function run(action){if(busy)return;busy=true;$('error').hidden=true;document.querySelectorAll('[data-action]').forEach(b=>b.disabled=true);
   try{await action();}catch(error){
@@ -119,7 +121,7 @@ async function change(action){
   if(action==='repeat'||action==='tomorrow'){
     p.startAt=action==='tomorrow'?nextMorning(settings):new Date(Math.ceil(Date.now()/60000)*60000+30*60000).toISOString();
     p.round++;p.omit=[];p.silent=[];
-  }else if(action==='silent')p.silent=['a'];else if(action==='remove')p.omit=['a'];
+  }else if(action==='silent'){p.silent=['a'];p.round++;}else if(action==='remove'){p.omit=['a'];p.round++;}
   state.pending={path:`/api/subscriptions/${s.id}`,method:action==='stop'?'DELETE':'PATCH',
     ...(action!=='stop'?{body:{settings,revision:s.revision}}:{})};persist();await submitPending();
 }
@@ -140,7 +142,7 @@ $('reload').onclick=()=>run(async()=>{const s=state.subscription;const data=awai
 for(const id of ['repeat','tomorrow','silent','remove','stop'])$(id).onclick=()=>run(()=>change(id));
 $('copy').onclick=()=>copy('feed');$('copy-manage').onclick=()=>copy('manage');
 $('seen').onclick=()=>{state.phoneSeenAt=new Date().toISOString();persist();render();
-  if(Date.parse(state.subscription.settings.reminderProbe.startAt)-Date.now()<5*60000)note('提醒时间已临近或错过。请重新安排一轮，并确认手机同步后再观察。');};
+  if(!state.subscription.disabled && Date.parse(state.subscription.settings.reminderProbe.startAt)-Date.now()<5*60000)note('提醒时间已临近或错过。请重新安排一轮，并确认手机同步后再观察。');};
 $('cases').oninput=event=>{const input=event.target,id=input.dataset.result||input.dataset.time;if(!id)return;state.results ||= {};const r=state.results[id] ||= {status:'pending',times:[]};
   if(input.dataset.result)r.status=input.value;else r.times[Number(input.dataset.index)]=input.value;persist();};
 for(const id of ['device','notes','manual']){$(id).value=state[id] || (id==='manual'?'pending':'');$(id).oninput=()=>{state[id]=$(id).value;persist();};}
