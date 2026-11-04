@@ -11,7 +11,8 @@ const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const json = value => JSON.stringify(value, null, 2) + '\n';
 const mime = {'.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.webp':'image/webp','.svg':'image/svg+xml','.ico':'image/x-icon'};
 const publicFiles = new Set(['index.html','style.css','calendar-view.css','subscription-guide.css',
-  'subscription-guide.mjs','calendar-data.json','config.json','version.json','UNICODE-LICENSE.txt']);
+  'subscription-guide.mjs','calendar-data.json','config.json','version.json','UNICODE-LICENSE.txt',
+  'reminder-check.html','reminder-check.mjs','reminder-check.css']);
 
 export function origin(value, {local = false} = {}) {
   let url;
@@ -177,6 +178,11 @@ export async function buildRelease(options = {}, env = process.env) {
   const appFile = Object.keys(app.metafile.outputs).map(file=>path.basename(file)).find(file=>/^app-.*\.js$/.test(file));
   await build({entryPoints:[path.join(sourceRoot,'subscription-guide.mjs')],outfile:path.join(frontend,'subscription-guide.mjs'),bundle:true,
     format:'esm',platform:'browser',target:['safari15.4','chrome100','firefox102'],minify:true,legalComments:'inline'});
+  if (['local','acceptance'].includes(config.mode)) {
+    await build({entryPoints:[path.join(sourceRoot,'reminder-check.mjs')],outfile:path.join(frontend,'reminder-check.mjs'),bundle:true,
+      format:'esm',platform:'browser',target:['safari15.4','chrome100','firefox102'],minify:true,legalComments:'inline'});
+    for (const file of ['reminder-check.html','reminder-check.css']) await fs.copyFile(path.join(sourceRoot,file),path.join(frontend,file));
+  }
   for (const file of ['style.css','calendar-view.css','subscription-guide.css','UNICODE-LICENSE.txt']) await fs.copyFile(path.join(sourceRoot,file),path.join(frontend,file));
   await fs.cp(path.join(sourceRoot,'assets'),path.join(frontend,'assets'),{recursive:true});
   await fs.mkdir(path.join(frontend,'licenses'),{recursive:true});

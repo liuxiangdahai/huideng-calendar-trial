@@ -68,6 +68,8 @@ jobs:
       - run: node tools/calendar/ci-remote.mjs acceptance verify
       - name: Test only the isolated Pages public service
         run: node tools/calendar/ci-remote.mjs acceptance smoke
+      - name: Verify reminder controls through the isolated Pages subscription
+        run: node tools/calendar/smoke-reminder-probe.mjs
       - name: Collect isolated service CPU evidence
         run: node tools/calendar/cloudflare-metrics.mjs --smoke-report artifacts/remote-smoke.json
       - run: node tools/calendar/build-environment.mjs trial
@@ -84,6 +86,7 @@ jobs:
             artifacts/remote-smoke.json
             artifacts/cloudflare-metrics.json
             artifacts/cloudflare-preflight.json
+            artifacts/reminder-probe-remote.json
           retention-days: 30
   remote-acceptance:
     needs: checks

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {randomBytes} from 'node:crypto';
 import ICAL from 'ical.js';
-import {defaults} from '../../static/calendar-reminders/core.mjs';
+import {defaults,selectCalendarOccurrences,dateInZone,addDays,rangeEnd,resolveAlarmInstants} from '../../static/calendar-reminders/core.mjs';
 import {applyPreset} from '../../static/calendar-reminders/presets.mjs';
 const base=new URL(process.argv[2]);
 const site=new URL(process.argv[3]);
@@ -69,6 +69,14 @@ try{
   assert.ok(first.headers.has('strict-transport-security'));
   const content=await first.text();assert.ok(!content.includes(created.manageToken));
   const entries=parse(content);assert.ok(entries.length>20);
+  // Verify the real preset/save/Pages path, not just the presence of an ICS file.
+  const today=dateInZone(new Date(),managed.settings.zone);
+  const expected=new Map(selectCalendarOccurrences(data,managed.settings,{start:addDays(today,-90),end:rangeEnd(today,24)})
+    .map(event=>[`${event.uid}@calendar.huidengvan.org`,resolveAlarmInstants(event,managed.settings.zone)]));
+  for(const event of active(entries)){
+    const actual=event.getAllSubcomponents('valarm').map(alarm=>alarm.getFirstPropertyValue('trigger').toJSDate().toISOString());
+    assert.deepEqual(actual,expected.get(event.getFirstPropertyValue('uid')),'公开订阅文件的提醒必须与实际保存的设置逐项一致');
+  }
   assert.equal(new Set(entries.map(e=>e.getFirstPropertyValue('uid'))).size,entries.length);
   const etag=first.headers.get('etag');assert.ok(etag);
   const head=await feed({method:'HEAD'});assert.equal(head.status,200);assert.equal(await head.text(),'');

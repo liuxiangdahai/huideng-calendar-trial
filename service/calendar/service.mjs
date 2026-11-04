@@ -161,6 +161,7 @@ function publicEvent(event, zone, alarmInstants) {
     title: event.title, date: event.date, tibetan: event.tibetan,
     source: event.source, sourceLabel: event.sourceLabel,
     ...(event.kind === 'daily-date' ? {kind: 'daily-date', description: event.description} : {}),
+    ...(event.probe ? {probe:event.probe} : {}),
     preference: remind
       ? {mode: 'remind', reminders: event.preference.reminders}
       : {mode: 'display', reminders: []},
@@ -182,7 +183,8 @@ function publishedEvent(entry) {
  * execute the same parameterized SQL and optimistic publication transactions.
  */
 export function createCalendarService({getData, validateSettings, selectOccurrences, exportICS,
-  resolveAlarmInstants = defaultAlarmInstants, now = () => new Date(), getRelease = () => DEVELOPMENT_RELEASE}) {
+  resolveAlarmInstants = defaultAlarmInstants, now = () => new Date(), getRelease = () => DEVELOPMENT_RELEASE,
+  validateMutation = () => {}}) {
   async function releaseFor(data) {
     const release = getRelease();
     return {...release, dataVersion: release.dataVersion || await digest(canonical(data ?? await getData()))};
@@ -210,9 +212,9 @@ export function createCalendarService({getData, validateSettings, selectOccurren
     return new Response(request.method === 'HEAD' ? null : JSON.stringify(body),
       {status: ready ? 200 : 503, headers: JSON_HEADERS});
   }
-  async function parseSettings(body, data) {
+  async function parseSettings(body, data, previous = null, time = now()) {
     if (!Object.hasOwn(body, 'settings')) throw new HttpError(400, '缺少日历设置。');
-    try { return validateSettings(body.settings, data.catalog); }
+    try { const settings = validateSettings(body.settings, data.catalog); validateMutation(settings, previous, time); return settings; }
     catch (error) { throw new HttpError(400, error.message || '日历设置无效。'); }
   }
   function validateSelection(data, settings, time) {
@@ -318,7 +320,7 @@ export function createCalendarService({getData, validateSettings, selectOccurren
           !Object.hasOwn(body.settings, 'includeDailyDates')) {
         body.settings = {...body.settings, includeDailyDates: JSON.parse(record.settings_json).includeDailyDates === true};
       }
-      const data = await getData(), settings = await parseSettings(body, data), time = now();
+      const data = await getData(), time = now(), settings = await parseSettings(body, data, JSON.parse(record.settings_json), time);
       const settingsJson = canonical(settings);
       if (settingsJson === record.settings_json) return json(recordView(record, baseUrl));
       validateSelection(data, settings, time);
@@ -445,7 +447,9 @@ export function createCalendarService({getData, validateSettings, selectOccurren
         expires_at = excluded.expires_at, ics = excluded.ics, etag = excluded.etag,
         last_modified = excluded.last_modified`,
     [record.id, record.revision, release.dataVersion, release.rendererVersion, localDay,
-      timestamp, new Date(time.getTime() + SNAPSHOT_TTL_MS).toISOString(), ics, etag, modified, ...sqlGuard(record)]));
+      timestamp, new Date(Math.min(time.getTime() + SNAPSHOT_TTL_MS,
+        stored.reminderProbe && time.getTime() < Date.parse(stored.reminderProbe.anchor) + 72*3600000
+          ? Date.parse(stored.reminderProbe.anchor) + 72*3600000 : Infinity)).toISOString(), ics, etag, modified, ...sqlGuard(record)]));
     statements.push(bound(env.DB, `UPDATE subscriptions SET render_version = render_version + 1
       WHERE id = ? AND revision = ? AND render_version = ?`, sqlGuard(record)));
     // D1 batch is transactional. The shared guard prevents stale concurrent feed

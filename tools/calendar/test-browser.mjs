@@ -9,7 +9,7 @@ import {buildRelease} from './release-build.mjs';
 const require=createRequire(import.meta.url);
 const cli=require.resolve('@playwright/test/cli');
 const files=readdirSync('tests/browser').filter(name=>name.endsWith('.spec.mjs')).sort();
-const independent=['calendar-entry.spec.mjs','calendar-daily.spec.mjs'];
+const independent=['calendar-entry.spec.mjs','calendar-daily.spec.mjs','reminder-probe.spec.mjs'];
 const batches=[files.filter(name=>!independent.includes(name)),
   ...independent.map(name=>files.filter(file=>file===name))];
 const browsers=process.argv.includes('--all') ? ['chromium','firefox','webkit'] : ['chromium'];

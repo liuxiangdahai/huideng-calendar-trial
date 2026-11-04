@@ -3,6 +3,7 @@ import {dirname} from 'node:path';
 import {SQLiteD1} from './sqlite-d1.mjs';
 import {createCalendarService} from './service.mjs';
 import {validateSettings, selectOccurrences, exportICS} from '../../static/calendar-reminders/core.mjs';
+import {reminderProbeAdapters} from './reminder-probe.mjs';
 
 export function createLocalService({databasePath, origin, now} = {}) {
   if (!databasePath || !origin) throw new Error('databasePath and origin are required');
@@ -12,7 +13,7 @@ export function createLocalService({databasePath, origin, now} = {}) {
   const DB = new SQLiteD1(databasePath);
   const service = createCalendarService({
     getData: () => JSON.parse(readFileSync(new URL('../../static/calendar-reminders/calendar-data.json', import.meta.url), 'utf8')),
-    validateSettings, selectOccurrences, exportICS, ...(now ? {now} : {})
+    validateSettings, selectOccurrences, exportICS, ...reminderProbeAdapters({enabled:true,...(now?{now}:{})}), ...(now ? {now} : {})
   });
   const env = {DB, PUBLIC_BASE_URL: url.origin, ALLOWED_ORIGINS: url.origin, ALLOW_LOCAL_DEV: 'true',
     RATE_LIMIT_SALT: 'local-preview-only'};

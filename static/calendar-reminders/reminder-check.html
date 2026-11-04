@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="referrer" content="no-referrer"><title>慧灯藏历 · 提醒实测</title><link rel="stylesheet" href="./reminder-check.css"></head>
+<body><header><a href="./">慧灯藏历</a><span>隔离验收 · 不影响正式订阅</span></header><main>
+<h1>让手机实际提醒一次</h1><p>这里添加的是独立测试日历。先确认手机收到日程，再关闭网页、锁屏观察通知。整个测试三天后到期，结束后请在手机移除测试日历。</p>
+<p id="notice" role="status">正在检查测试环境…</p><p id="error" role="alert" hidden></p>
+<section><h2>1　准备测试</h2><p id="zone"></p><label>设备与系统版本<input id="device" placeholder="例如 iPhone · iOS 27.0.1" maxlength="120"></label>
+<p>默认从现在约30分钟后开始，给添加和同步留出时间。B 项随手机日历的时区解释，请让手机与这里显示的时区一致。</p>
+<div class="actions"><button id="create" data-action disabled>准备测试订阅</button><button id="retry" data-action class="secondary" hidden>重试上次提交</button><button id="reload" data-action class="secondary" hidden>重新读取服务器</button></div></section>
+<section id="subscription" hidden><h2>2　添加独立测试日历</h2><p id="saved"></p>
+<div class="actions"><a id="open-calendar" class="button" hidden>打开 Apple 日历添加</a><button id="copy" data-action class="secondary">复制 HTTPS 订阅地址</button><button id="check" data-action class="secondary">检查服务端日程</button></div>
+<label>手动添加地址<input id="feed" readonly></label><p id="connection" role="status"></p>
+<details><summary>中文添加与提醒检查</summary><ol><li>在 iPhone 的 Safari 打开本页，点击上方“打开 Apple 日历添加”。</li><li>若未跳转，在“日历 → 添加日历 → 添加订阅日历”中粘贴上方 HTTPS 地址。</li><li>找到“慧灯提醒测试”旁的信息按钮，打开“日程提醒 / Event Alerts”。</li><li>在系统设置中检查“日历”的通知权限；测试期间关闭专注模式，并确认通知没有被安排进摘要。</li><li>在手机找到下面各项测试日程，核对“第几轮”。不要给整个测试日历加默认提醒，E、F 应保持无通知。</li></ol><p>Mac 可使用“文件 → 新建日历订阅”。Google 需在电脑网页通过网址添加，仍须单独验证通知。此页面不会判断或声称任何客户端已订阅成功。</p><a href="https://support.apple.com/zh-cn/guide/iphone/iph3d1110d4/ios" target="_blank" rel="noreferrer">Apple 中文说明</a></details>
+<details><summary>换浏览器或设备继续测试</summary><p>微信内请先转 Safari 再准备订阅。已创建的测试可用此管理链接恢复；链接能修改测试，请勿公开。草稿和观察记录仅保存在当前浏览器，换设备前请导出记录。</p><button id="copy-manage" data-action class="secondary">复制测试管理链接</button><input id="manage" readonly aria-label="测试管理链接" hidden></details></section>
+<section id="observation" hidden><h2>3　确认同步，再记录通知</h2><p id="round"></p><button id="seen" data-action class="secondary">我已在手机看到本轮日程</button><p id="sync" role="status"></p>
+<p>网页取数正常只说明服务可读。日程出现后，关闭网页并锁屏；实际收到通知时再回来填写。D 项分别记录两次。未观察到时保持“待观察”，不要填写预计时间。</p>
+<div id="cases"></div><details><summary>手动日程对照（帮助区分系统通知问题）</summary><p>在手机自己的日历中手动新建一条约十分钟后的定时日程，设置开始时提醒。若它也没有通知，应先排查系统通知设置。它的结果不算订阅提醒通过。</p><label>手动日程结果<select id="manual"><option value="pending">尚未测试</option><option value="received">已收到</option><option value="missed">未收到</option></select></label></details>
+<label>现场补充<textarea id="notes" rows="3" maxlength="2000" placeholder="例如：A 日程详情没有提醒字段，C 显示提醒。也可记录网络和是否锁屏。"></textarea></label>
+<button id="export" class="secondary">导出观察记录</button><p class="minor">记录不含订阅地址或管理凭证；保存和下载记录均不代表通知已通过。</p></section>
+<section id="changes" hidden><h2>4　复测修改与关闭</h2><p>每次修改仍用原订阅地址。必须在手机核对新的轮次或内容后再观察，不能假定网页保存后立即同步。测试期间最多观察48小时；未同步与未通知分别记录。</p>
+<div class="actions"><button id="repeat" data-action class="secondary">30分钟后再测一轮</button><button id="tomorrow" data-action class="secondary">明早08:00跨天测试</button><button id="silent" data-action class="secondary">将 A 改为仅显示</button><button id="remove" data-action class="secondary">取消 A 日程</button><button id="stop" data-action class="secondary">停用测试订阅</button></div>
+<p>进入下一轮会保留本轮观察记录，并重置本轮确认。取消和停用后，请核对手机同步及是否仍有旧通知；不要立刻删除测试日历来代替撤销验收。</p></section>
+</main><script type="module" src="./reminder-check.mjs"></script></body></html>
