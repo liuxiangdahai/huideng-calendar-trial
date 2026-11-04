@@ -18,8 +18,15 @@ test('real probe creation saves settings and checks ICS without claiming phone d
   await page.locator('#stop').click();await expect(page.locator('#saved')).toContainText('已停用');
   await expect(page.locator('#connection')).toContainText('文件内 0 次提醒');
   await expect(page.locator('#seen')).toBeEnabled();await page.locator('#seen').click();await expect(page.locator('#sync')).toContainText('撤销');
-  const download=page.waitForEvent('download');await page.locator('#export').click();const report=await fs.readFile(await (await download).path(),'utf8');
+  let downloads=0;page.on('download',()=>downloads++);
+  await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async text=>{window.copiedReport=text;}}}));
+  await page.locator('#copy-results').click();await expect(page.locator('#result-copy-status')).toContainText('已复制');
+  const report=await page.evaluate(()=>window.copiedReport);
   expect(report).not.toContain(initial.manageToken);expect(report).not.toContain(initial.subscription.feedUrl);expect(report).toContain('用户填写');
+  expect(report).toContain('详情未显示提醒时间');expect(report).toContain('第1轮');expect(downloads).toBe(0);
+  await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async()=>{throw Error('denied');}}}));
+  await page.locator('#copy-results').click();await expect(page.locator('#result-text')).toBeVisible();await expect(page.locator('#result-text')).toBeFocused();
+  await expect(page.locator('#result-copy-status')).toContainText('无需下载');expect(downloads).toBe(0);
 });
 test('lost creation response retries the same subscription and first reminder time',async({page})=>{
   let lost=true,first;

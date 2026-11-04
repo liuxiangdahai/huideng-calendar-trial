@@ -14,7 +14,7 @@ if(process.env.CALENDAR_EXPECTED_VERSION)assert.equal(health.version,process.env
 const data=JSON.parse(await fs.readFile('static/calendar-reminders/calendar-data.json','utf8'));
 const parse=text=>new ICAL.Component(ICAL.parse(text)).getAllSubcomponents('vevent');
 const startedAt=new Date().toISOString();
-const timing=[],dailyMeasurements=[];let created;let scenario='create';
+const timing=[],dailyMeasurements=[];let created;let scenario='create';let passed=false,failedScenario;
 const dailyEntries=entries=>entries.filter(event=>String(event.getFirstPropertyValue('uid')).startsWith('daily-date-'));
 const active=entries=>entries.filter(event=>event.getFirstPropertyValue('status')!=='CANCELLED');
 function verifyDaily(entries){
@@ -40,7 +40,16 @@ async function call(method,pathname,body,extraHeaders={}){
 }
 async function feed(options={}){
  const started=performance.now(),startTime=new Date().toISOString();const response=await fetch(created.feedUrl,{...options,redirect:'error',signal:AbortSignal.timeout(30000)}).catch(()=>{throw new Error('日历验收请求未完成，请检查隔离服务与网络。')});
- timing.push({scenario,operation:options.method||'feed',status:response.status,startedAt:startTime,finishedAt:new Date().toISOString(),wallMs:performance.now()-started});return response;
+ const entry={scenario,operation:options.method||'feed',status:response.status,startedAt:startTime,finishedAt:new Date().toISOString(),wallMs:performance.now()-started};
+ if(response.status>=400){
+  // Keep failed requests as evidence too. Never retain raw error bodies or URLs.
+  const message=await response.clone().json().then(value=>value.error).catch(()=>null);
+  entry.failureKind=message==='暂时无法连接订阅服务，请稍后重试。'?'gateway_unavailable':
+   message==='订阅服务暂时不可用，请稍后再试。'?'service_unavailable':
+   message==='订阅正在更新，请稍后重试。'?'publication_conflict':'other';
+  console.error(JSON.stringify({scenario,status:response.status,failureKind:entry.failureKind}));
+ }
+ timing.push(entry);return response;
 }
 try{
  let settings=applyPreset(defaults(data.catalog,'Asia/Shanghai'),data.catalog,'guru');
@@ -140,5 +149,9 @@ try{
  await call('DELETE',`/api/subscriptions/${created.id}`);
  assert.ok(parse(await (await feed()).text()).every(e=>e.getFirstPropertyValue('status')==='CANCELLED'));
  console.log(JSON.stringify({status:'passed',requests:timing.length,version:health.version,note:'wallMs is network latency, not Worker CPU'}));
- await fs.mkdir('artifacts',{recursive:true});await fs.writeFile('artifacts/remote-smoke.json',JSON.stringify({version:health.version,dataVersion:health.dataVersion,startedAt,finishedAt:new Date().toISOString(),timing,dailyMeasurements},null,2));
-}finally{if(created)await call('DELETE',`/api/subscriptions/${created.id}`).catch(()=>console.error('验收订阅清理失败，请在隔离环境检查。'));}
+ passed=true;
+}catch(error){failedScenario=scenario;throw error;}
+finally{
+ if(created)await call('DELETE',`/api/subscriptions/${created.id}`).catch(()=>console.error('验收订阅清理失败，请在隔离环境检查。'));
+ await fs.mkdir('artifacts',{recursive:true});await fs.writeFile('artifacts/remote-smoke.json',JSON.stringify({version:health.version,dataVersion:health.dataVersion,passed,failedScenario,startedAt,finishedAt:new Date().toISOString(),timing,dailyMeasurements},null,2));
+}

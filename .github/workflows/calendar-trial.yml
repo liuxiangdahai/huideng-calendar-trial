@@ -66,11 +66,12 @@ jobs:
       - name: Deploy isolated Pages and its service binding
         run: npx wrangler pages deploy --cwd dist/acceptance/pages --project-name huideng-calendar-acceptance --branch main
       - run: node tools/calendar/ci-remote.mjs acceptance verify
-      - name: Test only the isolated Pages public service
-        run: node tools/calendar/ci-remote.mjs acceptance smoke
       - name: Verify reminder controls through the isolated Pages subscription
         run: node tools/calendar/smoke-reminder-probe.mjs
+      - name: Test only the isolated Pages public service
+        run: node tools/calendar/ci-remote.mjs acceptance smoke
       - name: Collect isolated service CPU evidence
+        if: ${{ (success() || failure()) && hashFiles('artifacts/remote-smoke.json') != '' }}
         run: node tools/calendar/cloudflare-metrics.mjs --smoke-report artifacts/remote-smoke.json
       - run: node tools/calendar/build-environment.mjs trial
       - run: npx wrangler d1 migrations apply DB --remote --config dist/trial/worker/wrangler.json

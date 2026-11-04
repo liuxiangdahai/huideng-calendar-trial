@@ -96,7 +96,8 @@
     <button id="reload-subscription" type="button" class="secondary" hidden>重新载入已保存设置</button>
     <div id="subscription-new"><button id="create-subscription" class="primary full" type="button"><span id="create-subscription-label">请先选择日历应用</span><span data-icon="arrow-right" aria-hidden="true"></span></button></div>
     <div id="subscription-existing" hidden>
-      <div class="feed-actions entry-actions"><a id="iphone-subscribe" class="primary" hidden><span data-icon="calendar-plus" aria-hidden="true"></span>打开 Apple 日历订阅</a><a id="google-subscribe" class="primary" target="_blank" rel="noopener noreferrer" hidden><span data-icon="calendar-plus" aria-hidden="true"></span>打开 Google 日历添加页面</a><a id="outlook-subscribe" class="primary" target="_blank" rel="noopener noreferrer" hidden><span data-icon="calendar-plus" aria-hidden="true"></span>打开 Outlook 网页日历</a><button id="copy-feed" class="secondary" type="button"><span data-icon="copy" aria-hidden="true"></span>复制订阅地址</button></div>
+      <div class="feed-actions entry-actions"><a id="iphone-subscribe" class="primary" hidden><span data-icon="calendar-plus" aria-hidden="true"></span>打开 Apple 日历订阅</a><button id="copy-feed" class="secondary" type="button"><span data-icon="copy" aria-hidden="true"></span>复制订阅地址</button><a id="google-subscribe" class="secondary" target="_blank" rel="noopener noreferrer" hidden><span data-icon="calendar-plus" aria-hidden="true"></span>打开 Google 日历添加页面</a><a id="outlook-subscribe" class="secondary" target="_blank" rel="noopener noreferrer" hidden><span data-icon="calendar-plus" aria-hidden="true"></span>打开 Outlook 网页日历</a></div>
+      <p id="copy-progress" class="minor" role="status" hidden></p>
       <label class="url-label">订阅地址<input id="feed-url" readonly aria-label="订阅地址" spellcheck="false"></label>
       <button id="save-subscription" type="button" class="primary full" hidden>保存修改</button>
       <p id="subscription-status" class="status-note" role="status"></p>

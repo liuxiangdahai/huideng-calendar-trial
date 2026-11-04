@@ -116,6 +116,8 @@ test('remembered Google choice overrides Apple recommendation and desktop opens 
     const page = await context.newPage(); const service = await httpsService(page);
     await openSelected(page); await page.locator('#subscribe').click();
     const sub = await ready(page);
+    await verifyManualSteps(page,sub);
+    await page.locator('input[name="device"][value="google"]').check();
     await expect(page.locator('input[name="device"][value="google"]')).toBeChecked();
     await expect(page.locator('#iphone-subscribe')).toBeHidden();
     await expect(page.locator('#google-subscribe')).toBeVisible();
@@ -372,6 +374,26 @@ test('unsaved and failed settings disable Apple launch until saving the same sub
     expect(service.posts).toBe(1);
   } finally { await context.close(); }
 });
+
+async function verifyManualSteps(page,sub) {
+    let popups=0;page.on('popup',()=>popups++);
+    await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async text=>{window.copiedFeed=text;}}}));
+    for(const app of ['google','outlook']){
+      await page.locator(`input[name="device"][value="${app}"]`).check();
+      const actions=await page.locator('.entry-actions').evaluate(root=>[...root.children].filter(el=>!el.hidden).map(el=>el.id));
+      expect(actions).toEqual(['copy-feed',`${app}-subscribe`]);
+      await expect(page.locator('#copy-feed')).toHaveClass(/primary/);
+      await page.locator('#copy-feed').click();await expect(page.locator('#copy-progress')).toContainText('地址已复制');
+      expect(await page.evaluate(()=>window.copiedFeed)).toBe(sub.feedUrl);expect(popups).toBe(0);
+      await expect(page.locator('#guide-seen')).not.toBeChecked();
+    }
+    await page.evaluate(()=>{Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async()=>{throw Error('denied');}}});document.execCommand=()=>false;});
+    await page.locator('#copy-feed').click();await expect(page.locator('#copy-progress')).toContainText('未能自动复制');
+    await expect(page.locator('#subscription-error input')).toHaveValue(sub.feedUrl);
+    await page.locator('input[name="device"][value="iphone"]').check();
+    const actions=await page.locator('.entry-actions').evaluate(root=>[...root.children].filter(el=>!el.hidden).map(el=>el.id));
+    expect(actions).toEqual(['iphone-subscribe','copy-feed']);await expect(page.locator('#copy-progress')).toBeHidden();
+}
 
 test('clipboard denial offers a selectable read-only URL without implying subscription success', async ({ browser }) => {
   const context=await deviceContext(browser,devices.iphone);

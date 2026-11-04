@@ -252,13 +252,11 @@ function progressText(progress, hasReminders) {
   return hasReminders ? '已记录你的检查结果。实际提醒请以设备收到的通知为准。' : '已记录你看到日程。当前选择仅显示，无需开启提醒。';
 }
 
-export function createSubscriptionGuide(root, { notificationRoot = root, initialState, onStateChange = () => {}, onTestReminder = () => {} } = {}) {
+export function createSubscriptionGuide(root, { notificationRoot = root, initialState, onStateChange = () => {} } = {}) {
   if (!root) throw new TypeError('缺少订阅引导容器');
   let state = normalizeGuideState(initialState);
   let context = { app: state.app, hasReminders: true, hasSubscription: false, preparing: false, entryReady: false };
   let renderedKey = '';
-  let testStatus = '';
-  let testBusy = false;
   const openHelp = new Set();
   const device = calendarEnvironment();
   const snapshot = () => JSON.parse(JSON.stringify(state));
@@ -307,7 +305,7 @@ export function createSubscriptionGuide(root, { notificationRoot = root, initial
         <details class="guide-help" data-guide-help="notification-missing"><summary>找不到这个入口</summary><p>${onMac ? '在 Mac“系统设置”的搜索框中输入“通知”，找到“日历”的通知设置。日历列表未显示时，可在日历的“显示”菜单中选择“显示日历列表”。' : onComputer ? '在电脑系统设置中搜索“通知”，找到 Outlook 或你使用的浏览器，再检查通知权限。' : '在手机“设置”的搜索框中输入日历应用名称，打开这个应用的设置，查找通知权限。'}若日历内没有对应选项，请查看该应用的帮助；不同版本的名称可能不同。</p><p>如果日程尚未出现，请先检查是否勾选显示这份日历，并等待日历应用同步。</p></details>
       </div></details>
       <label class="guide-confirm"><input id="guide-reminders" data-guide-confirm="reminders" type="checkbox"${progress.reminders ? ' checked' : ''}><span>我已检查提醒<small>已检查日历提醒和${deviceName}系统通知权限。</small></span></label>
-      <details class="guide-help guide-test" data-guide-help="test-reminder"><summary>辅助检查：文件导入提醒</summary><p>这只检查导入文件后的通知，不验证订阅提醒。下载后将测试日程导入要使用的${deviceName}日历，提醒时间为生成后约十分钟。文件导入的测试结果不代表订阅日历也会采用同样的提醒。</p><p>${onComputer ? '请将文件导入电脑上的日历；如果耗时超过十分钟，请重新生成。' : device.mobile ? '请立即导入；如果手机不支持导入文件，可在该日历中手动建立十分钟后的测试日程。' : '请把文件传到手机并立即导入；如果耗时超过十分钟，请重新生成。'}</p><button id="test-reminder" class="secondary" type="button">${icon('bell')}下载十分钟提醒测试</button><p id="test-status" class="status-note" role="status">${escape(testStatus)}</p></details>` : '<p class="guide-note">你选择的日程均为“仅显示”，已跳过通知设置。若日历应用自带默认提醒，请关闭这份日历的默认通知。</p>'}
+      <details class="guide-help guide-test" data-guide-help="test-reminder"><summary>试一次实际提醒（无需下载）</summary><p>打开独立测试页，添加测试日历，先确认日程出现，再锁屏观察。无需下载文件；可直接在聊天反馈，或复制文字结果。正式订阅保持不变。</p><p>目前优先验证 Apple 日历。Google、Outlook 等需按其添加方式操作，可能无法在短时间内同步；未同步时不能据此判定提醒失败。</p><a id="test-reminder" class="secondary" href="https://huideng-calendar-acceptance.pages.dev/calendar-reminders/reminder-check.html" target="_blank" rel="noopener noreferrer">${icon('bell')}打开提醒测试页</a></details>` : '<p class="guide-note">你选择的日程均为“仅显示”，已跳过通知设置。若日历应用自带默认提醒，请关闭这份日历的默认通知。</p>'}
       <p class="guide-progress" data-guide-status role="status">${progressText(progress, context.hasReminders)}</p>
     </section>`;
     if (notificationRoot === root) root.innerHTML = addHtml + notificationHtml;
@@ -315,10 +313,8 @@ export function createSubscriptionGuide(root, { notificationRoot = root, initial
     for (const container of new Set([root, notificationRoot])) {
       for (const help of container.querySelectorAll('[data-guide-help]')) help.open = openHelp.has(help.dataset.guideHelp);
     }
-    const testButton = notificationRoot.querySelector('#test-reminder');
     const notifications = notificationRoot.querySelector('[data-guide-expand]');
     if (notifications) notifications.dataset.app = state.app;
-    if (testButton) testButton.disabled = testBusy;
     if (focusId) root.ownerDocument.getElementById(focusId)?.focus({ preventScroll: true });
     else if (focusHelp) root.ownerDocument.querySelector(`[data-guide-help="${CSS.escape(focusHelp)}"] > summary`)?.focus({ preventScroll: true });
     else if (focusJump) root.querySelector(`[data-guide-jump="${CSS.escape(focusJump)}"]`)?.focus({ preventScroll: true });
@@ -358,19 +354,6 @@ export function createSubscriptionGuide(root, { notificationRoot = root, initial
       target?.focus({ preventScroll: true });
       return;
     }
-    if (!event.target.closest('#test-reminder') || !context.hasReminders || testBusy) return;
-    const button = notificationRoot.querySelector('#test-reminder');
-    testBusy = true;
-    if (button) button.disabled = true;
-    try { await onTestReminder(); }
-    catch { setTestStatus('未能生成测试文件，请重试。'); }
-    finally { testBusy = false; const current = notificationRoot.querySelector('#test-reminder'); if (current) current.disabled = false; }
-  }
-
-  function setTestStatus(text) {
-    testStatus = String(text || '');
-    const node = notificationRoot.querySelector('#test-status');
-    if (node) node.textContent = testStatus;
   }
 
   const containers = [...new Set([root, notificationRoot])];
@@ -398,7 +381,6 @@ export function createSubscriptionGuide(root, { notificationRoot = root, initial
       for(const app of APPS) state.progress[app]={seen:false,reminders:false};
       renderedKey='';notify();render();
     },
-    setTestStatus,
     destroy() {
       for (const container of containers) {
         container.removeEventListener('change', onChange);

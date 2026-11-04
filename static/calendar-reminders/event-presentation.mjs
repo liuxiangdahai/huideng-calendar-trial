@@ -29,3 +29,15 @@ export function eventPresentation(event = {}, catalog) {
 export function eventIcon(event, catalog) {
   return icon(eventPresentation(event, catalog).icon);
 }
+
+// A published assembly is an occurrence, not evidence of an annual rule.
+// Show the next confirmed occurrence; never project last year's lunar date.
+export function eventDateHint(event, data, today) {
+  if (event.group !== 'practice' || event.rule) return event.ruleLabel || '';
+  const next = (data.published?.records || []).filter(record =>
+    record.eventId === event.id && record.date >= today)
+    .sort((a, b) => a.date.localeCompare(b.date))[0];
+  if (!next) return '下次日期待确认';
+  const [year, month, day] = next.date.split('-').map(Number);
+  return `${year}年${month}月${day}日 · 藏历${next.tibetan}`;
+}

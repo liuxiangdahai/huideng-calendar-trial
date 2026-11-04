@@ -209,6 +209,7 @@ input[type=time] { display: block; width: 100%; min-width: 0; height: 48px; marg
 .subscription-entry h3 { display: flex; align-items: center; gap: 9px; font-size: 17px; margin: 0 0 14px; }
 .entry-actions { margin: 0 0 14px; align-items: stretch; }
 .entry-actions a { min-height: 44px; overflow-wrap: anywhere; text-align: center; }
+.entry-actions [data-step]:not([data-step=""])::before { content: attr(data-step); display: inline-grid; place-items: center; flex: 0 0 22px; width: 22px; height: 22px; border: 1px solid currentColor; border-radius: 50%; font-size: 13px; line-height: 1; }
 .entry-actions [aria-disabled=true] { opacity: .5; cursor: wait; pointer-events: none; }
 .subscription-entry .field-note { margin: 12px 0 0; }
 .subscription-entry .url-label { margin-top: 12px; }

@@ -6,10 +6,9 @@ async function fixture(page, options = {}) {
   await page.evaluate(async options => {
     const { createSubscriptionGuide } = await import('/calendar-reminders/subscription-guide.mjs');
     window.guideStates = [];
-    window.guideTests = 0;
     window.guide = createSubscriptionGuide(document.querySelector('#add'), {
       notificationRoot: document.querySelector('#notifications'), initialState: options,
-      onStateChange: state => window.guideStates.push(state), onTestReminder: () => { window.guideTests += 1; }
+      onStateChange: state => window.guideStates.push(state)
     });
   }, options);
 }
@@ -49,10 +48,9 @@ test('display-only hides reminder guidance and test, preserves prior user checks
   await page.evaluate(() => window.guide.update({ hasReminders: true }));
   await expect(page.locator('#guide-reminders')).toBeChecked();
   await page.locator('.guide-test > summary').click();
-  await page.locator('#test-reminder').click();
-  expect(await page.evaluate(() => window.guideTests)).toBe(1);
-  await page.evaluate(() => window.guide.setTestStatus('测试文件已生成，请在手机导入。'));
-  await expect(page.locator('#test-status')).toHaveText('测试文件已生成，请在手机导入。');
+  await expect(page.locator('#test-reminder')).toHaveAttribute('href','https://huideng-calendar-acceptance.pages.dev/calendar-reminders/reminder-check.html');
+  await expect(page.locator('#test-reminder')).not.toHaveAttribute('download');
+  await expect(page.locator('.guide-test')).toContainText('无需下载');
 });
 
 test('other calendars show direct brand help without changing existing checks or subscription preferences', async ({ page }) => {

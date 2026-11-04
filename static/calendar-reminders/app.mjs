@@ -1,15 +1,14 @@
 import {defaults, normalizeSettings, selectOccurrences, selectCalendarOccurrences, exportICS, reminderLabel, addDays, rangeEnd} from './core.mjs';
 import {getTibetanDate} from './engine.mjs';
 import {icon, fillIcons} from './icons.mjs';
-import {deviceTimeZone,resolveTimeZone,zoneInfo,wallTimeInZone} from './timezones.mjs';
+import {deviceTimeZone,resolveTimeZone,zoneInfo} from './timezones.mjs';
 import {deviceDate,nextLocalMidnight,changedDeviceZone} from './device-time.mjs';
 import {createZonePicker} from './zone-picker.mjs';
 import {createCalendarView} from './calendar-view.mjs';
 import {createSubscriptionGuide} from './subscription-guide.mjs';
-import {reminderTestICS} from './reminder-test.mjs';
 import {PRESETS,presetIds,applyPreset,matchingPreset} from './presets.mjs';
 import {timeComparison} from './time-comparison.mjs';
-import {eventPresentation,eventIcon} from './event-presentation.mjs';
+import {eventPresentation,eventIcon,eventDateHint} from './event-presentation.mjs';
 import {calendarEnvironment,appleSubscriptionUrl,GOOGLE_ADD_URL,OUTLOOK_URL} from './calendar-entry.mjs';
 import {checkSubscriptionConnection} from './connection-check.mjs';
 import {cloneSettings as clone,fetchJSON} from './runtime.mjs';
@@ -102,6 +101,7 @@ function renderRegion(now=new Date()) {
 function checkDeviceTime() {
   const previousToday=today, previousZone=observedZone;
   observedZone=deviceTimeZone(); renderToday(); renderRegion();
+  if (today!==previousToday) renderDateHints();
   if (today!==previousToday || observedZone!==previousZone) renderPreview();
   clearTimeout(dayTimer); dayTimer=setTimeout(checkDeviceTime,Math.min(nextLocalMidnight(),60000-Date.now()%60000+50));
 }
@@ -112,6 +112,7 @@ function renderPresets() {
   $('#include-daily-dates').checked=settings.includeDailyDates===true;
 }
 function renderGroups() {
+  renderToday();
   openGroups = new Set([...document.querySelectorAll('.group-card[open]')].map(item => item.dataset.groupId).concat($('#groups').children.length ? [] : [...openGroups]));
   $('#groups').innerHTML = data.catalog.groups.map(group => {
     const all = data.catalog.events.filter(event => event.group === group.id);
@@ -122,9 +123,15 @@ function renderGroups() {
       <div class="event-list">${all.map(event => {
         const pref = settings.events[event.id], active = pref.mode !== 'off';
         const label = pref.mode === 'remind' ? (pref.reminders.length === 2 ? '两次提醒' : reminderLabel(pref.reminders)) : '仅显示';
-        return `<div class="event-row ${eventPresentation(event,data.catalog).colorClass}"><label class="event-label"><input type="checkbox" data-event="${esc(event.id)}" id="event-${esc(event.id)}" ${active ? 'checked' : ''}><span><span class="event-title">${esc(event.title)}</span><span class="event-rule">${esc(event.ruleLabel)}</span></span></label><button type="button" class="event-reminder ${pref.mode === 'remind' ? 'active' : ''}" data-reminder-event="${esc(event.id)}" aria-label="${esc(event.title)}的提醒设置" ${!active ? 'disabled' : ''}>${icon(pref.mode === 'remind' ? 'bell' : 'bell-off')}<span>${esc(label)}</span></button></div>`;
+        return `<div class="event-row ${eventPresentation(event,data.catalog).colorClass}"><label class="event-label"><input type="checkbox" data-event="${esc(event.id)}" id="event-${esc(event.id)}" ${active ? 'checked' : ''}><span><span class="event-title">${esc(event.title)}</span><span class="event-rule" data-date-hint="${esc(event.id)}">${esc(eventDateHint(event,data,today))}</span></span></label><button type="button" class="event-reminder ${pref.mode === 'remind' ? 'active' : ''}" data-reminder-event="${esc(event.id)}" aria-label="${esc(event.title)}的提醒设置" ${!active ? 'disabled' : ''}>${icon(pref.mode === 'remind' ? 'bell' : 'bell-off')}<span>${esc(label)}</span></button></div>`;
       }).join('')}</div></details>`;
   }).join('');
+}
+function renderDateHints() {
+  for (const node of document.querySelectorAll('[data-date-hint]')) {
+    const event=data.catalog.events.find(event=>event.id===node.dataset.dateHint);
+    if (event) node.textContent=eventDateHint(event,data,today);
+  }
 }
 function renderPreview() {
   $('#preview-error').hidden = true;
@@ -204,8 +211,14 @@ function deviceGuide() {
   if(ready) {outlook.href=OUTLOOK_URL;outlook.removeAttribute('aria-disabled');}
   else {outlook.removeAttribute('href');outlook.setAttribute('aria-disabled','true');}
   $('#copy-feed').disabled=!ready;
-  $('#copy-feed').classList.toggle('primary',app==='other'||['google','outlook'].includes(app)&&calendarDevice.mobile||app==='iphone'&&(!calendarDevice.apple||inAppApple));
+  const manualEntry=['google','outlook'].includes(app)&&!calendarDevice.mobile;
+  $('#copy-feed').classList.toggle('primary',app==='other'||['google','outlook'].includes(app)||app==='iphone'&&(!calendarDevice.apple||inAppApple));
   $('#copy-feed').classList.toggle('secondary',!$('#copy-feed').classList.contains('primary'));
+  $('#copy-feed').dataset.step=manualEntry?'1':'';
+  google.dataset.step=manualEntry&&app==='google'?'2':'';
+  outlook.dataset.step=manualEntry&&app==='outlook'?'2':'';
+  const copied=$('#copy-progress');
+  copied.hidden=!manualEntry||!ready||copied.dataset.app!==app||copied.dataset.feed!==subscription?.feedUrl;
   $('#entry-hint').textContent=managementRestoring ? '正在恢复订阅，请稍候。' : !app ? '选择日历应用后，查看对应的添加方式。' : requestPending ? '正在保存你的选择，请稍候。' : !subscription ? '选好日历应用后，我们会准备你的订阅。' : !ready ? '先保存修改，再继续添加到日历。' : inAppApple ? '也可复制上方的 HTTPS 订阅地址，在 Apple 日历中手动添加。复制后仍需到日历中确认。' : app==='iphone' ? calendarDevice.apple ? '将在系统日历中打开订阅确认，请按提示添加。' : '请把订阅地址传到你的 iPhone、iPad 或 Mac 上添加。' : app==='google' ? calendarDevice.mobile ? '请将订阅地址传到电脑，在 Google 日历网页中添加。' : '先复制订阅地址，再打开 Google 日历的“通过网址添加”页面。' : '应用有网址订阅入口时可粘贴此地址；否则请查看下方文件导入方式。';
   if(app==='outlook') $('#entry-hint').textContent=ready ? '先复制订阅地址，在 Outlook 网页版选择“添加日历 → 从 Web 订阅”；也可查看经典桌面版步骤。' : $('#entry-hint').textContent;
   if(inAppApple && !subscription) $('#entry-hint').textContent='请先在 Safari 或系统浏览器打开本页，再选择内容并准备订阅。微信与浏览器的本机草稿不会自动同步。';
@@ -435,17 +448,18 @@ function stopSubscription() {
   })());
 }
 async function copy(value, label) {
-  try { await navigator.clipboard.writeText(value); notify(`${label}已复制`); }
+  try { await navigator.clipboard.writeText(value); notify(`${label}已复制`); return true; }
   catch {
     const input = document.createElement('textarea'); input.value = value;
     input.style.cssText = 'position:fixed;opacity:0'; document.body.append(input); input.select();
     let copied=false;
     try {copied=document.execCommand('copy');} catch {}
     input.remove();
-    if (copied) notify(`${label}已复制`);
+    if (copied) {notify(`${label}已复制`);return true;}
     else {
       const output = document.createElement('input'); output.value = value; output.readOnly = true; output.setAttribute('aria-label',label);
       $('#subscription-error').replaceChildren(document.createTextNode(`请手动复制${label}：`),output); $('#subscription-error').hidden = false; output.focus(); output.select();
+      return false;
     }
   }
 }
@@ -563,7 +577,14 @@ function attachEvents() {
     catch (error) { showSubscriptionError(error); }
   });
   document.querySelectorAll('input[name="device"]').forEach(input => input.addEventListener('change',()=>{ui.app=input.value;persistUI();$('#entry-attempt').hidden=true;deviceGuide();void prepareSubscription();}));
-  $('#copy-feed').addEventListener('click',() => {if(subscription && !requestPending && !managementRestoring && !dirty() && !conflict) void copy(subscription.feedUrl,'订阅地址');});
+  $('#copy-feed').addEventListener('click',async() => {
+    if(!subscription||requestPending||managementRestoring||dirty()||conflict)return;
+    const feed=subscription.feedUrl,app=currentApp(),copied=await copy(feed,'订阅地址');
+    if(!['google','outlook'].includes(app)||calendarDevice.mobile||currentApp()!==app||subscription?.feedUrl!==feed)return;
+    const progress=$('#copy-progress');progress.dataset.app=app;progress.dataset.feed=feed;
+    progress.textContent=copied?`地址已复制。下一步打开 ${app==='google'?'Google 日历添加页面':'Outlook 网页日历'}，粘贴并确认添加。`:'未能自动复制。请先手动复制上方选中的地址，再打开日历添加页面。';
+    progress.hidden=false;
+  });
   $('#check-connection').addEventListener('click',checkConnection);
   $('#copy-page').addEventListener('click',()=>{const url=new URL(location.href);url.hash='';url.search='';void copy(url.href,'网页地址');});
   $('#apple-browser-help').addEventListener('click',()=>{
@@ -588,15 +609,6 @@ function attachEvents() {
   $('#cancel-stop').addEventListener('click',() => { $('#stop-confirmation').hidden = true; });
   $('#confirm-stop').addEventListener('click',stopSubscription);
   $('#downloads').addEventListener('click',event => { const button = event.target.closest('[data-download]'); if (button) downloadCalendar(button.dataset.download); });
-}
-function downloadReminderTest() {
-  try {
-    if(!settings.zone)throw new Error('请先选择提醒时区。');
-    const {at,content}=reminderTestICS();
-    download(content,'藏历-提醒测试.ics');
-    const time=wallTimeInZone(at,settings.zone).replace('T',' ');
-    guide.setTestStatus(`请在${time}（${zoneLabel()}）前导入。收到通知后可删除测试日程；这个测试不代表订阅更新已经通过检查。`);
-  } catch(error) {guide.setTestStatus(error.message);}
 }
 async function restoreManagementLink() {
   const manage = new URLSearchParams(location.hash.slice(1)).get('manage');
@@ -668,7 +680,7 @@ async function init() {
     onViewChange:view=>{ui.view=view;persistUI();},
     onEditEvent:(id,trigger)=>{const item=data.catalog.events.find(event=>event.id===id);if(item)openReminders([id],item.title,trigger);}});
   guide=createSubscriptionGuide($('#device-guide'),{notificationRoot:$('#notification-guide'),initialState:ui.guide,
-    onStateChange:state=>{ui.guide=state;persistUI();},onTestReminder:downloadReminderTest});
+    onStateChange:state=>{ui.guide=state;persistUI();}});
   const savedApp=['iphone','google','outlook','other'].includes(ui.app) ? ui.app : ui.guide?.app;
   if(['iphone','google','outlook','other'].includes(savedApp)) $(`input[name="device"][value="${savedApp}"]`).checked=true;
   attachEvents(); $('#app').hidden = false; renderGroups(); renderPresets();renderPreview(); persist();persistUI();checkDeviceTime();

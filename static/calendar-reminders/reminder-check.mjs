@@ -7,7 +7,7 @@ import {cloneSettings} from './runtime.mjs';
 const $=id=>document.getElementById(id),KEY='huideng.reminder-probe.v1',environment=calendarEnvironment();
 let state={},config,busy=false;
 try{state=JSON.parse(localStorage.getItem(KEY)||'{}');}catch{}
-const persist=()=>{try{localStorage.setItem(KEY,JSON.stringify(state));}catch{ $('notice').textContent='浏览器无法保存测试记录，请保留管理链接并及时导出观察记录。'; }};
+const persist=()=>{try{localStorage.setItem(KEY,JSON.stringify(state));}catch{ $('notice').textContent='浏览器无法保存测试记录，请保留管理链接，并复制文字结果留存。'; }};
 const note=text=>{$('notice').textContent=text;};
 const fail=error=>{$('error').hidden=false;$('error').textContent=error instanceof TypeError?'连接未完成，请检查网络后重试；已保存的测试和观察记录会保留。':error.message || '操作未完成，请重试。';};
 const escape=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -56,7 +56,7 @@ function render(){
     const status=item.omitted||s.disabled?'已撤销；同步后不应再提醒':item.quiet?'仅显示，不应提醒':item.instants.map(fmt).join('、');
     return `<article class="probe-case"><h3>${escape(item.label)}</h3><p>${escape(status)}</p><p class="minor">${escape(item.detail)}</p>
       <label>实际结果<select data-result="${item.id}"><option value="pending">待观察</option><option value="received">已收到预期通知</option><option value="missed">到了时间，未收到</option><option value="missing-field">日程详情没有提醒时间</option><option value="silent">观察结束，没有通知</option><option value="unexpected">不应提醒，但收到了</option><option value="not-synced">手机尚未同步本轮</option></select></label>
-      <div class="results">${Array.from({length:item.id==='d'?2:1},(_,i)=>`<label>实际通知时间${item.id==='d'?i+1:''}<input type="datetime-local" step="1" data-time="${item.id}" data-index="${i}" value="${escape(result.times?.[i]||'')}"></label>`).join('')}</div></article>`;
+      <details><summary>补充实际收到时间（可选）</summary><div class="results">${Array.from({length:item.id==='d'?2:1},(_,i)=>`<label>实际通知时间${item.id==='d'?i+1:''}<input type="datetime-local" step="1" data-time="${item.id}" data-index="${i}" value="${escape(result.times?.[i]||'')}"></label>`).join('')}</div></details></article>`;
   }).join('');
   for(const select of document.querySelectorAll('[data-result]'))select.value=state.results?.[select.dataset.result]?.status||'pending';
   for(const id of ['repeat','tomorrow','silent','remove','stop'])$(id).disabled=busy||!active;
@@ -146,11 +146,23 @@ $('seen').onclick=()=>{state.phoneSeenAt=new Date().toISOString();persist();rend
 $('cases').oninput=event=>{const input=event.target,id=input.dataset.result||input.dataset.time;if(!id)return;state.results ||= {};const r=state.results[id] ||= {status:'pending',times:[]};
   if(input.dataset.result)r.status=input.value;else r.times[Number(input.dataset.index)]=input.value;persist();};
 for(const id of ['device','notes','manual']){$(id).value=state[id] || (id==='manual'?'pending':'');$(id).oninput=()=>{state[id]=$(id).value;persist();};}
-$('export').onclick=()=>{
-  const report={kind:'用户填写的通知观察，非自动验收通过',build:config?.version,device:$('device').value,deviceZone:deviceTimeZone(),
-    history:state.history||[],current:reportSnapshot(),exportedAt:new Date().toISOString()};
-  const url=URL.createObjectURL(new Blob([JSON.stringify(report,null,2)],{type:'application/json'})),a=document.createElement('a');
-  a.href=url;a.download='慧灯提醒-真机观察.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+$('copy-results').onclick=async()=>{
+  const labels={pending:'待观察',received:'已收到预期通知',missed:'到了时间，未收到',
+    'missing-field':'详情未显示提醒时间（未据此判断通知失败）',silent:'观察结束，没有通知',unexpected:'不应提醒但收到了','not-synced':'手机尚未同步本轮'};
+  const rounds=[...(state.history||[]),reportSnapshot()].map(r=>{
+    const p=r.settings?.reminderProbe;if(!p)return '';
+    const local=value=>value?new Intl.DateTimeFormat('zh-CN',{timeZone:r.settings.zone,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).format(new Date(value)):'未记录';
+    return [`第${p.round}轮 · 设置版本${r.revision} · 时区${r.settings.zone}`,
+      `网页保存：${local(r.webSavedAt)}；服务器更新：${local(r.serverSavedAt)}`,
+      `手机确认同步：${r.phoneSeenAt?local(r.phoneSeenAt):'尚未确认'}`,
+      ...probeSchedule(r.settings).map(item=>`${item.id.toUpperCase()}：${labels[r.results?.[item.id]?.status]||'待观察'}；预定${item.quiet||item.omitted?'无提醒':item.instants.map(local).join('、')}；实收${r.results?.[item.id]?.times?.filter(Boolean).join('、')||'未记录'}`),
+      `手动日程对照：${{received:'已收到',missed:'未收到'}[r.manual]||'尚未测试'}`,
+      r.notes?`补充：${r.notes}`:''].filter(Boolean).join('\n');
+  });
+  const text=[`慧灯提醒测试（用户填写，非自动验收）`, `设备：${$('device').value||'未填写'}`,`设备时区：${deviceTimeZone()||'未知'}`,`页面版本：${config?.version||'未知'}`,...rounds].filter(Boolean).join('\n\n');
+  $('result-text').value=text;
+  try{await navigator.clipboard.writeText(text);$('result-text').hidden=true;$('result-copy-status').textContent='结果文字已复制，可粘贴到聊天。不含系统保存的订阅地址或管理凭证。';}
+  catch{$('result-text').hidden=false;$('result-text').focus();$('result-text').select();$('result-copy-status').textContent='请长按或使用系统复制操作，复制下方已选中的文字。无需下载文件。';}
 };
 try{
   config=await request('./config.json');
