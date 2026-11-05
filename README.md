@@ -4,7 +4,9 @@
 
 项目当前处于技术验收阶段。真实手机通知、国内网络和七天试用必须分别取得证据，浏览器模拟不能代替。
 
-当前技术验收站：[打开慧灯藏历](https://huideng-calendar-trial.pages.dev/calendar-reminders/)。应用`97778a2`已通过唯一流水线发布：134项规则/服务/构建检查、55项×三引擎、142次隔离Pages请求检查通过，含可选每日藏历日期。网页、API和ICS统一从Pages访问，内部服务绑定Worker。云端CPU p95为60.463ms，未达到8ms目标；网关CPU、前端长任务、真实设备和网络等门槛仍未完成，暂不扩大邀请。详见[本阶段报告](docs/calendar-daily-acceptance.md)及[验收台账](docs/calendar-trial-acceptance.md)。
+当前技术试用站：[打开慧灯藏历](https://huideng-calendar-trial.pages.dev/calendar-reminders/)。截至2026-11-05，应用`0521057`已通过唯一流水线发布：143项规则/服务/构建检查、60项×三引擎、143次隔离Pages链路请求及15次提醒专项请求通过，包含可选每日藏历日期、先复制再打开和免下载提醒测试。网页、API和ICS统一从Pages访问，内部服务绑定Worker。本轮云端CPU p95为74.896ms，未达到8ms目标；网关CPU、前端长任务、完整真实设备和网络等门槛仍未完成，暂不扩大邀请。详见[当前执行计划](docs/calendar-execution-plan.md)、[本轮证据](docs/evidence/subscription-flow-0521057/README.md)和[提醒验收](docs/calendar-reminder-acceptance.md)。
+
+与Claude或其他维护者协作，请先读[项目交接](docs/calendar-collaboration-handoff.md)及[本轮UI/UX审阅建议](docs/calendar-uiux-review.md)。设计建议尚未实施，不改变已有产品约定。
 
 ## 本地开发
 
