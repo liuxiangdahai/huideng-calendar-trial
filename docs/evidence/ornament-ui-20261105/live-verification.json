@@ -1,0 +1,43 @@
+{
+  "checkedAt": "2026-11-05T09:50:57.034Z",
+  "expected": "23abc3e39af655278de05233defcd8f92477b41a",
+  "scope": "只读线上版本、HTML/CSS与原创SVG核对；经开发机代理，不替代直连/真机验收",
+  "sites": [
+    {
+      "site": "huideng-calendar-acceptance.pages.dev",
+      "status": "verified",
+      "version": "23abc3e39af655278de05233defcd8f92477b41a",
+      "dataVersion": "0a6b1e7eb64f73f5f4d1bf86527df628e6e1b8ed91f5c917ecf8fcb38813d46b",
+      "assets": [
+        {
+          "name": "scroll-corner.svg",
+          "bytes": 541,
+          "sha256": "c88d677b55757651901d6464cdeb4794af7ed29782eee4dfa6ffcfb01e2a9c0b"
+        },
+        {
+          "name": "woven-flourish.svg",
+          "bytes": 555,
+          "sha256": "21eb7e026eb209dc38d80040c00b4a7a999b3159bca2c395cad96fe0edd696c8"
+        }
+      ]
+    },
+    {
+      "site": "huideng-calendar-trial.pages.dev",
+      "status": "verified",
+      "version": "23abc3e39af655278de05233defcd8f92477b41a",
+      "dataVersion": "0a6b1e7eb64f73f5f4d1bf86527df628e6e1b8ed91f5c917ecf8fcb38813d46b",
+      "assets": [
+        {
+          "name": "scroll-corner.svg",
+          "bytes": 541,
+          "sha256": "c88d677b55757651901d6464cdeb4794af7ed29782eee4dfa6ffcfb01e2a9c0b"
+        },
+        {
+          "name": "woven-flourish.svg",
+          "bytes": 555,
+          "sha256": "21eb7e026eb209dc38d80040c00b4a7a999b3159bca2c395cad96fe0edd696c8"
+        }
+      ]
+    }
+  ]
+}

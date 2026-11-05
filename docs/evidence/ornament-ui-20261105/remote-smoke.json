@@ -1,0 +1,1179 @@
+{
+  "version": "23abc3e39af655278de05233defcd8f92477b41a",
+  "dataVersion": "0a6b1e7eb64f73f5f4d1bf86527df628e6e1b8ed91f5c917ecf8fcb38813d46b",
+  "passed": true,
+  "startedAt": "2026-11-05T09:40:52.003Z",
+  "finishedAt": "2026-11-05T09:42:11.225Z",
+  "timing": [
+    {
+      "scenario": "create",
+      "operation": "POST",
+      "status": 201,
+      "startedAt": "2026-11-05T09:40:52.018Z",
+      "finishedAt": "2026-11-05T09:40:52.518Z",
+      "wallMs": 500.09436800000003
+    },
+    {
+      "scenario": "create",
+      "operation": "POST",
+      "status": 200,
+      "startedAt": "2026-11-05T09:40:52.520Z",
+      "finishedAt": "2026-11-05T09:40:52.716Z",
+      "wallMs": 195.15515600000003
+    },
+    {
+      "scenario": "create",
+      "operation": "POST",
+      "status": 200,
+      "startedAt": "2026-11-05T09:40:52.520Z",
+      "finishedAt": "2026-11-05T09:40:52.776Z",
+      "wallMs": 256.2195509999999
+    },
+    {
+      "scenario": "create",
+      "operation": "POST",
+      "status": 200,
+      "startedAt": "2026-11-05T09:40:52.519Z",
+      "finishedAt": "2026-11-05T09:40:52.782Z",
+      "wallMs": 263.18080799999996
+    },
+    {
+      "scenario": "create",
+      "operation": "GET",
+      "status": 200,
+      "startedAt": "2026-11-05T09:40:52.783Z",
+      "finishedAt": "2026-11-05T09:40:52.949Z",
+      "wallMs": 165.3564140000001
+    },
+    {
+      "scenario": "guru",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:40:52.949Z",
+      "finishedAt": "2026-11-05T09:40:53.114Z",
+      "wallMs": 164.4175479999999
+    },
+    {
+      "scenario": "guru",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:40:53.115Z",
+      "finishedAt": "2026-11-05T09:40:53.852Z",
+      "wallMs": 737.5028540000003
+    },
+    {
+      "scenario": "guru",
+      "operation": "HEAD",
+      "status": 200,
+      "startedAt": "2026-11-05T09:40:53.885Z",
+      "finishedAt": "2026-11-05T09:40:54.196Z",
+      "wallMs": 311.3935819999997
+    },
+    {
+      "scenario": "guru",
+      "operation": "feed",
+      "status": 304,
+      "startedAt": "2026-11-05T09:40:54.196Z",
+      "finishedAt": "2026-11-05T09:40:54.513Z",
+      "wallMs": 317.08124499999985
+    },
+    {
+      "scenario": "guru",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:40:54.514Z",
+      "finishedAt": "2026-11-05T09:40:54.803Z",
+      "wallMs": 288.75316699999985
+    },
+    {
+      "scenario": "guru",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:40:54.515Z",
+      "finishedAt": "2026-11-05T09:40:54.811Z",
+      "wallMs": 296.24106699999993
+    },
+    {
+      "scenario": "guru",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:40:54.513Z",
+      "finishedAt": "2026-11-05T09:40:54.840Z",
+      "wallMs": 327.0232609999998
+    },
+    {
+      "scenario": "guru",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:40:54.515Z",
+      "finishedAt": "2026-11-05T09:40:54.842Z",
+      "wallMs": 326.60572
+    },
+    {
+      "scenario": "guru",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:40:54.515Z",
+      "finishedAt": "2026-11-05T09:40:54.868Z",
+      "wallMs": 353.40058799999997
+    },
+    {
+      "scenario": "tsok",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:40:54.873Z",
+      "finishedAt": "2026-11-05T09:40:55.171Z",
+      "wallMs": 297.5988379999999
+    },
+    {
+      "scenario": "tsok",
+      "operation": "POST",
+      "status": 200,
+      "startedAt": "2026-11-05T09:40:55.171Z",
+      "finishedAt": "2026-11-05T09:40:55.345Z",
+      "wallMs": 174.09594400000015
+    },
+    {
+      "scenario": "tsok",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:40:55.346Z",
+      "finishedAt": "2026-11-05T09:40:56.132Z",
+      "wallMs": 786.0050269999997
+    },
+    {
+      "scenario": "tsok",
+      "operation": "HEAD",
+      "status": 200,
+      "startedAt": "2026-11-05T09:40:56.141Z",
+      "finishedAt": "2026-11-05T09:40:56.456Z",
+      "wallMs": 315.3453959999997
+    },
+    {
+      "scenario": "tsok",
+      "operation": "feed",
+      "status": 304,
+      "startedAt": "2026-11-05T09:40:56.456Z",
+      "finishedAt": "2026-11-05T09:40:56.750Z",
+      "wallMs": 293.59636800000044
+    },
+    {
+      "scenario": "tsok",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:40:56.751Z",
+      "finishedAt": "2026-11-05T09:40:57.070Z",
+      "wallMs": 318.92234199999984
+    },
+    {
+      "scenario": "tsok",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:40:56.751Z",
+      "finishedAt": "2026-11-05T09:40:57.071Z",
+      "wallMs": 320.45070399999986
+    },
+    {
+      "scenario": "tsok",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:40:56.750Z",
+      "finishedAt": "2026-11-05T09:40:57.094Z",
+      "wallMs": 343.95149500000025
+    },
+    {
+      "scenario": "tsok",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:40:56.751Z",
+      "finishedAt": "2026-11-05T09:40:57.096Z",
+      "wallMs": 344.636383
+    },
+    {
+      "scenario": "tsok",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:40:56.751Z",
+      "finishedAt": "2026-11-05T09:40:57.155Z",
+      "wallMs": 404.39195199999995
+    },
+    {
+      "scenario": "practice",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:40:57.157Z",
+      "finishedAt": "2026-11-05T09:40:57.483Z",
+      "wallMs": 326.35989599999994
+    },
+    {
+      "scenario": "practice",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:40:57.484Z",
+      "finishedAt": "2026-11-05T09:40:58.490Z",
+      "wallMs": 1005.4561699999995
+    },
+    {
+      "scenario": "practice",
+      "operation": "HEAD",
+      "status": 200,
+      "startedAt": "2026-11-05T09:40:58.516Z",
+      "finishedAt": "2026-11-05T09:40:58.983Z",
+      "wallMs": 467.48064800000066
+    },
+    {
+      "scenario": "practice",
+      "operation": "feed",
+      "status": 304,
+      "startedAt": "2026-11-05T09:40:58.983Z",
+      "finishedAt": "2026-11-05T09:40:59.732Z",
+      "wallMs": 748.7373360000001
+    },
+    {
+      "scenario": "practice",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:40:59.732Z",
+      "finishedAt": "2026-11-05T09:41:00.081Z",
+      "wallMs": 349.0496609999991
+    },
+    {
+      "scenario": "practice",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:40:59.733Z",
+      "finishedAt": "2026-11-05T09:41:00.170Z",
+      "wallMs": 437.500626
+    },
+    {
+      "scenario": "practice",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:40:59.733Z",
+      "finishedAt": "2026-11-05T09:41:00.217Z",
+      "wallMs": 484.25527899999906
+    },
+    {
+      "scenario": "practice",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:40:59.733Z",
+      "finishedAt": "2026-11-05T09:41:00.234Z",
+      "wallMs": 501.0158340000007
+    },
+    {
+      "scenario": "practice",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:40:59.733Z",
+      "finishedAt": "2026-11-05T09:41:00.476Z",
+      "wallMs": 742.8452399999996
+    },
+    {
+      "scenario": "dual",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:00.491Z",
+      "finishedAt": "2026-11-05T09:41:00.838Z",
+      "wallMs": 347.04229699999996
+    },
+    {
+      "scenario": "dual",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:00.839Z",
+      "finishedAt": "2026-11-05T09:41:02.074Z",
+      "wallMs": 1234.7668319999993
+    },
+    {
+      "scenario": "dual",
+      "operation": "HEAD",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:02.114Z",
+      "finishedAt": "2026-11-05T09:41:02.666Z",
+      "wallMs": 552.429055999999
+    },
+    {
+      "scenario": "dual",
+      "operation": "feed",
+      "status": 304,
+      "startedAt": "2026-11-05T09:41:02.666Z",
+      "finishedAt": "2026-11-05T09:41:03.196Z",
+      "wallMs": 529.7154740000005
+    },
+    {
+      "scenario": "dual",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:03.197Z",
+      "finishedAt": "2026-11-05T09:41:03.525Z",
+      "wallMs": 327.919989
+    },
+    {
+      "scenario": "dual",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:03.197Z",
+      "finishedAt": "2026-11-05T09:41:03.697Z",
+      "wallMs": 499.57030900000063
+    },
+    {
+      "scenario": "dual",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:03.197Z",
+      "finishedAt": "2026-11-05T09:41:03.767Z",
+      "wallMs": 569.6215539999994
+    },
+    {
+      "scenario": "dual",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:03.197Z",
+      "finishedAt": "2026-11-05T09:41:03.768Z",
+      "wallMs": 571.0849560000006
+    },
+    {
+      "scenario": "dual",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:03.196Z",
+      "finishedAt": "2026-11-05T09:41:03.770Z",
+      "wallMs": 573.9569699999993
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:03.794Z",
+      "finishedAt": "2026-11-05T09:41:04.086Z",
+      "wallMs": 291.9271239999998
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:04.086Z",
+      "finishedAt": "2026-11-05T09:41:05.492Z",
+      "wallMs": 1405.3408760000002
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:05.495Z",
+      "finishedAt": "2026-11-05T09:41:05.872Z",
+      "wallMs": 376.9052609999999
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:05.873Z",
+      "finishedAt": "2026-11-05T09:41:07.293Z",
+      "wallMs": 1420.24705
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:07.297Z",
+      "finishedAt": "2026-11-05T09:41:07.644Z",
+      "wallMs": 347.6130239999984
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:07.645Z",
+      "finishedAt": "2026-11-05T09:41:09.037Z",
+      "wallMs": 1392.416072
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:09.041Z",
+      "finishedAt": "2026-11-05T09:41:09.358Z",
+      "wallMs": 316.1542420000005
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:09.358Z",
+      "finishedAt": "2026-11-05T09:41:10.371Z",
+      "wallMs": 1013.0080359999993
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:10.375Z",
+      "finishedAt": "2026-11-05T09:41:10.680Z",
+      "wallMs": 305.43267800000103
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:10.680Z",
+      "finishedAt": "2026-11-05T09:41:11.809Z",
+      "wallMs": 1128.2981839999993
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:11.812Z",
+      "finishedAt": "2026-11-05T09:41:12.113Z",
+      "wallMs": 301.0057369999995
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:12.114Z",
+      "finishedAt": "2026-11-05T09:41:13.061Z",
+      "wallMs": 947.4625650000016
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:13.064Z",
+      "finishedAt": "2026-11-05T09:41:13.376Z",
+      "wallMs": 311.9474420000006
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:13.377Z",
+      "finishedAt": "2026-11-05T09:41:14.348Z",
+      "wallMs": 971.4217900000003
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:14.354Z",
+      "finishedAt": "2026-11-05T09:41:14.669Z",
+      "wallMs": 315.3175110000011
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:14.669Z",
+      "finishedAt": "2026-11-05T09:41:15.636Z",
+      "wallMs": 966.589602
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:15.639Z",
+      "finishedAt": "2026-11-05T09:41:15.973Z",
+      "wallMs": 333.6156809999993
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:15.973Z",
+      "finishedAt": "2026-11-05T09:41:17.290Z",
+      "wallMs": 1316.935518000002
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:17.294Z",
+      "finishedAt": "2026-11-05T09:41:17.613Z",
+      "wallMs": 318.8637630000012
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:17.613Z",
+      "finishedAt": "2026-11-05T09:41:18.582Z",
+      "wallMs": 968.8396859999993
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:18.585Z",
+      "finishedAt": "2026-11-05T09:41:18.910Z",
+      "wallMs": 324.94767299999876
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:18.911Z",
+      "finishedAt": "2026-11-05T09:41:20.030Z",
+      "wallMs": 1119.5783669999983
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:20.034Z",
+      "finishedAt": "2026-11-05T09:41:20.357Z",
+      "wallMs": 322.6669010000005
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:20.357Z",
+      "finishedAt": "2026-11-05T09:41:21.328Z",
+      "wallMs": 970.1520670000027
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:21.331Z",
+      "finishedAt": "2026-11-05T09:41:21.631Z",
+      "wallMs": 299.66400299999805
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:21.631Z",
+      "finishedAt": "2026-11-05T09:41:22.633Z",
+      "wallMs": 1002.2842049999999
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:22.637Z",
+      "finishedAt": "2026-11-05T09:41:22.931Z",
+      "wallMs": 294.3135369999982
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:22.932Z",
+      "finishedAt": "2026-11-05T09:41:24.064Z",
+      "wallMs": 1132.4532819999986
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:24.067Z",
+      "finishedAt": "2026-11-05T09:41:24.386Z",
+      "wallMs": 318.14137400000254
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:24.386Z",
+      "finishedAt": "2026-11-05T09:41:25.199Z",
+      "wallMs": 812.9595070000032
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:25.202Z",
+      "finishedAt": "2026-11-05T09:41:25.508Z",
+      "wallMs": 305.6326679999984
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:25.508Z",
+      "finishedAt": "2026-11-05T09:41:27.001Z",
+      "wallMs": 1493.1838979999957
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:27.005Z",
+      "finishedAt": "2026-11-05T09:41:27.305Z",
+      "wallMs": 299.8383390000017
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:27.305Z",
+      "finishedAt": "2026-11-05T09:41:28.383Z",
+      "wallMs": 1077.655187999997
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:28.388Z",
+      "finishedAt": "2026-11-05T09:41:28.696Z",
+      "wallMs": 307.4677789999987
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:28.696Z",
+      "finishedAt": "2026-11-05T09:41:29.454Z",
+      "wallMs": 757.3232360000038
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:29.457Z",
+      "finishedAt": "2026-11-05T09:41:29.762Z",
+      "wallMs": 305.27479799999855
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:29.763Z",
+      "finishedAt": "2026-11-05T09:41:30.572Z",
+      "wallMs": 809.3586769999965
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:30.575Z",
+      "finishedAt": "2026-11-05T09:41:30.880Z",
+      "wallMs": 305.6911179999952
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:30.881Z",
+      "finishedAt": "2026-11-05T09:41:31.721Z",
+      "wallMs": 840.5077639999945
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:31.727Z",
+      "finishedAt": "2026-11-05T09:41:32.037Z",
+      "wallMs": 310.32552399999986
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:32.037Z",
+      "finishedAt": "2026-11-05T09:41:33.088Z",
+      "wallMs": 1051.0424379999968
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:33.094Z",
+      "finishedAt": "2026-11-05T09:41:33.386Z",
+      "wallMs": 291.90121999999974
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:33.386Z",
+      "finishedAt": "2026-11-05T09:41:34.175Z",
+      "wallMs": 789.0269919999992
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:34.179Z",
+      "finishedAt": "2026-11-05T09:41:34.482Z",
+      "wallMs": 303.5960960000011
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:34.483Z",
+      "finishedAt": "2026-11-05T09:41:35.632Z",
+      "wallMs": 1148.8286609999996
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:35.635Z",
+      "finishedAt": "2026-11-05T09:41:35.937Z",
+      "wallMs": 302.30829300000187
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:35.938Z",
+      "finishedAt": "2026-11-05T09:41:37.077Z",
+      "wallMs": 1139.477595999997
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:37.081Z",
+      "finishedAt": "2026-11-05T09:41:37.385Z",
+      "wallMs": 303.6262409999981
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:37.385Z",
+      "finishedAt": "2026-11-05T09:41:38.156Z",
+      "wallMs": 770.1827300000004
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:38.159Z",
+      "finishedAt": "2026-11-05T09:41:38.456Z",
+      "wallMs": 296.6180269999968
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:38.456Z",
+      "finishedAt": "2026-11-05T09:41:39.982Z",
+      "wallMs": 1525.4637699999948
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:39.984Z",
+      "finishedAt": "2026-11-05T09:41:40.282Z",
+      "wallMs": 297.3757990000013
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:40.282Z",
+      "finishedAt": "2026-11-05T09:41:41.240Z",
+      "wallMs": 957.9557649999988
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:41.245Z",
+      "finishedAt": "2026-11-05T09:41:41.541Z",
+      "wallMs": 296.4544989999995
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:41.542Z",
+      "finishedAt": "2026-11-05T09:41:42.501Z",
+      "wallMs": 958.6762419999941
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:42.504Z",
+      "finishedAt": "2026-11-05T09:41:42.815Z",
+      "wallMs": 310.51049500000227
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:42.815Z",
+      "finishedAt": "2026-11-05T09:41:44.116Z",
+      "wallMs": 1301.474635999999
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:44.122Z",
+      "finishedAt": "2026-11-05T09:41:44.470Z",
+      "wallMs": 348.3048640000052
+    },
+    {
+      "scenario": "modify-read-30",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:44.470Z",
+      "finishedAt": "2026-11-05T09:41:45.595Z",
+      "wallMs": 1124.3748780000024
+    },
+    {
+      "scenario": "daily-only",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:45.598Z",
+      "finishedAt": "2026-11-05T09:41:45.891Z",
+      "wallMs": 293.15429700000095
+    },
+    {
+      "scenario": "daily-only",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:45.892Z",
+      "finishedAt": "2026-11-05T09:41:47.103Z",
+      "wallMs": 1211.6468189999941
+    },
+    {
+      "scenario": "daily-only-snapshot",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:47.135Z",
+      "finishedAt": "2026-11-05T09:41:47.803Z",
+      "wallMs": 668.5896129999965
+    },
+    {
+      "scenario": "daily-only-snapshot",
+      "operation": "HEAD",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:47.819Z",
+      "finishedAt": "2026-11-05T09:41:48.314Z",
+      "wallMs": 494.50701599999593
+    },
+    {
+      "scenario": "daily-only-304",
+      "operation": "feed",
+      "status": 304,
+      "startedAt": "2026-11-05T09:41:48.314Z",
+      "finishedAt": "2026-11-05T09:41:49.283Z",
+      "wallMs": 969.9195299999992
+    },
+    {
+      "scenario": "daily-only-concurrent",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:49.286Z",
+      "finishedAt": "2026-11-05T09:41:49.834Z",
+      "wallMs": 548.4075589999993
+    },
+    {
+      "scenario": "daily-only-concurrent",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:49.285Z",
+      "finishedAt": "2026-11-05T09:41:49.991Z",
+      "wallMs": 705.9321810000038
+    },
+    {
+      "scenario": "daily-only-concurrent",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:49.284Z",
+      "finishedAt": "2026-11-05T09:41:50.204Z",
+      "wallMs": 919.971673
+    },
+    {
+      "scenario": "daily-only-concurrent",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:49.285Z",
+      "finishedAt": "2026-11-05T09:41:50.367Z",
+      "wallMs": 1082.2045829999988
+    },
+    {
+      "scenario": "daily-only-concurrent",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:49.284Z",
+      "finishedAt": "2026-11-05T09:41:50.373Z",
+      "wallMs": 1089.4186919999993
+    },
+    {
+      "scenario": "practice-daily",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:50.412Z",
+      "finishedAt": "2026-11-05T09:41:50.770Z",
+      "wallMs": 357.67474900000525
+    },
+    {
+      "scenario": "practice-daily",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:50.770Z",
+      "finishedAt": "2026-11-05T09:41:52.421Z",
+      "wallMs": 1650.4812750000056
+    },
+    {
+      "scenario": "practice-daily-snapshot",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:52.453Z",
+      "finishedAt": "2026-11-05T09:41:53.122Z",
+      "wallMs": 669.2158679999993
+    },
+    {
+      "scenario": "practice-daily-snapshot",
+      "operation": "HEAD",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:53.127Z",
+      "finishedAt": "2026-11-05T09:41:53.796Z",
+      "wallMs": 668.9688160000005
+    },
+    {
+      "scenario": "practice-daily-304",
+      "operation": "feed",
+      "status": 304,
+      "startedAt": "2026-11-05T09:41:53.796Z",
+      "finishedAt": "2026-11-05T09:41:54.475Z",
+      "wallMs": 678.6162719999993
+    },
+    {
+      "scenario": "practice-daily-concurrent",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:54.477Z",
+      "finishedAt": "2026-11-05T09:41:55.092Z",
+      "wallMs": 615.2687250000017
+    },
+    {
+      "scenario": "practice-daily-concurrent",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:54.476Z",
+      "finishedAt": "2026-11-05T09:41:55.163Z",
+      "wallMs": 686.4636820000014
+    },
+    {
+      "scenario": "practice-daily-concurrent",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:54.476Z",
+      "finishedAt": "2026-11-05T09:41:55.206Z",
+      "wallMs": 730.5479760000017
+    },
+    {
+      "scenario": "practice-daily-concurrent",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:54.475Z",
+      "finishedAt": "2026-11-05T09:41:55.239Z",
+      "wallMs": 764.3214000000007
+    },
+    {
+      "scenario": "practice-daily-concurrent",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:54.477Z",
+      "finishedAt": "2026-11-05T09:41:55.314Z",
+      "wallMs": 837.5302050000028
+    },
+    {
+      "scenario": "dual-daily",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:55.350Z",
+      "finishedAt": "2026-11-05T09:41:55.737Z",
+      "wallMs": 386.92402899999433
+    },
+    {
+      "scenario": "dual-daily",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:55.737Z",
+      "finishedAt": "2026-11-05T09:41:57.439Z",
+      "wallMs": 1702.0399099999995
+    },
+    {
+      "scenario": "dual-daily-snapshot",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:57.470Z",
+      "finishedAt": "2026-11-05T09:41:58.769Z",
+      "wallMs": 1299.6638349999994
+    },
+    {
+      "scenario": "dual-daily-snapshot",
+      "operation": "HEAD",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:58.774Z",
+      "finishedAt": "2026-11-05T09:41:59.335Z",
+      "wallMs": 560.9614049999946
+    },
+    {
+      "scenario": "dual-daily-304",
+      "operation": "feed",
+      "status": 304,
+      "startedAt": "2026-11-05T09:41:59.335Z",
+      "finishedAt": "2026-11-05T09:41:59.721Z",
+      "wallMs": 385.76139200000034
+    },
+    {
+      "scenario": "dual-daily-concurrent",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:59.722Z",
+      "finishedAt": "2026-11-05T09:42:00.458Z",
+      "wallMs": 735.7224140000035
+    },
+    {
+      "scenario": "dual-daily-concurrent",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:59.723Z",
+      "finishedAt": "2026-11-05T09:42:00.538Z",
+      "wallMs": 815.5225229999924
+    },
+    {
+      "scenario": "dual-daily-concurrent",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:59.722Z",
+      "finishedAt": "2026-11-05T09:42:00.539Z",
+      "wallMs": 816.396292999998
+    },
+    {
+      "scenario": "dual-daily-concurrent",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:59.723Z",
+      "finishedAt": "2026-11-05T09:42:00.827Z",
+      "wallMs": 1103.2527059999993
+    },
+    {
+      "scenario": "dual-daily-concurrent",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:41:59.721Z",
+      "finishedAt": "2026-11-05T09:42:00.837Z",
+      "wallMs": 1115.5898129999987
+    },
+    {
+      "scenario": "daily-legacy-patch",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:42:00.873Z",
+      "finishedAt": "2026-11-05T09:42:01.050Z",
+      "wallMs": 176.70113600000332
+    },
+    {
+      "scenario": "daily-legacy-patch",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:42:01.050Z",
+      "finishedAt": "2026-11-05T09:42:02.075Z",
+      "wallMs": 1024.3192940000008
+    },
+    {
+      "scenario": "daily-disable",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:42:02.102Z",
+      "finishedAt": "2026-11-05T09:42:02.414Z",
+      "wallMs": 311.5616880000016
+    },
+    {
+      "scenario": "daily-disable",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:42:02.414Z",
+      "finishedAt": "2026-11-05T09:42:04.573Z",
+      "wallMs": 2158.9236260000034
+    },
+    {
+      "scenario": "daily-reenable",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:42:04.596Z",
+      "finishedAt": "2026-11-05T09:42:04.918Z",
+      "wallMs": 322.4218580000015
+    },
+    {
+      "scenario": "daily-reenable",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:42:04.919Z",
+      "finishedAt": "2026-11-05T09:42:07.062Z",
+      "wallMs": 2143.75447900001
+    },
+    {
+      "scenario": "cancel-disable",
+      "operation": "PATCH",
+      "status": 200,
+      "startedAt": "2026-11-05T09:42:07.083Z",
+      "finishedAt": "2026-11-05T09:42:07.396Z",
+      "wallMs": 312.6113699999987
+    },
+    {
+      "scenario": "cancel-disable",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:42:07.396Z",
+      "finishedAt": "2026-11-05T09:42:09.226Z",
+      "wallMs": 1829.7152530000021
+    },
+    {
+      "scenario": "cancel-disable",
+      "operation": "DELETE",
+      "status": 200,
+      "startedAt": "2026-11-05T09:42:09.247Z",
+      "finishedAt": "2026-11-05T09:42:09.526Z",
+      "wallMs": 279.0301180000097
+    },
+    {
+      "scenario": "cancel-disable",
+      "operation": "feed",
+      "status": 200,
+      "startedAt": "2026-11-05T09:42:09.527Z",
+      "finishedAt": "2026-11-05T09:42:11.060Z",
+      "wallMs": 1533.2313219999924
+    },
+    {
+      "scenario": "cancel-disable",
+      "operation": "DELETE",
+      "status": 200,
+      "startedAt": "2026-11-05T09:42:11.077Z",
+      "finishedAt": "2026-11-05T09:42:11.216Z",
+      "wallMs": 138.6464399999968
+    }
+  ],
+  "dailyMeasurements": [
+    {
+      "scenario": "daily-only",
+      "dailyEvents": 821,
+      "activeEvents": 821,
+      "totalEvents": 1115,
+      "icsBytes": 645292,
+      "status": "passed"
+    },
+    {
+      "scenario": "practice-daily",
+      "dailyEvents": 821,
+      "activeEvents": 1115,
+      "totalEvents": 1115,
+      "icsBytes": 647161,
+      "status": "passed"
+    },
+    {
+      "scenario": "dual-daily",
+      "dailyEvents": 821,
+      "activeEvents": 1115,
+      "totalEvents": 1115,
+      "icsBytes": 715892,
+      "status": "passed"
+    }
+  ]
+}

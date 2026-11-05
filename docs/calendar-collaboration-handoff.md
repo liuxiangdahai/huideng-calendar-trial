@@ -10,14 +10,14 @@
 | 技术试用站 | https://huideng-calendar-trial.pages.dev/calendar-reminders/ |
 | 隔离验收站 | https://huideng-calendar-acceptance.pages.dev/calendar-reminders/ |
 | 独立真实提醒测试 | https://huideng-calendar-acceptance.pages.dev/calendar-reminders/reminder-check.html |
-| 本次审阅代码基线 | 0521057b3fe05db7a20c90119a5402fa778b99b5 |
-| 本次审阅文档基线 | 162120841ba8b531d53cccbb81233d027401c431；开始工作时取最新 main |
-| 已核对发布流水线 | https://github.com/liuxiangdahai/huideng-calendar-trial/actions/runs/41794171062 |
+| 当前部署代码 | 23abc3e39af655278de05233defcd8f92477b41a |
+| 文档基线 | 11月5日纹样/UIUX验收更新；开始工作时取最新 main |
+| 已核对发布流水线 | https://github.com/liuxiangdahai/huideng-calendar-trial/actions/runs/42003059089 （第二次运行） |
 
 先读以下文档，遇到历史冲突以执行计划顶部现行状态及用户最新指示为准：
 
 1. `docs/calendar-execution-plan.md`：当前安排、目标及未通过的门槛。
-2. `docs/calendar-uiux-review.md`：设计审阅与实施方向。11月5日用户授权执行并补充纹样；每日日期、订阅状态与装饰正在落实，最新验收/发布状态看执行计划。
+2. `docs/calendar-uiux-review.md`：11月5日用户授权的每日日期、订阅状态与纹样已实施；每日日期最后改为与方案共享纸底。最新验收/发布状态看执行计划。
 3. `docs/calendar-next-actions.md`：用户和维护者的职责，免下载测试方法。
 4. `docs/calendar-user-guide.md`、`docs/calendar-reminder-acceptance.md`：应用能力与证据边界。
 5. `docs/calendar-source-update-proposal.md`、`docs/calendar-cost-and-source-audit.md`：资料更新和费用。
@@ -68,12 +68,12 @@
 
 ## 4. 当前已完成与未完成
 
-0521057 已部署试用/验收两站，包含先复制再打开、免下载测试和下一次已确认法会日期提示。143项日期/服务/构建、三种浏览器各60项、完整隔离链路143次请求和提醒专项15次请求通过。证据见 `docs/evidence/subscription-flow-0521057/`。
+23abc3e 已部署试用/验收两站，新增统一纸底的每日日期附加行、连接详情及原创SVG装饰；保留先复制再打开、免下载测试和下一次已确认法会日期提示。143项日期/服务/构建、三种浏览器各60项、完整隔离链路143次请求和提醒专项15次请求通过。最新证据见 `docs/evidence/ornament-ui-20261105/`，0521057记录保留作历史。
 
 以下不能写成已完成：
 
 - 真实手机：只有一次用户报告的 iPhone 原生日历成功通知；双提醒、改期、静默、撤销及各平台矩阵待验收。iPhone 详情未显示提醒字段不单独判失败。Google/Outlook 不保证保留网页逐项提醒。
-- 性能：本轮 Worker CPU p95 74.896ms，高于8ms目标，采集汇入95/143请求；网关指标不可用。前端历史冷启动长任务也有未达标记录。不能把“CI绿色”写成性能或免费额度通过。
+- 性能：本轮 Worker CPU p95 52.257ms，高于8ms目标；指标返回106次请求采样汇总，客户端记录143次；网关指标不可用。前端本轮交互p95均≤176ms、连续100次设置保留，但冷启动仍有372ms长任务。不能把“CI绿色”写成全部性能或免费额度通过。首次发布healthz 503、第二次完整发布成功，不声称间歇问题已根除。
 - 503：本轮未出现，历史间歇原因未确定，不能声称永久解决。
 - 佛慧法语自动检测：已定规则，但稳定资料读取及完整差异处理尚未接通，没有启用定时抓取。
 - 资料快照截至2027-05-06；滚动未来24个月不代表所有法会和天象都有已确认资料。
