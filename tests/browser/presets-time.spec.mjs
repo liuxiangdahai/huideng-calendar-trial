@@ -6,14 +6,16 @@ async function open(page){await page.goto('/calendar-reminders/');await expect(p
 test('presets replace choices without undo and clearing preserves local timezone and reminder times',async({page})=>{
   await open(page);await expect(page.locator('[data-event]:checked')).toHaveCount(0);await expect(page.locator('[data-preset][aria-pressed="true"]')).toHaveCount(0);
   await page.locator('[data-preset="guru"]').click();await expect(page.locator('[data-preset="guru"]')).toHaveAttribute('aria-pressed','true');
-  // A later generic preset rule once replaced the dark selected background,
-  // leaving pale text on paper. Check the rendered state, not only aria-pressed.
+  // Check the rendered selection and readable text, independent of whether the
+  // design uses a solid fill or a gradient.
   const selected=await page.locator('[data-preset="guru"]').evaluate(node=>{
-    const s=getComputedStyle(node);return {background:s.backgroundImage,text:getComputedStyle(node.querySelector('strong')).color};
+    const luminance=color=>color.match(/[\d.]+/g).slice(0,3).map(Number).map(value=>{value/=255;return value<=.04045?value/12.92:((value+.055)/1.055)**2.4;}).reduce((sum,value,index)=>sum+value*[.2126,.7152,.0722][index],0);
+    const background=getComputedStyle(node).backgroundColor,bg=luminance(background);
+    return {background,contrast:[...node.querySelectorAll('strong,small,em,.preset-copy>span')].map(text=>{const fg=luminance(getComputedStyle(text).color);return(Math.max(bg,fg)+.05)/(Math.min(bg,fg)+.05);})};
   });
-  expect(selected.background).toContain('gradient');
-  expect(selected.background).not.toBe(await page.locator('[data-preset="tsok"]').evaluate(node=>getComputedStyle(node).backgroundImage));
-  expect(selected.text).not.toBe('rgb(48, 37, 31)');
+  expect(selected.background).not.toBe('rgba(0, 0, 0, 0)');
+  expect(selected.background).not.toBe(await page.locator('[data-preset="tsok"]').evaluate(node=>getComputedStyle(node).backgroundColor));
+  expect(Math.min(...selected.contrast)).toBeGreaterThanOrEqual(4.5);
   await expect(page.locator('#undo-preset,#preset-undo')).toHaveCount(0);
   await expect(page.locator('#search,#reset')).toHaveCount(0);
   await page.locator('[data-reminder-event="guru-tsok"]').click();await page.locator('[data-reminder-field="time"]').fill('06:30');await page.locator('#add-reminder').click();await page.locator('#reminder-form button[type="submit"]').click();

@@ -165,7 +165,7 @@ test('Android handoff keeps copy and import available while actual ICS checks fa
     await page.route('**/calendar/*.ics',async route=>{
       probes++;publicRequests.push(route.request());
       if(mode==='real'){await route.fallback();return;}
-      if(mode==='hold') await new Promise(resolve=>{releaseCheck=resolve;});
+      if(mode==='hold'||mode==='html') await new Promise(resolve=>{releaseCheck=resolve;});
       await route.fulfill({status:200,contentType:'text/html',body:'<html>unavailable</html>'}).catch(()=>{});
     });
     await openSelected(page); await page.locator('#subscribe').click();
@@ -173,6 +173,9 @@ test('Android handoff keeps copy and import available while actual ICS checks fa
     await page.locator('input[name="device"][value="google"]').check();
     const sub = await ready(page,true);
     await expect(page.locator('#connection-result')).toHaveText('本次连接检查正常');
+    await expect(page.locator('#connection-details')).not.toHaveAttribute('open');
+    await expect(page.locator('#connection-details-label')).toHaveText('连接正常');
+    await page.locator('#connection-details > summary').click();
     await expect(page.locator('#connection-time')).toBeVisible();
     expect(probes).toBe(1);
     expect(publicRequests[0].headers().authorization).toBeUndefined();
@@ -193,7 +196,12 @@ test('Android handoff keeps copy and import available while actual ICS checks fa
     await expect(page.locator('[data-download="remind"]')).toBeVisible();
     await expect(page.locator('#guide-seen')).not.toBeChecked();
     mode='html';await page.locator('#check-connection').click();
+    await expect.poll(()=>Boolean(releaseCheck)).toBe(true);
+    await page.locator('#connection-details > summary').click();
+    await expect(page.locator('#connection-details')).not.toHaveAttribute('open');
+    releaseCheck();releaseCheck=null;
     await expect(page.locator('#connection-result')).toHaveText('本次连接检查失败');
+    await expect(page.locator('#connection-details')).toHaveAttribute('open');
     await expect(page.locator('#connection-note')).toContainText('不是日历文件');
     await expect(page.locator('#copy-feed')).toBeEnabled();
     await expect(page.locator('[data-download="remind"]')).toBeEnabled();

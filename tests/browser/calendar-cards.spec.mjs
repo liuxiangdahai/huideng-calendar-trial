@@ -61,11 +61,13 @@ async function verifyMonthHierarchy(page) {
       adjacent: inspect('.cal-day.cal-adjacent:not(.cal-selected):not(.cal-is-today):not(:hover)')
     };
   });
-  // Outside-month days recede without becoming unreadable or acquiring a darker backing.
+  // Outside-month dates recede through quieter, still-readable ink.
   expect(tones.current.text).toBeLessThan(tones.adjacent.text);
   expect(tones.current.tibetan).toBeLessThan(tones.adjacent.tibetan);
   expect(tones.current.weight).toBeGreaterThan(tones.adjacent.weight);
-  expect(tones.adjacent.background).toBeGreaterThanOrEqual(tones.current.background);
+  // Adjacent dates use quieter ink on a muted paper surface. Compare the date
+  // contrast instead of requiring the old, brighter adjacent-month fill.
+  expect(tones.current.contrast).toBeGreaterThan(tones.adjacent.contrast);
   for (const tone of Object.values(tones)) {
     expect(tone.contrast).toBeGreaterThanOrEqual(4.5);
     expect(tone.tibetanContrast).toBeGreaterThanOrEqual(4.5);

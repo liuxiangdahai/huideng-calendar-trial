@@ -14,6 +14,14 @@ async function downloadText(page){const pending=page.waitForEvent('download');aw
 test('daily date layer starts off, preserves legacy choices and presets, and clear removes both layers',async({page})=>{
  await open(page);await expect(page.locator('#include-daily-dates')).not.toBeChecked();await expect(page.locator('[data-event]:checked')).toHaveCount(0);
  await expect(page.locator('#subscribe')).toBeDisabled();
+ // Opening examples must not change selection or imply a fourth preset.
+ await page.locator('.daily-date-help > summary').click();
+ await expect(page.locator('.daily-date-examples')).toContainText('重日2');
+ await expect(page.locator('#include-daily-dates')).not.toBeChecked();
+ await page.locator('.daily-date-help > summary').click();
+ await page.locator('#include-daily-dates').focus();await page.keyboard.press('Space');
+ await expect(page.locator('#include-daily-dates')).toBeChecked();
+ await page.keyboard.press('Space');await expect(page.locator('#include-daily-dates')).not.toBeChecked();
  // A real saved v2 draft from before the date-layer field existed.
  await page.locator('[data-preset="guru"]').click();
  await page.evaluate(()=>{const key='huideng.calendar.v2',value=JSON.parse(localStorage.getItem(key));delete value.includeDailyDates;value.events['guru-tsok'].reminders=[{daysBefore:1,time:'06:30'},{daysBefore:0,time:'08:00'}];localStorage.setItem(key,JSON.stringify(value));});

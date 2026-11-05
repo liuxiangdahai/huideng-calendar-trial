@@ -155,7 +155,7 @@ function renderSaveState() {
   $('#reminder-count').textContent = dailyOnly ? '仅显示' : `${Object.values(settings.events).filter(pref=>pref.mode==='remind').length} 项提醒`;
   $('#daily-date-count').hidden=!settings.includeDailyDates || !count;
   $('#subscribe').setAttribute('aria-busy',String(requestPending||managementRestoring));
-  $('#save-state').textContent = stopped ? '已停用，请在手机移除订阅日历' : conflict ? '设置已在其他设备修改' : changed ? '有未保存的修改' : subscription ? '设置已保存，等待日历同步' : '随时调整你的选择';
+  $('#save-state').textContent = stopped ? '已停用，请在手机移除订阅日历' : conflict ? '设置已在其他设备修改' : changed ? '有未保存的修改' : subscription ? '设置已保存，等待日历同步' : !hasSelectedContent() ? '先选择修行日或每日藏历' : '随时调整你的选择';
   $('#unsaved-dot').hidden = !changed;
   $('#subscribe-label').textContent = managementRestoring ? '正在恢复订阅…' : requestPending ? '正在保存…' : subscription ? (changed ? '保存修改' : '查看订阅') : '订阅到日历';
   $('#subscribe').disabled = requestPending || managementRestoring || (!subscription && !hasSelectedContent());
@@ -239,6 +239,12 @@ function renderConnection() {
     !subscription ? '尚未准备' : lastWriteKind==='saved' ? '设置已保存，等待日历同步' : '地址已生成';
   $('#connection-title').textContent=title;
   const checking=connection.state==='checking';
+  const connectionPanel=$('#connection-status');
+  const failed=connection.state==='error';
+  // Make failures visible once; later re-renders respect the user's disclosure.
+  if(failed && connectionPanel.dataset.state!=='error') $('#connection-details').open=true;
+  connectionPanel.dataset.state=connection.state;
+  $('#connection-details-label').textContent=checking ? '正在检查' : failed ? '连接失败' : connection.state==='ok' ? '连接正常' : '连接信息';
   $('#connection-status').setAttribute('aria-busy',String(checking||busy));
   $('#connection-symbol').innerHTML=icon(stopped?'bell-off':connection.state==='ok'?'check':connection.state==='error'?'globe':'calendar');
   $('#connection-result').textContent=stopped ? '请在日历应用中移除这份订阅。' : !subscription ? '选择日历应用后，按步骤准备订阅。' : checking ? '正在检查服务与日历内容…' :

@@ -17,7 +17,7 @@
 先读以下文档，遇到历史冲突以执行计划顶部现行状态及用户最新指示为准：
 
 1. `docs/calendar-execution-plan.md`：当前安排、目标及未通过的门槛。
-2. `docs/calendar-uiux-review.md`：本轮设计审阅及建议；尚未实施或当成用户已确认的最终设计。
+2. `docs/calendar-uiux-review.md`：设计审阅与实施方向。11月5日用户授权执行并补充纹样；每日日期、订阅状态与装饰正在落实，最新验收/发布状态看执行计划。
 3. `docs/calendar-next-actions.md`：用户和维护者的职责，免下载测试方法。
 4. `docs/calendar-user-guide.md`、`docs/calendar-reminder-acceptance.md`：应用能力与证据边界。
 5. `docs/calendar-source-update-proposal.md`、`docs/calendar-cost-and-source-audit.md`：资料更新和费用。

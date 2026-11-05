@@ -1,0 +1,95 @@
+{
+  "scope": "正式本地构建的浏览器模拟，非真机通知或网络证据",
+  "errors": [],
+  "layout": [
+    {
+      "width": 320,
+      "scrollWidth": 320,
+      "dailyBottom": 729.953125,
+      "barTop": 721.703125
+    },
+    {
+      "width": 320,
+      "view": "preview",
+      "scrollWidth": 320,
+      "grid": 42
+    },
+    {
+      "width": 390,
+      "scrollWidth": 390,
+      "dailyBottom": 707.453125,
+      "barTop": 749.703125
+    },
+    {
+      "width": 390,
+      "view": "preview",
+      "scrollWidth": 390,
+      "grid": 42
+    },
+    {
+      "width": 545,
+      "scrollWidth": 545,
+      "dailyBottom": 788.453125,
+      "barTop": 741.8125
+    },
+    {
+      "width": 545,
+      "view": "preview",
+      "scrollWidth": 545,
+      "grid": 42
+    },
+    {
+      "width": 585,
+      "scrollWidth": 585,
+      "dailyBottom": 788.453125,
+      "barTop": 741.8125
+    },
+    {
+      "width": 585,
+      "view": "preview",
+      "scrollWidth": 585,
+      "grid": 42
+    },
+    {
+      "width": 768,
+      "scrollWidth": 768,
+      "dailyBottom": 788.453125,
+      "barTop": 769
+    },
+    {
+      "width": 768,
+      "view": "preview",
+      "scrollWidth": 768,
+      "grid": 42
+    },
+    {
+      "width": 1024,
+      "scrollWidth": 1024,
+      "dailyBottom": 851.453125,
+      "barTop": 769
+    },
+    {
+      "width": 1024,
+      "view": "preview",
+      "scrollWidth": 1024,
+      "grid": 42
+    },
+    {
+      "width": 1440,
+      "scrollWidth": 1440,
+      "dailyBottom": 851.453125,
+      "barTop": 769
+    },
+    {
+      "width": 1440,
+      "view": "preview",
+      "scrollWidth": 1440,
+      "grid": 42
+    }
+  ],
+  "subscriptionLayout": {
+    "overflow": false,
+    "copyEnabled": true,
+    "detailsOpen": true
+  }
+}
