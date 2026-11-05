@@ -1,0 +1,62 @@
+{
+  "version": "0521057",
+  "errors": [],
+  "layout": [
+    {
+      "width": 320,
+      "scroll": 320,
+      "buttons": [
+        {
+          "id": "copy-feed",
+          "height": 46
+        },
+        {
+          "id": "google-subscribe",
+          "height": 64
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "scroll": 390,
+      "buttons": [
+        {
+          "id": "copy-feed",
+          "height": 46
+        },
+        {
+          "id": "google-subscribe",
+          "height": 46
+        }
+      ]
+    },
+    {
+      "width": 585,
+      "scroll": 585,
+      "buttons": [
+        {
+          "id": "copy-feed",
+          "height": 46
+        },
+        {
+          "id": "google-subscribe",
+          "height": 46
+        }
+      ]
+    },
+    {
+      "width": 1440,
+      "scroll": 1440,
+      "buttons": [
+        {
+          "id": "copy-feed",
+          "height": 46
+        },
+        {
+          "id": "google-subscribe",
+          "height": 46
+        }
+      ]
+    }
+  ]
+}

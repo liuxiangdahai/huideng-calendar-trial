@@ -1,0 +1,10 @@
+{
+  "version": "0521057",
+  "checkedAt": "2026-11-05T07:57:46.048Z",
+  "origin": "https://huideng-calendar-acceptance.pages.dev",
+  "network": "本机测试代理；不是大陆直连证据",
+  "errors": [],
+  "phoneNotifications": "待真机验收",
+  "overflow": false,
+  "passed": true
+}
