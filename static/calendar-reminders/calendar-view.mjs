@@ -3,6 +3,7 @@ import {addDays, reminderLabel, zonedInstant} from './core.mjs';
 import {icon} from './icons.mjs';
 import {eventPresentation, eventIcon} from './event-presentation.mjs';
 import {resolveTimeZone, wallTimeInZone, zoneInfo} from './timezones.mjs';
+import {playMotion} from './motion.mjs';
 
 const WEEKDAYS = ['一', '二', '三', '四', '五', '六', '日'];
 const escape = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[char]));
@@ -244,15 +245,20 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     root.querySelectorAll('[data-cal-view]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.calView === view)));
     onViewChange(view);
     if (Object.hasOwn(scrollByView, view)) win?.scrollTo({top: scrollByView[view], behavior: 'instant'});
+    playMotion(view === 'month' ? monthRoot : listRoot,'fade');
   }
 
   function changeMonth(next) {
     const safeMonth = clamp(next, state.start.slice(0, 7), state.end.slice(0, 7));
+    if (safeMonth === month) return;
+    const direction = safeMonth > month ? 1 : -1;
     const oldDay = Number(selected.slice(8));
     const last = Number(addDays(shiftMonth(safeMonth + '-01', 1), -1).slice(8));
     selected = clamp(`${safeMonth}-${String(Math.min(oldDay, last)).padStart(2, '0')}`, state.start, state.end);
     month = safeMonth; focusDate = selected;
     const focus = activeKey(); renderMonth(); restoreFocus(focus);
+    playMotion($('[data-cal-grid]'),'month',direction);
+    playMotion($('[data-cal-detail]'),'fade');
     announce(monthTitle(month));
   }
 
@@ -262,19 +268,27 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     if (button.dataset.calView) return setView(button.dataset.calView);
     if (button.dataset.calEvent) return onEditEvent(button.dataset.calEvent, button);
     if (button.dataset.calDate) {
+      const previousMonth=month, previousDate=selected;
       selected = button.dataset.calDate; focusDate = selected; month = selected.slice(0, 7);
       renderMonth(); restoreFocus('date-' + focusDate);
+      if(month!==previousMonth) playMotion($('[data-cal-grid]'),'month',month>previousMonth ? 1 : -1);
+      if(selected!==previousDate) playMotion($('[data-cal-detail]'),'fade');
       announce(`${dateTitle(selected)}，${state.events.filter(item => item.date === selected).length}项已选日程`);
       return;
     }
     if (button.dataset.calAction === 'previous' || button.dataset.calAction === 'next') {
       changeMonth(shiftMonth(month + '-01', button.dataset.calAction === 'previous' ? -1 : 1).slice(0, 7));
     } else if (button.dataset.calAction === 'today') {
+      const previousMonth=month, previousDate=selected;
       selected = state.today; focusDate = selected; month = selected.slice(0, 7);
       renderMonth(); restoreFocus('today'); announce(`今天，${dateTitle(selected)}`);
+      if(month!==previousMonth) playMotion($('[data-cal-grid]'),'month',month>previousMonth ? 1 : -1);
+      if(selected!==previousDate) playMotion($('[data-cal-detail]'),'fade');
     } else if (button.dataset.calAction === 'more') {
+      const previousCount=$('[data-cal-list]').children.length;
       if(state.settings?.includeDailyDates) dailyShown += 30; else shown += 5;
       renderList();
+      [...$('[data-cal-list]').children].slice(previousCount,previousCount+3).forEach(node=>playMotion(node,'fade'));
       // Keep the current viewport and offer the next newly displayed date to keyboard users.
       if (!$('[data-cal-action="more"]').hidden) restoreFocus('more');
       else [...$('[data-cal-list]').querySelectorAll('button')].at(-1)?.focus({preventScroll: true});
@@ -287,8 +301,10 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     const next = navigateDate(button.dataset.calDate, event.key, state);
     if (!next) return; // Enter and Space invoke the button's normal click behavior.
     event.preventDefault();
+    const previousMonth=month;
     focusDate = next; month = next.slice(0, 7);
     renderMonth(); restoreFocus('date-' + focusDate);
+    if(month!==previousMonth) playMotion($('[data-cal-grid]'),'month',month>previousMonth ? 1 : -1);
   }
   function onChange(event) {
     if (event.target.matches('[data-cal-month]')) changeMonth(event.target.value);

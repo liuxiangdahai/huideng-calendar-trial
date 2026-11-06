@@ -1,3 +1,5 @@
+import {playMotion} from './motion.mjs';
+
 // Each panel has its own reading position. This is interface state only: it
 // never changes the subscription, the browsed month or the selected date.
 export function createMobileTabs({onLayout = () => {}} = {}) {
@@ -36,6 +38,8 @@ export function createMobileTabs({onLayout = () => {}} = {}) {
         // Both panels use normal document scrolling; prevent anchor adjustments
         // during the visibility change from overriding the chosen position.
         scrollTo({top: Math.max(0, y), behavior: 'auto'});
+        // Opacity only: remembered anchors and sticky geometry stay unchanged.
+        playMotion(pane(next),'fade');
       }
     }
     if (focus) buttons.find(button => button.dataset.tab === next)?.focus({preventScroll: true});

@@ -10,7 +10,7 @@ const sourceRoot = path.join(projectRoot, 'static/calendar-reminders');
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const json = value => JSON.stringify(value, null, 2) + '\n';
 const mime = {'.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.webp':'image/webp','.svg':'image/svg+xml','.ico':'image/x-icon'};
-const publicFiles = new Set(['index.html','style.css','calendar-view.css','subscription-guide.css',
+const publicFiles = new Set(['index.html','style.css','calendar-view.css','subscription-guide.css','motion.css',
   'subscription-guide.mjs','calendar-data.json','config.json','version.json','UNICODE-LICENSE.txt',
   'reminder-check.html','reminder-check.mjs','reminder-check.css']);
 

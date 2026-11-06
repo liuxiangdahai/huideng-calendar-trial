@@ -1,0 +1,31 @@
+/* Quiet depth: one shared material and short, interruptible feedback. */
+.quick-panel { box-shadow: 0 4px 14px #60461e09, inset 0 1px #fffdf9; }
+.primary { box-shadow: inset 0 1px #ffffff20, 0 2px 3px #421b1514; }
+.preset-icon,.group-icon { box-shadow: inset 0 1px #fffdf980, 0 1px 2px #60461e0c; }
+
+@media (prefers-reduced-motion: no-preference) {
+  :is(.primary,.secondary,.icon-button,.cal-arrow,.cal-today) {
+    transition: transform 140ms ease, background-color 140ms ease, border-color 140ms ease;
+  }
+  .preset-icon,.group-icon,.primary>.icon { transition: transform 180ms cubic-bezier(.2,.7,.2,1); }
+  .daily-date-help summary .icon { transition: transform 180ms ease; }
+  :is(.primary,.secondary,.icon-button,.cal-arrow,.cal-today):active:not(:disabled) { transform: translateY(1px); }
+  dialog[open] { animation: calendar-dialog-in 180ms cubic-bezier(.2,.7,.2,1); }
+  dialog[open]::backdrop { animation: calendar-backdrop-in 180ms ease; }
+  .toast:not([hidden]) { animation: calendar-notice-in 180ms ease-out; }
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  :is(.primary,.secondary,.cal-arrow,.cal-today):hover:not(:disabled):not(:active) { transform: translateY(-1px); }
+  .primary:hover:not(:disabled)>.icon:last-child { transform: translateX(2px); }
+  .preset-card:hover .preset-icon,.group-card>summary:hover .group-icon { transform: translateY(-2px); }
+}
+
+/* Individual translate preserves the dialog/toast's existing centering transform. */
+@keyframes calendar-dialog-in { from { opacity: .65; translate: 0 8px; } to { opacity: 1; translate: 0 0; } }
+@keyframes calendar-backdrop-in { from { opacity: .65; } to { opacity: 1; } }
+@keyframes calendar-notice-in { from { opacity: .65; translate: 0 4px; } to { opacity: 1; translate: 0 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *,*::before,*::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}

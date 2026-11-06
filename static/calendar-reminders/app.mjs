@@ -13,6 +13,7 @@ import {calendarEnvironment,appleSubscriptionUrl,GOOGLE_ADD_URL,OUTLOOK_URL} fro
 import {checkSubscriptionConnection} from './connection-check.mjs';
 import {cloneSettings as clone,fetchJSON} from './runtime.mjs';
 import {createMobileTabs} from './mobile-tabs.mjs';
+import {playMotion,installDisclosureMotion} from './motion.mjs';
 
 const $ = selector => document.querySelector(selector);
 const storageKey = 'huideng.calendar.v2', subscriptionKey = 'huideng.calendar.subscription';
@@ -488,13 +489,20 @@ function downloadCalendar(mode) {
   } catch (error) { $('#download-status').textContent = error.message; }
 }
 function attachEvents() {
+  installDisclosureMotion();
   $('#include-daily-dates').addEventListener('change',event=>{
     settings.includeDailyDates=event.target.checked;stopped=false;refresh(false);
+    playMotion(event.target,'check');
   });
   $('#preset-options').addEventListener('click',event=>{
     const button=event.target.closest('[data-preset]');if(!button)return;
-    settings=applyPreset(settings,data.catalog,button.dataset.preset);lastActive.clear();stopped=false;
-    refresh();$('#preset-options').querySelector(`[data-preset="${button.dataset.preset}"]`)?.focus({preventScroll:true});
+    const next=applyPreset(settings,data.catalog,button.dataset.preset);
+    if(JSON.stringify(next)===JSON.stringify(settings))return;
+    settings=next;lastActive.clear();stopped=false;
+    refresh();
+    const chosen=$('#preset-options').querySelector(`[data-preset="${button.dataset.preset}"]`);
+    chosen?.focus({preventScroll:true});
+    playMotion(chosen?.querySelector('.preset-check'),'check');
   });
   $('#clear-selection').addEventListener('click',()=>{
     if(!hasSelectedContent())return;
@@ -524,6 +532,7 @@ function attachEvents() {
     if (event.target.checked) settings.events[id] = clone(lastActive.get(id) || {mode:'display',reminders:pref.reminders.length ? pref.reminders : defaultReminders()});
     else { lastActive.set(id,clone(pref)); pref.mode = 'off'; }
     stopped = false; refresh();
+    playMotion(document.getElementById(`event-${id}`),'check');
   });
   $('#groups').addEventListener('click',event => {
     const button = event.target.closest('button'); if (!button) return;
