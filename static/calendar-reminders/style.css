@@ -21,6 +21,8 @@
   --font-serif: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", "SimSun", serif;
   --font-num: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
   /* 香布: gold edge, burgundy, ochre, deep teal. Pleats are a separate overlay. */
+  /* Hand-made paper: a faint fibre grain, generated once by the browser. */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .36 0 0 0 0 .25 0 0 0 0 .12 .1 0 0 0 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   --shambu: linear-gradient(#b58d4c 0 1px, #6e1f1a 1px 4px, #c9a35c 4px 6px, #1d4549 6px 9px);
   /* Legacy aliases kept for the shared guide stylesheet and older modules. */
   --card: var(--surface); --red-soft: var(--red-tint); --teal-dark: var(--teal); --teal-soft: var(--teal-tint);
@@ -31,7 +33,7 @@
 }
 * { box-sizing: border-box; }
 html { scroll-padding-top: calc(var(--tabs-height, 0px) + 12px); scroll-padding-bottom: calc(var(--action-height) + 24px + env(safe-area-inset-bottom)); -webkit-text-size-adjust: 100%; }
-body { margin: 0; background: var(--paper); color: var(--ink); font-size: 16px; line-height: 1.6; }
+body { margin: 0; background: var(--paper) var(--grain); color: var(--ink); font-size: 16px; line-height: 1.6; }
 #app { overflow-anchor: none; }
 :where(button, input, select, summary, a) { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 button, input, select { font: inherit; }
@@ -78,8 +80,11 @@ button:disabled { cursor: default; }
 .site-header {
   display: flex; align-items: center; justify-content: space-between; gap: 16px;
   padding: 12px max(32px, calc((100vw - 1216px) / 2));
-  background: #5e1914 linear-gradient(100deg, #4b1511, #6e1f1a 55%, #551712);
-  color: #f6e3bd; border-bottom: 1px solid #b38a4b;
+  position: relative;
+  /* 边玛墙: bundled-twig texture under a maroon wash, finished by a double gold rule. */
+  background: repeating-linear-gradient(90deg, #0000001c 0 1px, transparent 1px 3px, #ffffff08 3px 4px, transparent 4px 6px),
+    linear-gradient(100deg, #4a1410, #6b1d18 55%, #521511);
+  color: #f6e3bd; border-bottom: 1px solid #c39a55; box-shadow: 0 2px 0 #5a1813, 0 3px 0 #a98247;
 }
 .heading { display: flex; align-items: center; min-width: 0; }
 .brand { display: flex; align-items: center; gap: 14px; color: #f6e3bd; text-decoration: none; flex: none; }
@@ -112,10 +117,10 @@ button:disabled { cursor: default; }
 .masthead-date #today-gregorian { font-size: 28px; letter-spacing: 2px; color: #fff3d9; }
 .masthead-date #today-tibetan { min-height: 1.4em; font-size: 17px; letter-spacing: 2px; color: #f0dcb5; }
 /* Next practice day: one quiet line, not a card. */
-.masthead-next { display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: 14px; max-width: 360px; color: #f6e6c6; text-align: left; }
-.masthead-next .icon { grid-row: span 2; width: 44px; height: 44px; stroke-width: 1.1; color: #e3c387; filter: drop-shadow(0 1px 2px #0006); }
+.masthead-next { display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: 14px; max-width: 380px; padding: 10px 18px 10px 14px; border: 1px solid #c9a35c59; border-radius: var(--r); background: #0b262dbf; box-shadow: inset 0 0 0 3px #0b262d40, inset 0 0 0 4px #c9a35c26; -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); color: #f6e6c6; text-align: left; }
+.masthead-next .icon { grid-row: span 2; width: 40px; height: 40px; stroke-width: 1.1; color: #e3c387; filter: drop-shadow(0 1px 2px #0006); }
 .masthead-next small { font: 13px/1.5 var(--font-serif); letter-spacing: 3px; color: #ecd09a; text-shadow: 0 1px 2px #0006; }
-.masthead-next strong { font: 500 19px/1.45 var(--font-serif); letter-spacing: 1px; color: #fff3d9; text-shadow: 0 1px 3px #0007; }
+.masthead-next strong { font: 500 18px/1.45 var(--font-serif); letter-spacing: 1px; color: #fff3d9; text-shadow: 0 1px 3px #0007; }
 .masthead-next strong span { margin-left: 10px; font-size: 15px; color: #f3dfb8; }
 
 /* ── Layout ───────────────────────────────────────────────────────────── */
@@ -137,13 +142,16 @@ main { max-width: 1280px; min-height: calc(100svh - var(--header-space)); margin
 
 /* Section headings: serif, deep teal, a short gold rule — the 经页 margin mark. */
 .section-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; min-height: 44px; margin: 0 0 14px; padding-bottom: 10px; border-bottom: 1px solid var(--line); position: relative; }
-.section-heading::after { content: ""; position: absolute; left: 0; bottom: -1px; width: 28px; height: 2px; background: var(--gold); }
+.section-heading::after { content: ""; position: absolute; left: 0; bottom: -1px; width: 34px; height: 2px; background: var(--gold); }
+/* A small jewel (诺布) caps the rule — the same lozenge used across Tibetan borders. */
+.section-heading::before { content: ""; position: absolute; left: 34px; bottom: -4px; width: 6px; height: 6px; background: var(--gold); transform: rotate(45deg); }
 .section-heading h2 { font: 500 22px/1.4 var(--font-serif); letter-spacing: 2px; color: var(--teal); }
 
 /* ── Quick presets + daily dates ──────────────────────────────────────── */
 .quick-section { margin-bottom: 8px; }
 .quick-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 4px; margin-bottom: 10px; }
-.quick-heading h3, .category-heading h3 { font: 600 15px/1.5 var(--font-serif); letter-spacing: 2px; color: var(--teal); }
+.quick-heading h3, .category-heading h3 { display: flex; align-items: center; gap: 8px; font: 600 15px/1.5 var(--font-serif); letter-spacing: 2px; color: var(--teal); }
+.quick-heading h3::before, .category-heading h3::before { content: ""; flex: none; width: 5px; height: 5px; background: var(--gold); transform: rotate(45deg); }
 .quick-heading>span { font-size: 13px; color: var(--muted); }
 .quick-panel { border: 1px solid var(--line-2); border-radius: var(--r); background: var(--surface); overflow: hidden; }
 .preset-options { display: grid; grid-auto-rows: 1fr; }
@@ -152,12 +160,12 @@ main { max-width: 1280px; min-height: calc(100svh - var(--header-space)); margin
   padding: 12px 14px 12px 16px; border: 0; border-radius: 0; background: transparent; color: var(--ink); text-align: left;
 }
 .preset-card+.preset-card { border-top: 1px solid var(--line); }
-.preset-card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: transparent; }
+.preset-card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--red); transform: scaleY(0); transition: transform .2s cubic-bezier(.2,.7,.2,1); }
 .preset-card:hover:not([aria-pressed=true]) { background: var(--surface-2); }
 .preset-card:active { background: var(--red-tint); }
 .preset-card:focus-visible { z-index: 1; outline-offset: -3px; }
 .preset-card[aria-pressed=true] { background: var(--red-tint); }
-.preset-card[aria-pressed=true]::before { background: var(--red); }
+.preset-card[aria-pressed=true]::before { transform: scaleY(1); }
 .preset-icon { display: grid; place-items: center; flex: none; width: 36px; height: 36px; color: var(--teal); }
 .preset-icon .icon { width: 28px; height: 28px; stroke-width: 1.4; }
 .preset-card[aria-pressed=true] .preset-icon { color: var(--red); }
@@ -167,7 +175,7 @@ main { max-width: 1280px; min-height: calc(100svh - var(--header-space)); margin
 .preset-copy>span { font-size: 13px; line-height: 1.6; color: var(--muted); }
 .preset-copy em { font-size: 13px; line-height: 1.6; font-style: normal; color: var(--red); }
 .preset-check { display: grid; place-items: center; flex: none; width: 20px; height: 20px; border: 1.5px solid var(--control); border-radius: 50%; color: #fff6e6; }
-.preset-card[aria-pressed=true] .preset-check { background: var(--red); border-color: var(--red); }
+.preset-card[aria-pressed=true] .preset-check { background: var(--red); border-color: var(--red); box-shadow: 0 0 0 2px var(--red-tint), 0 0 0 3px var(--gold-2); }
 .preset-check .icon { width: 13px; height: 13px; stroke-width: 2.2; }
 .preset-scope-note { padding: 8px 16px 10px; border-top: 1px solid var(--line); font-size: 12px; line-height: 1.6; color: var(--muted); background: var(--surface-2); }
 .daily-date-option { padding: 4px 14px 0 16px; border-top: 1px solid var(--line); }
@@ -198,6 +206,7 @@ main { max-width: 1280px; min-height: calc(100svh - var(--header-space)); margin
 .group-card>summary::-webkit-details-marker { display: none; }
 .group-card>summary:hover { background: var(--surface-2); }
 .group-card[open] { background: var(--surface); }
+.group-card>summary { transition: box-shadow .2s, background-color .15s; }
 .group-card[open]>summary { box-shadow: inset 3px 0 var(--teal); }
 .group-icon { display: grid; place-items: center; flex: none; width: 36px; height: 36px; color: var(--teal); }
 .group-icon .icon { width: 26px; height: 26px; stroke-width: 1.4; }
@@ -232,7 +241,7 @@ main { max-width: 1280px; min-height: calc(100svh - var(--header-space)); margin
 .selection-footer a:hover { color: var(--red); }
 
 /* ── Preview panel: the 经页 ───────────────────────────────────────────── */
-.preview-panel { position: relative; padding: 4px 26px 0; border: 1px solid var(--line-2); border-radius: var(--r); background: var(--surface); box-shadow: var(--shadow-1); }
+.preview-panel { position: relative; padding: 4px 26px 0; border: 1px solid var(--line-2); border-radius: var(--r); background: var(--surface); box-shadow: inset 0 0 0 4px var(--surface), inset 0 0 0 5px #eadbbd, var(--shadow-1); }
 .preview-heading { margin-top: 14px; }
 .preview-meta { display: flex; align-items: center; justify-content: flex-end; gap: 6px; margin-bottom: 4px; font-size: 13px; color: var(--muted); }
 .preview-meta .text-button { max-width: 100%; font-size: 13px; text-align: left; overflow-wrap: anywhere; }
@@ -374,7 +383,13 @@ input[type=time], .url-label input { display: block; width: 100%; min-width: 0; 
   .action-summary p { margin: 0; text-align: right; }
   .action-buttons { display: grid; grid-template-columns: 88px minmax(0,1fr); gap: 12px; }
   .action-buttons>.primary { min-width: 0; min-height: 46px; }
-  .masthead-next { display: none; }
+  /* Phones: the next practice day becomes a third quiet line under today. */
+  .masthead-inner { flex-direction: column; align-items: flex-start; justify-content: center; gap: 4px; }
+  .masthead-next { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 8px; max-width: none; padding: 0; border: 0; background: none; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .masthead-next .icon { display: none; }
+  .masthead-next small { font-size: 12px; letter-spacing: 1px; }
+  .masthead-next strong, .masthead-next strong span { font-size: 13px; letter-spacing: 0; }
+  .masthead-next strong span { margin-left: 6px; }
 }
 @media (max-width: 620px) {
   .device-options { grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -391,8 +406,8 @@ input[type=time], .url-label input { display: block; width: 100%; min-width: 0; 
   .brand-type small { padding-left: 9px; font-size: 12px; letter-spacing: 2px; }
   #my-subscription { margin-left: auto; padding-inline: 14px; font-size: 13px; }
   main { padding: 0 16px 24px; }
-  .editorial-masthead { height: 86px; margin-bottom: 13px; background-image: url('./assets/himalaya-800.jpg'); background-position: 62% 38%; }
-  .masthead-inner { padding: 12px 16px; }
+  .editorial-masthead { height: auto; min-height: 86px; margin-bottom: 13px; background-image: url('./assets/himalaya-800.jpg'); background-position: 62% 38%; }
+  .masthead-inner { padding: 12px 16px; min-height: 86px; }
   .masthead-eyebrow { display: none; }
   .masthead-date .today { gap: 3px; }
   .masthead-date #today-gregorian { font-size: 19px; letter-spacing: .5px; }

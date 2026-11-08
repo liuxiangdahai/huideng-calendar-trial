@@ -28,7 +28,7 @@
 .cal-view-switch .icon { width: 16px; height: 16px; }
 
 /* Grid: hairlines only, weekend headers in burgundy, 经页 calm. */
-.cal-weekdays { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); border-bottom: 1px solid var(--line-2); }
+.cal-weekdays { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); border-top: 1px solid var(--line-2); border-bottom: 1px solid var(--line-2); background: var(--surface-2); }
 .cal-weekdays span { padding: 6px 0; text-align: center; color: var(--muted); font-size: 13px; letter-spacing: 1px; }
 .cal-weekdays span:nth-child(n+6) { color: var(--red); }
 .cal-week { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); }
@@ -45,7 +45,8 @@
 .cal-day.cal-adjacent:hover:not(:disabled) { background: #f1e8d9; }
 /* Selected = a fine gold frame. Today = a burgundy disc. They never merge. */
 .cal-day.cal-selected, .cal-day.cal-selected:hover:not(:disabled) { border-color: var(--gold); background: #fbf2df; box-shadow: inset 0 0 0 1px var(--gold); }
-.cal-day.cal-is-today .cal-gregorian { background: var(--red); color: #fff6e6; font-weight: 600; }
+.cal-day.cal-is-today .cal-gregorian { background: var(--red); color: #fff6e6; font-weight: 600; box-shadow: 0 0 0 2px var(--surface), 0 0 0 3px var(--gold-2); }
+.cal-day.cal-selected.cal-is-today .cal-gregorian { box-shadow: 0 0 0 2px #fbf2df, 0 0 0 3px var(--gold-2); }
 .cal-day.cal-is-today .cal-tibetan { color: var(--red); }
 .cal-day:focus-visible { position: relative; z-index: 1; outline-offset: -2px; }
 .cal-day:disabled { opacity: .45; }
