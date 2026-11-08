@@ -168,9 +168,15 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     $('[data-cal-action="previous"]').disabled = month <= state.start.slice(0, 7);
     $('[data-cal-action="next"]').disabled = month >= state.end.slice(0, 7);
     $('[data-cal-action="today"]').disabled = state.today < state.start || state.today > state.end;
-    const tibetanMonths = [...new Set(cells.filter(cell => cell.inMonth && cell.tibetan)
-      .map(cell => `藏历${cell.tibetan.yearName}年${cell.tibetan.display.split('月')[0]}月`))];
-    $('[data-cal-context]').textContent = tibetanMonths.join(' · ');
+    // Group the Tibetan months by year: "藏历火马年 九月 · 十月" (a year change keeps both names).
+    const tibetanYears = new Map();
+    for (const cell of cells) {
+      if (!cell.inMonth || !cell.tibetan) continue;
+      const months = tibetanYears.get(cell.tibetan.yearName) || new Set();
+      months.add(`${cell.tibetan.display.split('月')[0]}月`);
+      tibetanYears.set(cell.tibetan.yearName, months);
+    }
+    $('[data-cal-context]').textContent = [...tibetanYears].map(([year, months]) => `藏历${year}年 ${[...months].join(' · ')}`).join('　');
     const header = `<div class="cal-weekdays" role="row">${WEEKDAYS.map(day => `<span role="columnheader" aria-label="星期${day}">${day}</span>`).join('')}</div>`;
     const rows = Array.from({length: 6}, (_, row) => `<div class="cal-week" role="row">${cells.slice(row * 7, row * 7 + 7).map(cell => {
       const cellEvents = cell.disabled ? [] : cell.events;

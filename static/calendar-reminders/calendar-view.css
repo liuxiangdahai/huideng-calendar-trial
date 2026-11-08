@@ -14,7 +14,7 @@
 .cal-arrow, .cal-today { display: flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; padding: 8px; border: 1px solid transparent; border-radius: var(--r-sm); background: transparent; color: var(--ink); }
 .cal-arrow .icon { width: 20px; height: 20px; }
 .cal-today { margin-left: 6px; padding-inline: 14px; border-color: var(--line-2); color: var(--red); font-size: 14px; }
-.cal-arrow:hover:not(:disabled), .cal-today:hover:not(:disabled) { background: var(--red-tint); }
+@media (hover: hover) { .cal-arrow:hover:not(:disabled), .cal-today:hover:not(:disabled) { background: var(--red-tint); } }
 .cal-arrow:disabled { opacity: .35; }
 .cal-month-picker { position: relative; min-width: 0; }
 .cal-month-picker>.icon { position: absolute; top: calc(50% - 7px); right: 4px; width: 14px; height: 14px; color: var(--muted); pointer-events: none; }
