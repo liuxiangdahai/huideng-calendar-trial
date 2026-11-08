@@ -1,0 +1,29 @@
+{
+  "startedAt": "2026-11-06T07:42:37.924Z",
+  "environment": "acceptance",
+  "checks": [
+    {
+      "case": "保存、读取、六项提醒、HEAD、304",
+      "result": "通过",
+      "alarms": 5
+    },
+    {
+      "case": "同地址改时间、UID稳定、版本递增",
+      "result": "通过"
+    },
+    {
+      "case": "仅显示与取消不含提醒",
+      "result": "通过"
+    },
+    {
+      "case": "停用返回撤销且无提醒",
+      "result": "通过"
+    }
+  ],
+  "phoneNotifications": "待真机验收",
+  "version": "d9e96fce26646b8dc38f1f4084025c952ee8b5cd",
+  "dataVersion": "0a6b1e7eb64f73f5f4d1bf86527df628e6e1b8ed91f5c917ecf8fcb38813d46b",
+  "passed": true,
+  "requests": 15,
+  "finishedAt": "2026-11-06T07:42:43.311Z"
+}

@@ -1,0 +1,4934 @@
+{
+  "label": "motion-comparison-20261106",
+  "date": "2026-11-06T07:34:08.138Z",
+  "status": "measured",
+  "environment": {
+    "os": "Windows_NT 10.0.26300",
+    "cpu": "12th Gen Intel(R) Core(TM) i5-12500H",
+    "browser": "156.0.8078.76",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "timezone": "Asia/Singapore",
+    "cpuSlowdown": 4,
+    "network": {
+      "downBitsPerSecond": 1600000,
+      "upBitsPerSecond": 750000,
+      "latencyMs": 150
+    },
+    "serving": "local HTTP + gzip; formal dist/site; not production delivery",
+    "manifestSHA256": "413a21e70974291bd3568f0b67bcb780ab4194307fec1ed05517053205e97704",
+    "comparison": "Same page, 4x CPU, 4 alternating blocks of30; diagnostic only, not a replacement for full performance gate"
+  },
+  "cold": [],
+  "interactions": {
+    "1-no-preference": {
+      "frameEstimate": {
+        "count": 30,
+        "p50": 98.20000004768372,
+        "p95": 426.19999998807907,
+        "max": 426.5
+      },
+      "eventTiming": {
+        "count": 30,
+        "p50": 112,
+        "p95": 432,
+        "max": 448
+      },
+      "samplesWithoutEventTiming": 0,
+      "longTaskMaximumMs": 408,
+      "samples": [
+        {
+          "name": "1-no-preference",
+          "index": 0,
+          "type": "click",
+          "armed": 3129.699999988079,
+          "started": true,
+          "eventStart": 3211.899999976158,
+          "dispatched": 3233.699999988079,
+          "afterPaint": 3638.399999976158,
+          "complete": true,
+          "frameEstimateMs": 426.5,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 3211.699999988079,
+              "duration": 448,
+              "processing": 1.399999976158142,
+              "interactionId": 3756
+            },
+            {
+              "type": "pointerup",
+              "start": 3211.899999976158,
+              "duration": 448,
+              "processing": 0.6000000238418579,
+              "interactionId": 3756
+            },
+            {
+              "type": "click",
+              "start": 3211.899999976158,
+              "duration": 448,
+              "processing": 380.30000001192093,
+              "interactionId": 3756
+            }
+          ],
+          "nativeMs": 448,
+          "longTasks": [
+            {
+              "start": 3212.5,
+              "duration": 408
+            }
+          ]
+        },
+        {
+          "name": "1-no-preference",
+          "index": 1,
+          "type": "click",
+          "armed": 3960.800000011921,
+          "started": true,
+          "eventStart": 4019.800000011921,
+          "dispatched": 4042.300000011921,
+          "afterPaint": 4254.600000023842,
+          "complete": true,
+          "frameEstimateMs": 234.80000001192093,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 4019.699999988079,
+              "duration": 256,
+              "processing": 2.800000011920929,
+              "interactionId": 3763
+            },
+            {
+              "type": "pointerup",
+              "start": 4019.800000011921,
+              "duration": 256,
+              "processing": 0.19999998807907104,
+              "interactionId": 3763
+            },
+            {
+              "type": "click",
+              "start": 4019.800000011921,
+              "duration": 256,
+              "processing": 181.5,
+              "interactionId": 3763
+            }
+          ],
+          "nativeMs": 256,
+          "longTasks": [
+            {
+              "start": 4020,
+              "duration": 217
+            }
+          ]
+        },
+        {
+          "name": "1-no-preference",
+          "index": 2,
+          "type": "click",
+          "armed": 4458.800000011921,
+          "started": true,
+          "eventStart": 4509.800000011921,
+          "dispatched": 4524,
+          "afterPaint": 4764.600000023842,
+          "complete": true,
+          "frameEstimateMs": 254.80000001192093,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 4509.699999988079,
+              "duration": 264,
+              "processing": 3.099999964237213,
+              "interactionId": 3770
+            },
+            {
+              "type": "pointerup",
+              "start": 4509.800000011921,
+              "duration": 264,
+              "processing": 0.5,
+              "interactionId": 3770
+            },
+            {
+              "type": "click",
+              "start": 4509.800000011921,
+              "duration": 264,
+              "processing": 211.0999999642372,
+              "interactionId": 3770
+            }
+          ],
+          "nativeMs": 264,
+          "longTasks": [
+            {
+              "start": 4510.399999976158,
+              "duration": 229
+            }
+          ]
+        },
+        {
+          "name": "1-no-preference",
+          "index": 3,
+          "type": "click",
+          "armed": 4987.699999988079,
+          "started": true,
+          "eventStart": 5063.300000011921,
+          "dispatched": 5107.399999976158,
+          "afterPaint": 5489.5,
+          "complete": true,
+          "frameEstimateMs": 426.19999998807907,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 5063.199999988079,
+              "duration": 432,
+              "processing": 14.099999964237213,
+              "interactionId": 3777
+            },
+            {
+              "type": "pointerup",
+              "start": 5063.300000011921,
+              "duration": 432,
+              "processing": 0.30000001192092896,
+              "interactionId": 3777
+            },
+            {
+              "type": "click",
+              "start": 5063.300000011921,
+              "duration": 432,
+              "processing": 342.5,
+              "interactionId": 3777
+            }
+          ],
+          "nativeMs": 432,
+          "longTasks": [
+            {
+              "start": 5104.300000011921,
+              "duration": 363
+            }
+          ]
+        },
+        {
+          "name": "1-no-preference",
+          "index": 4,
+          "type": "click",
+          "armed": 5656.800000011921,
+          "started": true,
+          "eventStart": 5767.699999988079,
+          "dispatched": 5772.699999988079,
+          "afterPaint": 5955.899999976158,
+          "complete": true,
+          "frameEstimateMs": 188.19999998807907,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 5767.600000023842,
+              "duration": 208,
+              "processing": 0.6000000238418579,
+              "interactionId": 3784
+            },
+            {
+              "type": "pointerup",
+              "start": 5767.699999988079,
+              "duration": 208,
+              "processing": 0.09999996423721313,
+              "interactionId": 3784
+            },
+            {
+              "type": "click",
+              "start": 5767.699999988079,
+              "duration": 208,
+              "processing": 176.30000001192093,
+              "interactionId": 3784
+            }
+          ],
+          "nativeMs": 208,
+          "longTasks": [
+            {
+              "start": 5768.899999976158,
+              "duration": 185
+            }
+          ]
+        },
+        {
+          "name": "1-no-preference",
+          "index": 5,
+          "type": "click",
+          "armed": 6147.699999988079,
+          "started": true,
+          "eventStart": 6238.5,
+          "dispatched": 6243.800000011921,
+          "afterPaint": 6298.800000011921,
+          "complete": true,
+          "frameEstimateMs": 60.30000001192093,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 6238.100000023842,
+              "duration": 72,
+              "processing": 0.30000001192092896,
+              "interactionId": 3791
+            },
+            {
+              "type": "pointerup",
+              "start": 6238.5,
+              "duration": 72,
+              "processing": 0.10000002384185791,
+              "interactionId": 3791
+            },
+            {
+              "type": "click",
+              "start": 6238.5,
+              "duration": 72,
+              "processing": 48.5,
+              "interactionId": 3791
+            }
+          ],
+          "nativeMs": 72,
+          "longTasks": [
+            {
+              "start": 6238.899999976158,
+              "duration": 56
+            }
+          ]
+        },
+        {
+          "name": "1-no-preference",
+          "index": 6,
+          "type": "click",
+          "armed": 6506.199999988079,
+          "started": true,
+          "eventStart": 6587.100000023842,
+          "dispatched": 6590.399999976158,
+          "afterPaint": 6721.199999988079,
+          "complete": true,
+          "frameEstimateMs": 134.0999999642372,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 6584.399999976158,
+              "duration": 24,
+              "processing": 0.3999999761581421,
+              "interactionId": 3798
+            },
+            {
+              "type": "pointerup",
+              "start": 6587.100000023842,
+              "duration": 160,
+              "processing": 0.10000002384185791,
+              "interactionId": 3798
+            },
+            {
+              "type": "click",
+              "start": 6587.100000023842,
+              "duration": 160,
+              "processing": 106.39999997615814,
+              "interactionId": 3798
+            }
+          ],
+          "nativeMs": 160,
+          "longTasks": [
+            {
+              "start": 6590.199999988079,
+              "duration": 111
+            }
+          ]
+        },
+        {
+          "name": "1-no-preference",
+          "index": 7,
+          "type": "click",
+          "armed": 6982.399999976158,
+          "started": true,
+          "eventStart": 7059.399999976158,
+          "dispatched": 7068.600000023842,
+          "afterPaint": 7305.699999988079,
+          "complete": true,
+          "frameEstimateMs": 246.30000001192093,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 7059.100000023842,
+              "duration": 248,
+              "processing": 0.3999999761581421,
+              "interactionId": 3805
+            },
+            {
+              "type": "pointerup",
+              "start": 7059.399999976158,
+              "duration": 248,
+              "processing": 0.20000004768371582,
+              "interactionId": 3805
+            },
+            {
+              "type": "click",
+              "start": 7059.399999976158,
+              "duration": 248,
+              "processing": 218.39999997615814,
+              "interactionId": 3805
+            }
+          ],
+          "nativeMs": 248,
+          "longTasks": [
+            {
+              "start": 7062.399999976158,
+              "duration": 231
+            }
+          ]
+        },
+        {
+          "name": "1-no-preference",
+          "index": 8,
+          "type": "click",
+          "armed": 7486.899999976158,
+          "started": true,
+          "eventStart": 7676.800000011921,
+          "dispatched": 7707.699999988079,
+          "afterPaint": 7956.5,
+          "complete": true,
+          "frameEstimateMs": 279.69999998807907,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 7676.800000011921,
+              "duration": 296,
+              "processing": 13.199999988079071,
+              "interactionId": 3812
+            },
+            {
+              "type": "pointerup",
+              "start": 7676.800000011921,
+              "duration": 296,
+              "processing": 0.09999996423721313,
+              "interactionId": 3812
+            },
+            {
+              "type": "click",
+              "start": 7676.800000011921,
+              "duration": 296,
+              "processing": 133,
+              "interactionId": 3812
+            }
+          ],
+          "nativeMs": 296,
+          "longTasks": [
+            {
+              "start": 7681.899999976158,
+              "duration": 163
+            },
+            {
+              "start": 7847,
+              "duration": 108
+            }
+          ]
+        },
+        {
+          "name": "1-no-preference",
+          "index": 9,
+          "type": "click",
+          "armed": 8116,
+          "started": true,
+          "eventStart": 8214.100000023842,
+          "dispatched": 8216.5,
+          "afterPaint": 8264.899999976158,
+          "complete": true,
+          "frameEstimateMs": 50.799999952316284,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 8213,
+              "duration": 64,
+              "processing": 0.30000001192092896,
+              "interactionId": 3819
+            },
+            {
+              "type": "pointerup",
+              "start": 8214.100000023842,
+              "duration": 64,
+              "processing": 0,
+              "interactionId": 3819
+            },
+            {
+              "type": "click",
+              "start": 8214.100000023842,
+              "duration": 64,
+              "processing": 30.80000001192093,
+              "interactionId": 3819
+            }
+          ],
+          "nativeMs": 64,
+          "longTasks": []
+        },
+        {
+          "name": "1-no-preference",
+          "index": 10,
+          "type": "click",
+          "armed": 8473.699999988079,
+          "started": true,
+          "eventStart": 8552.399999976158,
+          "dispatched": 8569.100000023842,
+          "afterPaint": 8764,
+          "complete": true,
+          "frameEstimateMs": 211.60000002384186,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 8552.300000011921,
+              "duration": 224,
+              "processing": 1.699999988079071,
+              "interactionId": 3826
+            },
+            {
+              "type": "pointerup",
+              "start": 8552.399999976158,
+              "duration": 224,
+              "processing": 0.19999998807907104,
+              "interactionId": 3826
+            },
+            {
+              "type": "click",
+              "start": 8552.399999976158,
+              "duration": 224,
+              "processing": 172.69999998807907,
+              "interactionId": 3826
+            }
+          ],
+          "nativeMs": 224,
+          "longTasks": [
+            {
+              "start": 8554.800000011921,
+              "duration": 207
+            }
+          ]
+        },
+        {
+          "name": "1-no-preference",
+          "index": 11,
+          "type": "click",
+          "armed": 8948.100000023842,
+          "started": true,
+          "eventStart": 9061.600000023842,
+          "dispatched": 9064,
+          "afterPaint": 9173.300000011921,
+          "complete": true,
+          "frameEstimateMs": 111.69999998807907,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 9061.5,
+              "duration": 128,
+              "processing": 0.3999999761581421,
+              "interactionId": 3833
+            },
+            {
+              "type": "pointerup",
+              "start": 9061.600000023842,
+              "duration": 128,
+              "processing": 0.09999996423721313,
+              "interactionId": 3833
+            },
+            {
+              "type": "click",
+              "start": 9061.600000023842,
+              "duration": 128,
+              "processing": 92.5,
+              "interactionId": 3833
+            }
+          ],
+          "nativeMs": 128,
+          "longTasks": [
+            {
+              "start": 9062.300000011921,
+              "duration": 96
+            }
+          ]
+        },
+        {
+          "name": "1-no-preference",
+          "index": 12,
+          "type": "click",
+          "armed": 9338.5,
+          "started": true,
+          "eventStart": 9416.399999976158,
+          "dispatched": 9420.100000023842,
+          "afterPaint": 9474,
+          "complete": true,
+          "frameEstimateMs": 57.60000002384186,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 9416.199999988079,
+              "duration": 80,
+              "processing": 0.40000003576278687,
+              "interactionId": 3840
+            },
+            {
+              "type": "pointerup",
+              "start": 9416.399999976158,
+              "duration": 80,
+              "processing": 0.20000004768371582,
+              "interactionId": 3840
+            },
+            {
+              "type": "click",
+              "start": 9416.399999976158,
+              "duration": 80,
+              "processing": 47.799999952316284,
+              "interactionId": 3840
+            }
+          ],
+          "nativeMs": 80,
+          "longTasks": [
+            {
+              "start": 9419.600000023842,
+              "duration": 50
+            }
+          ]
+        },
+        {
+          "name": "1-no-preference",
+          "index": 13,
+          "type": "click",
+          "armed": 9665.5,
+          "started": true,
+          "eventStart": 10111.399999976158,
+          "dispatched": 10227.399999976158,
+          "afterPaint": 10284,
+          "complete": true,
+          "frameEstimateMs": 172.60000002384186,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 10111.100000023842,
+              "duration": 184,
+              "processing": 0.7000000476837158,
+              "interactionId": 3847
+            },
+            {
+              "type": "pointerup",
+              "start": 10111.399999976158,
+              "duration": 184,
+              "processing": 0.30000001192092896,
+              "interactionId": 3847
+            },
+            {
+              "type": "click",
+              "start": 10111.399999976158,
+              "duration": 184,
+              "processing": 52.5,
+              "interactionId": 3847
+            }
+          ],
+          "nativeMs": 184,
+          "longTasks": [
+            {
+              "start": 10202.899999976158,
+              "duration": 78
+            }
+          ]
+        },
+        {
+          "name": "1-no-preference",
+          "index": 14,
+          "type": "click",
+          "armed": 10533.199999988079,
+          "started": true,
+          "eventStart": 10570.699999988079,
+          "dispatched": 10576.600000023842,
+          "afterPaint": 10646.199999988079,
+          "complete": true,
+          "frameEstimateMs": 75.5,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 10570.399999976158,
+              "duration": 88,
+              "processing": 2,
+              "interactionId": 3854
+            },
+            {
+              "type": "pointerup",
+              "start": 10570.699999988079,
+              "duration": 88,
+              "processing": 0.10000002384185791,
+              "interactionId": 3854
+            },
+            {
+              "type": "click",
+              "start": 10570.699999988079,
+              "duration": 88,
+              "processing": 63.19999998807907,
+              "interactionId": 3854
+            }
+          ],
+          "nativeMs": 88,
+          "longTasks": [
+            {
+              "start": 10573,
+              "duration": 69
+            }
+          ]
+        },
+        {
+          "name": "1-no-preference",
+          "index": 15,
+          "type": "click",
+          "armed": 10913.100000023842,
+          "started": true,
+          "eventStart": 10999,
+          "dispatched": 11003,
+          "afterPaint": 11049,
+          "complete": true,
+          "frameEstimateMs": 50,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 10998.5,
+              "duration": 64,
+              "processing": 0.5,
+              "interactionId": 3861
+            },
+            {
+              "type": "pointerup",
+              "start": 10999,
+              "duration": 64,
+              "processing": 0,
+              "interactionId": 3861
+            },
+            {
+              "type": "click",
+              "start": 10999,
+              "duration": 64,
+              "processing": 36.69999998807907,
+              "interactionId": 3861
+            }
+          ],
+          "nativeMs": 64,
+          "longTasks": []
+        },
+        {
+          "name": "1-no-preference",
+          "index": 16,
+          "type": "click",
+          "armed": 11260.899999976158,
+          "started": true,
+          "eventStart": 11319.699999988079,
+          "dispatched": 11322.800000011921,
+          "afterPaint": 11376.199999988079,
+          "complete": true,
+          "frameEstimateMs": 56.5,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 11319.5,
+              "duration": 72,
+              "processing": 0.20000004768371582,
+              "interactionId": 3868
+            },
+            {
+              "type": "pointerup",
+              "start": 11319.699999988079,
+              "duration": 72,
+              "processing": 0.10000002384185791,
+              "interactionId": 3868
+            },
+            {
+              "type": "click",
+              "start": 11319.699999988079,
+              "duration": 72,
+              "processing": 47.80000001192093,
+              "interactionId": 3868
+            }
+          ],
+          "nativeMs": 72,
+          "longTasks": [
+            {
+              "start": 11320.100000023842,
+              "duration": 52
+            }
+          ]
+        },
+        {
+          "name": "1-no-preference",
+          "index": 17,
+          "type": "click",
+          "armed": 11618.100000023842,
+          "started": true,
+          "eventStart": 11656.899999976158,
+          "dispatched": 11663.399999976158,
+          "afterPaint": 11707.5,
+          "complete": true,
+          "frameEstimateMs": 50.60000002384186,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 11656.800000011921,
+              "duration": 72,
+              "processing": 1,
+              "interactionId": 3875
+            },
+            {
+              "type": "pointerup",
+              "start": 11656.899999976158,
+              "duration": 72,
+              "processing": 0,
+              "interactionId": 3875
+            },
+            {
+              "type": "click",
+              "start": 11656.899999976158,
+              "duration": 72,
+              "processing": 39.10000002384186,
+              "interactionId": 3875
+            }
+          ],
+          "nativeMs": 72,
+          "longTasks": []
+        },
+        {
+          "name": "1-no-preference",
+          "index": 18,
+          "type": "click",
+          "armed": 11943.5,
+          "started": true,
+          "eventStart": 11988.600000023842,
+          "dispatched": 11996.899999976158,
+          "afterPaint": 12070.100000023842,
+          "complete": true,
+          "frameEstimateMs": 81.5,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 11988.5,
+              "duration": 104,
+              "processing": 0.5,
+              "interactionId": 3882
+            },
+            {
+              "type": "pointerup",
+              "start": 11988.600000023842,
+              "duration": 104,
+              "processing": 0.3999999761581421,
+              "interactionId": 3882
+            },
+            {
+              "type": "click",
+              "start": 11988.600000023842,
+              "duration": 104,
+              "processing": 67.90000003576279,
+              "interactionId": 3882
+            }
+          ],
+          "nativeMs": 104,
+          "longTasks": [
+            {
+              "start": 11995.800000011921,
+              "duration": 70
+            }
+          ]
+        },
+        {
+          "name": "1-no-preference",
+          "index": 19,
+          "type": "click",
+          "armed": 12264.5,
+          "started": true,
+          "eventStart": 12320.300000011921,
+          "dispatched": 12326.300000011921,
+          "afterPaint": 12463.600000023842,
+          "complete": true,
+          "frameEstimateMs": 143.30000001192093,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 12320.100000023842,
+              "duration": 160,
+              "processing": 0.699999988079071,
+              "interactionId": 3889
+            },
+            {
+              "type": "pointerup",
+              "start": 12320.300000011921,
+              "duration": 160,
+              "processing": 0.19999998807907104,
+              "interactionId": 3889
+            },
+            {
+              "type": "click",
+              "start": 12320.300000011921,
+              "duration": 160,
+              "processing": 115,
+              "interactionId": 3889
+            }
+          ],
+          "nativeMs": 160,
+          "longTasks": [
+            {
+              "start": 12320.399999976158,
+              "duration": 141
+            }
+          ]
+        },
+        {
+          "name": "1-no-preference",
+          "index": 20,
+          "type": "click",
+          "armed": 12615.399999976158,
+          "started": true,
+          "eventStart": 12699.199999988079,
+          "dispatched": 12701.800000011921,
+          "afterPaint": 12745.600000023842,
+          "complete": true,
+          "frameEstimateMs": 46.40000003576279,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 12698.600000023842,
+              "duration": 64,
+              "processing": 0.5,
+              "interactionId": 3896
+            },
+            {
+              "type": "pointerup",
+              "start": 12699.199999988079,
+              "duration": 64,
+              "processing": 0.10000002384185791,
+              "interactionId": 3896
+            },
+            {
+              "type": "click",
+              "start": 12699.199999988079,
+              "duration": 64,
+              "processing": 38,
+              "interactionId": 3896
+            }
+          ],
+          "nativeMs": 64,
+          "longTasks": []
+        },
+        {
+          "name": "1-no-preference",
+          "index": 21,
+          "type": "click",
+          "armed": 12952.199999988079,
+          "started": true,
+          "eventStart": 12983.5,
+          "dispatched": 12991.699999988079,
+          "afterPaint": 13032.100000023842,
+          "complete": true,
+          "frameEstimateMs": 48.60000002384186,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 12983.5,
+              "duration": 80,
+              "processing": 0.3999999761581421,
+              "interactionId": 3903
+            },
+            {
+              "type": "pointerup",
+              "start": 12983.5,
+              "duration": 80,
+              "processing": 0,
+              "interactionId": 3903
+            },
+            {
+              "type": "click",
+              "start": 12983.5,
+              "duration": 80,
+              "processing": 34.299999952316284,
+              "interactionId": 3903
+            }
+          ],
+          "nativeMs": 80,
+          "longTasks": []
+        },
+        {
+          "name": "1-no-preference",
+          "index": 22,
+          "type": "click",
+          "armed": 13234.199999988079,
+          "started": true,
+          "eventStart": 13321,
+          "dispatched": 13325.899999976158,
+          "afterPaint": 13379.199999988079,
+          "complete": true,
+          "frameEstimateMs": 58.19999998807907,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 13320.199999988079,
+              "duration": 72,
+              "processing": 0.40000003576278687,
+              "interactionId": 3910
+            },
+            {
+              "type": "pointerup",
+              "start": 13321,
+              "duration": 72,
+              "processing": 0,
+              "interactionId": 3910
+            },
+            {
+              "type": "click",
+              "start": 13321,
+              "duration": 72,
+              "processing": 43.19999998807907,
+              "interactionId": 3910
+            }
+          ],
+          "nativeMs": 72,
+          "longTasks": []
+        },
+        {
+          "name": "1-no-preference",
+          "index": 23,
+          "type": "click",
+          "armed": 13547.699999988079,
+          "started": true,
+          "eventStart": 13621.300000011921,
+          "dispatched": 13643.699999988079,
+          "afterPaint": 13956.699999988079,
+          "complete": true,
+          "frameEstimateMs": 335.39999997615814,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 13621.199999988079,
+              "duration": 352,
+              "processing": 2.300000011920929,
+              "interactionId": 3917
+            },
+            {
+              "type": "pointerup",
+              "start": 13621.300000011921,
+              "duration": 352,
+              "processing": 0.800000011920929,
+              "interactionId": 3917
+            },
+            {
+              "type": "click",
+              "start": 13621.300000011921,
+              "duration": 352,
+              "processing": 308.5999999642372,
+              "interactionId": 3917
+            }
+          ],
+          "nativeMs": 352,
+          "longTasks": [
+            {
+              "start": 13627.100000023842,
+              "duration": 326
+            }
+          ]
+        },
+        {
+          "name": "1-no-preference",
+          "index": 24,
+          "type": "click",
+          "armed": 14153.100000023842,
+          "started": true,
+          "eventStart": 14236.399999976158,
+          "dispatched": 14269.199999988079,
+          "afterPaint": 14568.399999976158,
+          "complete": true,
+          "frameEstimateMs": 332,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 14236.199999988079,
+              "duration": 344,
+              "processing": 3.699999988079071,
+              "interactionId": 3924
+            },
+            {
+              "type": "pointerup",
+              "start": 14236.399999976158,
+              "duration": 336,
+              "processing": 0.19999998807907104,
+              "interactionId": 3924
+            },
+            {
+              "type": "click",
+              "start": 14236.399999976158,
+              "duration": 336,
+              "processing": 267,
+              "interactionId": 3924
+            }
+          ],
+          "nativeMs": 344,
+          "longTasks": [
+            {
+              "start": 14239.800000011921,
+              "duration": 309
+            }
+          ]
+        },
+        {
+          "name": "1-no-preference",
+          "index": 25,
+          "type": "click",
+          "armed": 14719.600000023842,
+          "started": true,
+          "eventStart": 14791.300000011921,
+          "dispatched": 14791.800000011921,
+          "afterPaint": 14929.600000023842,
+          "complete": true,
+          "frameEstimateMs": 138.30000001192093,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 14783,
+              "duration": 160,
+              "processing": 0.5,
+              "interactionId": 3931
+            },
+            {
+              "type": "pointerup",
+              "start": 14791.300000011921,
+              "duration": 152,
+              "processing": 0.09999996423721313,
+              "interactionId": 3931
+            },
+            {
+              "type": "click",
+              "start": 14791.300000011921,
+              "duration": 152,
+              "processing": 118.80000001192093,
+              "interactionId": 3931
+            }
+          ],
+          "nativeMs": 160,
+          "longTasks": [
+            {
+              "start": 14791.600000023842,
+              "duration": 123
+            }
+          ]
+        },
+        {
+          "name": "1-no-preference",
+          "index": 26,
+          "type": "click",
+          "armed": 15073.5,
+          "started": true,
+          "eventStart": 15136.199999988079,
+          "dispatched": 15137.199999988079,
+          "afterPaint": 15179.5,
+          "complete": true,
+          "frameEstimateMs": 43.30000001192093,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 15133.5,
+              "duration": 56,
+              "processing": 0.3999999761581421,
+              "interactionId": 3938
+            },
+            {
+              "type": "pointerup",
+              "start": 15136.199999988079,
+              "duration": 56,
+              "processing": 0.10000002384185791,
+              "interactionId": 3938
+            },
+            {
+              "type": "click",
+              "start": 15136.199999988079,
+              "duration": 56,
+              "processing": 35.80000001192093,
+              "interactionId": 3938
+            }
+          ],
+          "nativeMs": 56,
+          "longTasks": []
+        },
+        {
+          "name": "1-no-preference",
+          "index": 27,
+          "type": "click",
+          "armed": 15354.399999976158,
+          "started": true,
+          "eventStart": 15424.5,
+          "dispatched": 15429.100000023842,
+          "afterPaint": 15465.100000023842,
+          "complete": true,
+          "frameEstimateMs": 40.60000002384186,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 15424,
+              "duration": 56,
+              "processing": 0.3999999761581421,
+              "interactionId": 3945
+            },
+            {
+              "type": "pointerup",
+              "start": 15424.5,
+              "duration": 56,
+              "processing": 0,
+              "interactionId": 3945
+            },
+            {
+              "type": "click",
+              "start": 15424.5,
+              "duration": 56,
+              "processing": 29.799999952316284,
+              "interactionId": 3945
+            }
+          ],
+          "nativeMs": 56,
+          "longTasks": []
+        },
+        {
+          "name": "1-no-preference",
+          "index": 28,
+          "type": "click",
+          "armed": 15633.699999988079,
+          "started": true,
+          "eventStart": 15699.399999976158,
+          "dispatched": 15705.199999988079,
+          "afterPaint": 15797.600000023842,
+          "complete": true,
+          "frameEstimateMs": 98.20000004768372,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 15699.300000011921,
+              "duration": 112,
+              "processing": 0.30000001192092896,
+              "interactionId": 3952
+            },
+            {
+              "type": "pointerup",
+              "start": 15699.399999976158,
+              "duration": 112,
+              "processing": 0.2999999523162842,
+              "interactionId": 3952
+            },
+            {
+              "type": "click",
+              "start": 15699.399999976158,
+              "duration": 112,
+              "processing": 86,
+              "interactionId": 3952
+            }
+          ],
+          "nativeMs": 112,
+          "longTasks": [
+            {
+              "start": 15699.5,
+              "duration": 92
+            }
+          ]
+        },
+        {
+          "name": "1-no-preference",
+          "index": 29,
+          "type": "click",
+          "armed": 16052.699999988079,
+          "started": true,
+          "eventStart": 16141.699999988079,
+          "dispatched": 16150.800000011921,
+          "afterPaint": 16208.899999976158,
+          "complete": true,
+          "frameEstimateMs": 67.19999998807907,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 16141.199999988079,
+              "duration": 16,
+              "processing": 1,
+              "interactionId": 3959
+            },
+            {
+              "type": "pointerup",
+              "start": 16141.699999988079,
+              "duration": 64,
+              "processing": 0,
+              "interactionId": 3959
+            },
+            {
+              "type": "click",
+              "start": 16141.699999988079,
+              "duration": 64,
+              "processing": 45.5,
+              "interactionId": 3959
+            }
+          ],
+          "nativeMs": 64,
+          "longTasks": []
+        }
+      ]
+    },
+    "2-reduce": {
+      "frameEstimate": {
+        "count": 30,
+        "p50": 137.5999999642372,
+        "p95": 276.0999999642372,
+        "max": 318.30000001192093
+      },
+      "eventTiming": {
+        "count": 30,
+        "p50": 152,
+        "p95": 288,
+        "max": 328
+      },
+      "samplesWithoutEventTiming": 0,
+      "longTaskMaximumMs": 310,
+      "samples": [
+        {
+          "name": "2-reduce",
+          "index": 0,
+          "type": "click",
+          "armed": 16718.600000023842,
+          "started": true,
+          "eventStart": 16757.600000023842,
+          "dispatched": 16758.19999998808,
+          "afterPaint": 16888.899999976158,
+          "complete": true,
+          "frameEstimateMs": 131.29999995231628,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 16756.80000001192,
+              "duration": 136,
+              "processing": 0,
+              "interactionId": 3966
+            },
+            {
+              "type": "pointerup",
+              "start": 16757.600000023842,
+              "duration": 136,
+              "processing": 0,
+              "interactionId": 3966
+            },
+            {
+              "type": "click",
+              "start": 16757.600000023842,
+              "duration": 136,
+              "processing": 110.30000001192093,
+              "interactionId": 3966
+            }
+          ],
+          "nativeMs": 136,
+          "longTasks": [
+            {
+              "start": 16757.80000001192,
+              "duration": 112
+            }
+          ]
+        },
+        {
+          "name": "2-reduce",
+          "index": 1,
+          "type": "click",
+          "armed": 17064.5,
+          "started": true,
+          "eventStart": 17152.30000001192,
+          "dispatched": 17187.100000023842,
+          "afterPaint": 17428.399999976158,
+          "complete": true,
+          "frameEstimateMs": 276.0999999642372,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 17152.30000001192,
+              "duration": 288,
+              "processing": 4.300000011920929,
+              "interactionId": 3973
+            },
+            {
+              "type": "pointerup",
+              "start": 17152.30000001192,
+              "duration": 288,
+              "processing": 0.30000001192092896,
+              "interactionId": 3973
+            },
+            {
+              "type": "click",
+              "start": 17152.30000001192,
+              "duration": 288,
+              "processing": 211.39999997615814,
+              "interactionId": 3973
+            }
+          ],
+          "nativeMs": 288,
+          "longTasks": [
+            {
+              "start": 17154.69999998808,
+              "duration": 247
+            }
+          ]
+        },
+        {
+          "name": "2-reduce",
+          "index": 2,
+          "type": "click",
+          "armed": 17601.80000001192,
+          "started": true,
+          "eventStart": 17670.5,
+          "dispatched": 17694.80000001192,
+          "afterPaint": 17945.69999998808,
+          "complete": true,
+          "frameEstimateMs": 275.19999998807907,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 17670.5,
+              "duration": 288,
+              "processing": 11,
+              "interactionId": 3980
+            },
+            {
+              "type": "pointerup",
+              "start": 17670.5,
+              "duration": 288,
+              "processing": 0,
+              "interactionId": 3980
+            },
+            {
+              "type": "click",
+              "start": 17670.5,
+              "duration": 288,
+              "processing": 244.19999998807907,
+              "interactionId": 3980
+            }
+          ],
+          "nativeMs": 288,
+          "longTasks": [
+            {
+              "start": 17671,
+              "duration": 269
+            }
+          ]
+        },
+        {
+          "name": "2-reduce",
+          "index": 3,
+          "type": "click",
+          "armed": 18090,
+          "started": true,
+          "eventStart": 18138.100000023842,
+          "dispatched": 18147,
+          "afterPaint": 18289.600000023842,
+          "complete": true,
+          "frameEstimateMs": 151.5,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 18138,
+              "duration": 152,
+              "processing": 1.0999999642372131,
+              "interactionId": 3987
+            },
+            {
+              "type": "pointerup",
+              "start": 18138.100000023842,
+              "duration": 152,
+              "processing": 2.400000035762787,
+              "interactionId": 3987
+            },
+            {
+              "type": "click",
+              "start": 18138.100000023842,
+              "duration": 152,
+              "processing": 124,
+              "interactionId": 3987
+            }
+          ],
+          "nativeMs": 152,
+          "longTasks": [
+            {
+              "start": 18139.600000023842,
+              "duration": 134
+            }
+          ]
+        },
+        {
+          "name": "2-reduce",
+          "index": 4,
+          "type": "click",
+          "armed": 18452.600000023842,
+          "started": true,
+          "eventStart": 18505.100000023842,
+          "dispatched": 18510.5,
+          "afterPaint": 18694.600000023842,
+          "complete": true,
+          "frameEstimateMs": 189.5,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 18505,
+              "duration": 208,
+              "processing": 0.800000011920929,
+              "interactionId": 3994
+            },
+            {
+              "type": "pointerup",
+              "start": 18505.100000023842,
+              "duration": 208,
+              "processing": 0.09999996423721313,
+              "interactionId": 3994
+            },
+            {
+              "type": "click",
+              "start": 18505.100000023842,
+              "duration": 208,
+              "processing": 168.19999998807907,
+              "interactionId": 3994
+            }
+          ],
+          "nativeMs": 208,
+          "longTasks": [
+            {
+              "start": 18507.399999976158,
+              "duration": 175
+            }
+          ]
+        },
+        {
+          "name": "2-reduce",
+          "index": 5,
+          "type": "click",
+          "armed": 18844.30000001192,
+          "started": true,
+          "eventStart": 18982.80000001192,
+          "dispatched": 18987.100000023842,
+          "afterPaint": 19194.600000023842,
+          "complete": true,
+          "frameEstimateMs": 211.80000001192093,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 18982.600000023842,
+              "duration": 224,
+              "processing": 0.20000004768371582,
+              "interactionId": 4001
+            },
+            {
+              "type": "pointerup",
+              "start": 18982.80000001192,
+              "duration": 224,
+              "processing": 0,
+              "interactionId": 4001
+            },
+            {
+              "type": "click",
+              "start": 18982.80000001192,
+              "duration": 224,
+              "processing": 188.69999998807907,
+              "interactionId": 4001
+            }
+          ],
+          "nativeMs": 224,
+          "longTasks": [
+            {
+              "start": 18982.899999976158,
+              "duration": 195
+            }
+          ]
+        },
+        {
+          "name": "2-reduce",
+          "index": 6,
+          "type": "click",
+          "armed": 19345.899999976158,
+          "started": true,
+          "eventStart": 19401.600000023842,
+          "dispatched": 19403.899999976158,
+          "afterPaint": 19447.69999998808,
+          "complete": true,
+          "frameEstimateMs": 46.09999996423721,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 19401.600000023842,
+              "duration": 56,
+              "processing": 0.09999996423721313,
+              "interactionId": 4008
+            },
+            {
+              "type": "pointerup",
+              "start": 19401.600000023842,
+              "duration": 56,
+              "processing": 0.09999996423721313,
+              "interactionId": 4008
+            },
+            {
+              "type": "click",
+              "start": 19401.600000023842,
+              "duration": 56,
+              "processing": 38.700000047683716,
+              "interactionId": 4008
+            }
+          ],
+          "nativeMs": 56,
+          "longTasks": []
+        },
+        {
+          "name": "2-reduce",
+          "index": 7,
+          "type": "click",
+          "armed": 19629.399999976158,
+          "started": true,
+          "eventStart": 19731.5,
+          "dispatched": 19737.80000001192,
+          "afterPaint": 19945.69999998808,
+          "complete": true,
+          "frameEstimateMs": 214.19999998807907,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 19731.5,
+              "duration": 208,
+              "processing": 0.40000003576278687,
+              "interactionId": 4015
+            },
+            {
+              "type": "pointerup",
+              "start": 19731.5,
+              "duration": 208,
+              "processing": 0.19999998807907104,
+              "interactionId": 4015
+            },
+            {
+              "type": "click",
+              "start": 19731.5,
+              "duration": 208,
+              "processing": 191.69999998807907,
+              "interactionId": 4015
+            }
+          ],
+          "nativeMs": 208,
+          "longTasks": [
+            {
+              "start": 19731.5,
+              "duration": 198
+            }
+          ]
+        },
+        {
+          "name": "2-reduce",
+          "index": 8,
+          "type": "click",
+          "armed": 20109.600000023842,
+          "started": true,
+          "eventStart": 20145.399999976158,
+          "dispatched": 20170.80000001192,
+          "afterPaint": 20463.69999998808,
+          "complete": true,
+          "frameEstimateMs": 318.30000001192093,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 20145.100000023842,
+              "duration": 328,
+              "processing": 1.0999999642372131,
+              "interactionId": 4022
+            },
+            {
+              "type": "pointerup",
+              "start": 20145.399999976158,
+              "duration": 328,
+              "processing": 4.199999988079071,
+              "interactionId": 4022
+            },
+            {
+              "type": "click",
+              "start": 20145.399999976158,
+              "duration": 328,
+              "processing": 273.30000001192093,
+              "interactionId": 4022
+            }
+          ],
+          "nativeMs": 328,
+          "longTasks": [
+            {
+              "start": 20146.80000001192,
+              "duration": 310
+            }
+          ]
+        },
+        {
+          "name": "2-reduce",
+          "index": 9,
+          "type": "click",
+          "armed": 20612.69999998808,
+          "started": true,
+          "eventStart": 20708.80000001192,
+          "dispatched": 20712.600000023842,
+          "afterPaint": 20783.899999976158,
+          "complete": true,
+          "frameEstimateMs": 75.09999996423721,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 20708.5,
+              "duration": 104,
+              "processing": 0.5,
+              "interactionId": 4029
+            },
+            {
+              "type": "pointerup",
+              "start": 20708.80000001192,
+              "duration": 104,
+              "processing": 0,
+              "interactionId": 4029
+            },
+            {
+              "type": "click",
+              "start": 20708.80000001192,
+              "duration": 104,
+              "processing": 66.59999996423721,
+              "interactionId": 4029
+            }
+          ],
+          "nativeMs": 104,
+          "longTasks": [
+            {
+              "start": 20710.19999998808,
+              "duration": 70
+            }
+          ]
+        },
+        {
+          "name": "2-reduce",
+          "index": 10,
+          "type": "click",
+          "armed": 21041.19999998808,
+          "started": true,
+          "eventStart": 21067.69999998808,
+          "dispatched": 21088.399999976158,
+          "afterPaint": 21271.80000001192,
+          "complete": true,
+          "frameEstimateMs": 204.10000002384186,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 21067.69999998808,
+              "duration": 208,
+              "processing": 1,
+              "interactionId": 4036
+            },
+            {
+              "type": "pointerup",
+              "start": 21067.69999998808,
+              "duration": 208,
+              "processing": 0.09999996423721313,
+              "interactionId": 4036
+            },
+            {
+              "type": "click",
+              "start": 21067.69999998808,
+              "duration": 208,
+              "processing": 171.4000000357628,
+              "interactionId": 4036
+            }
+          ],
+          "nativeMs": 208,
+          "longTasks": [
+            {
+              "start": 21068.100000023842,
+              "duration": 195
+            }
+          ]
+        },
+        {
+          "name": "2-reduce",
+          "index": 11,
+          "type": "click",
+          "armed": 21425.100000023842,
+          "started": true,
+          "eventStart": 21482.69999998808,
+          "dispatched": 21494.80000001192,
+          "afterPaint": 21565.69999998808,
+          "complete": true,
+          "frameEstimateMs": 83,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 21482.600000023842,
+              "duration": 96,
+              "processing": 0.19999998807907104,
+              "interactionId": 4043
+            },
+            {
+              "type": "pointerup",
+              "start": 21482.69999998808,
+              "duration": 96,
+              "processing": 0,
+              "interactionId": 4043
+            },
+            {
+              "type": "click",
+              "start": 21482.69999998808,
+              "duration": 96,
+              "processing": 62.39999997615814,
+              "interactionId": 4043
+            }
+          ],
+          "nativeMs": 96,
+          "longTasks": [
+            {
+              "start": 21483,
+              "duration": 76
+            }
+          ]
+        },
+        {
+          "name": "2-reduce",
+          "index": 12,
+          "type": "click",
+          "armed": 21734.600000023842,
+          "started": true,
+          "eventStart": 21810.899999976158,
+          "dispatched": 21824,
+          "afterPaint": 21989.100000023842,
+          "complete": true,
+          "frameEstimateMs": 178.20000004768372,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 21810.69999998808,
+              "duration": 200,
+              "processing": 0.8999999761581421,
+              "interactionId": 4050
+            },
+            {
+              "type": "pointerup",
+              "start": 21810.899999976158,
+              "duration": 200,
+              "processing": 0,
+              "interactionId": 4050
+            },
+            {
+              "type": "click",
+              "start": 21810.899999976158,
+              "duration": 200,
+              "processing": 159.10000002384186,
+              "interactionId": 4050
+            }
+          ],
+          "nativeMs": 200,
+          "longTasks": [
+            {
+              "start": 21814.600000023842,
+              "duration": 170
+            }
+          ]
+        },
+        {
+          "name": "2-reduce",
+          "index": 13,
+          "type": "click",
+          "armed": 22269.899999976158,
+          "started": true,
+          "eventStart": 22336.69999998808,
+          "dispatched": 22349.5,
+          "afterPaint": 22387.600000023842,
+          "complete": true,
+          "frameEstimateMs": 50.90000003576279,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 22336.600000023842,
+              "duration": 72,
+              "processing": 1,
+              "interactionId": 4057
+            },
+            {
+              "type": "pointerup",
+              "start": 22336.69999998808,
+              "duration": 72,
+              "processing": 0,
+              "interactionId": 4057
+            },
+            {
+              "type": "click",
+              "start": 22336.69999998808,
+              "duration": 72,
+              "processing": 33.89999997615814,
+              "interactionId": 4057
+            }
+          ],
+          "nativeMs": 72,
+          "longTasks": []
+        },
+        {
+          "name": "2-reduce",
+          "index": 14,
+          "type": "click",
+          "armed": 22568.69999998808,
+          "started": true,
+          "eventStart": 22644.19999998808,
+          "dispatched": 22661.5,
+          "afterPaint": 22827,
+          "complete": true,
+          "frameEstimateMs": 182.80000001192093,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 22644.100000023842,
+              "duration": 200,
+              "processing": 1.199999988079071,
+              "interactionId": 4064
+            },
+            {
+              "type": "pointerup",
+              "start": 22644.19999998808,
+              "duration": 200,
+              "processing": 0.10000002384185791,
+              "interactionId": 4064
+            },
+            {
+              "type": "click",
+              "start": 22644.19999998808,
+              "duration": 200,
+              "processing": 154.80000001192093,
+              "interactionId": 4064
+            }
+          ],
+          "nativeMs": 200,
+          "longTasks": [
+            {
+              "start": 22647.399999976158,
+              "duration": 170
+            }
+          ]
+        },
+        {
+          "name": "2-reduce",
+          "index": 15,
+          "type": "click",
+          "armed": 23084.80000001192,
+          "started": true,
+          "eventStart": 23194.80000001192,
+          "dispatched": 23203.19999998808,
+          "afterPaint": 23332.30000001192,
+          "complete": true,
+          "frameEstimateMs": 137.5,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 23194.69999998808,
+              "duration": 144,
+              "processing": 2.699999988079071,
+              "interactionId": 4071
+            },
+            {
+              "type": "pointerup",
+              "start": 23194.80000001192,
+              "duration": 144,
+              "processing": 0.19999998807907104,
+              "interactionId": 4071
+            },
+            {
+              "type": "click",
+              "start": 23194.80000001192,
+              "duration": 144,
+              "processing": 113.80000001192093,
+              "interactionId": 4071
+            }
+          ],
+          "nativeMs": 144,
+          "longTasks": [
+            {
+              "start": 23194.80000001192,
+              "duration": 123
+            }
+          ]
+        },
+        {
+          "name": "2-reduce",
+          "index": 16,
+          "type": "click",
+          "armed": 23524.399999976158,
+          "started": true,
+          "eventStart": 23588.100000023842,
+          "dispatched": 23590.69999998808,
+          "afterPaint": 23634.5,
+          "complete": true,
+          "frameEstimateMs": 46.39999997615814,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 23588.100000023842,
+              "duration": 72,
+              "processing": 0.09999996423721313,
+              "interactionId": 4078
+            },
+            {
+              "type": "pointerup",
+              "start": 23588.100000023842,
+              "duration": 72,
+              "processing": 0,
+              "interactionId": 4078
+            },
+            {
+              "type": "click",
+              "start": 23588.100000023842,
+              "duration": 72,
+              "processing": 39.799999952316284,
+              "interactionId": 4078
+            }
+          ],
+          "nativeMs": 72,
+          "longTasks": []
+        },
+        {
+          "name": "2-reduce",
+          "index": 17,
+          "type": "click",
+          "armed": 23808.5,
+          "started": true,
+          "eventStart": 24019.399999976158,
+          "dispatched": 24022.899999976158,
+          "afterPaint": 24227.100000023842,
+          "complete": true,
+          "frameEstimateMs": 207.70000004768372,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 24019.19999998808,
+              "duration": 208,
+              "processing": 0.10000002384185791,
+              "interactionId": 4085
+            },
+            {
+              "type": "pointerup",
+              "start": 24019.399999976158,
+              "duration": 208,
+              "processing": 0.3999999761581421,
+              "interactionId": 4085
+            },
+            {
+              "type": "click",
+              "start": 24019.399999976158,
+              "duration": 208,
+              "processing": 183.0999999642372,
+              "interactionId": 4085
+            }
+          ],
+          "nativeMs": 208,
+          "longTasks": [
+            {
+              "start": 24019.5,
+              "duration": 188
+            }
+          ]
+        },
+        {
+          "name": "2-reduce",
+          "index": 18,
+          "type": "click",
+          "armed": 24382.30000001192,
+          "started": true,
+          "eventStart": 24468.5,
+          "dispatched": 24484.19999998808,
+          "afterPaint": 24626.19999998808,
+          "complete": true,
+          "frameEstimateMs": 157.69999998807907,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 24468.399999976158,
+              "duration": 176,
+              "processing": 3.100000023841858,
+              "interactionId": 4092
+            },
+            {
+              "type": "pointerup",
+              "start": 24468.5,
+              "duration": 176,
+              "processing": 0.19999998807907104,
+              "interactionId": 4092
+            },
+            {
+              "type": "click",
+              "start": 24468.5,
+              "duration": 176,
+              "processing": 126.30000001192093,
+              "interactionId": 4092
+            }
+          ],
+          "nativeMs": 176,
+          "longTasks": [
+            {
+              "start": 24468.69999998808,
+              "duration": 142
+            }
+          ]
+        },
+        {
+          "name": "2-reduce",
+          "index": 19,
+          "type": "click",
+          "armed": 24768.600000023842,
+          "started": true,
+          "eventStart": 24830.30000001192,
+          "dispatched": 24832.5,
+          "afterPaint": 24881.69999998808,
+          "complete": true,
+          "frameEstimateMs": 51.39999997615814,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 24830.100000023842,
+              "duration": 64,
+              "processing": 0.7000000476837158,
+              "interactionId": 4099
+            },
+            {
+              "type": "pointerup",
+              "start": 24830.30000001192,
+              "duration": 64,
+              "processing": 0,
+              "interactionId": 4099
+            },
+            {
+              "type": "click",
+              "start": 24830.30000001192,
+              "duration": 64,
+              "processing": 44.60000002384186,
+              "interactionId": 4099
+            }
+          ],
+          "nativeMs": 64,
+          "longTasks": []
+        },
+        {
+          "name": "2-reduce",
+          "index": 20,
+          "type": "click",
+          "armed": 25093.80000001192,
+          "started": true,
+          "eventStart": 25144.899999976158,
+          "dispatched": 25147.100000023842,
+          "afterPaint": 25196.100000023842,
+          "complete": true,
+          "frameEstimateMs": 51.200000047683716,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 25144.5,
+              "duration": 64,
+              "processing": 0.20000004768371582,
+              "interactionId": 4106
+            },
+            {
+              "type": "pointerup",
+              "start": 25144.899999976158,
+              "duration": 64,
+              "processing": 0,
+              "interactionId": 4106
+            },
+            {
+              "type": "click",
+              "start": 25144.899999976158,
+              "duration": 64,
+              "processing": 43.80000001192093,
+              "interactionId": 4106
+            }
+          ],
+          "nativeMs": 64,
+          "longTasks": []
+        },
+        {
+          "name": "2-reduce",
+          "index": 21,
+          "type": "click",
+          "armed": 25364.600000023842,
+          "started": true,
+          "eventStart": 25401.600000023842,
+          "dispatched": 25406.600000023842,
+          "afterPaint": 25539.19999998808,
+          "complete": true,
+          "frameEstimateMs": 137.5999999642372,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 25401.5,
+              "duration": 160,
+              "processing": 0.10000002384185791,
+              "interactionId": 4113
+            },
+            {
+              "type": "pointerup",
+              "start": 25401.600000023842,
+              "duration": 160,
+              "processing": 0,
+              "interactionId": 4113
+            },
+            {
+              "type": "click",
+              "start": 25401.600000023842,
+              "duration": 160,
+              "processing": 126.89999997615814,
+              "interactionId": 4113
+            }
+          ],
+          "nativeMs": 160,
+          "longTasks": [
+            {
+              "start": 25402.30000001192,
+              "duration": 132
+            }
+          ]
+        },
+        {
+          "name": "2-reduce",
+          "index": 22,
+          "type": "click",
+          "armed": 25732,
+          "started": true,
+          "eventStart": 25790.5,
+          "dispatched": 25795.100000023842,
+          "afterPaint": 25875.69999998808,
+          "complete": true,
+          "frameEstimateMs": 85.19999998807907,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 25790.30000001192,
+              "duration": 104,
+              "processing": 0.8999999761581421,
+              "interactionId": 4120
+            },
+            {
+              "type": "pointerup",
+              "start": 25790.5,
+              "duration": 104,
+              "processing": 0.20000004768371582,
+              "interactionId": 4120
+            },
+            {
+              "type": "click",
+              "start": 25790.5,
+              "duration": 104,
+              "processing": 75.89999997615814,
+              "interactionId": 4120
+            }
+          ],
+          "nativeMs": 104,
+          "longTasks": [
+            {
+              "start": 25790.600000023842,
+              "duration": 81
+            }
+          ]
+        },
+        {
+          "name": "2-reduce",
+          "index": 23,
+          "type": "click",
+          "armed": 26074.80000001192,
+          "started": true,
+          "eventStart": 26121.5,
+          "dispatched": 26125.80000001192,
+          "afterPaint": 26268.19999998808,
+          "complete": true,
+          "frameEstimateMs": 146.69999998807907,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 26121.30000001192,
+              "duration": 160,
+              "processing": 0.3999999761581421,
+              "interactionId": 4127
+            },
+            {
+              "type": "pointerup",
+              "start": 26121.5,
+              "duration": 160,
+              "processing": 0,
+              "interactionId": 4127
+            },
+            {
+              "type": "click",
+              "start": 26121.5,
+              "duration": 160,
+              "processing": 137.19999998807907,
+              "interactionId": 4127
+            }
+          ],
+          "nativeMs": 160,
+          "longTasks": [
+            {
+              "start": 26121.69999998808,
+              "duration": 142
+            }
+          ]
+        },
+        {
+          "name": "2-reduce",
+          "index": 24,
+          "type": "click",
+          "armed": 26473.30000001192,
+          "started": true,
+          "eventStart": 26532.19999998808,
+          "dispatched": 26535.899999976158,
+          "afterPaint": 26579.19999998808,
+          "complete": true,
+          "frameEstimateMs": 47,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 26532,
+              "duration": 64,
+              "processing": 0,
+              "interactionId": 4134
+            },
+            {
+              "type": "pointerup",
+              "start": 26532.19999998808,
+              "duration": 64,
+              "processing": 0,
+              "interactionId": 4134
+            },
+            {
+              "type": "click",
+              "start": 26532.19999998808,
+              "duration": 64,
+              "processing": 38.30000001192093,
+              "interactionId": 4134
+            }
+          ],
+          "nativeMs": 64,
+          "longTasks": []
+        },
+        {
+          "name": "2-reduce",
+          "index": 25,
+          "type": "click",
+          "armed": 26772.100000023842,
+          "started": true,
+          "eventStart": 26861,
+          "dispatched": 26862.899999976158,
+          "afterPaint": 27038.5,
+          "complete": true,
+          "frameEstimateMs": 177.5,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 26861,
+              "duration": 200,
+              "processing": 0.40000003576278687,
+              "interactionId": 4141
+            },
+            {
+              "type": "pointerup",
+              "start": 26861,
+              "duration": 200,
+              "processing": 0,
+              "interactionId": 4141
+            },
+            {
+              "type": "click",
+              "start": 26861,
+              "duration": 200,
+              "processing": 169.70000004768372,
+              "interactionId": 4141
+            }
+          ],
+          "nativeMs": 200,
+          "longTasks": [
+            {
+              "start": 26861.19999998808,
+              "duration": 172
+            }
+          ]
+        },
+        {
+          "name": "2-reduce",
+          "index": 26,
+          "type": "click",
+          "armed": 27216.600000023842,
+          "started": true,
+          "eventStart": 27263.5,
+          "dispatched": 27265.899999976158,
+          "afterPaint": 27311.80000001192,
+          "complete": true,
+          "frameEstimateMs": 48.30000001192093,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 27263,
+              "duration": 64,
+              "processing": 0.19999998807907104,
+              "interactionId": 4148
+            },
+            {
+              "type": "pointerup",
+              "start": 27263.5,
+              "duration": 64,
+              "processing": 0.09999996423721313,
+              "interactionId": 4148
+            },
+            {
+              "type": "click",
+              "start": 27263.5,
+              "duration": 64,
+              "processing": 41,
+              "interactionId": 4148
+            }
+          ],
+          "nativeMs": 64,
+          "longTasks": []
+        },
+        {
+          "name": "2-reduce",
+          "index": 27,
+          "type": "click",
+          "armed": 27487.100000023842,
+          "started": true,
+          "eventStart": 27524.600000023842,
+          "dispatched": 27528.100000023842,
+          "afterPaint": 27595.19999998808,
+          "complete": true,
+          "frameEstimateMs": 70.59999996423721,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 27524.600000023842,
+              "duration": 88,
+              "processing": 0.2999999523162842,
+              "interactionId": 4155
+            },
+            {
+              "type": "pointerup",
+              "start": 27524.600000023842,
+              "duration": 88,
+              "processing": 0.10000002384185791,
+              "interactionId": 4155
+            },
+            {
+              "type": "click",
+              "start": 27524.600000023842,
+              "duration": 88,
+              "processing": 52.59999996423721,
+              "interactionId": 4155
+            }
+          ],
+          "nativeMs": 88,
+          "longTasks": [
+            {
+              "start": 27524.600000023842,
+              "duration": 57
+            }
+          ]
+        },
+        {
+          "name": "2-reduce",
+          "index": 28,
+          "type": "click",
+          "armed": 27744.19999998808,
+          "started": true,
+          "eventStart": 27810.899999976158,
+          "dispatched": 27826.19999998808,
+          "afterPaint": 28026.600000023842,
+          "complete": true,
+          "frameEstimateMs": 215.70000004768372,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 27810.899999976158,
+              "duration": 216,
+              "processing": 4.199999988079071,
+              "interactionId": 4162
+            },
+            {
+              "type": "pointerup",
+              "start": 27810.899999976158,
+              "duration": 216,
+              "processing": 0,
+              "interactionId": 4162
+            },
+            {
+              "type": "click",
+              "start": 27810.899999976158,
+              "duration": 216,
+              "processing": 171.19999998807907,
+              "interactionId": 4162
+            }
+          ],
+          "nativeMs": 216,
+          "longTasks": [
+            {
+              "start": 27810.80000001192,
+              "duration": 191
+            }
+          ]
+        },
+        {
+          "name": "2-reduce",
+          "index": 29,
+          "type": "click",
+          "armed": 28181.399999976158,
+          "started": true,
+          "eventStart": 28304,
+          "dispatched": 28305.80000001192,
+          "afterPaint": 28369.19999998808,
+          "complete": true,
+          "frameEstimateMs": 65.19999998807907,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 28303.899999976158,
+              "duration": 72,
+              "processing": 0.19999998807907104,
+              "interactionId": 4169
+            },
+            {
+              "type": "pointerup",
+              "start": 28304,
+              "duration": 72,
+              "processing": 0,
+              "interactionId": 4169
+            },
+            {
+              "type": "click",
+              "start": 28304,
+              "duration": 72,
+              "processing": 50.09999996423721,
+              "interactionId": 4169
+            }
+          ],
+          "nativeMs": 72,
+          "longTasks": [
+            {
+              "start": 28304.19999998808,
+              "duration": 57
+            }
+          ]
+        }
+      ]
+    },
+    "3-reduce": {
+      "frameEstimate": {
+        "count": 30,
+        "p50": 57.30000001192093,
+        "p95": 270.0999999642372,
+        "max": 350.60000002384186
+      },
+      "eventTiming": {
+        "count": 30,
+        "p50": 72,
+        "p95": 280,
+        "max": 344
+      },
+      "samplesWithoutEventTiming": 0,
+      "longTaskMaximumMs": 331,
+      "samples": [
+        {
+          "name": "3-reduce",
+          "index": 0,
+          "type": "click",
+          "armed": 28985,
+          "started": true,
+          "eventStart": 29115.19999998808,
+          "dispatched": 29129.5,
+          "afterPaint": 29182.80000001192,
+          "complete": true,
+          "frameEstimateMs": 67.60000002384186,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 29115.19999998808,
+              "duration": 96,
+              "processing": 0.19999998807907104,
+              "interactionId": 4176
+            },
+            {
+              "type": "pointerup",
+              "start": 29115.19999998808,
+              "duration": 96,
+              "processing": 0.10000002384185791,
+              "interactionId": 4176
+            },
+            {
+              "type": "click",
+              "start": 29115.19999998808,
+              "duration": 96,
+              "processing": 48.5,
+              "interactionId": 4176
+            }
+          ],
+          "nativeMs": 96,
+          "longTasks": [
+            {
+              "start": 29117.69999998808,
+              "duration": 61
+            }
+          ]
+        },
+        {
+          "name": "3-reduce",
+          "index": 1,
+          "type": "click",
+          "armed": 29358.899999976158,
+          "started": true,
+          "eventStart": 29404.899999976158,
+          "dispatched": 29416.80000001192,
+          "afterPaint": 29454.899999976158,
+          "complete": true,
+          "frameEstimateMs": 50,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 29404.600000023842,
+              "duration": 72,
+              "processing": 3.899999976158142,
+              "interactionId": 4183
+            },
+            {
+              "type": "pointerup",
+              "start": 29404.899999976158,
+              "duration": 72,
+              "processing": 0.3999999761581421,
+              "interactionId": 4183
+            },
+            {
+              "type": "click",
+              "start": 29404.899999976158,
+              "duration": 72,
+              "processing": 34.10000002384186,
+              "interactionId": 4183
+            }
+          ],
+          "nativeMs": 72,
+          "longTasks": []
+        },
+        {
+          "name": "3-reduce",
+          "index": 2,
+          "type": "click",
+          "armed": 29636.399999976158,
+          "started": true,
+          "eventStart": 29668.80000001192,
+          "dispatched": 29671.899999976158,
+          "afterPaint": 29730.30000001192,
+          "complete": true,
+          "frameEstimateMs": 61.5,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 29668.5,
+              "duration": 72,
+              "processing": 0.19999998807907104,
+              "interactionId": 4190
+            },
+            {
+              "type": "pointerup",
+              "start": 29668.80000001192,
+              "duration": 72,
+              "processing": 0,
+              "interactionId": 4190
+            },
+            {
+              "type": "click",
+              "start": 29668.80000001192,
+              "duration": 72,
+              "processing": 55.10000002384186,
+              "interactionId": 4190
+            }
+          ],
+          "nativeMs": 72,
+          "longTasks": [
+            {
+              "start": 29669,
+              "duration": 58
+            }
+          ]
+        },
+        {
+          "name": "3-reduce",
+          "index": 3,
+          "type": "click",
+          "armed": 29972,
+          "started": true,
+          "eventStart": 30125.69999998808,
+          "dispatched": 30130.5,
+          "afterPaint": 30191.600000023842,
+          "complete": true,
+          "frameEstimateMs": 65.90000003576279,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 30125.5,
+              "duration": 80,
+              "processing": 2.600000023841858,
+              "interactionId": 4197
+            },
+            {
+              "type": "pointerup",
+              "start": 30125.69999998808,
+              "duration": 80,
+              "processing": 0.10000002384185791,
+              "interactionId": 4197
+            },
+            {
+              "type": "click",
+              "start": 30125.69999998808,
+              "duration": 80,
+              "processing": 51.80000001192093,
+              "interactionId": 4197
+            }
+          ],
+          "nativeMs": 80,
+          "longTasks": [
+            {
+              "start": 30127,
+              "duration": 56
+            }
+          ]
+        },
+        {
+          "name": "3-reduce",
+          "index": 4,
+          "type": "click",
+          "armed": 30434.30000001192,
+          "started": true,
+          "eventStart": 30571.899999976158,
+          "dispatched": 30581.69999998808,
+          "afterPaint": 30619.600000023842,
+          "complete": true,
+          "frameEstimateMs": 47.700000047683716,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 30571.5,
+              "duration": 72,
+              "processing": 0.30000001192092896,
+              "interactionId": 4204
+            },
+            {
+              "type": "pointerup",
+              "start": 30571.899999976158,
+              "duration": 72,
+              "processing": 0,
+              "interactionId": 4204
+            },
+            {
+              "type": "click",
+              "start": 30571.899999976158,
+              "duration": 72,
+              "processing": 33.5,
+              "interactionId": 4204
+            }
+          ],
+          "nativeMs": 72,
+          "longTasks": []
+        },
+        {
+          "name": "3-reduce",
+          "index": 5,
+          "type": "click",
+          "armed": 30807.19999998808,
+          "started": true,
+          "eventStart": 31048.80000001192,
+          "dispatched": 31063.600000023842,
+          "afterPaint": 31095.399999976158,
+          "complete": true,
+          "frameEstimateMs": 46.59999996423721,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 31048.399999976158,
+              "duration": 64,
+              "processing": 0.2999999523162842,
+              "interactionId": 4211
+            },
+            {
+              "type": "pointerup",
+              "start": 31048.80000001192,
+              "duration": 64,
+              "processing": 0,
+              "interactionId": 4211
+            },
+            {
+              "type": "click",
+              "start": 31048.80000001192,
+              "duration": 64,
+              "processing": 27.5,
+              "interactionId": 4211
+            }
+          ],
+          "nativeMs": 64,
+          "longTasks": []
+        },
+        {
+          "name": "3-reduce",
+          "index": 6,
+          "type": "click",
+          "armed": 31275.600000023842,
+          "started": true,
+          "eventStart": 31400.5,
+          "dispatched": 31406.600000023842,
+          "afterPaint": 31468.80000001192,
+          "complete": true,
+          "frameEstimateMs": 68.30000001192093,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 31400.19999998808,
+              "duration": 96,
+              "processing": 0.10000002384185791,
+              "interactionId": 4218
+            },
+            {
+              "type": "pointerup",
+              "start": 31400.5,
+              "duration": 96,
+              "processing": 0.10000002384185791,
+              "interactionId": 4218
+            },
+            {
+              "type": "click",
+              "start": 31400.5,
+              "duration": 96,
+              "processing": 58.09999996423721,
+              "interactionId": 4218
+            }
+          ],
+          "nativeMs": 96,
+          "longTasks": [
+            {
+              "start": 31404,
+              "duration": 61
+            }
+          ]
+        },
+        {
+          "name": "3-reduce",
+          "index": 7,
+          "type": "click",
+          "armed": 31703.69999998808,
+          "started": true,
+          "eventStart": 31769.30000001192,
+          "dispatched": 31782.69999998808,
+          "afterPaint": 31826.600000023842,
+          "complete": true,
+          "frameEstimateMs": 57.30000001192093,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 31768.899999976158,
+              "duration": 72,
+              "processing": 2.699999988079071,
+              "interactionId": 4225
+            },
+            {
+              "type": "pointerup",
+              "start": 31769.30000001192,
+              "duration": 72,
+              "processing": 1.199999988079071,
+              "interactionId": 4225
+            },
+            {
+              "type": "click",
+              "start": 31769.30000001192,
+              "duration": 72,
+              "processing": 38.19999998807907,
+              "interactionId": 4225
+            }
+          ],
+          "nativeMs": 72,
+          "longTasks": [
+            {
+              "start": 31769.600000023842,
+              "duration": 54
+            }
+          ]
+        },
+        {
+          "name": "3-reduce",
+          "index": 8,
+          "type": "click",
+          "armed": 32006.100000023842,
+          "started": true,
+          "eventStart": 32098.5,
+          "dispatched": 32103,
+          "afterPaint": 32146.399999976158,
+          "complete": true,
+          "frameEstimateMs": 47.89999997615814,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 32098.399999976158,
+              "duration": 64,
+              "processing": 0.19999998807907104,
+              "interactionId": 4232
+            },
+            {
+              "type": "pointerup",
+              "start": 32098.5,
+              "duration": 64,
+              "processing": 0,
+              "interactionId": 4232
+            },
+            {
+              "type": "click",
+              "start": 32098.5,
+              "duration": 64,
+              "processing": 39.69999998807907,
+              "interactionId": 4232
+            }
+          ],
+          "nativeMs": 64,
+          "longTasks": []
+        },
+        {
+          "name": "3-reduce",
+          "index": 9,
+          "type": "click",
+          "armed": 32350.80000001192,
+          "started": true,
+          "eventStart": 32428.600000023842,
+          "dispatched": 32436.600000023842,
+          "afterPaint": 32698.69999998808,
+          "complete": true,
+          "frameEstimateMs": 270.0999999642372,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 32428.5,
+              "duration": 280,
+              "processing": 1.300000011920929,
+              "interactionId": 4239
+            },
+            {
+              "type": "pointerup",
+              "start": 32428.600000023842,
+              "duration": 280,
+              "processing": 0.5,
+              "interactionId": 4239
+            },
+            {
+              "type": "click",
+              "start": 32428.600000023842,
+              "duration": 280,
+              "processing": 241.10000002384186,
+              "interactionId": 4239
+            }
+          ],
+          "nativeMs": 280,
+          "longTasks": [
+            {
+              "start": 32434.100000023842,
+              "duration": 247
+            }
+          ]
+        },
+        {
+          "name": "3-reduce",
+          "index": 10,
+          "type": "click",
+          "armed": 32937,
+          "started": true,
+          "eventStart": 33073.19999998808,
+          "dispatched": 33076.39999997616,
+          "afterPaint": 33120.10000002384,
+          "complete": true,
+          "frameEstimateMs": 46.90000003576279,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 33073.10000002384,
+              "duration": 56,
+              "processing": 0.30000001192092896,
+              "interactionId": 4246
+            },
+            {
+              "type": "pointerup",
+              "start": 33073.19999998808,
+              "duration": 56,
+              "processing": 0,
+              "interactionId": 4246
+            },
+            {
+              "type": "click",
+              "start": 33073.19999998808,
+              "duration": 56,
+              "processing": 41.09999996423721,
+              "interactionId": 4246
+            }
+          ],
+          "nativeMs": 56,
+          "longTasks": []
+        },
+        {
+          "name": "3-reduce",
+          "index": 11,
+          "type": "click",
+          "armed": 33383.80000001192,
+          "started": true,
+          "eventStart": 33543.10000002384,
+          "dispatched": 33544.19999998808,
+          "afterPaint": 33577.10000002384,
+          "complete": true,
+          "frameEstimateMs": 34,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 33542.19999998808,
+              "duration": 48,
+              "processing": 0.09999996423721313,
+              "interactionId": 4253
+            },
+            {
+              "type": "pointerup",
+              "start": 33543.10000002384,
+              "duration": 48,
+              "processing": 0,
+              "interactionId": 4253
+            },
+            {
+              "type": "click",
+              "start": 33543.10000002384,
+              "duration": 48,
+              "processing": 25.099999964237213,
+              "interactionId": 4253
+            }
+          ],
+          "nativeMs": 48,
+          "longTasks": []
+        },
+        {
+          "name": "3-reduce",
+          "index": 12,
+          "type": "click",
+          "armed": 33820.69999998808,
+          "started": true,
+          "eventStart": 34037.60000002384,
+          "dispatched": 34040.60000002384,
+          "afterPaint": 34087.30000001192,
+          "complete": true,
+          "frameEstimateMs": 49.69999998807907,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 34037.5,
+              "duration": 72,
+              "processing": 0.30000001192092896,
+              "interactionId": 4260
+            },
+            {
+              "type": "pointerup",
+              "start": 34037.60000002384,
+              "duration": 72,
+              "processing": 0,
+              "interactionId": 4260
+            },
+            {
+              "type": "click",
+              "start": 34037.60000002384,
+              "duration": 72,
+              "processing": 41.59999996423721,
+              "interactionId": 4260
+            }
+          ],
+          "nativeMs": 72,
+          "longTasks": []
+        },
+        {
+          "name": "3-reduce",
+          "index": 13,
+          "type": "click",
+          "armed": 34247.39999997616,
+          "started": true,
+          "eventStart": 34298.39999997616,
+          "dispatched": 34301.60000002384,
+          "afterPaint": 34423.69999998808,
+          "complete": true,
+          "frameEstimateMs": 125.30000001192093,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 34297.89999997616,
+              "duration": 128,
+              "processing": 0.19999998807907104,
+              "interactionId": 4267
+            },
+            {
+              "type": "pointerup",
+              "start": 34298.39999997616,
+              "duration": 128,
+              "processing": 0.10000002384185791,
+              "interactionId": 4267
+            },
+            {
+              "type": "click",
+              "start": 34298.39999997616,
+              "duration": 128,
+              "processing": 95.59999996423721,
+              "interactionId": 4267
+            }
+          ],
+          "nativeMs": 128,
+          "longTasks": [
+            {
+              "start": 34299.5,
+              "duration": 100
+            }
+          ]
+        },
+        {
+          "name": "3-reduce",
+          "index": 14,
+          "type": "click",
+          "armed": 34698.10000002384,
+          "started": true,
+          "eventStart": 34818.19999998808,
+          "dispatched": 34820.10000002384,
+          "afterPaint": 35168.80000001192,
+          "complete": true,
+          "frameEstimateMs": 350.60000002384186,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 34818.10000002384,
+              "duration": 344,
+              "processing": 0.9000000357627869,
+              "interactionId": 4274
+            },
+            {
+              "type": "pointerup",
+              "start": 34818.19999998808,
+              "duration": 344,
+              "processing": 0.10000002384185791,
+              "interactionId": 4274
+            },
+            {
+              "type": "click",
+              "start": 34818.19999998808,
+              "duration": 344,
+              "processing": 328.89999997615814,
+              "interactionId": 4274
+            }
+          ],
+          "nativeMs": 344,
+          "longTasks": [
+            {
+              "start": 34818.39999997616,
+              "duration": 331
+            }
+          ]
+        },
+        {
+          "name": "3-reduce",
+          "index": 15,
+          "type": "click",
+          "armed": 35455.5,
+          "started": true,
+          "eventStart": 35598.80000001192,
+          "dispatched": 35616.60000002384,
+          "afterPaint": 35655,
+          "complete": true,
+          "frameEstimateMs": 56.19999998807907,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 35598.60000002384,
+              "duration": 128,
+              "processing": 0.3999999761581421,
+              "interactionId": 4281
+            },
+            {
+              "type": "pointerup",
+              "start": 35598.80000001192,
+              "duration": 128,
+              "processing": 0,
+              "interactionId": 4281
+            },
+            {
+              "type": "click",
+              "start": 35598.80000001192,
+              "duration": 128,
+              "processing": 32.799999952316284,
+              "interactionId": 4281
+            }
+          ],
+          "nativeMs": 128,
+          "longTasks": [
+            {
+              "start": 35600.30000001192,
+              "duration": 50
+            }
+          ]
+        },
+        {
+          "name": "3-reduce",
+          "index": 16,
+          "type": "click",
+          "armed": 35903,
+          "started": true,
+          "eventStart": 36151,
+          "dispatched": 36155.30000001192,
+          "afterPaint": 36242,
+          "complete": true,
+          "frameEstimateMs": 91,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 36150.5,
+              "duration": 112,
+              "processing": 0.19999998807907104,
+              "interactionId": 4288
+            },
+            {
+              "type": "pointerup",
+              "start": 36151,
+              "duration": 112,
+              "processing": 0,
+              "interactionId": 4288
+            },
+            {
+              "type": "click",
+              "start": 36151,
+              "duration": 112,
+              "processing": 83.5,
+              "interactionId": 4288
+            }
+          ],
+          "nativeMs": 112,
+          "longTasks": [
+            {
+              "start": 36153.19999998808,
+              "duration": 86
+            }
+          ]
+        },
+        {
+          "name": "3-reduce",
+          "index": 17,
+          "type": "click",
+          "armed": 36422.69999998808,
+          "started": true,
+          "eventStart": 36469.69999998808,
+          "dispatched": 36471.60000002384,
+          "afterPaint": 36506.89999997616,
+          "complete": true,
+          "frameEstimateMs": 37.19999998807907,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 36468.30000001192,
+              "duration": 56,
+              "processing": 0.3999999761581421,
+              "interactionId": 4295
+            },
+            {
+              "type": "pointerup",
+              "start": 36469.69999998808,
+              "duration": 56,
+              "processing": 0,
+              "interactionId": 4295
+            },
+            {
+              "type": "click",
+              "start": 36469.69999998808,
+              "duration": 56,
+              "processing": 30.099999964237213,
+              "interactionId": 4295
+            }
+          ],
+          "nativeMs": 56,
+          "longTasks": []
+        },
+        {
+          "name": "3-reduce",
+          "index": 18,
+          "type": "click",
+          "armed": 36706,
+          "started": true,
+          "eventStart": 36905.30000001192,
+          "dispatched": 36907.30000001192,
+          "afterPaint": 37052.39999997616,
+          "complete": true,
+          "frameEstimateMs": 147.0999999642372,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 36905.19999998808,
+              "duration": 152,
+              "processing": 0.19999998807907104,
+              "interactionId": 4302
+            },
+            {
+              "type": "pointerup",
+              "start": 36905.30000001192,
+              "duration": 152,
+              "processing": 0,
+              "interactionId": 4302
+            },
+            {
+              "type": "click",
+              "start": 36905.30000001192,
+              "duration": 152,
+              "processing": 141,
+              "interactionId": 4302
+            }
+          ],
+          "nativeMs": 152,
+          "longTasks": [
+            {
+              "start": 36905.69999998808,
+              "duration": 143
+            }
+          ]
+        },
+        {
+          "name": "3-reduce",
+          "index": 19,
+          "type": "click",
+          "armed": 37215.30000001192,
+          "started": true,
+          "eventStart": 37373.69999998808,
+          "dispatched": 37375.19999998808,
+          "afterPaint": 37460.60000002384,
+          "complete": true,
+          "frameEstimateMs": 86.90000003576279,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 37373.30000001192,
+              "duration": 104,
+              "processing": 0.19999998807907104,
+              "interactionId": 4309
+            },
+            {
+              "type": "pointerup",
+              "start": 37373.69999998808,
+              "duration": 104,
+              "processing": 0,
+              "interactionId": 4309
+            },
+            {
+              "type": "click",
+              "start": 37373.69999998808,
+              "duration": 104,
+              "processing": 80.29999995231628,
+              "interactionId": 4309
+            }
+          ],
+          "nativeMs": 104,
+          "longTasks": [
+            {
+              "start": 37374.5,
+              "duration": 82
+            }
+          ]
+        },
+        {
+          "name": "3-reduce",
+          "index": 20,
+          "type": "click",
+          "armed": 37701.10000002384,
+          "started": true,
+          "eventStart": 37756.5,
+          "dispatched": 37760,
+          "afterPaint": 37801.10000002384,
+          "complete": true,
+          "frameEstimateMs": 44.60000002384186,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 37756.39999997616,
+              "duration": 72,
+              "processing": 0.40000003576278687,
+              "interactionId": 4316
+            },
+            {
+              "type": "pointerup",
+              "start": 37756.5,
+              "duration": 72,
+              "processing": 0,
+              "interactionId": 4316
+            },
+            {
+              "type": "click",
+              "start": 37756.5,
+              "duration": 72,
+              "processing": 35.30000001192093,
+              "interactionId": 4316
+            }
+          ],
+          "nativeMs": 72,
+          "longTasks": []
+        },
+        {
+          "name": "3-reduce",
+          "index": 21,
+          "type": "click",
+          "armed": 38041.19999998808,
+          "started": true,
+          "eventStart": 38153.19999998808,
+          "dispatched": 38157,
+          "afterPaint": 38195.69999998808,
+          "complete": true,
+          "frameEstimateMs": 42.5,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 38152.80000001192,
+              "duration": 56,
+              "processing": 0.19999998807907104,
+              "interactionId": 4323
+            },
+            {
+              "type": "pointerup",
+              "start": 38153.19999998808,
+              "duration": 56,
+              "processing": 0,
+              "interactionId": 4323
+            },
+            {
+              "type": "click",
+              "start": 38153.19999998808,
+              "duration": 56,
+              "processing": 32.5,
+              "interactionId": 4323
+            }
+          ],
+          "nativeMs": 56,
+          "longTasks": []
+        },
+        {
+          "name": "3-reduce",
+          "index": 22,
+          "type": "click",
+          "armed": 38422.89999997616,
+          "started": true,
+          "eventStart": 38556.19999998808,
+          "dispatched": 38570.39999997616,
+          "afterPaint": 38627.5,
+          "complete": true,
+          "frameEstimateMs": 71.30000001192093,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 38555.89999997616,
+              "duration": 88,
+              "processing": 0.30000001192092896,
+              "interactionId": 4330
+            },
+            {
+              "type": "pointerup",
+              "start": 38556.19999998808,
+              "duration": 88,
+              "processing": 0,
+              "interactionId": 4330
+            },
+            {
+              "type": "click",
+              "start": 38556.19999998808,
+              "duration": 88,
+              "processing": 52.799999952316284,
+              "interactionId": 4330
+            }
+          ],
+          "nativeMs": 88,
+          "longTasks": [
+            {
+              "start": 38556.80000001192,
+              "duration": 61
+            }
+          ]
+        },
+        {
+          "name": "3-reduce",
+          "index": 23,
+          "type": "click",
+          "armed": 39040.89999997616,
+          "started": true,
+          "eventStart": 39245.60000002384,
+          "dispatched": 39389.10000002384,
+          "afterPaint": 39427.5,
+          "complete": true,
+          "frameEstimateMs": 181.89999997615814,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 39245.39999997616,
+              "duration": 200,
+              "processing": 0.3999999761581421,
+              "interactionId": 4337
+            },
+            {
+              "type": "pointerup",
+              "start": 39245.60000002384,
+              "duration": 200,
+              "processing": 4.100000023841858,
+              "interactionId": 4337
+            },
+            {
+              "type": "click",
+              "start": 39245.60000002384,
+              "duration": 200,
+              "processing": 30.299999952316284,
+              "interactionId": 4337
+            }
+          ],
+          "nativeMs": 200,
+          "longTasks": [
+            {
+              "start": 39251.5,
+              "duration": 172
+            }
+          ]
+        },
+        {
+          "name": "3-reduce",
+          "index": 24,
+          "type": "click",
+          "armed": 39731.89999997616,
+          "started": true,
+          "eventStart": 39806.69999998808,
+          "dispatched": 39876.89999997616,
+          "afterPaint": 39931,
+          "complete": true,
+          "frameEstimateMs": 124.30000001192093,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 39806.60000002384,
+              "duration": 136,
+              "processing": 65.20000004768372,
+              "interactionId": 4344
+            },
+            {
+              "type": "pointerup",
+              "start": 39806.69999998808,
+              "duration": 136,
+              "processing": 0.10000002384185791,
+              "interactionId": 4344
+            },
+            {
+              "type": "click",
+              "start": 39806.69999998808,
+              "duration": 136,
+              "processing": 50.59999996423721,
+              "interactionId": 4344
+            }
+          ],
+          "nativeMs": 136,
+          "longTasks": [
+            {
+              "start": 39808,
+              "duration": 120
+            }
+          ]
+        },
+        {
+          "name": "3-reduce",
+          "index": 25,
+          "type": "click",
+          "armed": 40097.69999998808,
+          "started": true,
+          "eventStart": 40272.89999997616,
+          "dispatched": 40282.39999997616,
+          "afterPaint": 40319.89999997616,
+          "complete": true,
+          "frameEstimateMs": 47,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 40272.60000002384,
+              "duration": 72,
+              "processing": 0.40000003576278687,
+              "interactionId": 4351
+            },
+            {
+              "type": "pointerup",
+              "start": 40272.89999997616,
+              "duration": 72,
+              "processing": 0.09999996423721313,
+              "interactionId": 4351
+            },
+            {
+              "type": "click",
+              "start": 40272.89999997616,
+              "duration": 72,
+              "processing": 32.40000003576279,
+              "interactionId": 4351
+            }
+          ],
+          "nativeMs": 72,
+          "longTasks": []
+        },
+        {
+          "name": "3-reduce",
+          "index": 26,
+          "type": "click",
+          "armed": 40564,
+          "started": true,
+          "eventStart": 40710.60000002384,
+          "dispatched": 40712,
+          "afterPaint": 40741,
+          "complete": true,
+          "frameEstimateMs": 30.399999976158142,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 40710.5,
+              "duration": 48,
+              "processing": 0.30000001192092896,
+              "interactionId": 4358
+            },
+            {
+              "type": "pointerup",
+              "start": 40710.60000002384,
+              "duration": 48,
+              "processing": 0,
+              "interactionId": 4358
+            },
+            {
+              "type": "click",
+              "start": 40710.60000002384,
+              "duration": 48,
+              "processing": 24,
+              "interactionId": 4358
+            }
+          ],
+          "nativeMs": 48,
+          "longTasks": []
+        },
+        {
+          "name": "3-reduce",
+          "index": 27,
+          "type": "click",
+          "armed": 40943.5,
+          "started": true,
+          "eventStart": 41060.60000002384,
+          "dispatched": 41066.89999997616,
+          "afterPaint": 41110.69999998808,
+          "complete": true,
+          "frameEstimateMs": 50.09999996423721,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 41059.69999998808,
+              "duration": 64,
+              "processing": 0.2999999523162842,
+              "interactionId": 4365
+            },
+            {
+              "type": "pointerup",
+              "start": 41060.60000002384,
+              "duration": 64,
+              "processing": 0,
+              "interactionId": 4365
+            },
+            {
+              "type": "click",
+              "start": 41060.60000002384,
+              "duration": 64,
+              "processing": 30.600000023841858,
+              "interactionId": 4365
+            }
+          ],
+          "nativeMs": 64,
+          "longTasks": []
+        },
+        {
+          "name": "3-reduce",
+          "index": 28,
+          "type": "click",
+          "armed": 41353.69999998808,
+          "started": true,
+          "eventStart": 41468.10000002384,
+          "dispatched": 41469.89999997616,
+          "afterPaint": 41550.19999998808,
+          "complete": true,
+          "frameEstimateMs": 82.09999996423721,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 41467.60000002384,
+              "duration": 112,
+              "processing": 0.40000003576278687,
+              "interactionId": 4372
+            },
+            {
+              "type": "pointerup",
+              "start": 41468.10000002384,
+              "duration": 104,
+              "processing": 0,
+              "interactionId": 4372
+            },
+            {
+              "type": "click",
+              "start": 41468.10000002384,
+              "duration": 104,
+              "processing": 75,
+              "interactionId": 4372
+            }
+          ],
+          "nativeMs": 112,
+          "longTasks": [
+            {
+              "start": 41469.10000002384,
+              "duration": 78
+            }
+          ]
+        },
+        {
+          "name": "3-reduce",
+          "index": 29,
+          "type": "click",
+          "armed": 41931,
+          "started": true,
+          "eventStart": 42210.10000002384,
+          "dispatched": 42213.5,
+          "afterPaint": 42297.19999998808,
+          "complete": true,
+          "frameEstimateMs": 87.09999996423721,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 42209.89999997616,
+              "duration": 96,
+              "processing": 0.19999998807907104,
+              "interactionId": 4379
+            },
+            {
+              "type": "pointerup",
+              "start": 42210.10000002384,
+              "duration": 96,
+              "processing": 0.10000002384185791,
+              "interactionId": 4379
+            },
+            {
+              "type": "click",
+              "start": 42210.10000002384,
+              "duration": 96,
+              "processing": 78.19999998807907,
+              "interactionId": 4379
+            }
+          ],
+          "nativeMs": 96,
+          "longTasks": [
+            {
+              "start": 42211.60000002384,
+              "duration": 82
+            }
+          ]
+        }
+      ]
+    },
+    "4-no-preference": {
+      "frameEstimate": {
+        "count": 30,
+        "p50": 69.10000002384186,
+        "p95": 204.9000000357628,
+        "max": 236.10000002384186
+      },
+      "eventTiming": {
+        "count": 30,
+        "p50": 88,
+        "p95": 224,
+        "max": 256
+      },
+      "samplesWithoutEventTiming": 0,
+      "longTaskMaximumMs": 231,
+      "samples": [
+        {
+          "name": "4-no-preference",
+          "index": 0,
+          "type": "click",
+          "armed": 42997.10000002384,
+          "started": true,
+          "eventStart": 43095.39999997616,
+          "dispatched": 43104.60000002384,
+          "afterPaint": 43180,
+          "complete": true,
+          "frameEstimateMs": 84.60000002384186,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 43094.89999997616,
+              "duration": 16,
+              "processing": 0.40000003576278687,
+              "interactionId": 4386
+            },
+            {
+              "type": "pointerup",
+              "start": 43095.39999997616,
+              "duration": 96,
+              "processing": 0.10000002384185791,
+              "interactionId": 4386
+            },
+            {
+              "type": "click",
+              "start": 43095.39999997616,
+              "duration": 96,
+              "processing": 49.299999952316284,
+              "interactionId": 4386
+            }
+          ],
+          "nativeMs": 96,
+          "longTasks": [
+            {
+              "start": 43104.39999997616,
+              "duration": 63
+            }
+          ]
+        },
+        {
+          "name": "4-no-preference",
+          "index": 1,
+          "type": "click",
+          "armed": 43341.39999997616,
+          "started": true,
+          "eventStart": 43458.10000002384,
+          "dispatched": 43481.39999997616,
+          "afterPaint": 43556.30000001192,
+          "complete": true,
+          "frameEstimateMs": 98.19999998807907,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 43458,
+              "duration": 120,
+              "processing": 0.2999999523162842,
+              "interactionId": 4393
+            },
+            {
+              "type": "pointerup",
+              "start": 43458.10000002384,
+              "duration": 120,
+              "processing": 0.19999998807907104,
+              "interactionId": 4393
+            },
+            {
+              "type": "click",
+              "start": 43458.10000002384,
+              "duration": 120,
+              "processing": 69.5,
+              "interactionId": 4393
+            }
+          ],
+          "nativeMs": 120,
+          "longTasks": [
+            {
+              "start": 43460.39999997616,
+              "duration": 92
+            }
+          ]
+        },
+        {
+          "name": "4-no-preference",
+          "index": 2,
+          "type": "click",
+          "armed": 43777.69999998808,
+          "started": true,
+          "eventStart": 44069.60000002384,
+          "dispatched": 44074.60000002384,
+          "afterPaint": 44135,
+          "complete": true,
+          "frameEstimateMs": 65.39999997615814,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 44069.39999997616,
+              "duration": 88,
+              "processing": 0.3999999761581421,
+              "interactionId": 4400
+            },
+            {
+              "type": "pointerup",
+              "start": 44069.60000002384,
+              "duration": 88,
+              "processing": 0,
+              "interactionId": 4400
+            },
+            {
+              "type": "click",
+              "start": 44069.60000002384,
+              "duration": 88,
+              "processing": 55,
+              "interactionId": 4400
+            }
+          ],
+          "nativeMs": 88,
+          "longTasks": [
+            {
+              "start": 44070,
+              "duration": 61
+            }
+          ]
+        },
+        {
+          "name": "4-no-preference",
+          "index": 3,
+          "type": "click",
+          "armed": 44382,
+          "started": true,
+          "eventStart": 44500,
+          "dispatched": 44505.89999997616,
+          "afterPaint": 44545.89999997616,
+          "complete": true,
+          "frameEstimateMs": 45.89999997615814,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 44499.5,
+              "duration": 56,
+              "processing": 0.3999999761581421,
+              "interactionId": 4407
+            },
+            {
+              "type": "pointerup",
+              "start": 44500,
+              "duration": 56,
+              "processing": 0.10000002384185791,
+              "interactionId": 4407
+            },
+            {
+              "type": "click",
+              "start": 44500,
+              "duration": 56,
+              "processing": 33.30000001192093,
+              "interactionId": 4407
+            }
+          ],
+          "nativeMs": 56,
+          "longTasks": []
+        },
+        {
+          "name": "4-no-preference",
+          "index": 4,
+          "type": "click",
+          "armed": 44735.30000001192,
+          "started": true,
+          "eventStart": 44800.69999998808,
+          "dispatched": 44804.30000001192,
+          "afterPaint": 44888.60000002384,
+          "complete": true,
+          "frameEstimateMs": 87.90000003576279,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 44800.39999997616,
+              "duration": 112,
+              "processing": 0.30000001192092896,
+              "interactionId": 4414
+            },
+            {
+              "type": "pointerup",
+              "start": 44800.69999998808,
+              "duration": 112,
+              "processing": 0,
+              "interactionId": 4414
+            },
+            {
+              "type": "click",
+              "start": 44800.69999998808,
+              "duration": 112,
+              "processing": 61.19999998807907,
+              "interactionId": 4414
+            }
+          ],
+          "nativeMs": 112,
+          "longTasks": [
+            {
+              "start": 44801.30000001192,
+              "duration": 65
+            }
+          ]
+        },
+        {
+          "name": "4-no-preference",
+          "index": 5,
+          "type": "click",
+          "armed": 45193.10000002384,
+          "started": true,
+          "eventStart": 45319.89999997616,
+          "dispatched": 45331.60000002384,
+          "afterPaint": 45369,
+          "complete": true,
+          "frameEstimateMs": 49.10000002384186,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 45319.80000001192,
+              "duration": 72,
+              "processing": 0.3999999761581421,
+              "interactionId": 4421
+            },
+            {
+              "type": "pointerup",
+              "start": 45319.89999997616,
+              "duration": 72,
+              "processing": 0.10000002384185791,
+              "interactionId": 4421
+            },
+            {
+              "type": "click",
+              "start": 45319.89999997616,
+              "duration": 72,
+              "processing": 32.39999997615814,
+              "interactionId": 4421
+            }
+          ],
+          "nativeMs": 72,
+          "longTasks": []
+        },
+        {
+          "name": "4-no-preference",
+          "index": 6,
+          "type": "click",
+          "armed": 45595,
+          "started": true,
+          "eventStart": 45715.80000001192,
+          "dispatched": 45721.30000001192,
+          "afterPaint": 45760.80000001192,
+          "complete": true,
+          "frameEstimateMs": 45,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 45715.5,
+              "duration": 64,
+              "processing": 0.7000000476837158,
+              "interactionId": 4428
+            },
+            {
+              "type": "pointerup",
+              "start": 45715.80000001192,
+              "duration": 56,
+              "processing": 0,
+              "interactionId": 4428
+            },
+            {
+              "type": "click",
+              "start": 45715.80000001192,
+              "duration": 56,
+              "processing": 33.40000003576279,
+              "interactionId": 4428
+            }
+          ],
+          "nativeMs": 64,
+          "longTasks": []
+        },
+        {
+          "name": "4-no-preference",
+          "index": 7,
+          "type": "click",
+          "armed": 45950.60000002384,
+          "started": true,
+          "eventStart": 46318.69999998808,
+          "dispatched": 46355.69999998808,
+          "afterPaint": 46387.80000001192,
+          "complete": true,
+          "frameEstimateMs": 69.10000002384186,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 46318.5,
+              "duration": 72,
+              "processing": 21.099999964237213,
+              "interactionId": 4435
+            },
+            {
+              "type": "pointerup",
+              "start": 46318.69999998808,
+              "duration": 72,
+              "processing": 0.09999996423721313,
+              "interactionId": 4435
+            },
+            {
+              "type": "click",
+              "start": 46318.69999998808,
+              "duration": 72,
+              "processing": 16.600000023841858,
+              "interactionId": 4435
+            }
+          ],
+          "nativeMs": 72,
+          "longTasks": [
+            {
+              "start": 46326.69999998808,
+              "duration": 50
+            }
+          ]
+        },
+        {
+          "name": "4-no-preference",
+          "index": 8,
+          "type": "click",
+          "armed": 46650.80000001192,
+          "started": true,
+          "eventStart": 46801,
+          "dispatched": 46806.30000001192,
+          "afterPaint": 47037.10000002384,
+          "complete": true,
+          "frameEstimateMs": 236.10000002384186,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 46800.60000002384,
+              "duration": 256,
+              "processing": 0.5,
+              "interactionId": 4442
+            },
+            {
+              "type": "pointerup",
+              "start": 46801,
+              "duration": 256,
+              "processing": 0.10000002384185791,
+              "interactionId": 4442
+            },
+            {
+              "type": "click",
+              "start": 46801,
+              "duration": 256,
+              "processing": 83,
+              "interactionId": 4442
+            }
+          ],
+          "nativeMs": 256,
+          "longTasks": [
+            {
+              "start": 46802.39999997616,
+              "duration": 231
+            }
+          ]
+        },
+        {
+          "name": "4-no-preference",
+          "index": 9,
+          "type": "click",
+          "armed": 47291.60000002384,
+          "started": true,
+          "eventStart": 47581,
+          "dispatched": 47585.5,
+          "afterPaint": 47671.10000002384,
+          "complete": true,
+          "frameEstimateMs": 90.10000002384186,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 47580.30000001192,
+              "duration": 112,
+              "processing": 0.5,
+              "interactionId": 4449
+            },
+            {
+              "type": "pointerup",
+              "start": 47581,
+              "duration": 112,
+              "processing": 0.10000002384185791,
+              "interactionId": 4449
+            },
+            {
+              "type": "click",
+              "start": 47581,
+              "duration": 112,
+              "processing": 54.69999998807907,
+              "interactionId": 4449
+            }
+          ],
+          "nativeMs": 112,
+          "longTasks": [
+            {
+              "start": 47583.30000001192,
+              "duration": 58
+            }
+          ]
+        },
+        {
+          "name": "4-no-preference",
+          "index": 10,
+          "type": "click",
+          "armed": 48288.60000002384,
+          "started": true,
+          "eventStart": 48425.69999998808,
+          "dispatched": 48430.39999997616,
+          "afterPaint": 48568.60000002384,
+          "complete": true,
+          "frameEstimateMs": 142.9000000357628,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 48425.5,
+              "duration": 152,
+              "processing": 0.5,
+              "interactionId": 4456
+            },
+            {
+              "type": "pointerup",
+              "start": 48425.69999998808,
+              "duration": 152,
+              "processing": 0.09999996423721313,
+              "interactionId": 4456
+            },
+            {
+              "type": "click",
+              "start": 48425.69999998808,
+              "duration": 152,
+              "processing": 114.5,
+              "interactionId": 4456
+            }
+          ],
+          "nativeMs": 152,
+          "longTasks": [
+            {
+              "start": 48426.10000002384,
+              "duration": 120
+            }
+          ]
+        },
+        {
+          "name": "4-no-preference",
+          "index": 11,
+          "type": "click",
+          "armed": 48728.69999998808,
+          "started": true,
+          "eventStart": 48934.39999997616,
+          "dispatched": 48947.89999997616,
+          "afterPaint": 49139.30000001192,
+          "complete": true,
+          "frameEstimateMs": 204.9000000357628,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 48934.30000001192,
+              "duration": 224,
+              "processing": 2.199999988079071,
+              "interactionId": 4463
+            },
+            {
+              "type": "pointerup",
+              "start": 48934.39999997616,
+              "duration": 224,
+              "processing": 0,
+              "interactionId": 4463
+            },
+            {
+              "type": "click",
+              "start": 48934.39999997616,
+              "duration": 224,
+              "processing": 184.39999997615814,
+              "interactionId": 4463
+            }
+          ],
+          "nativeMs": 224,
+          "longTasks": [
+            {
+              "start": 48947.60000002384,
+              "duration": 186
+            }
+          ]
+        },
+        {
+          "name": "4-no-preference",
+          "index": 12,
+          "type": "click",
+          "armed": 49424.19999998808,
+          "started": true,
+          "eventStart": 49476.69999998808,
+          "dispatched": 49489.69999998808,
+          "afterPaint": 49620.30000001192,
+          "complete": true,
+          "frameEstimateMs": 143.60000002384186,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 49476.5,
+              "duration": 168,
+              "processing": 2.899999976158142,
+              "interactionId": 4470
+            },
+            {
+              "type": "pointerup",
+              "start": 49476.69999998808,
+              "duration": 168,
+              "processing": 0.30000001192092896,
+              "interactionId": 4470
+            },
+            {
+              "type": "click",
+              "start": 49476.69999998808,
+              "duration": 168,
+              "processing": 124.10000002384186,
+              "interactionId": 4470
+            }
+          ],
+          "nativeMs": 168,
+          "longTasks": [
+            {
+              "start": 49476.69999998808,
+              "duration": 139
+            }
+          ]
+        },
+        {
+          "name": "4-no-preference",
+          "index": 13,
+          "type": "click",
+          "armed": 49844.5,
+          "started": true,
+          "eventStart": 50040.89999997616,
+          "dispatched": 50044.69999998808,
+          "afterPaint": 50118.80000001192,
+          "complete": true,
+          "frameEstimateMs": 77.90000003576279,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 50040.80000001192,
+              "duration": 104,
+              "processing": 0.30000001192092896,
+              "interactionId": 4477
+            },
+            {
+              "type": "pointerup",
+              "start": 50040.89999997616,
+              "duration": 104,
+              "processing": 0,
+              "interactionId": 4477
+            },
+            {
+              "type": "click",
+              "start": 50040.89999997616,
+              "duration": 104,
+              "processing": 69,
+              "interactionId": 4477
+            }
+          ],
+          "nativeMs": 104,
+          "longTasks": [
+            {
+              "start": 50041.30000001192,
+              "duration": 74
+            }
+          ]
+        },
+        {
+          "name": "4-no-preference",
+          "index": 14,
+          "type": "click",
+          "armed": 50396.10000002384,
+          "started": true,
+          "eventStart": 50552.19999998808,
+          "dispatched": 50557.80000001192,
+          "afterPaint": 50591.39999997616,
+          "complete": true,
+          "frameEstimateMs": 39.19999998807907,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 50551.80000001192,
+              "duration": 56,
+              "processing": 1.600000023841858,
+              "interactionId": 4484
+            },
+            {
+              "type": "pointerup",
+              "start": 50552.19999998808,
+              "duration": 56,
+              "processing": 0,
+              "interactionId": 4484
+            },
+            {
+              "type": "click",
+              "start": 50552.19999998808,
+              "duration": 56,
+              "processing": 31.5,
+              "interactionId": 4484
+            }
+          ],
+          "nativeMs": 56,
+          "longTasks": []
+        },
+        {
+          "name": "4-no-preference",
+          "index": 15,
+          "type": "click",
+          "armed": 50800.39999997616,
+          "started": true,
+          "eventStart": 50886,
+          "dispatched": 51013.69999998808,
+          "afterPaint": 51062.69999998808,
+          "complete": true,
+          "frameEstimateMs": 176.69999998807907,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 50886,
+              "duration": 192,
+              "processing": 0.2999999523162842,
+              "interactionId": 4491
+            },
+            {
+              "type": "pointerup",
+              "start": 50886,
+              "duration": 192,
+              "processing": 0.09999996423721313,
+              "interactionId": 4491
+            },
+            {
+              "type": "click",
+              "start": 50886,
+              "duration": 192,
+              "processing": 43.5,
+              "interactionId": 4491
+            }
+          ],
+          "nativeMs": 192,
+          "longTasks": [
+            {
+              "start": 50908.80000001192,
+              "duration": 150
+            }
+          ]
+        },
+        {
+          "name": "4-no-preference",
+          "index": 16,
+          "type": "click",
+          "armed": 51337.60000002384,
+          "started": true,
+          "eventStart": 51481.39999997616,
+          "dispatched": 51495.60000002384,
+          "afterPaint": 51572.19999998808,
+          "complete": true,
+          "frameEstimateMs": 90.80000001192093,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 51481.10000002384,
+              "duration": 112,
+              "processing": 0.30000001192092896,
+              "interactionId": 4498
+            },
+            {
+              "type": "pointerup",
+              "start": 51481.39999997616,
+              "duration": 112,
+              "processing": 0.19999998807907104,
+              "interactionId": 4498
+            },
+            {
+              "type": "click",
+              "start": 51481.39999997616,
+              "duration": 112,
+              "processing": 73.30000001192093,
+              "interactionId": 4498
+            }
+          ],
+          "nativeMs": 112,
+          "longTasks": [
+            {
+              "start": 51482.10000002384,
+              "duration": 87
+            }
+          ]
+        },
+        {
+          "name": "4-no-preference",
+          "index": 17,
+          "type": "click",
+          "armed": 51767.10000002384,
+          "started": true,
+          "eventStart": 51904.5,
+          "dispatched": 51912.30000001192,
+          "afterPaint": 52048.19999998808,
+          "complete": true,
+          "frameEstimateMs": 143.69999998807907,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 51904.39999997616,
+              "duration": 152,
+              "processing": 0.30000001192092896,
+              "interactionId": 4505
+            },
+            {
+              "type": "pointerup",
+              "start": 51904.5,
+              "duration": 152,
+              "processing": 0,
+              "interactionId": 4505
+            },
+            {
+              "type": "click",
+              "start": 51904.5,
+              "duration": 152,
+              "processing": 114.19999998807907,
+              "interactionId": 4505
+            }
+          ],
+          "nativeMs": 152,
+          "longTasks": [
+            {
+              "start": 51904.80000001192,
+              "duration": 123
+            }
+          ]
+        },
+        {
+          "name": "4-no-preference",
+          "index": 18,
+          "type": "click",
+          "armed": 52214.60000002384,
+          "started": true,
+          "eventStart": 52298.19999998808,
+          "dispatched": 52310,
+          "afterPaint": 52348.30000001192,
+          "complete": true,
+          "frameEstimateMs": 50.10000002384186,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 52297.80000001192,
+              "duration": 64,
+              "processing": 0.5,
+              "interactionId": 4512
+            },
+            {
+              "type": "pointerup",
+              "start": 52298.19999998808,
+              "duration": 64,
+              "processing": 0,
+              "interactionId": 4512
+            },
+            {
+              "type": "click",
+              "start": 52298.19999998808,
+              "duration": 64,
+              "processing": 33.5,
+              "interactionId": 4512
+            }
+          ],
+          "nativeMs": 64,
+          "longTasks": []
+        },
+        {
+          "name": "4-no-preference",
+          "index": 19,
+          "type": "click",
+          "armed": 52530.89999997616,
+          "started": true,
+          "eventStart": 52602.30000001192,
+          "dispatched": 52611.80000001192,
+          "afterPaint": 52650.19999998808,
+          "complete": true,
+          "frameEstimateMs": 47.89999997615814,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 52601.89999997616,
+              "duration": 72,
+              "processing": 5.599999964237213,
+              "interactionId": 4519
+            },
+            {
+              "type": "pointerup",
+              "start": 52602.30000001192,
+              "duration": 72,
+              "processing": 0.10000002384185791,
+              "interactionId": 4519
+            },
+            {
+              "type": "click",
+              "start": 52602.30000001192,
+              "duration": 72,
+              "processing": 33.09999996423721,
+              "interactionId": 4519
+            }
+          ],
+          "nativeMs": 72,
+          "longTasks": []
+        },
+        {
+          "name": "4-no-preference",
+          "index": 20,
+          "type": "click",
+          "armed": 53052.89999997616,
+          "started": true,
+          "eventStart": 53099.69999998808,
+          "dispatched": 53130.89999997616,
+          "afterPaint": 53170.89999997616,
+          "complete": true,
+          "frameEstimateMs": 71.19999998807907,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 53099.30000001192,
+              "duration": 112,
+              "processing": 0.40000003576278687,
+              "interactionId": 4526
+            },
+            {
+              "type": "pointerup",
+              "start": 53099.69999998808,
+              "duration": 112,
+              "processing": 0,
+              "interactionId": 4526
+            },
+            {
+              "type": "click",
+              "start": 53099.69999998808,
+              "duration": 112,
+              "processing": 34.30000001192093,
+              "interactionId": 4526
+            }
+          ],
+          "nativeMs": 112,
+          "longTasks": []
+        },
+        {
+          "name": "4-no-preference",
+          "index": 21,
+          "type": "click",
+          "armed": 53388.80000001192,
+          "started": true,
+          "eventStart": 53492.10000002384,
+          "dispatched": 53496.69999998808,
+          "afterPaint": 53533.30000001192,
+          "complete": true,
+          "frameEstimateMs": 41.19999998807907,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 53491.80000001192,
+              "duration": 48,
+              "processing": 0.5999999642372131,
+              "interactionId": 4533
+            },
+            {
+              "type": "pointerup",
+              "start": 53492.10000002384,
+              "duration": 48,
+              "processing": 0,
+              "interactionId": 4533
+            },
+            {
+              "type": "click",
+              "start": 53492.10000002384,
+              "duration": 48,
+              "processing": 32.5,
+              "interactionId": 4533
+            }
+          ],
+          "nativeMs": 48,
+          "longTasks": []
+        },
+        {
+          "name": "4-no-preference",
+          "index": 22,
+          "type": "click",
+          "armed": 53715.19999998808,
+          "started": true,
+          "eventStart": 53868,
+          "dispatched": 53875.19999998808,
+          "afterPaint": 53897.10000002384,
+          "complete": true,
+          "frameEstimateMs": 29.100000023841858,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 53867.80000001192,
+              "duration": 40,
+              "processing": 0.800000011920929,
+              "interactionId": 4540
+            },
+            {
+              "type": "pointerup",
+              "start": 53868,
+              "duration": 40,
+              "processing": 0.8999999761581421,
+              "interactionId": 4540
+            },
+            {
+              "type": "click",
+              "start": 53868,
+              "duration": 40,
+              "processing": 19.600000023841858,
+              "interactionId": 4540
+            }
+          ],
+          "nativeMs": 40,
+          "longTasks": []
+        },
+        {
+          "name": "4-no-preference",
+          "index": 23,
+          "type": "click",
+          "armed": 54209.10000002384,
+          "started": true,
+          "eventStart": 54253.60000002384,
+          "dispatched": 54265.89999997616,
+          "afterPaint": 54302.10000002384,
+          "complete": true,
+          "frameEstimateMs": 48.5,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 54253.5,
+              "duration": 72,
+              "processing": 0.3999999761581421,
+              "interactionId": 4547
+            },
+            {
+              "type": "pointerup",
+              "start": 54253.60000002384,
+              "duration": 72,
+              "processing": 0,
+              "interactionId": 4547
+            },
+            {
+              "type": "click",
+              "start": 54253.60000002384,
+              "duration": 72,
+              "processing": 31.5,
+              "interactionId": 4547
+            }
+          ],
+          "nativeMs": 72,
+          "longTasks": []
+        },
+        {
+          "name": "4-no-preference",
+          "index": 24,
+          "type": "click",
+          "armed": 54523.89999997616,
+          "started": true,
+          "eventStart": 54626.69999998808,
+          "dispatched": 54633.19999998808,
+          "afterPaint": 54682.5,
+          "complete": true,
+          "frameEstimateMs": 55.80000001192093,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 54626.39999997616,
+              "duration": 64,
+              "processing": 0.30000001192092896,
+              "interactionId": 4554
+            },
+            {
+              "type": "pointerup",
+              "start": 54626.69999998808,
+              "duration": 64,
+              "processing": 0,
+              "interactionId": 4554
+            },
+            {
+              "type": "click",
+              "start": 54626.69999998808,
+              "duration": 64,
+              "processing": 41.19999998807907,
+              "interactionId": 4554
+            }
+          ],
+          "nativeMs": 64,
+          "longTasks": []
+        },
+        {
+          "name": "4-no-preference",
+          "index": 25,
+          "type": "click",
+          "armed": 54837.5,
+          "started": true,
+          "eventStart": 54882.19999998808,
+          "dispatched": 54956.10000002384,
+          "afterPaint": 55060.60000002384,
+          "complete": true,
+          "frameEstimateMs": 178.4000000357628,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 54882,
+              "duration": 192,
+              "processing": 0.30000001192092896,
+              "interactionId": 4561
+            },
+            {
+              "type": "pointerup",
+              "start": 54882.19999998808,
+              "duration": 192,
+              "processing": 0.5,
+              "interactionId": 4561
+            },
+            {
+              "type": "click",
+              "start": 54882.19999998808,
+              "duration": 192,
+              "processing": 96.59999996423721,
+              "interactionId": 4561
+            }
+          ],
+          "nativeMs": 192,
+          "longTasks": [
+            {
+              "start": 54882.39999997616,
+              "duration": 172
+            }
+          ]
+        },
+        {
+          "name": "4-no-preference",
+          "index": 26,
+          "type": "click",
+          "armed": 55313.69999998808,
+          "started": true,
+          "eventStart": 55358.60000002384,
+          "dispatched": 55364.19999998808,
+          "afterPaint": 55412.10000002384,
+          "complete": true,
+          "frameEstimateMs": 53.5,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 55358.39999997616,
+              "duration": 64,
+              "processing": 0.19999998807907104,
+              "interactionId": 4568
+            },
+            {
+              "type": "pointerup",
+              "start": 55358.60000002384,
+              "duration": 64,
+              "processing": 0,
+              "interactionId": 4568
+            },
+            {
+              "type": "click",
+              "start": 55358.60000002384,
+              "duration": 64,
+              "processing": 42.19999998807907,
+              "interactionId": 4568
+            }
+          ],
+          "nativeMs": 64,
+          "longTasks": []
+        },
+        {
+          "name": "4-no-preference",
+          "index": 27,
+          "type": "click",
+          "armed": 55652.39999997616,
+          "started": true,
+          "eventStart": 55755,
+          "dispatched": 55757.80000001192,
+          "afterPaint": 55824,
+          "complete": true,
+          "frameEstimateMs": 69,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 55754.69999998808,
+              "duration": 88,
+              "processing": 0.3999999761581421,
+              "interactionId": 4575
+            },
+            {
+              "type": "pointerup",
+              "start": 55755,
+              "duration": 88,
+              "processing": 0.09999996423721313,
+              "interactionId": 4575
+            },
+            {
+              "type": "click",
+              "start": 55755,
+              "duration": 88,
+              "processing": 59.30000001192093,
+              "interactionId": 4575
+            }
+          ],
+          "nativeMs": 88,
+          "longTasks": [
+            {
+              "start": 55757.5,
+              "duration": 61
+            }
+          ]
+        },
+        {
+          "name": "4-no-preference",
+          "index": 28,
+          "type": "click",
+          "armed": 56046.39999997616,
+          "started": true,
+          "eventStart": 56141.39999997616,
+          "dispatched": 56152.10000002384,
+          "afterPaint": 56221,
+          "complete": true,
+          "frameEstimateMs": 79.60000002384186,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 56140.89999997616,
+              "duration": 104,
+              "processing": 0.2999999523162842,
+              "interactionId": 4582
+            },
+            {
+              "type": "pointerup",
+              "start": 56141.39999997616,
+              "duration": 104,
+              "processing": 3.800000011920929,
+              "interactionId": 4582
+            },
+            {
+              "type": "click",
+              "start": 56141.39999997616,
+              "duration": 104,
+              "processing": 64.39999997615814,
+              "interactionId": 4582
+            }
+          ],
+          "nativeMs": 104,
+          "longTasks": [
+            {
+              "start": 56144.80000001192,
+              "duration": 72
+            }
+          ]
+        },
+        {
+          "name": "4-no-preference",
+          "index": 29,
+          "type": "click",
+          "armed": 56450.80000001192,
+          "started": true,
+          "eventStart": 56524.60000002384,
+          "dispatched": 56528.80000001192,
+          "afterPaint": 56570.19999998808,
+          "complete": true,
+          "frameEstimateMs": 45.59999996423721,
+          "nativeEventTiming": [
+            {
+              "type": "pointerdown",
+              "start": 56524.5,
+              "duration": 72,
+              "processing": 0.6000000238418579,
+              "interactionId": 4589
+            },
+            {
+              "type": "pointerup",
+              "start": 56524.60000002384,
+              "duration": 72,
+              "processing": 0,
+              "interactionId": 4589
+            },
+            {
+              "type": "click",
+              "start": 56524.60000002384,
+              "duration": 72,
+              "processing": 35.30000001192093,
+              "interactionId": 4589
+            }
+          ],
+          "nativeMs": 72,
+          "longTasks": []
+        }
+      ]
+    }
+  },
+  "errors": []
+}
