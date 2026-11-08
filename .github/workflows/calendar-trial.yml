@@ -7,6 +7,12 @@ on:
       - 'README.md'
   pull_request:
   workflow_dispatch:
+    inputs:
+      operation:
+        description: '正常验收发布，或仅恢复11月8日中断的试用后台'
+        type: choice
+        default: release
+        options: [release, recover-trial-20261108]
 permissions:
   contents: read
 concurrency:
@@ -14,6 +20,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   checks:
+    if: inputs.operation != 'recover-trial-20261108'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -117,3 +124,28 @@ jobs:
           name: isolated-remote-check
           path: artifacts/remote-smoke.json
           retention-days: 7
+  recover-trial:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.operation == 'recover-trial-20261108'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: calendar-trial
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Restore only the verified Worker matching the existing Pages release
+        run: node tools/calendar/recover-trial-20261108.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trial-recovery-evidence
+          path: artifacts/trial-recovery.json
+          retention-days: 30
