@@ -387,6 +387,9 @@ input[type=time], .url-label input { display: block; width: 100%; min-width: 0; 
   .masthead-inner { flex-direction: column; align-items: flex-start; justify-content: center; gap: 4px; }
   .masthead-next { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 8px; max-width: none; padding: 0; border: 0; background: none; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
   .masthead-next .icon { display: none; }
+  /* Reserve the line before it is computed so nothing below shifts (CLS 0). */
+  .masthead-next { min-height: 20px; }
+  .masthead-next[hidden] { display: flex !important; visibility: hidden; }
   .masthead-next small { font-size: 12px; letter-spacing: 1px; }
   .masthead-next strong, .masthead-next strong span { font-size: 13px; letter-spacing: 0; }
   .masthead-next strong span { margin-left: 6px; }
