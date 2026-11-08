@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {createGateway} from '../../service/gateway/gateway.mjs';
+import {createGateway, GATEWAY_FAILURE_STAGES} from '../../service/gateway/gateway.mjs';
 
 const base='https://huideng-calendar-acceptance.pages.dev';
 const release={version:'a'.repeat(40),dataVersion:'b'.repeat(64),environment:'acceptance'};
@@ -50,18 +50,20 @@ test('gateway health verifies commit, date data and environment without exposing
  for(const mismatch of [{environment:'trial'},{version:'c'.repeat(40)},{dataVersion:'d'.repeat(64)},{status:'failed'}]){
   const failed=await gateway.fetch(request('/healthz'),env(async()=>Response.json({status:'ok',...release,...mismatch})));
   assert.equal(failed.status,503);assert.match((await failed.json()).error,/暂时无法连接/);
+  assert.equal(failed.headers.get('x-calendar-gateway-stage'),'health_mismatch');
  }
  const head=await gateway.fetch(request('/healthz',{method:'HEAD'}),env(async req=>{assert.equal(req.method,'GET');return health();}));
  assert.equal(head.status,200);assert.equal(await head.text(),'');
 });
 
 test('missing bindings, HTML and redirects fail closed without returning Worker URLs or raw errors',async()=>{
- for(const bindings of [{PUBLIC_BASE_URL:base},env(async()=>{throw new Error('https://secret.invalid/token');}),
-   env(async()=>new Response('login',{headers:{'Content-Type':'text/html'}})),
-   env(async()=>new Response(null,{status:302,headers:{Location:'https://secret.workers.dev/calendar/token.ics'}}))]){
+ for(const [stage,bindings] of [['binding_missing',{PUBLIC_BASE_URL:base}],['binding_fetch',env(async()=>{throw new Error('https://secret.invalid/token');})],
+   ['health_payload',env(async()=>new Response('login',{headers:{'Content-Type':'text/html'}}))],
+   ['unexpected_redirect',env(async()=>new Response(null,{status:302,headers:{Location:'https://secret.workers.dev/calendar/token.ics'}}))]]){
   const response=await gateway.fetch(request('/healthz'),bindings);
   assert.equal(response.status,503);assert.doesNotMatch(await response.text(),/secret|<html|login/);
   assert.equal(response.headers.get('location'),null);
+  assert.equal(response.headers.get('x-calendar-gateway-stage'),stage);
  }
 });
 
@@ -70,6 +72,7 @@ test('calendar and management endpoints cannot return HTML while JSON errors ret
   for(const status of [200,502]){
    const response=await gateway.fetch(request(path),env(async()=>new Response('<html>challenge</html>',{status,headers:{'Content-Type':'text/html'}})));
    assert.equal(response.status,503);assert.equal(response.headers.get('content-type'),'application/json; charset=utf-8');
+   assert.equal(response.headers.get('x-calendar-gateway-stage'),'unexpected_response_type');
    assert.doesNotMatch(await response.text(),/challenge|<html/);
   }
   const response=await gateway.fetch(request(path),env(async()=>Response.json({error:'请稍后重试。'},{status:429,headers:{'Retry-After':'5'}})));
@@ -78,6 +81,44 @@ test('calendar and management endpoints cannot return HTML while JSON errors ret
  }
  const options=await gateway.fetch(request('/api/subscriptions',{method:'OPTIONS'}),env(async()=>new Response(null,{status:204,headers:{'Access-Control-Allow-Origin':base}})));
  assert.equal(options.status,204);assert.equal(options.headers.get('access-control-allow-origin'),base);
+});
+
+test('safe failure stages distinguish thrown feed calls from invalid responses without retries or private details',async()=>{
+ const path=`/calendar/${'x'.repeat(43)}.ics?private=must-not-return`;
+ for(const method of ['GET','HEAD']){
+  let calls=0;
+  const response=await gateway.fetch(request(path,{method,headers:{Authorization:'Bearer must-not-return'}}),env(async()=>{
+   calls++;throw new Error('private https://example.invalid/calendar/secret.ics Authorization: Bearer must-not-return');
+  }));
+  assert.equal(calls,1,'diagnosis must not retry a failed subscription request');
+  assert.equal(response.status,503);
+  assert.equal(response.headers.get('x-calendar-gateway-stage'),'binding_fetch');
+  assert.equal(response.headers.get('cache-control'),'no-store');
+  assert.equal(response.headers.get('strict-transport-security'),'max-age=31536000');
+  const body=await response.text();
+  if(method==='HEAD')assert.equal(body,'');
+  else assert.deepEqual(JSON.parse(body),{error:'暂时无法连接订阅服务，请稍后重试。'});
+  assert.doesNotMatch(body+JSON.stringify([...response.headers]),/secret|private|Authorization|Bearer|must-not-return/);
+ }
+ assert.ok(Object.isFrozen(GATEWAY_FAILURE_STAGES));
+ assert.ok(!GATEWAY_FAILURE_STAGES.includes('https://secret.invalid/token'));
+});
+
+test('failure stages remain request-local and backend-provided diagnostic labels are never propagated',async()=>{
+ let releaseBinding;
+ const waiting=new Promise(resolve=>{releaseBinding=resolve;});
+ const pending=gateway.fetch(request(`/calendar/${'x'.repeat(43)}.ics`),env(async()=>{await waiting;throw new Error('private');}));
+ const badHealth=await gateway.fetch(request('/healthz'),env(async()=>Response.json({status:'ok',...release,environment:'trial'})));
+ releaseBinding();
+ assert.equal(badHealth.headers.get('x-calendar-gateway-stage'),'health_mismatch');
+ assert.equal((await pending).headers.get('x-calendar-gateway-stage'),'binding_fetch');
+ for(const status of [200,503]){
+  const response=await gateway.fetch(request('/api/subscriptions'),env(async()=>Response.json(
+   status===200?{revision:1}:{error:'订阅服务暂时不可用，请稍后再试。'},
+   {status,headers:{'X-Calendar-Gateway-Stage':'private-token-or-fake-phase'}})));
+  assert.equal(response.status,status);
+  assert.equal(response.headers.get('x-calendar-gateway-stage'),null);
+ }
 });
 
 test('transport guards reject insecure writes and host spoofing before invoking the backend',async()=>{

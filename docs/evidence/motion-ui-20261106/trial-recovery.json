@@ -1,0 +1,19 @@
+{
+  "checkedAt": "2026-11-08T09:05:56.186Z",
+  "stable": "23abc3e39af655278de05233defcd8f92477b41a",
+  "interrupted": "d9e96fce26646b8dc38f1f4084025c952ee8b5cd",
+  "versionId": "5daec4d6-d837-416d-b51e-2f916bbd1999",
+  "site": "https://huideng-calendar-trial.pages.dev",
+  "status": "verified",
+  "before": {
+    "pageVersion": "23abc3e39af655278de05233defcd8f92477b41a",
+    "workerVersion": "d9e96fce26646b8dc38f1f4084025c952ee8b5cd",
+    "dataVersion": "0a6b1e7eb64f73f5f4d1bf86527df628e6e1b8ed91f5c917ecf8fcb38813d46b"
+  },
+  "after": {
+    "status": "verified",
+    "version": "23abc3e39af655278de05233defcd8f92477b41a",
+    "dataVersion": "0a6b1e7eb64f73f5f4d1bf86527df628e6e1b8ed91f5c917ecf8fcb38813d46b",
+    "environment": "trial"
+  }
+}

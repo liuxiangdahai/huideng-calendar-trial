@@ -38,6 +38,23 @@ async function open(page, {reducedMotion = 'no-preference', missingAnimationAPI 
   return {errors, writes};
 }
 
+test('published motion stylesheet loads as CSS and drives dialog feedback with a reduced-motion fallback', async ({page}) => {
+  const response = page.waitForResponse(r => new URL(r.url()).pathname.endsWith('/motion.css'));
+  const audit = await open(page);
+  const css = await response;
+  expect(css.status()).toBe(200);
+  expect(css.headers()['content-type']).toContain('text/css');
+  expect(await page.locator('.quick-panel').evaluate(node => getComputedStyle(node).boxShadow)).not.toBe('none');
+  await page.locator('[data-preset="guru"]').click();
+  await page.locator('#reminder-settings').click();
+  const dialog = page.locator('#reminder-dialog');
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toHaveCSS('animation-name','calendar-dialog-in');
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await expect(dialog).toHaveCSS('animation-name','none');
+  expect(audit).toEqual({errors:[],writes:[]});
+});
+
 test('rapid preset and month changes finish on the last choice with usable keyboard focus', async ({page}) => {
   const audit = await open(page);
   await page.locator('#include-daily-dates').check();

@@ -5,9 +5,19 @@ const routes = new Set(['/api/subscriptions', '/healthz']);
 const dynamicPath = path => routes.has(path) || path.startsWith('/api/') || path.startsWith('/calendar/');
 const validRoute = path => routes.has(path) || /^\/api\/subscriptions\/[a-f0-9-]{36}$/.test(path) || /^\/calendar\/[A-Za-z0-9_-]{43}\.ics$/.test(path);
 const json = (body, status = 200) => new Response(JSON.stringify(body), {status, headers: {'Content-Type':'application/json; charset=utf-8', 'Cache-Control':'no-store'}});
+// These fixed stages identify where a request failed, never why the runtime
+// threw. Keep URLs, headers, settings, response bodies and exception text out.
+export const GATEWAY_FAILURE_STAGES = Object.freeze([
+  'public_origin', 'binding_missing', 'binding_fetch', 'unexpected_redirect',
+  'backend_unavailable', 'health_payload', 'health_mismatch',
+  'unexpected_response_type', 'response_forward', 'gateway_failure'
+]);
+const FAILURE_HEADER = 'X-Calendar-Gateway-Stage';
 
 function protect(response, request, isAPI = false) {
   const headers = new Headers(response.headers);
+  // Only this gateway may label its own failures; do not trust a backend label.
+  headers.delete(FAILURE_HEADER);
   headers.set('X-Content-Type-Options', 'nosniff');
   headers.set('Referrer-Policy', 'no-referrer');
   headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
@@ -36,7 +46,7 @@ export function createGateway(release) {
   return {async fetch(request, env) {
     const url = new URL(request.url), isAPI = url.pathname.startsWith('/api/');
     if (!dynamicPath(url.pathname)) return env.ASSETS.fetch(request);
-    let result;
+    let result, stage = 'public_origin';
     try {
       const publicURL = new URL(env.PUBLIC_BASE_URL);
       const local = env.ALLOW_LOCAL_DEV === 'true' && LOOPBACK.has(url.hostname) && LOOPBACK.has(publicURL.hostname);
@@ -50,18 +60,22 @@ export function createGateway(release) {
         return protect(result, request, isAPI);
       }
       if (!validRoute(url.pathname)) return protect(json({error:'没有找到此页面。'}, 404), request, isAPI);
-      if (!env.CALENDAR_SERVICE?.fetch) throw new Error('Missing binding');
+      if (!env.CALENDAR_SERVICE?.fetch) { stage = 'binding_missing'; throw new Error('Missing binding'); }
       const health = url.pathname === '/healthz';
       if (health && !['GET','HEAD'].includes(request.method)) return protect(json({error:'不支持此操作。'},405),request);
       // No fetch to workers.dev. The original headers, body, client context and
       // conditional requests stay intact when crossing the Service Binding.
+      stage = 'binding_fetch';
       result = await env.CALENDAR_SERVICE.fetch(health && request.method === 'HEAD' ? new Request(request, {method:'GET'}) : request);
       if (result.status >= 300 && result.status < 400 && result.status !== 304) {
+        stage = 'unexpected_redirect';
         await result.body?.cancel(); throw new Error('Unexpected redirect');
       }
       if (health) {
-        if (result.status !== 200) { await result.body?.cancel(); throw new Error('Backend unavailable'); }
+        if (result.status !== 200) { stage = 'backend_unavailable'; await result.body?.cancel(); throw new Error('Backend unavailable'); }
+        stage = 'health_payload';
         const backend = await readHealth(result);
+        stage = 'health_mismatch';
         if (backend.status !== 'ok' || ['version','dataVersion','environment'].some(key => backend[key] !== release[key])) throw new Error('Version or environment mismatch');
         result = json({status:'ok', version:backend.version, dataVersion:backend.dataVersion, environment:backend.environment, gatewayVersion:release.version});
       } else if (result.status !== 204 && result.status !== 304) {
@@ -69,12 +83,15 @@ export function createGateway(release) {
         // HTML document as a calendar or management response.
         const type = result.headers.get('content-type')?.split(';',1)[0].trim().toLowerCase();
         const expected = !isAPI && result.ok ? 'text/calendar' : 'application/json';
-        if (type !== expected) { await result.body?.cancel(); throw new Error('Unexpected response type'); }
+        if (type !== expected) { stage = 'unexpected_response_type'; await result.body?.cancel(); throw new Error('Unexpected response type'); }
       }
+      stage = 'response_forward';
       return protect(result, request, isAPI);
     } catch {
       // Do not include exception text: runtime errors can contain capability URLs.
-      return protect(json({error:'暂时无法连接订阅服务，请稍后重试。'},503),request,isAPI);
+      const response = protect(json({error:'暂时无法连接订阅服务，请稍后重试。'},503),request,isAPI);
+      response.headers.set(FAILURE_HEADER, GATEWAY_FAILURE_STAGES.includes(stage) ? stage : 'gateway_failure');
+      return response;
     }
   }};
 }

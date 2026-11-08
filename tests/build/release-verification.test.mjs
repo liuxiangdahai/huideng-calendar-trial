@@ -90,3 +90,18 @@ test('matching commits do not bypass gateway, data, transport or rendered-page i
     await assert.rejects(verifyReleaseOnce(options,{fetchImpl:async url=>new URL(url).pathname===failure.path?failure.response():validResource(url)}));
   }
 });
+
+test('a missing stylesheet returning Pages fallback HTML cannot pass release verification',async()=>{
+  const resource=style=>async url=>{
+    const pathname=new URL(url).pathname;
+    if(pathname==='/calendar-reminders/')return new Response(`<meta content="${current.version}"><link rel="stylesheet" href="./motion.css">`);
+    if(pathname==='/calendar-reminders/motion.css')return style();
+    return validResource(url);
+  };
+  for(const style of [()=>new Response('<html>Open calendar</html>',{headers:{'Content-Type':'text/html'}}),
+    ()=>new Response(null,{status:404}),()=>new Response('',{headers:{'Content-Type':'text/css'}})]){
+    await assert.rejects(verifyReleaseOnce(options,{fetchImpl:resource(style)}),/motion.css/);
+  }
+  const result=await verifyReleaseOnce(options,{fetchImpl:resource(()=>new Response('.primary{opacity:1}',{headers:{'Content-Type':'text/css; charset=utf-8'}}))});
+  assert.equal(result.status,'verified');
+});

@@ -183,7 +183,7 @@ export async function buildRelease(options = {}, env = process.env) {
       format:'esm',platform:'browser',target:['safari15.4','chrome100','firefox102'],minify:true,legalComments:'inline'});
     for (const file of ['reminder-check.html','reminder-check.css']) await fs.copyFile(path.join(sourceRoot,file),path.join(frontend,file));
   }
-  for (const file of ['style.css','calendar-view.css','subscription-guide.css','UNICODE-LICENSE.txt']) await fs.copyFile(path.join(sourceRoot,file),path.join(frontend,file));
+  for (const file of ['style.css','calendar-view.css','subscription-guide.css','motion.css','UNICODE-LICENSE.txt']) await fs.copyFile(path.join(sourceRoot,file),path.join(frontend,file));
   await fs.cp(path.join(sourceRoot,'assets'),path.join(frontend,'assets'),{recursive:true});
   await fs.mkdir(path.join(frontend,'licenses'),{recursive:true});
   await fs.copyFile(path.join(sourceRoot,'vendor/zangli/LICENSE.md'),path.join(frontend,'licenses/zangli-LICENSE.txt'));

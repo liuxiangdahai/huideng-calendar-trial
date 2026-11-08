@@ -35,6 +35,16 @@ export async function verifyReleaseOnce({api,site,version,kind='gateway'},
     assert.equal(htmlResponse.status,200);
     const html=await htmlResponse.text();
     assert.ok(html.includes(`content="${backend.version}"`));
+    // Pages can return its fallback HTML with 200 for an omitted asset.
+    // A matching HTML version alone is therefore insufficient proof of delivery.
+    for(const [,name] of html.matchAll(/<link rel="stylesheet" href="\.\/([a-z-]+\.css)">/g)){
+      const style=await read(site,`/calendar-reminders/${name}`);
+      const type=style.headers.get('content-type')?.split(';',1)[0].trim().toLowerCase();
+      if(style.status!==200||type!=='text/css')await style.body?.cancel();
+      assert.equal(style.status,200,`${name} 未正确发布`);
+      assert.equal(type,'text/css',`${name} 必须返回CSS而非回退HTML`);
+      assert.ok((await style.text()).trim().length>0,`${name} 不能是空文件`);
+    }
   }
   assert.ok(now()<=deadline,'版本检查超时');
   return {status:'verified',version:backend.version,dataVersion:backend.dataVersion,environment:backend.environment};

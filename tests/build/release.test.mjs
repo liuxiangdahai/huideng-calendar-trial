@@ -7,6 +7,23 @@ import path from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {Script} from 'node:vm';
 
+test('published HTML ships every linked stylesheet with its actual CSS content',async()=>{
+ const output=path.resolve(projectRoot,'dist/stylesheet-contract');
+ try{
+  await buildRelease({mode:'local',output});
+  const frontend=path.join(output,'site/calendar-reminders');
+  const html=readFileSync(path.join(frontend,'index.html'),'utf8');
+  const styles=[...html.matchAll(/<link rel="stylesheet" href="\.\/([a-z-]+\.css)">/g)].map(match=>match[1]);
+  assert.ok(styles.includes('motion.css'));
+  for(const name of styles){
+   assert.equal(readFileSync(path.join(frontend,name),'utf8'),readFileSync(path.join(projectRoot,'static/calendar-reminders',name),'utf8'),name);
+  }
+ }finally{
+  assert.ok(output.startsWith(path.resolve(projectRoot,'dist')+path.sep));
+  rmSync(output,{recursive:true,force:true});
+ }
+});
+
 test('standalone embeds literal dollar sequences without restoring external scripts or corrupting JavaScript',async()=>{
  const artifacts=path.resolve(projectRoot,'artifacts');mkdirSync(artifacts,{recursive:true});
  const fixture=mkdtempSync(path.join(artifacts,'standalone-build-'));

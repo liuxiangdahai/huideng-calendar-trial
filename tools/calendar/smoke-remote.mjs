@@ -4,6 +4,7 @@ import {randomBytes} from 'node:crypto';
 import ICAL from 'ical.js';
 import {defaults,selectCalendarOccurrences,dateInZone,addDays,rangeEnd,resolveAlarmInstants} from '../../static/calendar-reminders/core.mjs';
 import {applyPreset} from '../../static/calendar-reminders/presets.mjs';
+import {GATEWAY_FAILURE_STAGES} from '../../service/gateway/gateway.mjs';
 const base=new URL(process.argv[2]);
 const site=new URL(process.argv[3]);
 if(base.origin!=='https://huideng-calendar-acceptance.pages.dev' || site.origin!==base.origin)throw new Error('远端写入测试仅允许独立 acceptance Pages 入口。');
@@ -47,7 +48,9 @@ async function feed(options={}){
   entry.failureKind=message==='暂时无法连接订阅服务，请稍后重试。'?'gateway_unavailable':
    message==='订阅服务暂时不可用，请稍后再试。'?'service_unavailable':
    message==='订阅正在更新，请稍后重试。'?'publication_conflict':'other';
-  console.error(JSON.stringify({scenario,status:response.status,failureKind:entry.failureKind}));
+  const gatewayStage=response.headers.get('X-Calendar-Gateway-Stage');
+  if(entry.failureKind==='gateway_unavailable' && GATEWAY_FAILURE_STAGES.includes(gatewayStage))entry.gatewayStage=gatewayStage;
+  console.error(JSON.stringify({scenario,status:response.status,failureKind:entry.failureKind,...(entry.gatewayStage?{gatewayStage:entry.gatewayStage}:{})}));
  }
  timing.push(entry);return response;
 }
