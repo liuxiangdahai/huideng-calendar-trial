@@ -1,0 +1,221 @@
+{
+  "note": "本机 Chrome 合成测量（4倍CPU、390×844、模拟网络），同一台机器先后运行；不是线上或真机数据。before=0c0b16c，after=本轮分支。冷启动最长任务在两次基线之间波动 203–263ms，改版后 219–283ms，判断为同一噪声范围，未改善也未明显退化。",
+  "runs": [
+    {
+      "label": "before-redesign",
+      "date": "2026-11-08T09:56:31.264Z",
+      "environment": {
+        "browser": "153.0.8010.12",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "cpuSlowdown": 4,
+        "network": {
+          "downBitsPerSecond": 1600000,
+          "upBitsPerSecond": 750000,
+          "latencyMs": 150
+        },
+        "serving": "local HTTP + gzip; formal dist/site; not production delivery"
+      },
+      "cold": {
+        "lcp": {
+          "count": 5,
+          "p50": 924,
+          "p95": 928,
+          "max": 928
+        },
+        "cls": {
+          "count": 5,
+          "p50": 0,
+          "p95": 0,
+          "max": 0
+        }
+      },
+      "coldLongestTaskMs": [
+        228,
+        203,
+        224,
+        229,
+        229
+      ],
+      "interactions": {
+        "preset": {
+          "eventTimingP95": 104,
+          "longTaskMaxMs": 150
+        },
+        "checkbox": {
+          "eventTimingP95": 72,
+          "longTaskMaxMs": 73
+        },
+        "category": {
+          "eventTimingP95": 24,
+          "longTaskMaxMs": 0
+        },
+        "month": {
+          "eventTimingP95": 64,
+          "longTaskMaxMs": 0
+        },
+        "view": {
+          "eventTimingP95": 48,
+          "longTaskMaxMs": 53
+        },
+        "open-reminder": {
+          "eventTimingP95": 72,
+          "longTaskMaxMs": 0
+        }
+      },
+      "stability": {
+        "actions": 100,
+        "settingsRetained": true,
+        "eventTimingP95": 88,
+        "longTaskMaximumMs": 96
+      },
+      "errors": []
+    },
+    {
+      "label": "before-redesign-2",
+      "date": "2026-11-08T10:06:56.992Z",
+      "environment": {
+        "browser": "153.0.8010.12",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "cpuSlowdown": 4,
+        "network": {
+          "downBitsPerSecond": 1600000,
+          "upBitsPerSecond": 750000,
+          "latencyMs": 150
+        },
+        "serving": "local HTTP + gzip; formal dist/site; not production delivery"
+      },
+      "cold": {
+        "lcp": {
+          "count": 5,
+          "p50": 948,
+          "p95": 968,
+          "max": 968
+        },
+        "cls": {
+          "count": 5,
+          "p50": 0,
+          "p95": 0,
+          "max": 0
+        }
+      },
+      "coldLongestTaskMs": [
+        259,
+        236,
+        242,
+        263,
+        237
+      ],
+      "interactions": {
+        "preset": {
+          "eventTimingP95": 88,
+          "longTaskMaxMs": 134
+        },
+        "checkbox": {
+          "eventTimingP95": 104,
+          "longTaskMaxMs": 98
+        },
+        "category": {
+          "eventTimingP95": 24,
+          "longTaskMaxMs": 0
+        },
+        "month": {
+          "eventTimingP95": 80,
+          "longTaskMaxMs": 68
+        },
+        "view": {
+          "eventTimingP95": 48,
+          "longTaskMaxMs": 0
+        },
+        "open-reminder": {
+          "eventTimingP95": 56,
+          "longTaskMaxMs": 0
+        }
+      },
+      "stability": {
+        "actions": 100,
+        "settingsRetained": true,
+        "eventTimingP95": 88,
+        "longTaskMaximumMs": 107
+      },
+      "errors": []
+    },
+    {
+      "label": "after-redesign-2",
+      "date": "2026-11-08T09:59:54.126Z",
+      "environment": {
+        "browser": "153.0.8010.12",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "cpuSlowdown": 4,
+        "network": {
+          "downBitsPerSecond": 1600000,
+          "upBitsPerSecond": 750000,
+          "latencyMs": 150
+        },
+        "serving": "local HTTP + gzip; formal dist/site; not production delivery"
+      },
+      "cold": {
+        "lcp": {
+          "count": 5,
+          "p50": 932,
+          "p95": 940,
+          "max": 940
+        },
+        "cls": {
+          "count": 5,
+          "p50": 0,
+          "p95": 0,
+          "max": 0
+        }
+      },
+      "coldLongestTaskMs": [
+        243,
+        221,
+        253,
+        250,
+        283
+      ],
+      "interactions": {
+        "preset": {
+          "eventTimingP95": 112,
+          "longTaskMaxMs": 135
+        },
+        "checkbox": {
+          "eventTimingP95": 80,
+          "longTaskMaxMs": 68
+        },
+        "category": {
+          "eventTimingP95": 32,
+          "longTaskMaxMs": 0
+        },
+        "month": {
+          "eventTimingP95": 80,
+          "longTaskMaxMs": 52
+        },
+        "view": {
+          "eventTimingP95": 64,
+          "longTaskMaxMs": 0
+        },
+        "open-reminder": {
+          "eventTimingP95": 80,
+          "longTaskMaxMs": 0
+        }
+      },
+      "stability": {
+        "actions": 100,
+        "settingsRetained": true,
+        "eventTimingP95": 88,
+        "longTaskMaximumMs": 87
+      },
+      "errors": []
+    }
+  ]
+}

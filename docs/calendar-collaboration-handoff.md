@@ -2,6 +2,8 @@
 
 更新：2026-11-05。这是已有产品的交接，不是从零建站需求。开始工作时重新读取仓库状态、执行计划及线上版本；不要将本文中的历史证据当成新修改已通过。
 
+2026-11-08补充：样式改为一套设计变量（`style.css`顶部`:root`），新增颜色、阴影、字体请加变量而不是写色值；藏式元素（香布`--shambu`、八吉祥图标`icons.mjs`）均为代码绘制，不再新增独立装饰图片。日程标签只区分“提醒/仅显示”两色，分类靠图标与文字。佛慧法语资料更新请用`tools/calendar/fohui-diff.mjs`比对手动保存的月份页，不要整份重导或自动抓取。
+
 2026-11-06补充：动效由`motion.mjs`与`motion.css`集中维护，月份/勾选/面板效果仅由操作入口触发；不要在通用render或时钟刷新中播放。手机阅读锚点只做淡入，不移动位置；系统偏好每次动作即时查询，媒体变化监听负责取消已有动画。保留同纸底的每日藏历，禁止为动效另加彩色背景。正式构建和离线文件共享这些源码，验收记录见`docs/evidence/motion-ui-20261106/`。
 
 ## 1. 项目与入口
@@ -47,7 +49,7 @@
 | 快捷方案与手机吸顶切换 | `presets.mjs`、`mobile-tabs.mjs`（同上目录） |
 | 添加方式、中文帮助与连接状态 | `calendar-entry.mjs`、`subscription-guide.mjs`、`subscription-guide.css`、`connection-check.mjs` |
 | 日期和设置模型、ICS | `core.mjs`、`engine.mjs`、时区模块及固定版本 `vendor/zangli/` |
-| 节日来源、目录和稳定记录编号 | `data/calendar/` |
+| 节日来源、目录和稳定记录编号 | `data/calendar/`；更新比对 `tools/calendar/fohui-diff.mjs` |
 | Worker / Pages 网关 | `service/calendar/`、`service/gateway/` |
 | 产品唯一构建与环境绑定 | `tools/calendar/release-build.mjs`、`build-environment.mjs` |
 | 唯一发布流程 | `.github/workflows/calendar-trial.yml` |
