@@ -1,7 +1,6 @@
 /* Quiet depth: one shared material and short, interruptible feedback. */
-.quick-panel { box-shadow: 0 4px 14px #60461e09, inset 0 1px #fffdf9; }
+.quick-panel { box-shadow: var(--shadow-1, 0 4px 14px #60461e09); }
 .primary { box-shadow: inset 0 1px #ffffff20, 0 2px 3px #421b1514; }
-.preset-icon,.group-icon { box-shadow: inset 0 1px #fffdf980, 0 1px 2px #60461e0c; }
 
 @media (prefers-reduced-motion: no-preference) {
   :is(.primary,.secondary,.icon-button,.cal-arrow,.cal-today) {

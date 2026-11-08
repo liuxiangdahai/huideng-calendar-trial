@@ -5,11 +5,11 @@ import {icon} from './icons.mjs';
 const groups = {
   tsok: ['荟供日', 'bell-vajra'],
   buddha: ['佛菩萨殊胜日', 'lotus'],
-  masters: ['上师纪念日', 'throne'],
-  practice: ['法会与修行月', 'pecha'],
-  festivals: ['藏历节庆', 'festival'],
-  nature: ['节气与天象', 'sun-moon'],
-  other: ['其他纪念日', 'bookmark']
+  masters: ['上师纪念日', 'parasol'],
+  practice: ['法会与修行月', 'wheel'],
+  festivals: ['藏历节庆', 'banner'],
+  nature: ['节气与天象', 'nyida'],
+  other: ['其他纪念日', 'vase']
 };
 
 export function eventPresentation(event = {}, catalog) {
