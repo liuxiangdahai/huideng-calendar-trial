@@ -1,5 +1,5 @@
 /* Shared surfaces and type scale, with fallbacks for the standalone guide. */
-.device-options{grid-template-columns:repeat(2,minmax(0,1fr))}
+
 .connection-status{position:relative;margin:0 0 14px;padding:0;border:0;font-size:14px;line-height:1.65;overflow-wrap:anywhere}
 .connection-heading{display:flex;gap:8px;align-items:center;min-height:44px;padding-right:116px;color:var(--teal-dark,#173b40)}
 .connection-heading>span{display:flex;flex:0 0 18px}
@@ -87,6 +87,13 @@
 .guide-notification-body h4{margin:20px 0 10px;font-size:15px;font-weight:600}
 .guide-progress{font-size:14px;color:var(--muted,#706357);padding:10px 0}
 .guide-add :focus-visible,.guide-check :focus-visible{outline:2px solid var(--focus,#79383a);outline-offset:3px;border-radius:3px}
-@media(max-width:620px){.device-options{grid-template-columns:1fr}.guide-methods{grid-template-columns:1fr;gap:12px}.guide-method{padding:12px 0}.guide-steps li{gap:12px}}
+@media(max-width:620px){.guide-methods{grid-template-columns:1fr;gap:12px}.guide-method{padding:12px 0}.guide-steps li{gap:12px}}
 @media(max-width:480px){.guide-add,.guide-check{font-size:14px}.guide-links{display:grid;gap:2px}.guide-notification-body{padding-left:12px;padding-right:12px}.guide-handoff,.guide-caution{padding:10px 12px}.guide-test>button{width:calc(100% - 8px)}}
 @media(prefers-reduced-motion:reduce){.guide-notifications>summary>.icon:last-child,.guide-help>summary::after{transition:none}}
+/* Redesign layer: quiet status before preparation, shared stage numerals. */
+.connection-status[data-prepared=false]{display:none}
+#entry-hint:empty{display:none}
+.guide-stage-number{background:var(--teal-tint,#e7ede8);color:var(--teal,#1d4549);font-family:var(--font-num,Georgia,serif)}
+.browser-handoff{background:var(--surface-2,#f8f0e2)}
+.guide-notifications{border-color:var(--line-2,#ccb894);border-radius:var(--r,6px)}
+.guide-add .secondary,.guide-check .secondary{border-radius:var(--r-sm,4px)}

@@ -109,7 +109,7 @@ test('shared event presentation preserves source titles and distinguishes eclips
   assert.match(eventIcon(event, data.catalog), /^<svg.*aria-hidden="true"/);
   assert.equal(eventPresentation({eventId: 'guru-tsok'}, data.catalog).icon, 'ritual-bell');
   assert.equal(eventPresentation({eventId: 'dakini-tsok'}, data.catalog).icon, 'vajra');
-  for (const [group, expectedIcon] of [['tsok', 'bell-vajra'], ['masters', 'throne'], ['practice', 'pecha'], ['festivals', 'festival'], ['nature', 'sun-moon']]) {
+  for (const [group, expectedIcon] of [['tsok', 'bell-vajra'], ['masters', 'parasol'], ['practice', 'wheel'], ['festivals', 'banner'], ['nature', 'nyida'], ['other', 'vase']]) {
     // Existing catalog metadata retains old generic icons; every screen must use
     // the shared current design mapping instead of silently overriding it.
     assert.equal(eventPresentation({group}, data.catalog).icon, expectedIcon);

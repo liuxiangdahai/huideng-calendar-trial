@@ -130,10 +130,10 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
       <label class="cal-month-picker"><span class="sr-only">选择月份</span><select data-cal-month data-cal-focus="month-picker" aria-label="选择月份"></select>${icon('chevron')}</label>
       <button type="button" class="cal-arrow" data-cal-action="next" data-cal-focus="next" aria-label="下一月">${icon('chevron-right')}</button>
       <button type="button" class="cal-today" data-cal-action="today" data-cal-focus="today">今天</button>
-    </div><div class="cal-view-switch" role="group" aria-label="日期预览方式">
+    </div><p class="cal-month-context" data-cal-context></p><div class="cal-view-switch" role="group" aria-label="日期预览方式">
       <button type="button" data-cal-view="month" data-cal-focus="month-view">${icon('calendar')}<span>月历</span></button>
       <button type="button" data-cal-view="list" data-cal-focus="list-view">${icon('list')}<span>列表</span></button>
-    </div></div><section class="cal-month-view" aria-label="月历预览"><p class="cal-month-context" data-cal-context></p>
+    </div></div><section class="cal-month-view" aria-label="月历预览">
     <div class="cal-grid" role="grid" aria-label="月历，使用方向键浏览日期，回车查看日程" data-cal-grid></div>
     <section class="cal-day-detail" aria-label="所选日期的日程" data-cal-detail></section>
   </section><section class="cal-list-view" aria-label="近期日程列表" hidden>
@@ -168,9 +168,15 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     $('[data-cal-action="previous"]').disabled = month <= state.start.slice(0, 7);
     $('[data-cal-action="next"]').disabled = month >= state.end.slice(0, 7);
     $('[data-cal-action="today"]').disabled = state.today < state.start || state.today > state.end;
-    const tibetanMonths = [...new Set(cells.filter(cell => cell.inMonth && cell.tibetan)
-      .map(cell => `藏历${cell.tibetan.yearName}年${cell.tibetan.display.split('月')[0]}月`))];
-    $('[data-cal-context]').textContent = tibetanMonths.join(' · ');
+    // Group the Tibetan months by year: "藏历火马年 九月 · 十月" (a year change keeps both names).
+    const tibetanYears = new Map();
+    for (const cell of cells) {
+      if (!cell.inMonth || !cell.tibetan) continue;
+      const months = tibetanYears.get(cell.tibetan.yearName) || new Set();
+      months.add(`${cell.tibetan.display.split('月')[0]}月`);
+      tibetanYears.set(cell.tibetan.yearName, months);
+    }
+    $('[data-cal-context]').textContent = [...tibetanYears].map(([year, months]) => `藏历${year}年 ${[...months].join(' · ')}`).join('　');
     const header = `<div class="cal-weekdays" role="row">${WEEKDAYS.map(day => `<span role="columnheader" aria-label="星期${day}">${day}</span>`).join('')}</div>`;
     const rows = Array.from({length: 6}, (_, row) => `<div class="cal-week" role="row">${cells.slice(row * 7, row * 7 + 7).map(cell => {
       const cellEvents = cell.disabled ? [] : cell.events;
@@ -178,9 +184,9 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
       const markers = [...new Set(cellEvents.map(event => eventPresentation(event, state.data?.catalog).colorClass))];
       const labels = cellEvents.slice(0, 2).map(event => {
         const presentation = eventPresentation(event, state.data?.catalog);
-        return `<span class="cal-mini-event ${presentation.colorClass}" title="${escape(event.title)}">${escape(event.title)}</span>`;
+        return `<span class="cal-mini-event ${presentation.colorClass}${event.preference?.mode === 'remind' ? ' is-remind' : ''}" title="${escape(event.title)}">${escape(event.title)}</span>`;
       }).join('');
-      const mobileSummary = cellEvents.length ? `<span class="cal-mobile-events" aria-hidden="true"><span class="cal-mobile-event ${eventPresentation(cellEvents[0], state.data?.catalog).colorClass}" title="${escape(cellEvents[0].title)}">${escape(cellEvents[0].title)}</span>${cellEvents.length > 1 ? `<span class="cal-mobile-more">另 ${cellEvents.length - 1} 项</span>` : ''}</span>` : '';
+      const mobileSummary = cellEvents.length ? `<span class="cal-mobile-events" aria-hidden="true"><span class="cal-mobile-event ${eventPresentation(cellEvents[0], state.data?.catalog).colorClass}${cellEvents[0].preference?.mode === 'remind' ? ' is-remind' : ''}" title="${escape(cellEvents[0].title)}">${escape(cellEvents[0].title)}</span>${cellEvents.length > 1 ? `<span class="cal-mobile-more">另 ${cellEvents.length - 1} 项</span>` : ''}</span>` : '';
       return `<div role="gridcell" aria-selected="${cell.selected}" class="cal-cell"><button type="button" class="cal-day${cell.inMonth ? '' : ' cal-adjacent'}${cell.selected ? ' cal-selected' : ''}${cell.today ? ' cal-is-today' : ''}" data-cal-date="${cell.date}" data-cal-focus="date-${cell.date}" tabindex="${cell.date === focusDate && !cell.disabled ? 0 : -1}" aria-label="${escape(aria)}"${cell.today ? ' aria-current="date"' : ''}${cell.disabled ? ' disabled' : ''}>
         <span class="cal-day-date" aria-hidden="true"><span class="cal-gregorian">${cell.day}</span><span class="cal-tibetan">${escape(cell.tibetan ? dayPart(cell.tibetan) : '')}</span></span>
         <span class="cal-marks" aria-hidden="true">${cell.tibetan?.monthLeap ? '<span class="cal-leap">闰月</span>' : ''}${cell.repeatNumber ? `<span class="cal-repeat">重日${cell.repeatNumber}</span>` : ''}${cellEvents.length ? `<span class="cal-category-marks">${markers.slice(0, 3).map(color => `<i class="cal-category-dot ${color}"></i>`).join('')}</span><span class="cal-event-count">${cell.count}</span>` : ''}</span>
@@ -229,7 +235,7 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     const focus = activeKey();
     renderMonth(); renderList();
     monthRoot.hidden = view !== 'month'; listRoot.hidden = view !== 'list';
-    $('[data-cal-navigation]').hidden = view !== 'month';
+    $('[data-cal-navigation]').hidden = view !== 'month'; $('[data-cal-context]').hidden = view !== 'month';
     root.querySelectorAll('[data-cal-view]').forEach(button => {
       button.setAttribute('aria-pressed', String(button.dataset.calView === view));
     });
@@ -241,7 +247,7 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     scrollByView[view] = win?.scrollY || 0;
     view = next;
     monthRoot.hidden = view !== 'month'; listRoot.hidden = view !== 'list';
-    $('[data-cal-navigation]').hidden = view !== 'month';
+    $('[data-cal-navigation]').hidden = view !== 'month'; $('[data-cal-context]').hidden = view !== 'month';
     root.querySelectorAll('[data-cal-view]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.calView === view)));
     onViewChange(view);
     if (Object.hasOwn(scrollByView, view)) win?.scrollTo({top: scrollByView[view], behavior: 'instant'});

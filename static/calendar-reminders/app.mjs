@@ -1,5 +1,5 @@
 import {defaults, normalizeSettings, selectOccurrences, selectCalendarOccurrences, exportICS, reminderLabel, addDays, rangeEnd} from './core.mjs';
-import {getTibetanDate} from './engine.mjs';
+import {getTibetanDate,generateOccurrences} from './engine.mjs';
 import {icon, fillIcons} from './icons.mjs';
 import {deviceTimeZone,resolveTimeZone,zoneInfo} from './timezones.mjs';
 import {deviceDate,nextLocalMidnight,changedDeviceZone} from './device-time.mjs';
@@ -86,8 +86,31 @@ function safeHTTP(value) {
 function renderToday() {
   const now=new Date(); today=deviceDate(now);
   $('#today-gregorian').textContent = new Intl.DateTimeFormat('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'short'}).format(now);
-  try { $('#today-tibetan').textContent = `藏历 ${getTibetanDate(today).display}`; }
+  try { const tibetan=getTibetanDate(today); $('#today-tibetan').textContent = `藏历${tibetan.yearName}年 ${tibetan.display}`; }
   catch { $('#today-tibetan').textContent = ''; }
+  renderNextPractice();
+}
+// Read-only orientation for every visitor: the next guru or dakini tsok day,
+// computed from the same PRO rules as the feed. It never changes selections.
+let nextPracticeDay = '';
+function renderNextPractice() {
+  const node = $('#next-practice');
+  if (!node || !data?.catalog || nextPracticeDay === today) return;
+  nextPracticeDay = today;
+  const run = () => {
+    try {
+      const events = data.catalog.events.filter(event => ['guru-tsok','dakini-tsok'].includes(event.id));
+      const next = generateOccurrences({catalog:{...data.catalog,events},published:{records:[],coverage:null}},{start:today,end:addDays(today,40)})
+        .sort((a,b) => a.date.localeCompare(b.date))[0];
+      if (!next) { node.hidden = true; return; }
+      const days = Math.round((Date.parse(next.date) - Date.parse(today)) / 864e5), [, month, day] = next.date.split('-').map(Number);
+      const when = days === 0 ? '今天' : `${month}月${day}日 · ${days === 1 ? '明天' : `还有 ${days} 天`}`;
+      node.innerHTML = `${icon('knot')}<small>${days === 0 ? '今日荟供' : '下一个荟供日'}</small><strong>${esc(next.title)}<span>${esc(when)}</span></strong>`;
+      node.hidden = false;
+    } catch { node.hidden = true; }
+  };
+  // Deferred so the first paint and the cold-start task stay unchanged.
+  if (typeof requestIdleCallback === 'function') requestIdleCallback(run, {timeout: 1500}); else setTimeout(run, 300);
 }
 function renderRegion(now=new Date()) {
   const info=settings.zone ? zoneInfo(settings.zone,now) : null;
@@ -220,7 +243,7 @@ function deviceGuide() {
   outlook.dataset.step=manualEntry&&app==='outlook'?'2':'';
   const copied=$('#copy-progress');
   copied.hidden=!manualEntry||!ready||copied.dataset.app!==app||copied.dataset.feed!==subscription?.feedUrl;
-  $('#entry-hint').textContent=managementRestoring ? '正在恢复订阅，请稍候。' : !app ? '选择日历应用后，查看对应的添加方式。' : requestPending ? '正在保存你的选择，请稍候。' : !subscription ? '选好日历应用后，我们会准备你的订阅。' : !ready ? '先保存修改，再继续添加到日历。' : inAppApple ? '也可复制上方的 HTTPS 订阅地址，在 Apple 日历中手动添加。复制后仍需到日历中确认。' : app==='iphone' ? calendarDevice.apple ? '将在系统日历中打开订阅确认，请按提示添加。' : '请把订阅地址传到你的 iPhone、iPad 或 Mac 上添加。' : app==='google' ? calendarDevice.mobile ? '请将订阅地址传到电脑，在 Google 日历网页中添加。' : '先复制订阅地址，再打开 Google 日历的“通过网址添加”页面。' : '应用有网址订阅入口时可粘贴此地址；否则请查看下方文件导入方式。';
+  $('#entry-hint').textContent=managementRestoring ? '正在恢复订阅，请稍候。' : !app ? '' : requestPending ? '正在保存你的选择，请稍候。' : !subscription ? '选好日历应用后，我们会准备你的订阅。' : !ready ? '先保存修改，再继续添加到日历。' : inAppApple ? '也可复制上方的 HTTPS 订阅地址，在 Apple 日历中手动添加。复制后仍需到日历中确认。' : app==='iphone' ? calendarDevice.apple ? '将在系统日历中打开订阅确认，请按提示添加。' : '请把订阅地址传到你的 iPhone、iPad 或 Mac 上添加。' : app==='google' ? calendarDevice.mobile ? '请将订阅地址传到电脑，在 Google 日历网页中添加。' : '先复制订阅地址，再打开 Google 日历的“通过网址添加”页面。' : '应用有网址订阅入口时可粘贴此地址；否则请查看下方文件导入方式。';
   if(app==='outlook') $('#entry-hint').textContent=ready ? '先复制订阅地址，在 Outlook 网页版选择“添加日历 → 从 Web 订阅”；也可查看经典桌面版步骤。' : $('#entry-hint').textContent;
   if(inAppApple && !subscription) $('#entry-hint').textContent='请先在 Safari 或系统浏览器打开本页，再选择内容并准备订阅。微信与浏览器的本机草稿不会自动同步。';
   $('#create-subscription').hidden=inAppApple && !subscription;
@@ -245,6 +268,8 @@ function renderConnection() {
   // Make failures visible once; later re-renders respect the user's disclosure.
   if(failed && connectionPanel.dataset.state!=='error') $('#connection-details').open=true;
   connectionPanel.dataset.state=connection.state;
+  // Before anything is prepared there is no connection to describe; keep the panel out of the way.
+  connectionPanel.dataset.prepared=String(Boolean(subscription||busy||stopped));
   $('#connection-details-label').textContent=checking ? '正在检查' : failed ? '连接失败' : connection.state==='ok' ? '连接正常' : '连接信息';
   $('#connection-status').setAttribute('aria-busy',String(checking||busy));
   $('#connection-symbol').innerHTML=icon(stopped?'bell-off':connection.state==='ok'?'check':connection.state==='error'?'globe':'calendar');

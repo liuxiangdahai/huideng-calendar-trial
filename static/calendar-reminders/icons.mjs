@@ -1,28 +1,29 @@
-// Original 24-unit outlines, shared by navigation, categories and guidance.
+// Original 24-unit outlines on one grid and stroke. Practice categories draw on
+// the Eight Auspicious Symbols (八吉祥) so every group reads as one family.
 // Decorative SVGs stay out of the accessibility tree; actions retain text labels.
-const ritualBell = '<path d="M12 2v6M12 2c-3 1-3.5 3-2 5m2-5c3 1 3.5 3 2 5M10 8h4m-4 2h4M12 10c-5 0-4 6-7 9h14c-3-3-2-9-7-9ZM5 21h14M8 16h8"/>';
+const bell = '<path d="M12 2v3.4M12 2c-1.4.8-1.6 2.1-1 3.4M12 2c1.4.8 1.6 2.1 1 3.4M10 6.4h4"/><path d="M12 7.6c-3.4 0-4.4 2.6-4.4 6 0 2.9-.9 4.4-2.4 5.4h13.6c-1.5-1-2.4-2.5-2.4-5.4 0-3.4-1-6-4.4-6Z"/><path d="M7.5 16h9M12 19v2"/>';
+const vajra = '<circle cx="12" cy="12" r="1.5"/><path d="M9.3 9.4h5.4M9.3 14.6h5.4M12 2.5v6.9m0 5.2v6.9M12 2.5c-3.2 1.2-3.6 4-2.7 6.9M12 2.5c3.2 1.2 3.6 4 2.7 6.9M12 21.5c-3.2-1.2-3.6-4-2.7-6.9m2.7 6.9c3.2-1.2 3.6-4 2.7-6.9"/>';
 const paths = {
-  'ritual-bell': ritualBell,
-  'bell-vajra': `<g transform="translate(-1 3) scale(.78)">${ritualBell}</g><g transform="rotate(12 19 11)"><ellipse cx="19" cy="11" rx="1.2" ry="1"/><path d="M16.8 8.8h4.4m-4.4 4.4h4.4M19 2v6.8m0 4.4V20M19 2c-3.4 1.5-3.5 3.5-2.2 6.8M19 2c3.4 1.5 3.5 3.5 2.2 6.8M19 20c-3.4-1.5-3.5-3.5-2.2-6.8M19 20c3.4-1.5 3.5-3.5 2.2-6.8"/></g>`,
+  // 金刚铃 · 金刚杵 · 铃杵（荟供）
+  'ritual-bell': bell,
+  vajra,
+  'bell-vajra': `<g transform="translate(-3.4 1.2) scale(.9)">${bell}</g><g transform="translate(9.6 2.4) scale(.8)">${vajra}</g>`,
+  // 莲花（佛菩萨）· 法轮（法会与修行月）· 宝伞（上师）· 胜利幢（节庆）· 日月（天象）· 宝瓶（其他）· 吉祥结（品牌）
+  lotus: '<path d="M12 4.2c2.7 2.9 2.7 7.6 0 10.8-2.7-3.2-2.7-7.9 0-10.8Z"/><path d="M11 13.6C9.7 11 7.3 9.3 4.3 9.2c.8 3.6 3.9 5.8 7.7 5.8 3.8 0 6.9-2.2 7.7-5.8-3 .1-5.4 1.8-6.7 4.4"/><path d="M4.6 12.9C3.6 13.1 2.8 13.5 2 14c1.6 2.3 5.6 3.4 10 3.4s8.4-1.1 10-3.4c-.8-.5-1.6-.9-2.6-1.1"/><path d="M6.5 20.5h11"/>',
+  wheel: '<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2.5V10m0 4v7.5M2.5 12H10m4 0h7.5M5.3 5.3l5.3 5.3m2.8 2.8 5.3 5.3m0-13.4-5.3 5.3m-2.8 2.8-5.3 5.3"/>',
+  parasol: '<path d="M12 2v1.6"/><path d="M3.6 10.2C4.8 6 8 3.6 12 3.6s7.2 2.4 8.4 6.6"/><path d="M3.6 10.2c1.4 1.3 2.8 1.3 4.2 0 1.4 1.3 2.8 1.3 4.2 0 1.4 1.3 2.8 1.3 4.2 0 1.4 1.3 2.8 1.3 4.2 0"/><path d="M12 10.6v11M5.7 11.3v3m12.6-3v3"/>',
+  banner: '<path d="M12 2v2.6"/><path d="M7.2 7.2C7.6 5.4 9.6 4.6 12 4.6s4.4.8 4.8 2.6"/><path d="M7.2 7.2v7.3m9.6-7.3v7.3M7.2 10.6h9.6"/><path d="M7.2 14.5c.8 1.2 1.6 1.2 2.4 0 .8 1.2 1.6 1.2 2.4 0 .8 1.2 1.6 1.2 2.4 0 .8 1.2 1.6 1.2 2.4 0"/><path d="M12 15.6V22m-3.4-6.5v3.3m6.8-3.3v3.3"/>',
+  nyida: '<circle cx="12" cy="8.6" r="3.4"/><path d="M12 2.4v1"/><path d="M4.4 10.6c.4 4.7 3.6 8 7.6 8s7.2-3.3 7.6-8c-1.9 2.6-4.6 3.8-7.6 3.8s-5.7-1.2-7.6-3.8Z"/><path d="M8 21h8"/>',
+  vase: '<path d="M12 1.8v1.4M9.6 3.4h4.8"/><path d="M10.4 3.4c0 1.9-1 2.6-1.6 3.1h6.4c-.6-.5-1.6-1.2-1.6-3.1"/><path d="M8.8 6.5C5.6 7.8 4.9 12.6 6.6 15.8 7.7 17.9 9.6 19 12 19s4.3-1.1 5.4-3.2c1.7-3.2 1-8-2.2-9.3"/><path d="M6.4 10c3.7 1.2 7.5 1.2 11.2 0M9.6 19l-.6 2.6h6l-.6-2.6"/>',
+  knot: '<g transform="rotate(45 12 12)"><path d="M6.5 6.5h11v11h-11z"/><path d="M10.2 6.5v11M13.8 6.5v11M6.5 10.2h11M6.5 13.8h11"/><path d="M6.5 10.2C3.5 10.2 3.5 6.5 6.5 6.5M10.2 6.5c0-3 3.6-3 3.6 0M17.5 6.5c3 0 3 3.7 0 3.7M17.5 13.8c3 0 3 3.7 0 3.7M13.8 17.5c0 3-3.6 3-3.6 0M6.5 17.5c-3 0-3-3.7 0-3.7"/></g>',
   globe: '<circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18M5 6.5h14M5 17.5h14"/>',
   calendar: '<rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M7.5 3v4m9-4v4M3.5 10h17m-12.5 4h2m4 0h2m-8 4h2"/>',
   'calendar-check': '<path d="M20.5 11V7a2 2 0 0 0-2-2h-13a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6M7.5 3v4m9-4v4M3.5 10h17m-6 7 2.5 2.5 4.5-5"/>',
   'calendar-plus': '<path d="M20.5 11V7a2 2 0 0 0-2-2h-13a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6M7.5 3v4m9-4v4M3.5 10h17M18 14v7m-3.5-3.5h7"/>',
-  // A central bead between lotus collars and two closed, five-pronged crowns.
-  vajra: '<g transform="rotate(35 12 12)"><ellipse cx="12" cy="12" rx="1.7" ry="1.4"/><path d="M9.2 9.2h5.6m-5.6 5.6h5.6M12 2v7.2m0 5.6V22M12 2C8 3.2 7.5 5.2 9.2 9.2M12 2c4 1.2 4.5 3.2 2.8 7.2M12 2C10 4.4 10 6.8 10.5 9.2M12 2c2 2.4 2 4.8 1.5 7.2M12 22c-4-1.2-4.5-3.2-2.8-7.2M12 22c4-1.2 4.5-3.2 2.8-7.2M12 22c-2-2.4-2-4.8-1.5-7.2M12 22c2-2.4 2-4.8 1.5-7.2"/></g>',
-  'woven-seal': '<path d="m12 2 4 4-4 4-4-4 4-4Zm0 12 4 4-4 4-4-4 4-4ZM2 12l4-4 4 4-4 4-4-4Zm12 0 4-4 4 4-4 4-4-4ZM8 8l8 8m0-8-8 8"/>',
-  lotus: '<path d="M12 19C6.8 19 3 15.6 3 10c3.4.1 6.6 2.2 9 6 2.4-3.8 5.6-5.9 9-6 0 5.6-3.8 9-9 9Zm0-3c-3.6-3.6-3.6-7.7 0-12 3.6 4.3 3.6 8.4 0 12ZM6.2 7l.8 4.1M17.8 7l-.8 4.1M7 21h10"/>',
-  throne: '<path d="M6.5 16V9c0-3.6 2.4-6 5.5-7 3.1 1 5.5 3.4 5.5 7v7M5 12H3.5v5h17v-5H19M6 17v3m12-3v3M4 21h16M8.5 10v3h7v-3M9 6.5h6"/>',
-  pecha: '<rect x="3" y="6" width="18" height="10" rx="1.5"/><path d="M7 6v10m10-10v10M10 10h4m-4 3h4M4 19h16M5 21h14"/>',
-  festival: '<rect x="3.5" y="6" width="17" height="15" rx="2"/><path d="M3.5 11h17M7.5 3.5V8m9-4.5V8m-8 8 3.5-3 3.5 3-3.5 3-3.5-3ZM10 3h4"/>',
-  'sun-moon': '<path d="M19 15.3a7.8 7.8 0 0 1-10.3-10A7.9 7.9 0 1 0 19 15.3Z"/><circle cx="17" cy="6" r="2.5"/><path d="M17 1v1m0 8v1m-5-5h1m8 0h1m-1.5-3.5-.7.7m-7.1 6.4.8-.8"/>',
   eclipse: '<circle cx="12" cy="12" r="6.5"/><path d="M13.5 5.7a6.5 6.5 0 0 0 0 12.6M12 2v1m0 18v1M2 12h1m18 0h1M5 5l.8.8m12.4 12.4.8.8M5 19l.8-.8M18.2 5.8 19 5"/>',
   person: '<circle cx="12" cy="7" r="3"/><path d="M6 21v-3a6 6 0 0 1 12 0v3M3 21h18"/>',
-  book: '<path d="M12 5v16M3 4c4-1 7-1 9 1 2-2 5-2 9-1v15c-4-1-7-1-9 2-2-3-5-3-9-2V4Z"/>',
-  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/>',
-  bookmark: '<path d="M6 3h12v18l-6-4-6 4V3Z"/>',
   bell: '<path d="M18 9a6 6 0 0 0-12 0c0 5.5-2 6-2 8h16c0-2-2-2.5-2-8ZM10 21h4M12 2v1"/>',
-  'bell-settings': '<path d="M13 7a4.5 4.5 0 0 0-9 0c0 4-1.5 4.5-1.5 6h10.8M7 17h3M8.5 1v1.5M16 5h6M16 12h6M13 19h9M18 3v4m2 3v4m-4 3v4"/>',
+  'bell-settings': '<path d="M15 8.5a5 5 0 0 0-10 0c0 4.6-1.7 5-1.7 6.7h13.4c0-.8-.3-1.3-.7-2M8.5 19h3M10 2.5v1"/><circle cx="18.5" cy="9.5" r="2.5"/><path d="M18.5 5v2m0 5v2m4.5-4.5h-2m-5 0h-2"/>',
   'bell-off': '<path d="m3 3 18 18M9 3.8A6 6 0 0 1 18 9c0 2.2.3 3.6.8 4.7M6 8v1c0 5.5-2 6-2 8h13m-7 4h4"/>',
   sliders: '<path d="M4 6h4m4 0h8M4 18h8m4 0h4M8 3v6m8 6v6M4 12h11m4 0h1m-5-3v6"/>',
   search: '<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/>',
@@ -33,8 +34,6 @@ const paths = {
   close: '<path d="m6 6 12 12M6 18 18 6"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
   check: '<path d="m5 12 4.5 4.5L19 7"/>',
-  'check-circle': '<circle cx="12" cy="12" r="9"/><path d="m7.5 12 3 3L17 8.5"/>',
-  circle: '<circle cx="12" cy="12" r="9"/>',
   list: '<path d="M9 6h12M9 12h12M9 18h12M3 6h1m-1 6h1m-1 6h1"/>',
   download: '<path d="M12 3v12m-4-4 4 4 4-4M4 16v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/>',
   phone: '<rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 5h4m-3 14h2"/>',
