@@ -119,3 +119,15 @@ test('Pages publishes only approved public assets and cannot expose backend, con
  for(const file of ['index.html','version.json','_worker.js','_routes.json','calendar-reminders/index.html','calendar-reminders/app-ABC123.js','calendar-reminders/assets/huideng-logo.png','calendar-reminders/licenses/zangli-LICENSE.txt'])assert.equal(isPublicFile(file),true,file);
  for(const file of ['worker/worker.mjs','.env','deployment.local.json','_worker.js.map','_worker.js/wrangler.json','calendar-reminders/assets/.env','calendar-reminders/service.sqlite','calendar-reminders/app.mjs'])assert.equal(isPublicFile(file),false,file);
 });
+
+test('the everyday-date calendar ships as a static, alarm-free file a year and more ahead', async () => {
+  const {dailyCalendarForBuild} = await import('../../tools/calendar/release-build.mjs');
+  const now = Date.parse('2026-11-09T05:00:00Z');
+  const text = dailyCalendarForBuild(now);
+  assert.equal(text, dailyCalendarForBuild(now + 3600000), 'same build day, same bytes');
+  assert.match(text, /X-WR-CALNAME:慧灯·每日藏历/);
+  assert.doesNotMatch(text, /BEGIN:VALARM/);
+  assert.match(text, /UID:daily-only-2026-10-09@/);
+  assert.match(text, /DTSTART;VALUE=DATE:20281108/);
+  assert.match(text, /SUMMARY:◦ 藏历/);
+});

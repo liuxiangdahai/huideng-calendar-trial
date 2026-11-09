@@ -196,6 +196,7 @@ export async function buildRelease(options = {}, env = process.env) {
   await fs.mkdir(path.join(frontend,'licenses'),{recursive:true});
   await fs.copyFile(path.join(sourceRoot,'vendor/zangli/LICENSE.md'),path.join(frontend,'licenses/zangli-LICENSE.txt'));
   await fs.copyFile(path.join(sourceRoot,'vendor/zangli/README.md'),path.join(frontend,'licenses/zangli-README.md'));
+  await fs.copyFile(path.join(sourceRoot,'vendor/qrcode/LICENSE.md'),path.join(frontend,'licenses/qrcode-generator-LICENSE.txt'));
   try { await fs.copyFile(path.join(sourceRoot,'assets/README.md'),path.join(frontend,'licenses/artwork.md')); await fs.rm(path.join(frontend,'assets/README.md')); }
   catch (error) { if(error.code!=='ENOENT') throw error; }
   const html = (await normalizedHTML()).replace('src="./app.mjs"',`src="./${appFile}"`).replace('</head>',`${releaseTag(release)}\n</head>`);

@@ -497,9 +497,6 @@ input[type=time]::-webkit-datetime-edit { padding: 0; }
 .time-choices button[aria-pressed=true] small { color: var(--red); }
 .time-choices button:disabled { opacity: .5; cursor: default; }
 #time-choice-note { font-size: 13px; color: var(--muted); }
-.step-add-button { width: 100%; min-height: 56px; gap: 12px; font: 500 18px/1.4 var(--font-serif); letter-spacing: 2px; box-shadow: inset 0 0 0 2px var(--red), inset 0 0 0 3px #b38a4b; }
-.step-add-button .icon { width: 22px; height: 22px; }
-.step-add-button:disabled { box-shadow: none; }
 .step-add-note { margin-top: 8px; font-size: 13px; line-height: 1.7; color: var(--muted); }
 .advanced-settings { margin-top: 26px; border-top: 1px solid var(--line-2); }
 .advanced-settings>summary { display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 10px 4px; list-style: none; color: var(--ink); }
@@ -519,11 +516,40 @@ input[type=time]::-webkit-datetime-edit { padding: 0; }
 .daily-calendar .feed-actions { margin: 0; }
 @media (min-width: 1024px) {
   /* Computers: the steps stay as a compact header; details are the main tool. */
-  .step-add-button { min-height: 50px; font-size: 16px; }
-  .time-choices button { min-height: 52px; }
+    .time-choices button { min-height: 52px; }
 }
 @media (max-width: 1023px) {
   /* Phones: larger targets for older hands. */
   .preset-copy strong, .daily-date-title-row strong { font-size: 17px; }
   .time-choices strong { font-size: 17px; }
+}
+
+.step-add-device { padding: 12px 14px; border: 1px solid var(--line-2); border-left: 3px solid var(--red); border-radius: 0 var(--r) var(--r) 0; background: var(--surface); font-size: 15px; line-height: 1.7; color: var(--ink); }
+#share-settings { margin-top: 4px; padding-left: 0; font-size: 14px; }
+.wechat-banner { display: flex; gap: 12px; align-items: flex-start; margin: 14px 0 0; padding: 12px 14px; border: 1px solid #d8c29a; border-left: 3px solid var(--gold); border-radius: 0 var(--r) var(--r) 0; background: var(--gold-tint); color: #4f3f2a; }
+.wechat-banner .icon { margin-top: 3px; color: var(--gold); }
+.wechat-banner strong { display: block; font: 600 16px/1.5 var(--font-serif); color: var(--ink); }
+.wechat-banner p { font-size: 14px; line-height: 1.7; }
+.subscribed-card { margin: 0 0 20px; padding: 14px 16px; border: 1px solid #b9cdc3; border-radius: var(--r); background: var(--teal-tint); }
+.subscribed-title { display: flex; align-items: center; gap: 8px; font: 600 16px/1.5 var(--font-serif); color: var(--teal); }
+.subscribed-title .icon { width: 22px; height: 22px; }
+#subscribed-next { margin: 4px 0 2px 30px; font-size: 14px; line-height: 1.7; color: var(--ink-2); }
+#subscribed-open { margin-left: 22px; font-size: 14px; color: var(--teal); }
+.title-marks { margin: 20px 0 0; }
+.title-marks legend { padding-bottom: 8px; font: 600 15px/1.5 var(--font-serif); letter-spacing: 1px; color: var(--teal); }
+.title-marks label { position: relative; display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 8px 12px; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); cursor: pointer; }
+.title-marks label+label { margin-top: 6px; }
+.title-marks input { flex: none; width: 18px; height: 18px; margin: 0; accent-color: var(--red); }
+.title-marks strong { display: block; font-size: 15px; font-weight: 500; }
+.title-marks small { display: block; font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }
+.title-marks label:has(input:checked) { border-color: var(--red); background: var(--red-tint); }
+.share-body { display: grid; grid-template-columns: 180px minmax(0,1fr); gap: 18px; align-items: center; }
+.share-qr { width: 180px; padding: 8px; border: 1px solid var(--line-2); border-radius: var(--r); background: #fff; }
+.share-qr svg { display: block; width: 100%; height: auto; }
+@media (max-width: 1023px) {
+  /* Phones in the simple path: the clock and zone bar move out of the way. */
+  #app.advanced-closed .region-bar { display: none; }
+}
+@media (max-width: 480px) {
+  .share-body { grid-template-columns: 1fr; justify-items: center; }
 }

@@ -50,7 +50,7 @@ test('preset saves retain feed URL, remind only on tsok days and clocks remain U
   expect((await creds(page)).revision).toBe(original.revision);await page.locator('#subscribe').click();await expect.poll(async()=>(await creds(page)).revision).toBe(original.revision+1);expect((await creds(page)).feedUrl).toBe(original.feedUrl);
   const events=new ICAL.Component(ICAL.parse(await (await request.get(original.feedUrl)).text())).getAllSubcomponents('vevent');
   const tsok=new Set(['莲师荟供日','空行母荟供日']);expect(events.length).toBeGreaterThan(100);
-  for(const event of events)expect(event.getAllSubcomponents('valarm').length).toBe(tsok.has(event.getFirstPropertyValue('summary'))?1:0);
+  for(const event of events)expect(event.getAllSubcomponents('valarm').length).toBe(tsok.has(event.getFirstPropertyValue('summary').replace(/^[◆◇◦] /,''))?1:0);
 });
 test('device clock is primary overseas and cross-zone detail follows actual alarm dates',async({browser})=>{
   const context=await browser.newContext({baseURL:'http://127.0.0.1:4173',timezoneId:'Asia/Singapore'});try{

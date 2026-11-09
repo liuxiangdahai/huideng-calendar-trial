@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import ICAL from 'ical.js';
-import {defaults, selectOccurrences, exportICS, zonedInstant, normalizeSettings, relativeTrigger,
+import {defaults, selectOccurrences, exportICS, zonedInstant, normalizeSettings, relativeTrigger, markedTitle,
   validateSettings, addDays, rangeEnd} from '../../static/calendar-reminders/core.mjs';
 import {applyPreset} from '../../static/calendar-reminders/presets.mjs';
 const data=JSON.parse(fs.readFileSync('static/calendar-reminders/calendar-data.json','utf8'));
@@ -91,13 +91,13 @@ test('independent iCalendar parser validates UTF-8, all-day dates and two alarm 
     assert.equal(event.getFirstPropertyValue('dtstart').isDate,true);
     assert.equal(event.getFirstPropertyValue('dtstart').toString(),source.date);
     assert.equal(event.getFirstPropertyValue('dtend').toString(),addDays(source.date,1));
-    assert.equal(event.getFirstPropertyValue('summary'),source.title);
+    assert.equal(event.getFirstPropertyValue('summary'),markedTitle(source));
     const alarms=event.getAllSubcomponents('valarm');
     assert.equal(alarms.length,source.preference.mode==='remind'?2:0);
     if(alarms.length)assert.equal(alarms[1].getFirstPropertyValue('trigger').toSeconds(),-4*3600);
   }
   const special={...events[0],title:'测试,分号;反斜杠\\换行\n中文字'.repeat(12)};
-  assert.equal(parsed(exportICS([special],{zone:settings.zone})).getFirstSubcomponent('vevent').getFirstPropertyValue('summary'),special.title);
+  assert.equal(parsed(exportICS([special],{zone:settings.zone})).getFirstSubcomponent('vevent').getFirstPropertyValue('summary'),markedTitle(special));
 });
 
 test('subscription revisions preserve UID and timestamps and cancellation has no alarm',()=>{
@@ -143,4 +143,18 @@ test('all-day reminders use civil-day relative triggers that Android calendars k
   const ics=exportICS([event],{zone:'Asia/Shanghai'});
   assert.doesNotMatch(ics,/VALUE=DATE-TIME|Asia\/Shanghai。/);
   assert.match(ics.replace(/\r\n /g,''),/按手机当地时间/);
+});
+
+test('title marks tell reminders, display days and everyday dates apart in a chosen style',()=>{
+  const settings=makeSettings(),[event]=selectOccurrences(data,settings,window).filter(e=>e.preference.mode==='remind');
+  const display={...event,preference:{mode:'display',reminders:[]}},daily={...event,kind:'daily-date',title:'藏历九月廿九'};
+  assert.deepEqual([event,display,daily].map(e=>markedTitle(e)),[`◆ ${event.title}`,`◇ ${event.title}`,'◦ 藏历九月廿九']);
+  assert.equal(markedTitle(event,'words'),`【提醒】${event.title}`);
+  assert.equal(markedTitle(event,'none'),event.title);
+  // Title-sorting apps put reminders first and everyday dates last.
+  assert.ok('◆' < '◇' && '◇' < '◦');
+  assert.equal(validateSettings({...settings,titleMarks:'symbols'},data.catalog).titleMarks,undefined);
+  assert.equal(validateSettings({...settings,titleMarks:'words'},data.catalog).titleMarks,'words');
+  assert.throws(()=>validateSettings({...settings,titleMarks:'emoji'},data.catalog),/标记/);
+  assert.match(exportICS([event],{zone:settings.zone,titleMarks:'words'}),/SUMMARY:【提醒】/);
 });

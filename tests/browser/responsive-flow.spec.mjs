@@ -16,6 +16,8 @@ test('presets and independent daily dates fit phone first screen and preview sta
   // Keep its complete controls in the first screen, without shrinking type or
   // touch targets to force the first category into the same viewport.
   expect(layout.daily).toBeLessThan(layout.bar);
+  await expect(page.locator('#advanced-settings')).not.toHaveAttribute('open','');
+  await page.locator('#advanced-settings>summary').click();
   await page.locator('.group-card>summary').first().scrollIntoViewIfNeeded();
   await expect(page.locator('.group-card>summary').first()).toBeInViewport();
   await expect(page.locator('#search,#reset')).toHaveCount(0);

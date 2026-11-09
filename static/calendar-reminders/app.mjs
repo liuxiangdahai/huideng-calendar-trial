@@ -14,6 +14,7 @@ import {checkSubscriptionConnection} from './connection-check.mjs';
 import {cloneSettings as clone,fetchJSON} from './runtime.mjs';
 import {createMobileTabs} from './mobile-tabs.mjs';
 import {playMotion,installDisclosureMotion} from './motion.mjs';
+import qrcode from './vendor/qrcode/qrcode.mjs';
 
 const $ = selector => document.querySelector(selector);
 const storageKey = 'huideng.calendar.v2', subscriptionKey = 'huideng.calendar.subscription';
@@ -186,13 +187,65 @@ function renderTimeChoices() {
   $('#time-choice-note').textContent=!prefs.length ? '先在上一步选择会提醒的日子' : !current ? '已逐项设置不同时间' :
     [...document.querySelectorAll('[data-time-choice]')].some(b=>b.dataset.timeChoice===current) ? '' : `当前：${reminderLabel(prefs[0].reminders)}`;
 }
-// Step 3 names the device it recognised; the subscription panel still lets
-// the person choose another calendar application.
+// Step 3 names the device it recognised. Computers can add Google, Outlook or
+// Mac calendars directly; the phone hand-off (QR) is offered, never required.
+const deviceLabel=()=>calendarDevice.appleMobile ? '加入 iPhone 日历' : calendarDevice.mac ? '加入 Mac 日历' :
+  /Android/i.test(navigator.userAgent) ? '加入安卓手机日历' : calendarDevice.mobile ? '加入手机日历' : '加入我的日历';
 function renderQuickAdd() {
-  const label=calendarDevice.appleMobile ? '加入 iPhone 日历' : calendarDevice.mac ? '加入 Mac 日历' :
-    /Android/i.test(navigator.userAgent) ? '加入安卓手机日历' : calendarDevice.mobile ? '加入手机日历' : '加入我的日历';
-  $('#quick-subscribe-label').textContent=subscription ? (dirty() ? '保存修改' : '查看我的订阅') : label;
-  $('#quick-subscribe').disabled=$('#subscribe').disabled;
+  $('#step-add-device').textContent=calendarDevice.appleMobile ? '已识别为 iPhone / iPad：点底部按钮，系统日历会直接询问是否添加。' :
+    calendarDevice.mac ? '已识别为 Mac：可直接加入 Mac 日历；也可选 Google 或 Outlook。' :
+    /Android/i.test(navigator.userAgent) ? '已识别为安卓手机：点底部按钮后，按你的日历应用（手机自带、Google 等）一步步添加。' :
+    calendarDevice.mobile ? '点底部按钮后，选择你使用的日历应用。' :
+    '在电脑上可直接加入 Google、Outlook 或 Mac 日历；想加到手机上，可用下方“扫码”在手机继续。';
+  $('#share-settings').lastChild.textContent=calendarDevice.mobile ? '把这套设置分享给师兄' : '用手机扫码继续 · 分享给师兄';
+  renderSubscribedCard();
+}
+function renderSubscribedCard() {
+  const card=$('#subscribed-card'), show=Boolean(subscription) && !stopped && !conflict && !dirty();
+  card.hidden=!show; if(!show)return;
+  const next=upcoming.find(event=>event.preference?.mode==='remind') || upcoming.find(event=>event.kind!=='daily-date');
+  if(!next){$('#subscribed-next').textContent='目前没有即将到来的修行日。';return;}
+  const [, month, day]=next.date.split('-').map(Number);
+  $('#subscribed-next').textContent=next.preference?.mode==='remind'
+    ? `下一次提醒：${month}月${day}日 ${next.title} · ${reminderLabel(next.preference.reminders)}`
+    : `下一个修行日：${month}月${day}日 ${next.title}（仅显示）`;
+}
+// A share link carries the preset, the shared reminder time, the everyday
+// layer and the title style. Per-item fine tuning stays with its owner.
+function shareURL() {
+  const url=new URL(location.href); url.hash=''; url.search='';
+  const preset=matchingPreset(settings,data.catalog), times=new Set(remindPrefs().map(p=>p.reminders.map(r=>`${r.daysBefore}-${r.time.replace(':','')}`).join('_')));
+  if(preset) url.searchParams.set('p',preset);
+  if(times.size===1 && !/_/.test([...times][0])) url.searchParams.set('t',[...times][0]);
+  if(settings.includeDailyDates) url.searchParams.set('d','1');
+  if(settings.titleMarks) url.searchParams.set('m',settings.titleMarks);
+  return {href:url.href,preset,custom:!preset || times.size>1};
+}
+function openShare() {
+  const {href,preset,custom}=shareURL();
+  const presetTitle=PRESETS.find(item=>item.id===preset)?.title || '自选的修行日';
+  const prefs=remindPrefs();
+  $('#share-summary').textContent=`${presetTitle}${prefs.length?` · 提醒：${reminderLabel(prefs[0].reminders)}`:''}${settings.includeDailyDates?' · 含每日藏历':''}`;
+  $('#share-custom-note').hidden=!custom;
+  try { const qr=qrcode(0,'M'); qr.addData(href); qr.make(); $('#share-qr').innerHTML=qr.createSvgTag({cellSize:4,margin:2,scalable:true}); }
+  catch { $('#share-qr').textContent='链接过长，无法生成二维码，请复制链接。'; }
+  $('#share-copy').onclick=()=>void copy(href,'分享链接');
+  $('#share-dialog').showModal();
+}
+function applySharedSettings() {
+  const params=new URLSearchParams(location.search);
+  if(![...params.keys()].some(key=>['p','t','d','m'].includes(key)))return '';
+  const clean=new URL(location.href); for(const key of ['p','t','d','m']) clean.searchParams.delete(key);
+  try{history.replaceState(history.state,'',clean.href);}catch{}
+  if(subscription) return '你已有自己的订阅，分享链接的设置没有自动套用；可在下方修改后保存。';
+  let next=clone(settings);
+  if(PRESETS.some(item=>item.id===params.get('p'))) next=applyPreset(next,data.catalog,params.get('p'));
+  const time=params.get('t')?.match(/^([0-7])-([01]\d|2[0-3])([0-5]\d)$/);
+  if(time) for(const pref of Object.values(next.events)) if(pref.mode==='remind') pref.reminders=[{daysBefore:Number(time[1]),time:`${time[2]}:${time[3]}`}];
+  if(params.get('d')==='1') next.includeDailyDates=true;
+  if(['words','none'].includes(params.get('m'))) next.titleMarks=params.get('m'); else delete next.titleMarks;
+  settings=next;
+  return '已按分享的设置选好，确认后点底部按钮加入日历。';
 }
 function renderSaveState() {
   const changed = dirty(), count = countSelected();
@@ -203,7 +256,8 @@ function renderSaveState() {
   $('#subscribe').setAttribute('aria-busy',String(requestPending||managementRestoring));
   $('#save-state').textContent = stopped ? '已停用，请在手机移除订阅日历' : conflict ? '设置已在其他设备修改' : changed ? '有未保存的修改' : subscription ? '设置已保存，等待日历同步' : !hasSelectedContent() ? '先选择修行日或每日藏历' : '随时调整你的选择';
   $('#unsaved-dot').hidden = !changed;
-  $('#subscribe-label').textContent = managementRestoring ? '正在恢复订阅…' : requestPending ? '正在保存…' : subscription ? (changed ? '保存修改' : '查看订阅') : '订阅到日历';
+  $('#subscribe-label').textContent = managementRestoring ? '正在恢复订阅…' : requestPending ? '正在保存…' : subscription ? (changed ? '保存修改' : '查看订阅') : deviceLabel();
+  for(const input of document.querySelectorAll('input[name="title-marks"]')) input.checked=input.value===(settings.titleMarks||'symbols');
   $('#subscribe').disabled = requestPending || managementRestoring || (!subscription && !hasSelectedContent());
   // This opens the existing panel only. Keep it available while saving so a
   // user who closed the panel can return to progress, help or a failure state.
@@ -451,7 +505,7 @@ async function performSaveSubscription(create) {
     const attempt=create ? creationAttempt() : null;
     const submitted = clone(attempt ? attempt.settings : settings);
     const result = await api(create ? 'POST' : 'PATCH',create ? '/api/subscriptions' : `/api/subscriptions/${encodeURIComponent(subscription.id)}`,
-      create ? {settings:submitted} : {settings:submitted,revision:subscription.revision},undefined,attempt?.key);
+      create ? {settings:submitted} : {settings:{...submitted,titleMarks:submitted.titleMarks||'symbols'},revision:subscription.revision},undefined,attempt?.key);
     if(create && (!/^[a-f0-9-]{36}$/.test(result.id) || !/^[A-Za-z0-9_-]{43}$/.test(result.manageToken) ||
         !Number.isSafeInteger(result.revision) || result.revision<1 || !result.settings || result.disabled)) {
       throw new Error('订阅服务返回的信息不完整。创建进度已保留，请重试恢复同一份订阅。');
@@ -532,7 +586,7 @@ function downloadOccurrences() {
 function downloadCalendar(mode) {
   try {
     const events = downloadOccurrences().filter(event => event.preference.mode === mode);
-    download(exportICS(events,{zone:settings.zone,name:mode === 'remind' ? '慧灯藏历 · 修行提醒' : '慧灯藏历 · 仅显示',sourceVersion:data.updatedOn}),`藏历-${mode === 'remind' ? '提醒' : '仅显示'}.ics`);
+    download(exportICS(events,{zone:settings.zone,titleMarks:settings.titleMarks,name:mode === 'remind' ? '慧灯藏历 · 修行提醒' : '慧灯藏历 · 仅显示',sourceVersion:data.updatedOn}),`藏历-${mode === 'remind' ? '提醒' : '仅显示'}.ics`);
     $('#download-status').textContent = '已发起下载。请继续在日历应用中导入，并检查通知设置。';
   } catch (error) { $('#download-status').textContent = error.message; }
 }
@@ -564,15 +618,30 @@ function attachEvents() {
     button.focus({preventScroll:true});playMotion(button,'check');
     notify(subscription?'提醒时间已改；保存修改后同步到日历。':`所有提醒改为${reminderLabel([{daysBefore:Number(daysBefore),time}])}。`);
   });
-  $('#quick-subscribe').addEventListener('click',()=>openSubscription({prepare:true}));
+  $('#share-settings').addEventListener('click',openShare);
+  $('#subscribed-open').addEventListener('click',()=>openSubscription());
+  for(const input of document.querySelectorAll('input[name="title-marks"]')) input.addEventListener('change',()=>{
+    if(input.value==='symbols') delete settings.titleMarks; else settings.titleMarks=input.value;
+    stopped=false;refresh(false);
+    notify(subscription?'标记样式已改；保存修改后，日历下次同步时更新。':'标记样式已改。');
+  });
+  if(calendarDevice.inAppBrowser){
+    $('#wechat-banner').hidden=false;
+    if(calendarDevice.appleMobile) $('#wechat-banner-text').innerHTML=`${esc(calendarDevice.inAppBrowser)}会拦截“加入日历”。点右上角 <b>···</b>，选择“在 Safari 中打开”，再继续操作。`;
+    else $('#wechat-banner-text').innerHTML=`${esc(calendarDevice.inAppBrowser)}会拦截“加入日历”。点右上角 <b>···</b>，选择“在浏览器打开”，再继续操作。`;
+  }
   const advanced=$('#advanced-settings');
   // Phones open in the simple three steps; computers show everything. A
   // person's own choice is remembered on this device.
   advanced.open=typeof ui.advancedOpen==='boolean' ? ui.advancedOpen : !matchMedia('(max-width:1023px)').matches;
-  advanced.addEventListener('toggle',()=>{ui.advancedOpen=advanced.open;persistUI();});
+  const syncAdvanced=()=>$('#app').classList.toggle('advanced-closed',!advanced.open);
+  syncAdvanced();
+  advanced.addEventListener('toggle',()=>{ui.advancedOpen=advanced.open;persistUI();syncAdvanced();});
   const dailyUrl=new URL('./daily-dates.ics',location.href);
   if(dailyUrl.protocol==='https:') $('#daily-calendar-apple').href=dailyUrl.href.replace(/^https:/,'webcal:');
-  $('#daily-calendar-apple').hidden=!calendarDevice.apple;
+  $('#daily-calendar-apple').hidden=!calendarDevice.apple || dailyUrl.protocol!=='https:';
+  // The offline single-file page has no shared file to subscribe to.
+  $('.daily-calendar').hidden=!/^https?:$/.test(dailyUrl.protocol);
   $('#daily-calendar-copy').addEventListener('click',()=>void copy(dailyUrl.href,'每日藏历订阅地址'));
   $('#clear-selection').addEventListener('click',()=>{
     if(!hasSelectedContent())return;
@@ -757,6 +826,7 @@ async function init() {
   const storedCreation=readStored(creationKey);
   if(!subscription && storedCreation?.apiBaseUrl===apiBaseUrl && /^[A-Za-z0-9_-]{43}$/.test(storedCreation.key) &&
       storedCreation.settings && typeof storedCreation.settings==='object' && !Array.isArray(storedCreation.settings)) pendingCreation=storedCreation;
+  const sharedNotice=applySharedSettings();
   zonePicker=createZonePicker($('#zone-dialog'),{onApply:zone=>{
     settings.zone=zone;stopped=false;ui.lastDeviceZone=observedZone;persistUI();refresh(false);
     notify(subscription?'提醒地区已调整；点击保存修改后同步。':'提醒地区已调整。');
@@ -770,6 +840,7 @@ async function init() {
   if(['iphone','google','outlook','other'].includes(savedApp)) $(`input[name="device"][value="${savedApp}"]`).checked=true;
   attachEvents(); $('#app').hidden = false; renderGroups(); renderPresets();renderPreview(); persist();persistUI();checkDeviceTime();
   if(pendingCreation?.blocked) showSubscriptionError(pendingCreation.blocked);
+  if(sharedNotice) notify(sharedNotice);
   // Reuse the browser's completed layout. Writing a root variable between two
   // bounding-box reads forced the whole document to lay out twice on startup.
   const actionBar=$('.action-bar'), previewColumn=$('.preview-column');
