@@ -101,8 +101,7 @@
 .cal-daily-icon .icon { width: 22px; height: 22px; stroke-width: 1.4; }
 .cal-daily-entry h4 { color: var(--ink); font: 500 var(--fs-base)/1.6 var(--font-serif); overflow-wrap: anywhere; }
 .cal-daily-meta { display: flex; flex-wrap: wrap; gap: 2px 10px; color: var(--muted); font-size: var(--fs-sm); line-height: 1.7; }
-.cal-daily-source, .cal-daily-note { margin-top: 2px; color: var(--muted); font-size: var(--fs-sm); line-height: 1.7; overflow-wrap: anywhere; }
-.cal-daily-source a { color: var(--teal); text-decoration: underline; text-underline-offset: 3px; }
+.cal-daily-note { margin-top: 2px; color: var(--muted); font-size: var(--fs-sm); line-height: 1.7; overflow-wrap: anywhere; }
 .cal-daily-note { color: var(--teal); }
 .cal-list-content>.cal-daily-entry:only-of-type { padding-bottom: 0; border-bottom: 0; }
 .cal-data-note { margin: 14px 0 0; padding: 10px 12px; border-left: 2px solid var(--gold); border-radius: 0 var(--r-sm) var(--r-sm) 0; background: var(--gold-tint); color: #4c4841; font-size: var(--fs-sm); line-height: 1.8; overflow-wrap: anywhere; }

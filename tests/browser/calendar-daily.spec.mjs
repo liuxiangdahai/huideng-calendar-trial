@@ -56,7 +56,7 @@ test('month marks only festivals while daily details and list show real consecut
  await page.locator('#include-daily-dates').check();await page.locator('#tab-preview').click();
  await expect(page.locator('.cal-day')).toHaveCount(42);await expect(page.locator('.cal-event-count')).toHaveCount(0);
  await page.locator('[data-cal-date="2026-10-19"]').click();await expect(page.locator('[data-cal-detail]')).toContainText('重日1');
- await expect(page.locator('[data-cal-detail] [data-cal-daily-date]')).toHaveCount(1);await expect(page.locator('[data-cal-detail]')).toContainText('藏历 PRO');
+ await expect(page.locator('[data-cal-detail] [data-cal-daily-date]')).toHaveCount(1);await expect(page.locator('[data-cal-detail]')).not.toContainText('藏历 PRO');await expect(page.locator('footer')).toContainText('藏历 PRO');
  await expect(page.locator('[data-cal-detail] [data-cal-event]')).toHaveCount(0);
  // Phones show the day in a bottom sheet; close it before choosing another date.
  const closeSheet=async()=>{await page.keyboard.press('Escape');await expect(page.locator('[data-cal-sheet]')).toBeHidden();};
