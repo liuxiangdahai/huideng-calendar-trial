@@ -86,6 +86,10 @@ npx wrangler pages deploy --cwd dist/trial/pages --project-name huideng-calendar
 
 ## 回滚与恢复
 
+2026-11-08已完成一次故障恢复：[42465698604](https://github.com/liuxiangdahai/huideng-calendar-trial/actions/runs/42465698604)。试用Worker更新后Pages发布中断，现有Pages仍为23abc3e。唯一工作流的`recover-trial-20261108`是这次事故专用入口：固定目标版本和Worker，先校验线上版本及后台/数据代码兼容，只重新激活此前通过验收的Worker版本，再校验整个站点一致性。没有部署未经验收的新代码，也没有执行数据库或订阅写入。该入口不接受任意版本，线上版本变化后会拒绝操作，不能用作日常发布。证据在`docs/evidence/motion-ui-20261106/trial-recovery.json`。
+
+Cloudflare代码回滚不会回退绑定资源的数据，因此数据兼容性必须单独核对；不能把此项代码恢复当作隔离数据库恢复演练已完成。[官方回滚说明](https://developers.cloudflare.com/workers/versions-and-deployments/rollbacks/)
+
 0003迁移为旧订阅增加可空创建恢复摘要和唯一索引，不更换已有管理凭证、订阅地址或日程UID。新客户端用同一随机创建标识重试，七天内恢复同一份订阅；过期、已停用或盐轮换时明确报错。`RATE_LIMIT_SALT`的轮换会使未完成创建无法通过该标识恢复，但已经保存的管理凭证继续有效；不要随意轮换。服务器仅保留恢复标识和管理凭证的摘要。
 
 保留已发布提交、两套构建配置和发布记录。新 Pages 订阅发放后，回滚版本必须包含 `_worker.js`、`_routes.json`、正确服务绑定及 `/calendar/*` 动态接口；不能退回只有静态页面的历史版本。Pages 项目名称和公开路径保持不变，Worker 与网关必须同版本。选定兼容源码后通过唯一流水线重新构建、先在隔离环境演练，再进行试用发布；无兼容版本时发布修复，不能用旧静态站顶替。
