@@ -38,6 +38,7 @@ export function normalizeSettings(raw, catalog) {
   const base = defaults(catalog, raw?.zone);
   if (!raw || ![1,2].includes(raw.version)) return base;
   base.includeDailyDates = raw.version === 2 && raw.includeDailyDates === true;
+  if (raw.version === 2 && raw.titleMarks !== 'symbols' && Object.hasOwn(TITLE_MARK_STYLES, raw.titleMarks ?? '')) base.titleMarks = raw.titleMarks;
   for (const event of catalog.events) {
     // Only the ten events present in v1 inherit v1 group choices. Newly added
     // observances must never be selected by an old broad category setting.
@@ -63,8 +64,14 @@ export function validateSettings(raw, catalog) {
   if (Object.hasOwn(raw, 'includeDailyDates') && typeof raw.includeDailyDates !== 'boolean') {
     throw new Error('每日藏历选项必须为开启或关闭。');
   }
+  if (Object.hasOwn(raw, 'titleMarks') && !Object.hasOwn(TITLE_MARK_STYLES, raw.titleMarks)) {
+    throw new Error('标题标记样式无效。');
+  }
   for (const id of Object.keys(raw.events)) if (!ids.has(id)) throw new Error('节日目录已更新，请刷新页面后重试。');
-  return {version: 2, zone, includeDailyDates: raw.includeDailyDates === true, events: Object.fromEntries(catalog.events.map(e =>
+  // The default style is omitted so settings saved before 2026-11-09 stay identical.
+  return {version: 2, zone, includeDailyDates: raw.includeDailyDates === true,
+    ...(raw.titleMarks && raw.titleMarks !== 'symbols' ? {titleMarks: raw.titleMarks} : {}),
+    events: Object.fromEntries(catalog.events.map(e =>
     [e.id, raw.events[e.id] ? cleanPreference(raw.events[e.id]) : {mode: 'off', reminders: initialReminders()}]))};
 }
 export function eventPreference(event, settings) {
@@ -174,7 +181,25 @@ export function foldLine(line) {
   }
   return output;
 }
-export function exportICS(events, {zone, name = '慧灯·藏历修行日', generatedAt = new Date(), sourceVersion = '2026-10-20', usePublishedAlarmInstants = false} = {}) {
+// One subscription shows one colour, so a short leading mark tells the three
+// kinds apart in every calendar app: ◆ will remind, ◇ display-only festival,
+// ◦ everyday Tibetan date. In apps that order an all-day list by title, these
+// code points also sort reminders first and everyday dates last.
+// People choose the style in 详细设置: symbols (default), words, or none.
+export const TITLE_MARK_STYLES = Object.freeze({
+  symbols: Object.freeze({remind: '◆ ', display: '◇ ', daily: '◦ '}),
+  words: Object.freeze({remind: '【提醒】', display: '【修行日】', daily: '【每日】'}),
+  none: Object.freeze({remind: '', display: '', daily: ''})
+});
+export const TITLE_MARKS = TITLE_MARK_STYLES.symbols;
+export const titleMarkStyle = value => Object.hasOwn(TITLE_MARK_STYLES, value) ? value : 'symbols';
+export function markedTitle(event, style = 'symbols') {
+  const marks = TITLE_MARK_STYLES[titleMarkStyle(style)];
+  const mark = event.kind === 'daily-date' ? marks.daily
+    : event.preference?.mode === 'remind' ? marks.remind : marks.display;
+  return `${mark}${event.title}`;
+}
+export function exportICS(events, {zone, name = '慧灯·藏历修行日', generatedAt = new Date(), sourceVersion = '2026-10-20', usePublishedAlarmInstants = false, titleMarks = 'symbols'} = {}) {
   zone = resolveTimeZone(zone);
   if (!zone) throw new Error('请选择有效的提醒时区。');
   const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Huideng Vancouver//Practice Calendar 1.0//ZH',
@@ -195,7 +220,7 @@ export function exportICS(events, {zone, name = '慧灯·藏历修行日', gener
     lines.push('BEGIN:VEVENT', `UID:${event.uid}@calendar.huidengvan.org`, `DTSTAMP:${stamp(dtstamp)}`,
       `DTSTART;VALUE=DATE:${event.date.replaceAll('-', '')}`,
       `DTEND;VALUE=DATE:${addDays(event.date, 1).replaceAll('-', '')}`,
-      `SUMMARY:${escapeICS(event.title)}`, `DESCRIPTION:${escapeICS(description.join('\n'))}`,
+      `SUMMARY:${escapeICS(markedTitle(event, titleMarks))}`, `DESCRIPTION:${escapeICS(description.join('\n'))}`,
       `URL:${daily ? ENGINE.url : event.source}`, `STATUS:${status}`, 'TRANSP:TRANSPARENT', `SEQUENCE:${sequence}`);
     if (event.createdAt) lines.push(`CREATED:${stamp(asDate(event.createdAt))}`);
     if (event.lastModified) lines.push(`LAST-MODIFIED:${stamp(asDate(event.lastModified))}`);
@@ -218,4 +243,13 @@ export function exportICS(events, {zone, name = '慧灯·藏历修行日', gener
 }
 export function reminderLabel(reminders) {
   return reminders.map(r => `${r.daysBefore === 0 ? '当天' : `提前${r.daysBefore}天`} ${r.time}`).join('、');
+}
+
+// The everyday date layer is identical for every visitor, so it ships as one
+// static file on the CDN: no Worker CPU, no personal data, no alarms. Its UIDs
+// use a separate namespace so it can coexist with a feed that bundles them.
+export const DAILY_CALENDAR_PATH = 'daily-dates.ics';
+export function exportDailyCalendar(start, end) {
+  const events = dailyDateOccurrences(start, end).map(event => ({...event, uid: `daily-only-${event.date}`}));
+  return exportICS(events, {zone: 'UTC', name: '慧灯·每日藏历', generatedAt: new Date(`${start}T00:00:00Z`)});
 }

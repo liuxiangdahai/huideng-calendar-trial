@@ -3,6 +3,7 @@ test('mobile sticky tabs preserve independent panel positions, month and focused
  const tapTab=async id=>{const b=await page.locator(id).boundingBox();await page.mouse.click(b.x+b.width/2,b.y+b.height/2);};
  await page.setViewportSize({width:390,height:844});await page.goto('/calendar-reminders/');await expect(page.locator('#app')).toBeVisible();
  await page.locator('[data-preset="practice"]').click();
+ await page.locator('#advanced-settings>summary').click();
  const group=page.locator('[data-group-id="masters"]');await group.locator('summary').click();
  await page.locator('.selection-footer').scrollIntoViewIfNeeded();
  await expect.poll(()=>page.locator('.mobile-tabs').evaluate(n=>Math.round(n.getBoundingClientRect().top))).toBe(0);

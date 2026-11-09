@@ -13,7 +13,8 @@ import {calendarEnvironment,appleSubscriptionUrl,GOOGLE_ADD_URL,OUTLOOK_URL} fro
 import {checkSubscriptionConnection} from './connection-check.mjs';
 import {cloneSettings as clone,fetchJSON} from './runtime.mjs';
 import {createMobileTabs} from './mobile-tabs.mjs';
-import {playMotion,installDisclosureMotion} from './motion.mjs';
+import {playMotion,playSymbol,installDisclosureMotion} from './motion.mjs';
+import qrcode from './vendor/qrcode/qrcode.mjs';
 
 const $ = selector => document.querySelector(selector);
 const storageKey = 'huideng.calendar.v2', subscriptionKey = 'huideng.calendar.subscription';
@@ -43,9 +44,20 @@ const currentApp = () => $('input[name="device"]:checked')?.value || '';
 const hasReminders = () => Object.values(settings.events).some(pref=>pref.mode==='remind');
 function persistUI() { try {localStorage.setItem(uiKey,JSON.stringify(ui));} catch {} }
 
-function notify(message) {
-  $('#toast').textContent = message; $('#toast').hidden = false;
-  clearTimeout(notify.timer); notify.timer = setTimeout(() => { $('#toast').hidden = true; }, 4000);
+// An optional undo keeps one-tap clearing safe for anyone who taps by mistake.
+function notify(message, undo) {
+  // A toast is a short note, not a sentence: no full stop at the end, and
+  // a second clause joins with a comma.
+  const toast=$('#toast'); toast.textContent = String(message).replace(/[。.]+$/,'').replace(/。/g,'，'); toast.hidden = false;
+  if(undo){
+    const button=document.createElement('button'); button.type='button'; button.className='toast-undo'; button.textContent='撤销';
+    button.addEventListener('click',()=>{toast.hidden=true;clearTimeout(notify.timer);undo();},{once:true});
+    toast.append(button);
+  }
+  clearTimeout(notify.timer); notify.timer = setTimeout(() => { toast.hidden = true; }, undo ? 7000 : 4000);
+}
+function restoreSnapshot(snapshot, message) {
+  settings=clone(snapshot);stopped=false;refresh();notify(message);
 }
 function persist() {
   try {
@@ -131,7 +143,7 @@ function checkDeviceTime() {
 }
 function renderPresets() {
   const current=matchingPreset(settings,data.catalog);
-  $('#preset-options').innerHTML=PRESETS.map(preset=>`<button class="preset-card" type="button" data-preset="${preset.id}" aria-pressed="${current===preset.id}"${preset.id==='practice'?' aria-describedby="preset-scope-note"':''}><span class="preset-icon">${icon(preset.icon)}</span><span class="preset-copy"><strong>${preset.title}<small>${presetIds(data.catalog,preset.id).length} 项</small></strong><span>${preset.description}</span><em>提醒：${preset.reminder}</em></span><span class="preset-check" aria-hidden="true">${current===preset.id?icon('check'):''}</span></button>`).join('');
+  $('#preset-options').innerHTML=PRESETS.map(preset=>`<button class="preset-card" type="button" data-preset="${preset.id}" aria-pressed="${current===preset.id}"${preset.id==='practice'?' aria-describedby="preset-scope-note"':''}><span class="preset-icon">${icon(preset.icon)}</span><span class="preset-copy"><strong>${preset.title}<small>${presetIds(data.catalog,preset.id).length} 项</small></strong><span>${preset.description}</span><em>${icon('bell')}${preset.reminder}</em></span><span class="preset-check" aria-hidden="true">${current===preset.id?icon('check'):''}</span></button>`).join('');
   $('#clear-selection').disabled=!hasSelectedContent();
   $('#include-daily-dates').checked=settings.includeDailyDates===true;
 }
@@ -170,7 +182,101 @@ function renderPreview() {
   }
   calendarView?.update({data,settings,events,today,start,end,deviceZone:observedZone});
   $('#reminder-settings').disabled=!countSelected();
+  renderTimeChoices(); renderQuickAdd();
   renderRegion(); renderSaveState();
+}
+// Step 2: one reminder time for every day that reminds. Detailed per-item
+// times stay possible; the step then says so instead of overwriting silently.
+function remindPrefs() { return Object.values(settings.events).filter(pref=>pref.mode==='remind'); }
+function renderTimeChoices() {
+  const prefs=remindPrefs(), keys=new Set(prefs.map(pref=>pref.reminders.map(r=>`${r.daysBefore}|${r.time}`).join(',')));
+  const current=keys.size===1 ? [...keys][0] : '';
+  for(const button of document.querySelectorAll('[data-time-choice]')) {
+    button.disabled=!prefs.length;
+    button.setAttribute('aria-pressed',String(button.dataset.timeChoice===current));
+  }
+  $('#time-choice-note').textContent=!prefs.length ? '先在上一步选择会提醒的日子' : !current ? '已逐项设置不同时间' :
+    [...document.querySelectorAll('[data-time-choice]')].some(b=>b.dataset.timeChoice===current) ? '' : `当前：${reminderLabel(prefs[0].reminders)}`;
+}
+// Step 3 names the device it recognised. A browser that reports a computer but
+// behaves like a phone (touch, narrow screen, e.g. a "desktop site" toggle) is
+// treated as a phone: phone readers never see computer instructions.
+const phoneLike=()=>calendarDevice.mobile || matchMedia('(pointer:coarse) and (max-width:767px)').matches;
+const deviceLabel=()=>calendarDevice.appleMobile ? '加入 iPhone 日历' : calendarDevice.mac ? '加入 Mac 日历' :
+  calendarDevice.android ? '加入手机日历' : phoneLike() ? '加入手机日历' : '加入我的日历';
+function renderQuickAdd() {
+  const phone=phoneLike();
+  $('#add-title-text').textContent=phone ? '加入手机日历' : '加入日历';
+  $('#step-add-device').textContent=subscription
+    ? (phone ? '已经加入过。以后改了选择，点底部“保存修改”，手机日历会自动更新，不用重新添加。' : '已经加入过。以后改了选择，点底部“保存修改”，日历会自动更新，不用重新添加。')
+    : calendarDevice.appleMobile ? '点底部按钮，iPhone 会问是否订阅这个日历，点“订阅”即可。'
+    : phone ? '点底部按钮，按提示把它加到手机自带的日历里。'
+    : calendarDevice.mac ? '可以直接加入 Mac 日历，也可以选 Google 或 Outlook。'
+    : '可以直接加入 Google 或 Outlook 日历；要加到手机上，用下方扫码。';
+  $('#step-add-note').textContent=subscription ? '' : '只需添加一次。已经加过的不用再加；如果日历里同一天出现两遍，删掉其中一个日历即可。';
+  $('#step-add-note').hidden=Boolean(subscription);
+  $('#share-settings').lastChild.textContent=phone ? '把这套设置分享给师兄' : '用手机扫码继续 · 分享给师兄';
+  renderSubscribedCard();
+}
+function renderSubscribedCard() {
+  const card=$('#subscribed-card'), show=Boolean(subscription) && !stopped && !conflict && !dirty();
+  card.hidden=!show; if(!show)return;
+  // A web page cannot open the phone's settings, so give the one path that
+  // works on every phone: search the Settings app for the calendar.
+  $('#subscribed-hint').textContent=phoneLike()
+    ? '到时没有响铃？打开手机“设置”，搜索“日历”，确认已允许通知。改了设置后，手机日历通常几小时内更新。'
+    : '没有收到提醒？在日历应用的设置里确认已允许通知。改了设置后，日历通常几小时内更新。';
+  const next=upcoming.find(event=>event.preference?.mode==='remind') || upcoming.find(event=>event.kind!=='daily-date');
+  if(!next){$('#subscribed-next').textContent='目前没有即将到来的修行日。';return;}
+  const [, month, day]=next.date.split('-').map(Number);
+  $('#subscribed-next').textContent=next.preference?.mode==='remind'
+    ? `下一次提醒：${month}月${day}日 ${next.title} · ${reminderLabel(next.preference.reminders)}`
+    : `下一个修行日：${month}月${day}日 ${next.title}（仅显示）`;
+}
+// The bottom bar always says what happens next, in the person's own terms.
+function nextStepText() {
+  if(!hasSelectedContent()) return '第 1 步：选择要提醒的日子';
+  const prefs=remindPrefs();
+  if(!prefs.length) return '只显示日期，不响铃';
+  const times=new Set(prefs.map(pref=>JSON.stringify(pref.reminders)));
+  return times.size===1 ? `提醒：${reminderLabel(prefs[0].reminders)}` : '提醒时间已逐项设置';
+}
+// A share link carries the preset, the shared reminder time, the everyday
+// layer and the title style. Per-item fine tuning stays with its owner.
+function shareURL() {
+  const url=new URL(location.href); url.hash=''; url.search='';
+  const preset=matchingPreset(settings,data.catalog), times=new Set(remindPrefs().map(p=>p.reminders.map(r=>`${r.daysBefore}-${r.time.replace(':','')}`).join('_')));
+  if(preset) url.searchParams.set('p',preset);
+  if(times.size===1 && !/_/.test([...times][0])) url.searchParams.set('t',[...times][0]);
+  if(settings.includeDailyDates) url.searchParams.set('d','1');
+  if(settings.titleMarks) url.searchParams.set('m',settings.titleMarks);
+  return {href:url.href,preset,custom:!preset || times.size>1};
+}
+function openShare() {
+  const {href,preset,custom}=shareURL();
+  const presetTitle=PRESETS.find(item=>item.id===preset)?.title || '自选的修行日';
+  const prefs=remindPrefs();
+  $('#share-summary').textContent=`${presetTitle}${prefs.length?` · 提醒：${reminderLabel(prefs[0].reminders)}`:''}${settings.includeDailyDates?' · 含每日藏历':''}`;
+  $('#share-custom-note').hidden=!custom;
+  try { const qr=qrcode(0,'M'); qr.addData(href); qr.make(); $('#share-qr').innerHTML=qr.createSvgTag({cellSize:4,margin:2,scalable:true}); }
+  catch { $('#share-qr').textContent='链接过长，无法生成二维码，请复制链接。'; }
+  $('#share-copy').onclick=()=>void copy(href,'分享链接');
+  $('#share-dialog').showModal();
+}
+function applySharedSettings() {
+  const params=new URLSearchParams(location.search);
+  if(![...params.keys()].some(key=>['p','t','d','m'].includes(key)))return '';
+  const clean=new URL(location.href); for(const key of ['p','t','d','m']) clean.searchParams.delete(key);
+  try{history.replaceState(history.state,'',clean.href);}catch{}
+  if(subscription) return '你已有自己的订阅，分享链接的设置没有自动套用；可在下方修改后保存。';
+  let next=clone(settings);
+  if(PRESETS.some(item=>item.id===params.get('p'))) next=applyPreset(next,data.catalog,params.get('p'));
+  const time=params.get('t')?.match(/^([0-7])-([01]\d|2[0-3])([0-5]\d)$/);
+  if(time) for(const pref of Object.values(next.events)) if(pref.mode==='remind') pref.reminders=[{daysBefore:Number(time[1]),time:`${time[2]}:${time[3]}`}];
+  if(params.get('d')==='1') next.includeDailyDates=true;
+  if(['words','none'].includes(params.get('m'))) next.titleMarks=params.get('m'); else delete next.titleMarks;
+  settings=next;
+  return '已按分享的设置选好，确认后点底部按钮加入日历。';
 }
 function renderSaveState() {
   const changed = dirty(), count = countSelected();
@@ -179,13 +285,20 @@ function renderSaveState() {
   $('#reminder-count').textContent = dailyOnly ? '仅显示' : `${Object.values(settings.events).filter(pref=>pref.mode==='remind').length} 项提醒`;
   $('#daily-date-count').hidden=!settings.includeDailyDates || !count;
   $('#subscribe').setAttribute('aria-busy',String(requestPending||managementRestoring));
-  $('#save-state').textContent = stopped ? '已停用，请在手机移除订阅日历' : conflict ? '设置已在其他设备修改' : changed ? '有未保存的修改' : subscription ? '设置已保存，等待日历同步' : !hasSelectedContent() ? '先选择修行日或每日藏历' : '随时调整你的选择';
+  $('#save-state').textContent = stopped ? '已停用，请在手机移除订阅日历' : conflict ? '设置已在其他设备修改' : changed ? '有改动，保存后同步到日历' : subscription ? '已保存，日历稍后自动更新' : nextStepText();
   $('#unsaved-dot').hidden = !changed;
-  $('#subscribe-label').textContent = managementRestoring ? '正在恢复订阅…' : requestPending ? '正在保存…' : subscription ? (changed ? '保存修改' : '查看订阅') : '订阅到日历';
-  $('#subscribe').disabled = requestPending || managementRestoring || (!subscription && !hasSelectedContent());
+  $('#subscribe-label').textContent = managementRestoring ? '正在恢复订阅…' : requestPending ? '正在保存…' : subscription ? (changed ? '保存修改' : '查看订阅') : deviceLabel();
+  for(const input of document.querySelectorAll('input[name="title-marks"]')) input.checked=input.value===(settings.titleMarks||'symbols');
+  const ctaDisabled = requestPending || managementRestoring || (!subscription && !hasSelectedContent());
+  // The first time the main button becomes usable, it gives one gentle pulse
+  // so the eye finds the next step. Not on load, not on later changes.
+  if(renderSaveState.wasDisabled===true && !ctaDisabled && !subscription && !renderSaveState.nudged){renderSaveState.nudged=true;requestAnimationFrame(()=>playMotion($('#subscribe'),'nudge'));}
+  renderSaveState.wasDisabled=ctaDisabled;
+  $('#subscribe').disabled = ctaDisabled;
   // This opens the existing panel only. Keep it available while saving so a
   // user who closed the panel can return to progress, help or a failure state.
   $('#my-subscription').disabled = false;
+  if (data) renderQuickAdd();
 }
 function refresh(rebuild = true) {
   const focusId = document.activeElement?.id;
@@ -428,7 +541,7 @@ async function performSaveSubscription(create) {
     const attempt=create ? creationAttempt() : null;
     const submitted = clone(attempt ? attempt.settings : settings);
     const result = await api(create ? 'POST' : 'PATCH',create ? '/api/subscriptions' : `/api/subscriptions/${encodeURIComponent(subscription.id)}`,
-      create ? {settings:submitted} : {settings:submitted,revision:subscription.revision},undefined,attempt?.key);
+      create ? {settings:submitted} : {settings:{...submitted,titleMarks:submitted.titleMarks||'symbols'},revision:subscription.revision},undefined,attempt?.key);
     if(create && (!/^[a-f0-9-]{36}$/.test(result.id) || !/^[A-Za-z0-9_-]{43}$/.test(result.manageToken) ||
         !Number.isSafeInteger(result.revision) || result.revision<1 || !result.settings || result.disabled)) {
       throw new Error('订阅服务返回的信息不完整。创建进度已保留，请重试恢复同一份订阅。');
@@ -448,7 +561,7 @@ async function performSaveSubscription(create) {
     if (changedDuringSave) {
       settings = latestDraft; refresh(); renderSubscription();
       notify('已保存上次提交的设置；后续修改仍待保存。');
-    } else notify('设置已保存，等待日历同步');
+    } else notify(phoneLike()?'已保存。手机日历通常几小时内自动更新。':'已保存。日历通常几小时内自动更新。');
   } catch (error) { showSubscriptionError(error); }
   finally {
     requestPending = false; renderSubscription();
@@ -509,7 +622,7 @@ function downloadOccurrences() {
 function downloadCalendar(mode) {
   try {
     const events = downloadOccurrences().filter(event => event.preference.mode === mode);
-    download(exportICS(events,{zone:settings.zone,name:mode === 'remind' ? '慧灯藏历 · 修行提醒' : '慧灯藏历 · 仅显示',sourceVersion:data.updatedOn}),`藏历-${mode === 'remind' ? '提醒' : '仅显示'}.ics`);
+    download(exportICS(events,{zone:settings.zone,titleMarks:settings.titleMarks,name:mode === 'remind' ? '慧灯藏历 · 修行提醒' : '慧灯藏历 · 仅显示',sourceVersion:data.updatedOn}),`藏历-${mode === 'remind' ? '提醒' : '仅显示'}.ics`);
     $('#download-status').textContent = '已发起下载。请继续在日历应用中导入，并检查通知设置。';
   } catch (error) { $('#download-status').textContent = error.message; }
 }
@@ -518,19 +631,79 @@ function attachEvents() {
   $('#include-daily-dates').addEventListener('change',event=>{
     settings.includeDailyDates=event.target.checked;stopped=false;refresh(false);
     playMotion(event.target,'check');
+    if(event.target.checked) playSymbol($('.daily-date-icon svg'));
   });
   $('#preset-options').addEventListener('click',event=>{
     const button=event.target.closest('[data-preset]');if(!button)return;
+    // Tapping the chosen plan again cancels it, like the checkbox below it.
+    if(button.getAttribute('aria-pressed')==='true'){
+      const before=clone(settings);
+      for(const [id,pref] of Object.entries(settings.events)){ if(pref.mode!=='off')lastActive.set(id,clone(pref)); pref.mode='off'; }
+      stopped=false;refresh();
+      $('#preset-options').querySelector(`[data-preset="${button.dataset.preset}"]`)?.focus({preventScroll:true});
+      notify(subscription?'已取消这个方案；保存修改后更新日历。':'已取消这个方案。',()=>restoreSnapshot(before,'已恢复之前的选择。'));
+      return;
+    }
+    const firstChoice=!hasSelectedContent();
     const next=applyPreset(settings,data.catalog,button.dataset.preset);
+    // Days newly added by a preset follow the time already chosen in step 2.
+    const chosenTimes=new Set(remindPrefs().map(pref=>JSON.stringify(pref.reminders)));
+    if(chosenTimes.size===1){const reminders=JSON.parse([...chosenTimes][0]);
+      for(const [id,pref] of Object.entries(next.events)) if(pref.mode==='remind' && settings.events[id]?.mode!=='remind') pref.reminders=reminders.map(r=>({...r}));}
     if(JSON.stringify(next)===JSON.stringify(settings))return;
     settings=next;lastActive.clear();stopped=false;
     refresh();
     const chosen=$('#preset-options').querySelector(`[data-preset="${button.dataset.preset}"]`);
     chosen?.focus({preventScroll:true});
     playMotion(chosen?.querySelector('.preset-check'),'check');
+    playSymbol(chosen?.querySelector('.preset-icon svg'));
+    // On a phone, the first choice brings step 2 into view so the next decision
+    // is visible without hunting for it.
+    if(firstChoice && phoneLike()){
+      const step=$('#time-title')?.closest('.quick-section'), action=$('.action-bar')?.getBoundingClientRect().top ?? innerHeight;
+      const box=step?.getBoundingClientRect();
+      if(box && box.bottom>action-8) step.scrollIntoView({block:'end',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+    }
   });
+  $('#time-choices').addEventListener('click',event=>{
+    const button=event.target.closest('[data-time-choice]');if(!button||button.disabled)return;
+    const [daysBefore,time]=button.dataset.timeChoice.split('|');
+    for(const pref of remindPrefs()) pref.reminders=[{daysBefore:Number(daysBefore),time}];
+    stopped=false;refresh();
+    button.focus({preventScroll:true});playMotion(button,'check');
+    notify(subscription?'提醒时间已改；保存修改后同步到日历。':`所有提醒改为${reminderLabel([{daysBefore:Number(daysBefore),time}])}。`);
+  });
+  $('#share-settings').addEventListener('click',openShare);
+  $('#subscribed-open').addEventListener('click',()=>openSubscription());
+  for(const input of document.querySelectorAll('input[name="title-marks"]')) input.addEventListener('change',()=>{
+    if(input.value==='symbols') delete settings.titleMarks; else settings.titleMarks=input.value;
+    stopped=false;refresh(false);
+    notify(subscription?'标记样式已改；保存修改后，日历下次同步时更新。':'标记样式已改。');
+  });
+  if(calendarDevice.inAppBrowser){
+    $('#wechat-banner').hidden=false;
+    if(calendarDevice.appleMobile) $('#wechat-banner-text').innerHTML=`${esc(calendarDevice.inAppBrowser)}会拦截“加入日历”。点右上角 <b>···</b>，选择“在 Safari 中打开”，再继续操作。已在 Safari 里加过的，在 Safari 里打开就能看到，不用再加。`;
+    else $('#wechat-banner-text').innerHTML=`${esc(calendarDevice.inAppBrowser)}会拦截“加入日历”。点右上角 <b>···</b>，选择“在浏览器打开”，再继续操作。已在浏览器里加过的，在浏览器里打开就能看到，不用再加。`;
+  }
+  // Clouds only drift while the banner is on screen: no work for a hidden layer.
+  const clouds=$('.masthead-clouds');
+  if(clouds && 'IntersectionObserver' in window) new IntersectionObserver(([entry])=>clouds.classList.toggle('is-paused',!entry.isIntersecting)).observe(clouds);
+  const advanced=$('#advanced-settings');
+  // Phones open in the simple three steps; computers show everything. A
+  // person's own choice is remembered on this device.
+  advanced.open=typeof ui.advancedOpen==='boolean' ? ui.advancedOpen : !matchMedia('(max-width:1023px)').matches;
+  const syncAdvanced=()=>$('#app').classList.toggle('advanced-closed',!advanced.open);
+  syncAdvanced();
+  advanced.addEventListener('toggle',()=>{ui.advancedOpen=advanced.open;persistUI();syncAdvanced();});
+  const dailyUrl=new URL('./daily-dates.ics',location.href);
+  if(dailyUrl.protocol==='https:') $('#daily-calendar-apple').href=dailyUrl.href.replace(/^https:/,'webcal:');
+  $('#daily-calendar-apple').hidden=!calendarDevice.apple || dailyUrl.protocol!=='https:';
+  // The offline single-file page has no shared file to subscribe to.
+  $('.daily-calendar').hidden=!/^https?:$/.test(dailyUrl.protocol);
+  $('#daily-calendar-copy').addEventListener('click',()=>void copy(dailyUrl.href,'每日藏历订阅地址'));
   $('#clear-selection').addEventListener('click',()=>{
     if(!hasSelectedContent())return;
+    const before=clone(settings);
     for(const [id,pref] of Object.entries(settings.events)) {
       if(pref.mode!=='off')lastActive.set(id,clone(pref));
       pref.mode='off';
@@ -538,7 +711,7 @@ function attachEvents() {
     settings.includeDailyDates=false;stopped=false;refresh();
     if($('.workspace').dataset.activeTab==='preview' && matchMedia('(max-width:1023px)').matches) $('[data-cal-view="month"]').focus({preventScroll:true});
     else $('#preset-options button').focus({preventScroll:true});
-    notify(subscription?'已清空选择；保存修改后更新订阅。':'已清空选择，可以重新挑选。');
+    notify(subscription?'已清空选择；保存修改后更新日历。':'已清空选择。',()=>restoreSnapshot(before,'已恢复之前的选择。'));
   });
   const openZone=()=>zonePicker.open({zone:settings.zone,deviceZone:observedZone});
   $('#zone-settings').addEventListener('click',openZone);
@@ -551,13 +724,23 @@ function attachEvents() {
   window.addEventListener('focus',checkDeviceTime);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkDeviceTime();});
   window.addEventListener('hashchange',() => { void restoreManagementLink(); });
+  // Opening a category by hand plays its symbol; restored or re-drawn open
+  // categories stay still.
+  const openedByHand=new WeakSet();
+  $('#groups').addEventListener('click',event=>{const summary=event.target.closest('.group-card>summary');if(summary)openedByHand.add(summary.parentElement);});
+  $('#groups').addEventListener('toggle',event=>{
+    const card=event.target;if(!openedByHand.has(card))return;openedByHand.delete(card);
+    if(card.open) playSymbol(card.querySelector('.group-icon svg'));
+  },true);
   $('#groups').addEventListener('change',event => {
     const id = event.target.dataset.event; if (!id) return;
     const pref = settings.events[id];
     if (event.target.checked) settings.events[id] = clone(lastActive.get(id) || {mode:'display',reminders:pref.reminders.length ? pref.reminders : defaultReminders()});
     else { lastActive.set(id,clone(pref)); pref.mode = 'off'; }
     stopped = false; refresh();
-    playMotion(document.getElementById(`event-${id}`),'check');
+    const box=document.getElementById(`event-${id}`);
+    playMotion(box,'check');
+    if(event.target.checked) playSymbol(box?.closest('.group-card')?.querySelector('.group-icon svg'));
   });
   $('#groups').addEventListener('click',event => {
     const button = event.target.closest('button'); if (!button) return;
@@ -571,6 +754,7 @@ function attachEvents() {
         else if (pref.mode === 'off') settings.events[item.id] = clone(lastActive.get(item.id) || {mode:'display',reminders:pref.reminders.length ? pref.reminders : defaultReminders()});
       }
       stopped = false; refresh();
+      if (button.dataset.selectGroup) playSymbol(document.querySelector(`.group-card[data-group-id="${CSS.escape(groupId)}"] .group-icon svg`));
     } else if (button.dataset.reminderEvent) {
       const item = data.catalog.events.find(item => item.id === button.dataset.reminderEvent);
       openReminders([item.id],item.title,button);
@@ -602,7 +786,19 @@ function attachEvents() {
   createMobileTabs();
   $('.skip').addEventListener('click',event=>{event.preventDefault();$('#tab-selection').click();$('#preset-options button')?.focus();});
   $('#my-subscription').addEventListener('click',()=>openSubscription());
-  $('#subscribe').addEventListener('click',() => openSubscription({prepare:true}));
+  // The panel grows out of the button that opened it, so the step reads as
+  // one continuous action rather than a page jump.
+  $('#subscribe').addEventListener('click',event => {
+    const dialog=$('#subscription-dialog'), wasOpen=dialog.open;
+    openSubscription({prepare:true});
+    if(wasOpen || !dialog.open) return;
+    const from=event.currentTarget.getBoundingClientRect(), to=dialog.getBoundingClientRect();
+    dialog.style.setProperty('--from-x',`${Math.round(from.left+from.width/2-(to.left+to.width/2))}px`);
+    dialog.style.setProperty('--from-y',`${Math.round(from.top+from.height/2-(to.top+to.height/2))}px`);
+    dialog.classList.add('from-cta');
+    dialog.addEventListener('animationend',()=>dialog.classList.remove('from-cta'),{once:true});
+    dialog.addEventListener('close',()=>dialog.classList.remove('from-cta'),{once:true});
+  });
   $('#create-subscription').addEventListener('click',()=>prepareSubscription({retry:true}));
   $('#restart-creation').addEventListener('click',()=>{
     if(requestPending||managementRestoring||subscription||!creationBlocked)return;
@@ -712,6 +908,7 @@ async function init() {
   const storedCreation=readStored(creationKey);
   if(!subscription && storedCreation?.apiBaseUrl===apiBaseUrl && /^[A-Za-z0-9_-]{43}$/.test(storedCreation.key) &&
       storedCreation.settings && typeof storedCreation.settings==='object' && !Array.isArray(storedCreation.settings)) pendingCreation=storedCreation;
+  const sharedNotice=applySharedSettings();
   zonePicker=createZonePicker($('#zone-dialog'),{onApply:zone=>{
     settings.zone=zone;stopped=false;ui.lastDeviceZone=observedZone;persistUI();refresh(false);
     notify(subscription?'提醒地区已调整；点击保存修改后同步。':'提醒地区已调整。');
@@ -725,6 +922,7 @@ async function init() {
   if(['iphone','google','outlook','other'].includes(savedApp)) $(`input[name="device"][value="${savedApp}"]`).checked=true;
   attachEvents(); $('#app').hidden = false; renderGroups(); renderPresets();renderPreview(); persist();persistUI();checkDeviceTime();
   if(pendingCreation?.blocked) showSubscriptionError(pendingCreation.blocked);
+  if(sharedNotice) notify(sharedNotice);
   // Reuse the browser's completed layout. Writing a root variable between two
   // bounding-box reads forced the whole document to lay out twice on startup.
   const actionBar=$('.action-bar'), previewColumn=$('.preview-column');
@@ -733,7 +931,13 @@ async function init() {
     const value=`${barHeight}px`;
     if(document.documentElement.style.getPropertyValue('--action-height')!==value)
       document.documentElement.style.setProperty('--action-height',value);
-    previewColumn.classList.toggle('can-stick',previewHeight<innerHeight-barHeight-40);
+    // A preview shorter than the window sticks to the top. A taller one scrolls
+    // with the page until its bottom edge meets the action bar, then stays,
+    // so the calendar remains beside a long list of categories.
+    const room=innerHeight-barHeight;
+    previewColumn.classList.add('can-stick');
+    const top=previewHeight<room-40 ? 16 : Math.round(room-previewHeight-16);
+    if(previewColumn.style.getPropertyValue('--stick-top')!==`${top}px`) previewColumn.style.setProperty('--stick-top',`${top}px`);
   };
   if(window.ResizeObserver){
     const observer=new ResizeObserver(entries=>{

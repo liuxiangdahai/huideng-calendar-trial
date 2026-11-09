@@ -38,8 +38,9 @@ export function createMobileTabs({onLayout = () => {}} = {}) {
         // Both panels use normal document scrolling; prevent anchor adjustments
         // during the visibility change from overriding the chosen position.
         scrollTo({top: Math.max(0, y), behavior: 'auto'});
-        // Opacity only: remembered anchors and sticky geometry stay unchanged.
-        playMotion(pane(next),'fade');
+        // A short slide from the side the tab sits on; transform only, so
+        // remembered anchors and sticky geometry stay unchanged.
+        playMotion(pane(next),'pane',next === 'preview' ? 1 : -1);
       }
     }
     if (focus) buttons.find(button => button.dataset.tab === next)?.focus({preventScroll: true});

@@ -8,6 +8,12 @@ const MAX_BODY_BYTES = 65536;
 const RETENTION_MS = 90 * 86400000;
 const SNAPSHOT_TTL_MS = 60 * 60 * 1000;
 const CREATION_REPLAY_MS = 7 * 86400000;
+// Twenty new feeds per address per day in production. Only the local preview
+// server raises it, so a full browser test run is not throttled.
+const dailyCreationCap = env => {
+  const cap = Number(env.CREATION_DAILY_LIMIT);
+  return Number.isInteger(cap) && cap > 0 ? cap : 20;
+};
 const DEVELOPMENT_RELEASE = Object.freeze({version: 'development', dataVersion: '',
   rendererVersion: 'snapshot-v2', environment: 'local'});
 const utf8 = new TextEncoder();
@@ -153,7 +159,7 @@ function sqlGuard(record) {
   return [record.id, record.revision, record.render_version];
 }
 const GUARD = 'EXISTS (SELECT 1 FROM subscriptions WHERE id = ? AND revision = ? AND render_version = ?)';
-function publicEvent(event, zone, alarmInstants) {
+function publicEvent(event, zone, alarmInstants, titleMarks = 'symbols') {
   // Keep the publication ledger small; never store tokens, UI state, or unused catalog metadata in it.
   const remind = event.kind !== 'daily-date' && event.preference.mode === 'remind';
   return {
@@ -165,6 +171,9 @@ function publicEvent(event, zone, alarmInstants) {
     preference: remind
       ? {mode: 'remind', reminders: event.preference.reminders}
       : {mode: 'display', reminders: []},
+    // Marked titles (◆/◇/◦) arrived on 2026-11-09; the marker re-publishes
+    // each entry once so clients that compare SEQUENCE replace the old title.
+    titleForm: titleMarks || 'symbols',
     reminderZone: remind ? zone : undefined,
     // Marks the relative-trigger serializer so every reminder event is
     // re-published once (SEQUENCE + 1) and clients replace the old alarm.
@@ -293,9 +302,9 @@ export function createCalendarService({getData, validateSettings, selectOccurren
     const insert = env.DB.prepare(`INSERT INTO subscriptions
       (id, feed_token, manage_token_hash, settings_json, created_at, updated_at, creation_key_hash, creation_body_hash)
       SELECT ?, ?, ?, ?, ?, ?, ?, ?
-      WHERE COALESCE((SELECT count FROM creation_limits WHERE bucket = ?), 0) < 20
+      WHERE COALESCE((SELECT count FROM creation_limits WHERE bucket = ?), 0) < ?
       ON CONFLICT(creation_key_hash) DO NOTHING`)
-      .bind(id, feedToken, manageHash, canonical(settings), timestamp, timestamp, keyHash, bodyHash, limit?.bucket ?? null);
+      .bind(id, feedToken, manageHash, canonical(settings), timestamp, timestamp, keyHash, bodyHash, limit?.bucket ?? null, dailyCreationCap(env));
     const statements = [insert];
     if (limit) statements.push(env.DB.prepare(`INSERT INTO creation_limits(bucket, count, expires_at)
       SELECT ?, 1, ? WHERE EXISTS (SELECT 1 FROM subscriptions WHERE id = ?)
@@ -322,6 +331,11 @@ export function createCalendarService({getData, validateSettings, selectOccurren
       if (body.settings && typeof body.settings === 'object' && !Array.isArray(body.settings) &&
           !Object.hasOwn(body.settings, 'includeDailyDates')) {
         body.settings = {...body.settings, includeDailyDates: JSON.parse(record.settings_json).includeDailyDates === true};
+      }
+      // Likewise keep a saved title style when an older page omits the field.
+      if (body.settings && typeof body.settings === 'object' && !Array.isArray(body.settings) &&
+          !Object.hasOwn(body.settings, 'titleMarks') && JSON.parse(record.settings_json).titleMarks) {
+        body.settings = {...body.settings, titleMarks: JSON.parse(record.settings_json).titleMarks};
       }
       const data = await getData(), time = now(), settings = await parseSettings(body, data, JSON.parse(record.settings_json), time);
       const settingsJson = canonical(settings);
@@ -394,7 +408,7 @@ export function createCalendarService({getData, validateSettings, selectOccurren
     const previous = new Map(prior.map(entry => [entry.uid, entry])), next = new Map(), changes = [];
     for (const occurrence of selection) {
       if (!occurrence.uid || next.has(occurrence.uid)) throw new Error('Duplicate or missing occurrence UID');
-      const event = publicEvent(occurrence, settings.zone, resolveAlarmInstants(occurrence, settings.zone));
+      const event = publicEvent(occurrence, settings.zone, resolveAlarmInstants(occurrence, settings.zone), settings.titleMarks);
       const content = canonical(event), old = previous.get(event.uid);
       // The ledger stores the exact canonical text it hashed. Identical text has
       // the identical hash, so only new or changed events pay for SHA-256.
@@ -423,7 +437,7 @@ export function createCalendarService({getData, validateSettings, selectOccurren
     const modified = entries.reduce((latest, entry) => entry.modified_at > latest ? entry.modified_at : latest, record.updated_at);
     const ics = exportICS(events, {zone: settings.zone, name: '慧灯藏历',
       generatedAt: new Date(modified), sourceVersion: data.sourceVersion || data.updatedOn || '',
-      usePublishedAlarmInstants: true});
+      usePublishedAlarmInstants: true, titleMarks: settings.titleMarks});
     const etag = `"${await digest(ics)}"`;
     const statements = [];
     if (changes.length) statements.push(bound(env.DB, `INSERT INTO calendar_entries

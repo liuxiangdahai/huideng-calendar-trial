@@ -21,7 +21,7 @@ test('presets replace choices without undo and clearing preserves local timezone
   await page.locator('[data-reminder-event="guru-tsok"]').click();await page.locator('[data-reminder-field="time"]').fill('06:30');await page.locator('#add-reminder').click();await page.locator('#reminder-form button[type="submit"]').click();
   const old=await draft(page);await page.locator('[data-preset="practice"]').click();await expect(page.locator('[data-event]:checked')).toHaveCount(54);expect((await draft(page)).events['guru-tsok']).toEqual(old.events['guru-tsok']);
   const prefs=Object.values((await draft(page)).events);expect(prefs.filter(pref=>pref.mode==='remind')).toHaveLength(2);expect(prefs.filter(pref=>pref.mode==='display')).toHaveLength(52);
-  await expect(page.locator('[data-preset="practice"]')).toContainText('提醒：荟供日，其余仅显示');await expect(page.locator('[data-preset="practice"]')).toHaveAttribute('aria-pressed','true');
+  await expect(page.locator('[data-preset="practice"]')).toContainText('荟供日提醒，其余只显示');await expect(page.locator('[data-preset="practice"]')).toHaveAttribute('aria-pressed','true');
   await page.locator('[data-preset="tsok"]').click();await page.reload();await expect(page.locator('[data-event]:checked')).toHaveCount(2);expect((await draft(page)).events['guru-tsok']).toEqual(old.events['guru-tsok']);
   await page.locator('[data-preset="guru"]').click();await expect(page.locator('[data-event]:checked')).toHaveCount(1);expect((await draft(page)).events['dakini-tsok'].mode).toBe('off');
   await page.locator('[data-preset="practice"]').click();const beforeClear=await draft(page);
@@ -41,8 +41,8 @@ test('presets replace choices without undo and clearing preserves local timezone
 test('preset saves retain feed URL, remind only on tsok days and clocks remain UI only',async({page,request})=>{
   await open(page);await page.locator('[data-preset="guru"]').click();await page.locator('#subscribe').click();await page.locator('input[name="device"][value="iphone"]').check();await expect(page.locator('#feed-url')).not.toHaveValue('');const original=await creds(page);await page.locator('[data-close="subscription-dialog"]').first().click();
   await expect(page.locator('#time-comparison')).toContainText('设备与提醒时间');await expect(page.locator('#zone-summary')).toContainText('北京时间 · UTC+08:00');
-  await page.locator('[data-preset="practice"]').click();await expect(page.locator('#save-state')).toContainText('未保存');expect((await creds(page)).revision).toBe(original.revision);
-  await page.locator('#clear-selection').click();await expect(page.locator('#selection-count')).toHaveText('已选 0 项');await expect(page.locator('#save-state')).toContainText('未保存');
+  await page.locator('[data-preset="practice"]').click();await expect(page.locator('#save-state')).toContainText('保存后');expect((await creds(page)).revision).toBe(original.revision);
+  await page.locator('#clear-selection').click();await expect(page.locator('#selection-count')).toHaveText('已选 0 项');await expect(page.locator('#save-state')).toContainText('保存后');
   expect((await creds(page)).revision).toBe(original.revision);expect((await creds(page)).feedUrl).toBe(original.feedUrl);
   const remote=await (await request.get(`/api/subscriptions/${original.id}`,{headers:{Authorization:`Bearer ${original.manageToken}`}})).json();
   expect(remote.revision).toBe(original.revision);expect(remote.settings).toEqual(original.savedSettings);
@@ -50,7 +50,7 @@ test('preset saves retain feed URL, remind only on tsok days and clocks remain U
   expect((await creds(page)).revision).toBe(original.revision);await page.locator('#subscribe').click();await expect.poll(async()=>(await creds(page)).revision).toBe(original.revision+1);expect((await creds(page)).feedUrl).toBe(original.feedUrl);
   const events=new ICAL.Component(ICAL.parse(await (await request.get(original.feedUrl)).text())).getAllSubcomponents('vevent');
   const tsok=new Set(['莲师荟供日','空行母荟供日']);expect(events.length).toBeGreaterThan(100);
-  for(const event of events)expect(event.getAllSubcomponents('valarm').length).toBe(tsok.has(event.getFirstPropertyValue('summary'))?1:0);
+  for(const event of events)expect(event.getAllSubcomponents('valarm').length).toBe(tsok.has(event.getFirstPropertyValue('summary').replace(/^[◆◇◦] /,''))?1:0);
 });
 test('device clock is primary overseas and cross-zone detail follows actual alarm dates',async({browser})=>{
   const context=await browser.newContext({baseURL:'http://127.0.0.1:4173',timezoneId:'Asia/Singapore'});try{

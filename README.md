@@ -10,6 +10,8 @@
 
 请先读[项目交接](docs/calendar-collaboration-handoff.md)及[本轮UI/UX审阅建议](docs/calendar-uiux-review.md)。设计建议尚未实施，不改变已有产品约定。
 
+接手维护先读 [`docs/maintainer-handbook.md`](docs/maintainer-handbook.md)（一页）。
+
 ## 本地开发
 
 需要 Node.js 24。安装后运行：

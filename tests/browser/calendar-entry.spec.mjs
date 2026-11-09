@@ -169,7 +169,8 @@ test('Android handoff keeps copy and import available while actual ICS checks fa
       await route.fulfill({status:200,contentType:'text/html',body:'<html>unavailable</html>'}).catch(()=>{});
     });
     await openSelected(page); await page.locator('#subscribe').click();
-    expect(service.posts).toBe(0);
+    // Android starts on the phone's own calendar; switching keeps the same feed.
+    await expect(page.locator('input[name="device"][value="other"]')).toBeChecked();
     await page.locator('input[name="device"][value="google"]').check();
     const sub = await ready(page,true);
     await expect(page.locator('#connection-result')).toHaveText('本次连接检查正常');

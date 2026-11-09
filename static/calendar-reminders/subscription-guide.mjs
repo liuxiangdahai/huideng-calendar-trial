@@ -102,7 +102,7 @@ function addition(app, context, device) {
       ['copy', '粘贴订阅地址。'],
       ['calendar-check', '点按“添加日历”。']
     ])}<p class="guide-note">若打开后没有出现添加页面，在 ${link('https://calendar.google.com/', 'Google 日历网页')}左侧找到“其他日历”，点按旁边的加号，再选择“通过网址添加”。请确认当前登录的是手机使用的 Google 账号。</p><p class="guide-links">${link(HELP.googleAdd, 'Google 中文订阅帮助')}</p>`)}
-    <p class="guide-caution">本网页逐项设置的提醒时间可能不会生效，请在 Google 日历中检查实际提供的通知选项。</p>`;
+    <p class="guide-caution">Google 日历通过网址订阅时，不读取文件里的提醒，本页设的提醒时间对它不起作用。添加后，请按“检查通知”里的步骤，在 Google 日历里给这个日历设“全天活动通知”。</p>`;
   if (app === 'outlook') return `${device.mobile ? '<p class="guide-handoff">请先在电脑网页版或经典桌面版添加订阅，再在需要使用的设备中检查日程。</p>' : ''}${addSteps(app, `${location('在电脑上操作 · Outlook 网页版', 'calendar')}
     <p>${prepare}</p>${steps([
       ['copy', '复制上方的订阅地址。'],
@@ -231,10 +231,10 @@ function notificationSteps(app, device) {
       ['sliders', '打开左上角菜单。'],
       ['sliders', '进入“设置”。'],
       ['calendar', '选择“慧灯藏历”对应的日历。'],
-      ['bell', '若有“通知”选项，按需设置提醒。'],
+      ['bell', '在“全天活动通知”中添加一项，例如“当天 08:00”；若没有这一项，查看“活动通知”。'],
       ['search', '在手机系统设置中搜索 Google 日历。'],
       ['bell', '检查这个应用的通知权限是否已开启。']
-    ])}<p class="guide-caution">若该订阅没有通知选项，无法在本页强制开启。网页设置的逐项提醒也可能不生效，请以手机日历实际显示为准。</p><p class="guide-links">${link(HELP.googleNotifications, 'Google 中文通知帮助（Android）')}</p>`;
+    ])}<p class="guide-caution">Google 只按你在这里设的通知提醒，所有日程（包括只显示的节日）都会用这个时间；若只想荟供日响铃，请只订阅荟供日，或改用手机自带日历。若该日历没有通知选项，本页无法强制开启。</p><p class="guide-links">${link(HELP.googleNotifications, 'Google 中文通知帮助（Android）')}</p>`;
   const huawei = `<details class="guide-help" data-guide-help="huawei-notifications"><summary>华为 HarmonyOS 6.0 通知入口</summary><p>以下名称来自对应版本的官方说明；其他版本请使用上方通用步骤。</p>${steps([
     ['sliders', '打开手机“设置”。'], ['bell', '进入“通知和状态栏”。'], ['calendar', '选择你使用的日历应用。'], ['bell', '打开“允许通知”。']
   ])}<p class="guide-links">${link(HELP.huaweiNotifications, '华为中文通知帮助')}</p></details>`;
@@ -243,7 +243,7 @@ function notificationSteps(app, device) {
     ['bell', '检查日程中显示的提醒时间。'],
     ['search', '在手机系统设置中搜索日历应用的名称。'],
     ['bell', '在该应用的通知设置中允许通知。']
-  ])}<p class="guide-note">若日程没有显示提醒时间，请在日历应用中补充设置。各品牌的菜单名称可能因版本不同而变化。</p>${huawei}`;
+  ])}<p class="guide-note">打开一条荟供日，看“提醒”是否为你设的时间（例如“当天 08:00”）。若显示的时间不对或没有提醒，可直接在日程里修改；小米等手机还可打开“闹钟提醒”，响铃更明显。各品牌的菜单名称可能因版本不同而变化。</p>${huawei}`;
 }
 
 function progressText(progress, hasReminders) {

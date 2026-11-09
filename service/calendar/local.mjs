@@ -16,7 +16,7 @@ export function createLocalService({databasePath, origin, now} = {}) {
     validateSettings, selectOccurrences, exportICS, ...reminderProbeAdapters({enabled:true,...(now?{now}:{})}), ...(now ? {now} : {})
   });
   const env = {DB, PUBLIC_BASE_URL: url.origin, ALLOWED_ORIGINS: url.origin, ALLOW_LOCAL_DEV: 'true',
-    RATE_LIMIT_SALT: 'local-preview-only'};
+    RATE_LIMIT_SALT: 'local-preview-only', CREATION_DAILY_LIMIT: '1000'};
   return {
     async fetch(request) {
       const headers = new Headers(request.headers);

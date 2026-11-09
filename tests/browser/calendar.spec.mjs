@@ -77,14 +77,14 @@ test('category and individual reminder settings export real all-day events and p
   expect(alerts.length).toBeGreaterThan(20);
   for (const event of alerts) {
     expect(event.getFirstPropertyValue('dtstart').isDate).toBe(true);
-    expect(event.getFirstPropertyValue('summary')).toBe('莲师荟供日');
+    expect(event.getFirstPropertyValue('summary')).toBe('◆ 莲师荟供日');
     expect(event.getAllSubcomponents('valarm')).toHaveLength(2);
   }
   const quiet = await downloadText(page,'[data-download="display"]');
   expect(quiet).not.toContain('BEGIN:VALARM');
   await page.locator('input[name="device"][value="google"]').check();
   await expect(page.locator('#device-guide')).toContainText('电脑浏览器');
-  await expect(page.locator('#device-guide')).toContainText('提醒时间可能不会生效');
+  await expect(page.locator('#device-guide')).toContainText('不读取文件里的提醒');
   await page.locator('input[name="device"][value="other"]').check();
   await expect(page.locator('#device-guide')).toContainText('文件导入');
   await closeSubscription(page); await page.reload();
@@ -107,7 +107,7 @@ test('real subscription keeps its URL, cancels removed events and allows saving 
   await expect.poll(async() => (await credentials(page)).revision).toBe(2);
   expect((await credentials(page)).feedUrl).toBe(first.feedUrl);
   const updated = components(await (await request.get(first.feedUrl)).text());
-  expect(updated.filter(event => event.getFirstPropertyValue('summary') === '空行母荟供日').every(event => event.getFirstPropertyValue('status') === 'CANCELLED')).toBe(true);
+  expect(updated.filter(event => event.getFirstPropertyValue('summary').replace(/^[◆◇◦] /, '') === '空行母荟供日').every(event => event.getFirstPropertyValue('status') === 'CANCELLED')).toBe(true);
   await closeSubscription(page); await page.locator('[data-clear-group="tsok"]').click();
   await expect(page.locator('#selection-count')).toHaveText('已选 0 项');
   await expect(page.locator('#subscribe')).toBeEnabled();
@@ -198,7 +198,7 @@ test('edits made during delayed creation and saving remain an unsaved draft',asy
   await page.locator('[data-event="dakini-tsok"]').uncheck();
   release();
   await expect.poll(async() => (await credentials(page))?.revision).toBe(1);
-  await expect(page.locator('#save-state')).toHaveText('有未保存的修改');
+  await expect(page.locator('#save-state')).toHaveText('有改动，保存后同步到日历');
   expect((await draft(page)).events['dakini-tsok'].mode).toBe('off');
   expect((await credentials(page)).savedSettings.events['dakini-tsok'].mode).toBe('remind');
   await page.unroute('**/api/subscriptions',delayed);
@@ -211,7 +211,7 @@ test('edits made during delayed creation and saving remain an unsaved draft',asy
   release();
   await expect.poll(async() => (await credentials(page))?.revision).toBe(2);
   await expect(page.locator('#selection-count')).toHaveText('已选 0 项');
-  await expect(page.locator('#save-state')).toHaveText('有未保存的修改');
+  await expect(page.locator('#save-state')).toHaveText('有改动，保存后同步到日历');
   expect((await credentials(page)).savedSettings.events['guru-tsok'].mode).toBe('remind');
 });
 
@@ -226,6 +226,9 @@ test('mobile selection, preview, long names and dialogs fit 390 and 320 pixel wi
   await page.screenshot({path:'.calendar-preview/mobile-preview.png',fullPage:true});
   await page.locator('#tab-preview').press('ArrowLeft');
   await expect(page.locator('#tab-selection')).toBeFocused();
+  // Phones open in the simple three steps; categories live under 详细设置.
+  await expect(page.locator('#advanced-settings')).not.toHaveAttribute('open','');
+  await page.locator('#advanced-settings>summary').click();
   await page.locator('[data-group-id="masters"] summary').click();
   await page.locator('[data-event="jigme-lingpa"]').check();
   for (const width of [390,320]) {

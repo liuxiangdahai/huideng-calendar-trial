@@ -4,13 +4,21 @@ import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import {build} from 'esbuild';
+import {exportDailyCalendar, DAILY_CALENDAR_PATH} from '../../static/calendar-reminders/core.mjs';
+
+const isoDay = time => new Date(time).toISOString().slice(0, 10);
+// The window is anchored to the UTC build day, so rebuilding on the same day is
+// byte-identical; every release refreshes it. Release checks require a year ahead.
+export function dailyCalendarForBuild(now = Date.now()) {
+  return exportDailyCalendar(isoDay(now - 31 * 86400000), isoDay(now + 730 * 86400000));
+}
 
 export const projectRoot = fileURLToPath(new URL('../../', import.meta.url));
 const sourceRoot = path.join(projectRoot, 'static/calendar-reminders');
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const json = value => JSON.stringify(value, null, 2) + '\n';
 const mime = {'.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.webp':'image/webp','.svg':'image/svg+xml','.ico':'image/x-icon'};
-const publicFiles = new Set(['index.html','style.css','calendar-view.css','subscription-guide.css','motion.css',
+const publicFiles = new Set(['daily-dates.ics','index.html','style.css','calendar-view.css','subscription-guide.css','motion.css',
   'subscription-guide.mjs','calendar-data.json','config.json','version.json','UNICODE-LICENSE.txt',
   'reminder-check.html','reminder-check.mjs','reminder-check.css']);
 
@@ -188,16 +196,19 @@ export async function buildRelease(options = {}, env = process.env) {
   await fs.mkdir(path.join(frontend,'licenses'),{recursive:true});
   await fs.copyFile(path.join(sourceRoot,'vendor/zangli/LICENSE.md'),path.join(frontend,'licenses/zangli-LICENSE.txt'));
   await fs.copyFile(path.join(sourceRoot,'vendor/zangli/README.md'),path.join(frontend,'licenses/zangli-README.md'));
+  await fs.copyFile(path.join(sourceRoot,'vendor/qrcode/LICENSE.md'),path.join(frontend,'licenses/qrcode-generator-LICENSE.txt'));
   try { await fs.copyFile(path.join(sourceRoot,'assets/README.md'),path.join(frontend,'licenses/artwork.md')); await fs.rm(path.join(frontend,'assets/README.md')); }
   catch (error) { if(error.code!=='ENOENT') throw error; }
   const html = (await normalizedHTML()).replace('src="./app.mjs"',`src="./${appFile}"`).replace('</head>',`${releaseTag(release)}\n</head>`);
   await fs.writeFile(path.join(frontend,'index.html'),html);
   await fs.writeFile(path.join(frontend,'calendar-data.json'),data);
+  // Static everyday-date calendar: a month back, two years ahead of the build day.
+  await fs.writeFile(path.join(frontend,DAILY_CALENDAR_PATH),dailyCalendarForBuild());
   await fs.writeFile(path.join(frontend,'config.json'),json({apiBaseUrl:config.apiBaseUrl,...release}));
   for (const directory of [site,frontend]) await fs.writeFile(path.join(directory,'version.json'),json(release));
   await fs.writeFile(path.join(site,'index.html'),'<!doctype html><html lang="zh-Hans"><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=/calendar-reminders/"><title>慧灯藏历</title><a href="/calendar-reminders/">打开藏历</a></html>');
   await fs.writeFile(path.join(site,'_redirects'),'/ /calendar-reminders/ 302\n');
-  await fs.writeFile(path.join(site,'_headers'),'/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: no-referrer\n  X-Robots-Tag: noindex, nofollow, noarchive\n  Permissions-Policy: geolocation=(), camera=(), microphone=()\n  Cache-Control: no-cache\n/calendar-reminders/app-*.js\n  Cache-Control: public, max-age=31536000, immutable\n/calendar-reminders/assets/*\n  Cache-Control: public, max-age=3600\n');
+  await fs.writeFile(path.join(site,'_headers'),'/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: no-referrer\n  X-Robots-Tag: noindex, nofollow, noarchive\n  Permissions-Policy: geolocation=(), camera=(), microphone=()\n  Cache-Control: no-cache\n/calendar-reminders/app-*.js\n  Cache-Control: public, max-age=31536000, immutable\n/calendar-reminders/assets/*\n  Cache-Control: public, max-age=3600\n/calendar-reminders/daily-dates.ics\n  Content-Type: text/calendar; charset=utf-8\n  Cache-Control: public, max-age=21600\n');
   await build({entryPoints:[path.join(projectRoot,'service/calendar/worker.mjs')],outfile:path.join(worker,'worker.mjs'),bundle:true,format:'esm',
     platform:'neutral',target:'es2022',minify:true,legalComments:'inline',plugins:[{name:'calendar-release',setup(plugin) {
       plugin.onLoad({filter:/[\\/]service[\\/]calendar[\\/]release\.json$/},()=>({contents:json(release),loader:'json'}));
