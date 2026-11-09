@@ -83,14 +83,14 @@ test('calendar and management endpoints cannot return HTML while JSON errors ret
  assert.equal(options.status,204);assert.equal(options.headers.get('access-control-allow-origin'),base);
 });
 
-test('safe failure stages distinguish thrown feed calls from invalid responses without retries or private details',async()=>{
+test('safe failure stages distinguish thrown feed calls; a feed read is retried once and never leaks private details',async()=>{
  const path=`/calendar/${'x'.repeat(43)}.ics?private=must-not-return`;
  for(const method of ['GET','HEAD']){
   let calls=0;
   const response=await gateway.fetch(request(path,{method,headers:{Authorization:'Bearer must-not-return'}}),env(async()=>{
    calls++;throw new Error('private https://example.invalid/calendar/secret.ics Authorization: Bearer must-not-return');
   }));
-  assert.equal(calls,1,'diagnosis must not retry a failed subscription request');
+  assert.equal(calls,2,'an idempotent feed read is retried exactly once');
   assert.equal(response.status,503);
   assert.equal(response.headers.get('x-calendar-gateway-stage'),'binding_fetch');
   assert.equal(response.headers.get('cache-control'),'no-store');
@@ -102,6 +102,24 @@ test('safe failure stages distinguish thrown feed calls from invalid responses w
  }
  assert.ok(Object.isFrozen(GATEWAY_FAILURE_STAGES));
  assert.ok(!GATEWAY_FAILURE_STAGES.includes('https://secret.invalid/token'));
+});
+
+test('one retry rescues a cut-off feed read and is labelled; writes and health checks are not retried',async()=>{
+ let calls=0;
+ const ok=await gateway.fetch(request(`/calendar/${'x'.repeat(43)}.ics`),env(async()=>{
+  calls++;if(calls===1)throw new Error('cut off');
+  return new Response('BEGIN:VCALENDAR',{headers:{'content-type':'text/calendar; charset=utf-8'}});
+ }));
+ assert.equal(calls,2);assert.equal(ok.status,200);assert.equal(ok.headers.get('x-calendar-gateway-retry'),'1');
+ assert.equal(await ok.text(),'BEGIN:VCALENDAR');
+ for(const [path,init] of [['/api/subscriptions',{method:'POST',body:'{}'}],['/healthz',{}]]){
+  let n=0;
+  const failed=await gateway.fetch(request(path,init),env(async()=>{n++;throw new Error('down');}));
+  assert.equal(n,1,`${path} must not be retried`);assert.equal(failed.status,503);
+ }
+ const forged=await gateway.fetch(request(`/calendar/${'x'.repeat(43)}.ics`),env(async()=>new Response('BEGIN:VCALENDAR',
+  {headers:{'content-type':'text/calendar','X-Calendar-Gateway-Retry':'1'}})));
+ assert.equal(forged.headers.get('x-calendar-gateway-retry'),null,'a backend cannot claim a retry');
 });
 
 test('failure stages remain request-local and backend-provided diagnostic labels are never propagated',async()=>{

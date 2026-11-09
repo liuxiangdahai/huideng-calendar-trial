@@ -22,11 +22,30 @@ class HttpError extends Error {
   constructor(status, message, details) { super(message); this.status = status; this.details = details; }
 }
 const json = (body, status = 200) => new Response(JSON.stringify(body), {status, headers: JSON_HEADERS});
+// Sorted-key JSON. Same output as before, built with plain loops and a cache
+// of sorted key lists per object shape: it runs for every event of a feed.
+const sortedKeys = new Map();
+const quotedKey = new Map();
 const canonical = value => {
-  if (Array.isArray(value)) return `[${value.map(canonical).join(',')}]`;
+  if (Array.isArray(value)) {
+    let out = '[';
+    for (let i = 0; i < value.length; i++) out += (i ? ',' : '') + canonical(value[i]);
+    return out + ']';
+  }
   if (value && typeof value === 'object') {
-    return `{${Object.keys(value).sort().filter(key => value[key] !== undefined)
-      .map(key => `${JSON.stringify(key)}:${canonical(value[key])}`).join(',')}}`;
+    const own = Object.keys(value), shape = own.join('\u0000');
+    let keys = sortedKeys.get(shape);
+    if (!keys) { keys = [...own].sort(); if (sortedKeys.size < 512) sortedKeys.set(shape, keys); }
+    let out = '{', first = true;
+    for (const key of keys) {
+      const item = value[key];
+      if (item === undefined) continue;
+      let quoted = quotedKey.get(key);
+      if (quoted === undefined) { quoted = JSON.stringify(key); if (quotedKey.size < 1024) quotedKey.set(key, quoted); }
+      out += (first ? '' : ',') + quoted + ':' + canonical(item);
+      first = false;
+    }
+    return out + '}';
   }
   return JSON.stringify(value);
 };

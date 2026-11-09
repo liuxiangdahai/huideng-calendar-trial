@@ -3,8 +3,18 @@ import {resolveTimeZone, deviceTimeZone, ZONE_LABELS, civilDateInZone, wallTimeI
 
 export const MODES = {off: '不添加', display: '仅加入日历', remind: '加入并提醒'};
 export const ZONES = ZONE_LABELS;
+// Feed generation calls this thousands of times per request (all-day end
+// dates, alarm days, the rolling window), so recent results are memoised.
+const addDaysCache = new Map();
 export function addDays(date, count) {
-  return new Date(Date.parse(date + 'T12:00:00Z') + count * 86400000).toISOString().slice(0, 10);
+  const key = date + '|' + count;
+  let value = addDaysCache.get(key);
+  if (value === undefined) {
+    value = new Date(Date.parse(date + 'T12:00:00Z') + count * 86400000).toISOString().slice(0, 10);
+    if (addDaysCache.size >= 8192) addDaysCache.clear();
+    addDaysCache.set(key, value);
+  }
+  return value;
 }
 export function dateInZone(instant, zone) {
   return civilDateInZone(instant, zone);
@@ -119,7 +129,20 @@ export function selectCalendarOccurrences(data, settings, range = {}, festivalSe
 // Resolve recurring wall-clock alarms with IANA rules. Like calendar-compatible
 // disambiguation, choose the first repeated instant and shift a missing time by
 // the DST gap. Future rolling windows must not fail because they encounter DST.
+// A wall time in a zone always maps to the same instant for a given runtime's
+// time zone data, so results are memoised: each alarm otherwise costs 6–9
+// Intl formatting calls, the largest share of feed regeneration CPU.
+const zonedCache = new Map();
 export function zonedInstant(date, time, zone) {
+  const key = `${date}T${time}|${zone}`;
+  const cached = zonedCache.get(key);
+  if (cached !== undefined) return new Date(cached);
+  const instant = zonedInstantUncached(date, time, zone);
+  if (zonedCache.size >= 8192) zonedCache.clear();
+  zonedCache.set(key, instant.getTime());
+  return instant;
+}
+function zonedInstantUncached(date, time, zone) {
   const desired = `${date}T${time}:00`;
   const wanted = Date.parse(desired + 'Z');
   if (!Number.isFinite(wanted)) throw new Error('日期或时间无效。');
@@ -154,7 +177,17 @@ function publishedAlarmInstants(event) {
   })) throw new Error('已发布的提醒时间无效，请稍后重试。');
   return values;
 }
-const stamp = date => date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+// 2026-11-09T08:30:00.000Z -> 20261109T083000Z, by slicing instead of regexes.
+const stampISO = iso => iso.slice(0, 4) + iso.slice(5, 7) + iso.slice(8, 13) + iso.slice(14, 16) + iso.slice(17, 19) + 'Z';
+const stamp = date => stampISO(date.toISOString());
+// Ledger timestamps arrive as ISO strings; memoise their stamped form.
+const stampCache = new Map();
+const stampValue = value => {
+  if (value instanceof Date) return stamp(value);
+  let out = stampCache.get(value);
+  if (out === undefined) { out = stamp(new Date(value)); if (stampCache.size >= 4096) stampCache.clear(); stampCache.set(value, out); }
+  return out;
+};
 // All-day reminders are written relative to the event's civil midnight, the
 // form Apple Calendar itself uses. Field tests (2026-11-08) showed Xiaomi
 // Calendar turning absolute UTC triggers on all-day events into the UTC wall
@@ -167,7 +200,17 @@ export function relativeTrigger(reminder) {
   return `TRIGGER:${offset < 0 ? '-' : ''}PT${Math.abs(offset)}M`;
 }
 export const escapeICS = value => String(value).replace(/\\/g, '\\\\').replace(/\r\n|\r|\n/g, '\\n').replace(/;/g, '\\;').replace(/,/g, '\\,');
+// Feeds are regenerated daily with almost the same lines, so folded lines
+// (Chinese text takes the slow per-character path) are memoised.
+const foldCache = new Map();
 export function foldLine(line) {
+  const cached = foldCache.get(line);
+  if (cached !== undefined) return cached;
+  const folded = foldLineUncached(line);
+  if (line.length > 25) { if (foldCache.size >= 8192) foldCache.clear(); foldCache.set(line, folded); }
+  return folded;
+}
+function foldLineUncached(line) {
   // Fast path: 25 UTF-16 units can never exceed 75 UTF-8 bytes, and an ASCII
   // line is one byte per unit. Most ICS lines take this path unchanged.
   if (line.length <= 25 || (line.length <= 75 && /^[\x00-\x7f]*$/.test(line))) return line;
@@ -215,17 +258,16 @@ export function exportICS(events, {zone, name = '慧灯·藏历修行日', gener
       [`藏历${event.tibetan}`, '日期换算：藏历 PRO；节日名称与安排：佛慧法语藏历。',
       `原站标注：${event.sourceLabel || event.title}`, event.source,
       event.preference.mode === 'remind' ? `提醒：${reminderLabel(event.preference.reminders)}（按手机当地时间）。提醒时间不代表共修开始时间。` : '仅加入日历；请关闭此日历的默认通知。'];
-    const asDate = value => value instanceof Date ? value : new Date(value);
-    const dtstamp = asDate(event.dtstamp || event.lastModified || event.createdAt || generatedAt);
+    const dtstamp = event.dtstamp || event.lastModified || event.createdAt || generatedAt;
     const status = event.status === 'CANCELLED' ? 'CANCELLED' : 'CONFIRMED';
     const sequence = Number.isSafeInteger(event.sequence) && event.sequence >= 0 ? event.sequence : 0;
-    lines.push('BEGIN:VEVENT', `UID:${event.uid}@calendar.huidengvan.org`, `DTSTAMP:${stamp(dtstamp)}`,
+    lines.push('BEGIN:VEVENT', `UID:${event.uid}@calendar.huidengvan.org`, `DTSTAMP:${stampValue(dtstamp)}`,
       `DTSTART;VALUE=DATE:${event.date.replaceAll('-', '')}`,
       `DTEND;VALUE=DATE:${addDays(event.date, 1).replaceAll('-', '')}`,
       `SUMMARY:${escapeICS(markedTitle(event, titleMarks))}`, `DESCRIPTION:${escapeICS(description.join('\n'))}`,
       `URL:${daily ? ENGINE.url : event.source}`, `STATUS:${status}`, 'TRANSP:TRANSPARENT', `SEQUENCE:${sequence}`);
-    if (event.createdAt) lines.push(`CREATED:${stamp(asDate(event.createdAt))}`);
-    if (event.lastModified) lines.push(`LAST-MODIFIED:${stamp(asDate(event.lastModified))}`);
+    if (event.createdAt) lines.push(`CREATED:${stampValue(event.createdAt)}`);
+    if (event.lastModified) lines.push(`LAST-MODIFIED:${stampValue(event.lastModified)}`);
     if (!daily && status !== 'CANCELLED' && event.preference.mode === 'remind') {
       // Only the server explicitly opts into its own publication ledger. Direct
       // exports ignore arbitrary alarmInstants copied into browser event data.
