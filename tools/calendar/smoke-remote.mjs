@@ -26,7 +26,8 @@ function verifyDaily(entries){
   assert.equal(event.getAllSubcomponents('valarm').length,0);
   assert.equal(event.getFirstPropertyValue('transp'),'TRANSPARENT');
   assert.ok(event.getFirstPropertyValue('dtstart').isDate);
-  assert.match(event.getFirstPropertyValue('summary'),/^藏历/);
+  // The title may carry the chosen everyday mark (◦ or 【每日】) before the date.
+  assert.match(event.getFirstPropertyValue('summary'),/^(?:◦ |【每日】)?藏历/);
   assert.match(event.getFirstPropertyValue('description'),/藏历 PRO/);
   assert.ok(!event.getFirstPropertyValue('description').includes('原站标注'));
  }
