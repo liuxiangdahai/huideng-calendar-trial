@@ -771,7 +771,7 @@ test('a rolling Los Angeles subscription survives a newly included autumn DST ov
   const overlaps = f.entries(await advanced.text()).filter(event =>
     event.getFirstPropertyValue('dtstart').toString() === '2028-11-05');
   assert.equal(overlaps.length, 1);
-  assert.equal(overlaps[0].getFirstPropertyValue('summary'), '◆ 观音菩萨加持日');
+  assert.equal(overlaps[0].getFirstPropertyValue('summary'), '观音菩萨加持日');
   const alarms = overlaps[0].getAllSubcomponents('valarm');
   assert.equal(alarms.length, 1);
   // The phone resolves 01:30 on the overlap day itself; the feed carries one civil offset.

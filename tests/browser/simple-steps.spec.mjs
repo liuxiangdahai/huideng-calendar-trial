@@ -36,13 +36,14 @@ test('a shared link pre-fills preset, time, everyday dates and title style, then
   await page.locator('[data-preset="tsok"]').click();
   await page.locator('[data-time-choice="0|07:00"]').click();
   await page.locator('#include-daily-dates').check();
-  await page.locator('input[name="title-marks"][value="words"]').check();
+  await page.locator('input[name="title-marks"][value="symbols"]').check();
+  await expect(page.locator('input[name="title-marks"]')).toHaveCount(2);
   await page.locator('#share-settings').click();
   await expect(page.locator('#share-dialog')).toBeVisible();
   await expect(page.locator('#share-qr svg')).toBeVisible();
   await expect(page.locator('#share-summary')).toContainText('两个荟供日');
   await page.context().grantPermissions(['clipboard-read','clipboard-write']).catch(()=>{});
-  const shared=await page.evaluate(()=>{const url=new URL(location.href);url.search='?p=tsok&t=0-0700&d=1&m=words';return url.href;});
+  const shared=await page.evaluate(()=>{const url=new URL(location.href);url.search='?p=tsok&t=0-0700&d=1&m=symbols';return url.href;});
   const other=await page.context().browser().newContext({viewport:{width:390,height:844},baseURL:new URL(page.url()).origin});
   const phone=await other.newPage();await open(phone,shared);
   await expect(phone.locator('[data-preset="tsok"]')).toHaveAttribute('aria-pressed','true');
@@ -50,7 +51,7 @@ test('a shared link pre-fills preset, time, everyday dates and title style, then
   await expect(phone.locator('#include-daily-dates')).toBeChecked();
   expect(new URL(phone.url()).search).toBe('');
   const stored=await phone.evaluate(()=>JSON.parse(localStorage.getItem('huideng.calendar.v2')));
-  expect(stored.titleMarks).toBe('words');
+  expect(stored.titleMarks).toBe('symbols');
   await other.close();
 });
 
@@ -68,15 +69,16 @@ test('after subscribing, the page opens on a sync status with the next reminder;
   const text=await (await request.get(feedUrl)).text();
   const titles=new ICAL.Component(ICAL.parse(text)).getAllSubcomponents('vevent').map(e=>e.getFirstPropertyValue('summary'));
   expect(titles.length).toBeGreaterThan(0);
-  expect(titles.every(title=>title.startsWith('◆ '))).toBe(true);
-  // Changing the style is a normal settings change that the feed follows.
+  // No marks by default.
+  expect(titles.every(title=>!/^[◆◇◦]/.test(title))).toBe(true);
+  // Choosing symbols is a normal settings change that the feed follows.
   await page.locator('#advanced-settings>summary').click();
-  await page.locator('input[name="title-marks"][value="none"]').check();
+  await page.locator('input[name="title-marks"][value="symbols"]').check();
   await expect(page.locator('#subscribed-card')).toBeHidden();
   await page.locator('#subscribe').click();
   await expect(page.locator('#subscribe-label')).toHaveText('我的订阅');
   const after=await (await request.get(feedUrl)).text();
-  expect(after).toMatch(/SUMMARY:莲师荟供日/);
+  expect(after).toMatch(/SUMMARY:◆ 莲师荟供日/);
 });
 
 test('inside WeChat the page says first how to open it in a browser',async({browser})=>{

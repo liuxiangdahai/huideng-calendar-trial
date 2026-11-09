@@ -285,7 +285,9 @@ function applySharedSettings() {
   const time=params.get('t')?.match(/^([0-7])-([01]\d|2[0-3])([0-5]\d)$/);
   if(time) for(const pref of Object.values(next.events)) if(pref.mode==='remind') pref.reminders=[{daysBefore:Number(time[1]),time:`${time[2]}:${time[3]}`}];
   if(params.get('d')==='1') next.includeDailyDates=true;
-  if(['words','none'].includes(params.get('m'))) next.titleMarks=params.get('m'); else delete next.titleMarks;
+  // Two styles are offered: none (default) or symbols. Anything else falls
+  // back to none.
+  if(params.get('m')==='symbols') next.titleMarks='symbols'; else delete next.titleMarks;
   settings=next;
   return '已按分享的设置选好，确认后点底部按钮加入日历。';
 }
@@ -299,7 +301,7 @@ function renderSaveState() {
   $('#save-state').textContent = stopped ? '已停用，请在手机移除订阅日历' : conflict ? '设置已在其他设备修改' : changed ? '有改动，保存后同步到日历' : subscription ? '已同步到日历，改动会自动更新' : nextStepText();
   $('#unsaved-dot').hidden = !changed;
   $('#subscribe-label').textContent = managementRestoring ? '正在恢复订阅…' : requestPending ? '正在保存…' : subscription ? (changed ? '保存修改' : '我的订阅') : deviceLabel();
-  for(const input of document.querySelectorAll('input[name="title-marks"]')) input.checked=input.value===(settings.titleMarks||'symbols');
+  for(const input of document.querySelectorAll('input[name="title-marks"]')) input.checked=input.value===(settings.titleMarks||'none');
   const ctaDisabled = requestPending || managementRestoring || (!subscription && !hasSelectedContent());
   // The first time the main button becomes usable, it gives one gentle pulse
   // so the eye finds the next step. Not on load, not on later changes.
@@ -572,7 +574,7 @@ async function performSaveSubscription(create) {
     const attempt=create ? creationAttempt() : null;
     const submitted = clone(attempt ? attempt.settings : settings);
     const result = await api(create ? 'POST' : 'PATCH',create ? '/api/subscriptions' : `/api/subscriptions/${encodeURIComponent(subscription.id)}`,
-      create ? {settings:submitted} : {settings:{...submitted,titleMarks:submitted.titleMarks||'symbols'},revision:subscription.revision},undefined,attempt?.key);
+      create ? {settings:submitted} : {settings:{...submitted,titleMarks:submitted.titleMarks||'none'},revision:subscription.revision},undefined,attempt?.key);
     if(create && (!/^[a-f0-9-]{36}$/.test(result.id) || !/^[A-Za-z0-9_-]{43}$/.test(result.manageToken) ||
         !Number.isSafeInteger(result.revision) || result.revision<1 || !result.settings || result.disabled)) {
       throw new Error('订阅服务返回的信息不完整。创建进度已保留，请重试恢复同一份订阅。');
@@ -713,7 +715,7 @@ function attachEvents() {
     if(show) $('.device-options')?.scrollIntoView({block:'nearest',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
   });
   for(const input of document.querySelectorAll('input[name="title-marks"]')) input.addEventListener('change',()=>{
-    if(input.value==='symbols') delete settings.titleMarks; else settings.titleMarks=input.value;
+    if(input.value==='none') delete settings.titleMarks; else settings.titleMarks=input.value;
     stopped=false;refresh(false);
     notify(subscription?'标记样式已改；保存修改后，日历下次同步时更新。':'标记样式已改。');
   });

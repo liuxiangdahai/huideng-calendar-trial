@@ -77,7 +77,7 @@ test('category and individual reminder settings export real all-day events and p
   expect(alerts.length).toBeGreaterThan(20);
   for (const event of alerts) {
     expect(event.getFirstPropertyValue('dtstart').isDate).toBe(true);
-    expect(event.getFirstPropertyValue('summary')).toBe('◆ 莲师荟供日');
+    expect(event.getFirstPropertyValue('summary')).toBe('莲师荟供日');
     expect(event.getAllSubcomponents('valarm')).toHaveLength(2);
   }
   const quiet = await downloadText(page,'[data-download="display"]');

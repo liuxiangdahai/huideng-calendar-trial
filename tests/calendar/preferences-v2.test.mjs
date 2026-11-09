@@ -145,15 +145,17 @@ test('all-day reminders use civil-day relative triggers that Android calendars k
   assert.match(ics.replace(/\r\n /g,''),/按手机当地时间/);
 });
 
-test('title marks tell reminders, display days and everyday dates apart in a chosen style',()=>{
+test('titles carry no marks by default; chosen symbols tell reminders, display days and everyday dates apart',()=>{
   const settings=makeSettings(),[event]=selectOccurrences(data,settings,window).filter(e=>e.preference.mode==='remind');
   const display={...event,preference:{mode:'display',reminders:[]}},daily={...event,kind:'daily-date',title:'藏历九月廿九'};
-  assert.deepEqual([event,display,daily].map(e=>markedTitle(e)),[`◆ ${event.title}`,`◇ ${event.title}`,'◦ 藏历九月廿九']);
+  assert.deepEqual([event,display,daily].map(e=>markedTitle(e)),[event.title,event.title,'藏历九月廿九']);
+  assert.deepEqual([event,display,daily].map(e=>markedTitle(e,'symbols')),[`◆ ${event.title}`,`◇ ${event.title}`,'◦ 藏历九月廿九']);
   assert.equal(markedTitle(event,'words'),`【提醒】${event.title}`);
   assert.equal(markedTitle(event,'none'),event.title);
   // Title-sorting apps put reminders first and everyday dates last.
   assert.ok('◆' < '◇' && '◇' < '◦');
-  assert.equal(validateSettings({...settings,titleMarks:'symbols'},data.catalog).titleMarks,undefined);
+  assert.equal(validateSettings({...settings,titleMarks:'none'},data.catalog).titleMarks,undefined);
+  assert.equal(validateSettings({...settings,titleMarks:'symbols'},data.catalog).titleMarks,'symbols');
   assert.equal(validateSettings({...settings,titleMarks:'words'},data.catalog).titleMarks,'words');
   assert.throws(()=>validateSettings({...settings,titleMarks:'emoji'},data.catalog),/标记/);
   assert.match(exportICS([event],{zone:settings.zone,titleMarks:'words'}),/SUMMARY:【提醒】/);

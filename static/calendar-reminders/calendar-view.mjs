@@ -105,8 +105,8 @@ function eventMarkup(event, location, state) {
     <button type="button" class="cal-reminder${event.preference?.mode === 'remind' ? ' is-active' : ''}" data-cal-event="${escape(id)}" data-cal-focus="${escape(location + '-' + event.uid)}" aria-label="调整${escape(event.title)}的提醒">${icon(event.preference?.mode === 'remind' ? 'bell' : 'bell-off')}<span>${escape(reminderText(event))}</span><span class="cal-edit">调整提醒</span></button>${converted}</article>`;
 }
 
-// The preview shows the same title mark the calendar app will show (◆/◇/◦,
-// 【提醒】… or none). The mark is drawn beside the original title, never
+// The preview shows the same title mark the calendar app will show (none
+// by default, or ◆/◇/◦). The mark is drawn beside the original title, never
 // written into it, so the title text stays exactly the source's.
 function markAttr(event, style) {
   const full = markedTitle(event, style), mark = full.slice(0, full.length - String(event.title).length);
@@ -243,15 +243,14 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     $('[data-cal-context]').textContent = [...tibetanYears].map(([year, months]) => `藏历${year}年 ${[...months].join(' · ')}`).join('　');
     // With the everyday layer on, each day gets its own quiet line showing
     // the entry the calendar app will show, with the chosen mark (◦, 【每日】
-    // or none). A phone cell is too narrow for the date, so it shows “每日”
-    // (with ◦ in symbol style); word marks such as 【修行日】 would hide the
-    // name there, so phones show them in the day sheet and list instead.
+    // or none). A phone cell is too narrow for the full date, so it shows
+    // “藏历” (with ◦ if chosen); the day sheet and list carry the full line.
     const daily = state.settings?.includeDailyDates === true;
     const dailyLine = cell => {
       if (!daily || cell.disabled || !cell.tibetan) return '';
       const entry = dailyDateOccurrences(cell.date, cell.date)[0];
       if (!entry) return '';
-      return `<span class="cal-daily-line" aria-hidden="true"${markAttr(entry, state.settings?.titleMarks)}><span class="cal-daily-full">${escape(entry.title)}</span><span class="cal-daily-short">每日</span></span>`;
+      return `<span class="cal-daily-line" aria-hidden="true"${markAttr(entry, state.settings?.titleMarks)}><span class="cal-daily-full">${escape(entry.title)}</span><span class="cal-daily-short">藏历</span></span>`;
     };
     const header = `<div class="cal-weekdays" role="row">${WEEKDAYS.map(day => `<span role="columnheader" aria-label="星期${day}">${day}</span>`).join('')}</div>`;
     const rows = Array.from({length: 6}, (_, row) => `<div class="cal-week" role="row">${cells.slice(row * 7, row * 7 + 7).map(cell => {
@@ -277,7 +276,7 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     const before = grid.dataset.month === month ? new Set([...grid.querySelectorAll('.cal-mini-event,.cal-mobile-event')].map(labelKey)) : null;
     grid.innerHTML = header + rows;
     grid.dataset.month = month;
-    grid.dataset.marks = state.settings?.titleMarks || 'symbols';
+    grid.dataset.marks = state.settings?.titleMarks || 'none';
     if (before) [...grid.querySelectorAll('.cal-mini-event,.cal-mobile-event')].filter(node => !before.has(labelKey(node)) && node.offsetParent)
       .slice(0, 16).forEach(node => playMotion(node, 'appear'));
     renderDetail();

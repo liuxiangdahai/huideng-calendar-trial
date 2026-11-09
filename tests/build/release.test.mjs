@@ -129,5 +129,5 @@ test('the everyday-date calendar ships as a static, alarm-free file a year and m
   assert.doesNotMatch(text, /BEGIN:VALARM/);
   assert.match(text, /UID:daily-only-2026-10-09@/);
   assert.match(text, /DTSTART;VALUE=DATE:20281108/);
-  assert.match(text, /SUMMARY:◦ 藏历/);
+  assert.match(text, /SUMMARY:藏历/);
 });

@@ -186,7 +186,6 @@
 .cal-day.cal-adjacent .cal-daily-line { color: #8a9ab3; }
 @media (max-width: 1023px) {
   .cal-daily-line { display: block; text-align: center; font-size: 11px; line-height: 14px; white-space: nowrap; }
-  [data-marks=words] :is(.cal-daily-line, .cal-mobile-event)[data-mark]::before { content: none; }
   .cal-daily-full { display: none; }
   .cal-daily-short { display: inline; }
 }
