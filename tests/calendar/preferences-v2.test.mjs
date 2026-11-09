@@ -150,13 +150,14 @@ test('titles carry no marks by default; chosen symbols tell reminders, display d
   const display={...event,preference:{mode:'display',reminders:[]}},daily={...event,kind:'daily-date',title:'藏历九月廿九'};
   assert.deepEqual([event,display,daily].map(e=>markedTitle(e)),[event.title,event.title,'藏历九月廿九']);
   assert.deepEqual([event,display,daily].map(e=>markedTitle(e,'symbols')),[`◆ ${event.title}`,`◇ ${event.title}`,'◦ 藏历九月廿九']);
-  assert.equal(markedTitle(event,'words'),`【提醒】${event.title}`);
+  assert.equal(markedTitle(event,'words'),event.title,'the retired word style shows no marks');
   assert.equal(markedTitle(event,'none'),event.title);
   // Title-sorting apps put reminders first and everyday dates last.
   assert.ok('◆' < '◇' && '◇' < '◦');
   assert.equal(validateSettings({...settings,titleMarks:'none'},data.catalog).titleMarks,undefined);
   assert.equal(validateSettings({...settings,titleMarks:'symbols'},data.catalog).titleMarks,'symbols');
-  assert.equal(validateSettings({...settings,titleMarks:'words'},data.catalog).titleMarks,'words');
+  assert.equal(validateSettings({...settings,titleMarks:'words'},data.catalog).titleMarks,undefined);
+  assert.equal(normalizeSettings({...settings,titleMarks:'words'},data.catalog).titleMarks,undefined);
   assert.throws(()=>validateSettings({...settings,titleMarks:'emoji'},data.catalog),/标记/);
-  assert.match(exportICS([event],{zone:settings.zone,titleMarks:'words'}),/SUMMARY:【提醒】/);
+  assert.doesNotMatch(exportICS([event],{zone:settings.zone,titleMarks:'words'}),/【/);
 });

@@ -74,13 +74,13 @@ export function validateSettings(raw, catalog) {
   if (Object.hasOwn(raw, 'includeDailyDates') && typeof raw.includeDailyDates !== 'boolean') {
     throw new Error('每日藏历选项必须为开启或关闭。');
   }
-  if (Object.hasOwn(raw, 'titleMarks') && !Object.hasOwn(TITLE_MARK_STYLES, raw.titleMarks)) {
+  if (Object.hasOwn(raw, 'titleMarks') && !Object.hasOwn(TITLE_MARK_STYLES, raw.titleMarks) && !RETIRED_TITLE_MARKS.has(raw.titleMarks)) {
     throw new Error('标题标记样式无效。');
   }
   for (const id of Object.keys(raw.events)) if (!ids.has(id)) throw new Error('节日目录已更新，请刷新页面后重试。');
   // The default style is omitted so settings saved before 2026-11-09 stay identical.
   return {version: 2, zone, includeDailyDates: raw.includeDailyDates === true,
-    ...(raw.titleMarks && raw.titleMarks !== DEFAULT_TITLE_MARKS ? {titleMarks: raw.titleMarks} : {}),
+    ...(raw.titleMarks && raw.titleMarks !== DEFAULT_TITLE_MARKS && Object.hasOwn(TITLE_MARK_STYLES, raw.titleMarks) ? {titleMarks: raw.titleMarks} : {}),
     events: Object.fromEntries(catalog.events.map(e =>
     [e.id, raw.events[e.id] ? cleanPreference(raw.events[e.id]) : {mode: 'off', reminders: initialReminders()}]))};
 }
@@ -228,14 +228,16 @@ function foldLineUncached(line) {
 // kinds apart in every calendar app: ◆ will remind, ◇ display-only festival,
 // ◦ everyday Tibetan date. In apps that order an all-day list by title, these
 // code points also sort reminders first and everyday dates last.
-// People choose the style in 详细设置: symbols (default), words, or none.
+// People choose the style in 详细设置: none (default) or symbols. The old
+// 【提醒】 word style was retired on 11-09; a saved choice of it reads as none.
 // No marks unless the person chooses symbols (user decision 11-09).
 export const DEFAULT_TITLE_MARKS = 'none';
 export const TITLE_MARK_STYLES = Object.freeze({
   symbols: Object.freeze({remind: '◆ ', display: '◇ ', daily: '◦ '}),
-  words: Object.freeze({remind: '【提醒】', display: '【修行日】', daily: '【每日】'}),
   none: Object.freeze({remind: '', display: '', daily: ''})
 });
+// Older pages may still send these; accept them and save no marks.
+export const RETIRED_TITLE_MARKS = new Set(['words']);
 export const TITLE_MARKS = TITLE_MARK_STYLES.symbols;
 export const titleMarkStyle = value => Object.hasOwn(TITLE_MARK_STYLES, value) ? value : DEFAULT_TITLE_MARKS;
 export function markedTitle(event, style = DEFAULT_TITLE_MARKS) {
