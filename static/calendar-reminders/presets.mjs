@@ -1,8 +1,8 @@
 import {cloneSettings} from './runtime.mjs';
 export const PRESETS = [
-  {id:'guru',title:'莲师荟供日',description:'每月莲师荟供日',reminder:'莲师荟供日',icon:'ritual-bell'},
-  {id:'tsok',title:'两个荟供日',description:'莲师与空行母荟供日',reminder:'两个荟供日',icon:'bell-vajra'},
-  {id:'practice',title:'全部修行日',description:'各类修行日与已收录日月食',reminder:'荟供日，其余仅显示',icon:'lotus'}
+  {id:'guru',title:'莲师荟供日',description:'藏历每月初十',reminder:'到日子提醒',icon:'ritual-bell'},
+  {id:'tsok',title:'两个荟供日',description:'莲师初十 · 空行母廿五',reminder:'到日子提醒',icon:'bell-vajra'},
+  {id:'practice',title:'全部修行日',description:'各类修行日与已收录日月食',reminder:'荟供日提醒，其余只显示',icon:'lotus'}
 ];
 const tsokIds = new Set(['guru-tsok','dakini-tsok']);
 const presetMode = (presetId,eventId) => presetId==='practice' && !tsokIds.has(eventId) ? 'display' : 'remind';
