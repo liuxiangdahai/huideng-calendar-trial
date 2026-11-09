@@ -54,6 +54,39 @@ export function playMotion(node, kind = 'reveal', direction = 1) {
   } catch { /* Older browsers retain the completed, fully usable UI. */ }
 }
 
+// Each ritual symbol answers a choice the way the object itself moves: the
+// bell swings from its handle, the wheel turns, the lotus opens, the parasol
+// spreads, the banner ripples, the sun rises from the moon, the vase settles.
+// One short play per tap; transform only; skipped under reduced motion.
+const SYMBOL_MOTION = {
+  'ritual-bell': {origin:'50% 8%', duration:720, frames:[0,16,-12,7,-3,0].map(d => ({transform:`rotate(${d}deg)`}))},
+  'bell-vajra': {origin:'40% 10%', duration:640, frames:[0,10,-8,4,0].map(d => ({transform:`rotate(${d}deg)`}))},
+  vajra: {origin:'50% 50%', duration:560, frames:[{transform:'rotate(0)'}, {transform:'rotate(-14deg)'}, {transform:'rotate(6deg)'}, {transform:'rotate(0)'}]},
+  wheel: {origin:'50% 50%', duration:900, frames:[{transform:'rotate(0)'}, {transform:'rotate(360deg)'}], easing:'cubic-bezier(.3,.6,.2,1)'},
+  lotus: {origin:'50% 90%', duration:560, frames:[{transform:'scale(.82)'}, {transform:'scale(1.08)', offset:.6}, {transform:'scale(1)'}]},
+  parasol: {origin:'50% 15%', duration:560, frames:[{transform:'scaleX(.8)'}, {transform:'scaleX(1.06)', offset:.6}, {transform:'scaleX(1)'}]},
+  banner: {origin:'50% 5%', duration:640, frames:[0,-7,5,-2,0].map(d => ({transform:`skewX(${d}deg)`}))},
+  nyida: {origin:'50% 50%', duration:560, frames:[{transform:'translateY(3px)', opacity:.6}, {transform:'translateY(-1px)', opacity:1, offset:.6}, {transform:'translateY(0)'}]},
+  vase: {origin:'50% 100%', duration:520, frames:[{transform:'translateY(0) rotate(0)'}, {transform:'translateY(-3px) rotate(-4deg)', offset:.4}, {transform:'translateY(0) rotate(2deg)', offset:.75}, {transform:'translateY(0) rotate(0)'}]},
+  knot: {origin:'50% 50%', duration:600, frames:[{transform:'rotate(0) scale(1)'}, {transform:'rotate(45deg) scale(.92)', offset:.5}, {transform:'rotate(90deg) scale(1)'}]},
+  eclipse: {origin:'50% 50%', duration:600, frames:[{opacity:1}, {opacity:.45, offset:.5}, {opacity:1}]}
+};
+export function playSymbol(svg) {
+  const spec = SYMBOL_MOTION[svg?.dataset?.iconName];
+  if (!spec || !svg.isConnected || typeof svg.animate !== 'function') return;
+  const doc = svg.ownerDocument, {active} = contextFor(doc);
+  if (doc.defaultView.matchMedia(reducedMotionQuery).matches || doc.hidden) return;
+  for (const [target, animation] of active) if (target === svg) { animation.cancel(); active.delete(target); }
+  try {
+    svg.style.transformOrigin = spec.origin;
+    const animation = svg.animate(spec.frames, {duration: spec.duration, easing: spec.easing || 'cubic-bezier(.3,.7,.3,1)'});
+    animation.id = 'calendar-symbol';
+    active.set(svg, animation);
+    const clean = () => { if (active.get(svg) === animation) active.delete(svg); };
+    animation.finished.then(clean, clean);
+  } catch { /* Static symbol remains. */ }
+}
+
 // Smooth a container whose content was just swapped: grow or shrink from the
 // previous height instead of snapping. Purely visual; layout is already final.
 export function playResize(node, fromHeight) {

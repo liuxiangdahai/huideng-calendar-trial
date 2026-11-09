@@ -13,7 +13,7 @@ import {calendarEnvironment,appleSubscriptionUrl,GOOGLE_ADD_URL,OUTLOOK_URL} fro
 import {checkSubscriptionConnection} from './connection-check.mjs';
 import {cloneSettings as clone,fetchJSON} from './runtime.mjs';
 import {createMobileTabs} from './mobile-tabs.mjs';
-import {playMotion,installDisclosureMotion} from './motion.mjs';
+import {playMotion,playSymbol,installDisclosureMotion} from './motion.mjs';
 import qrcode from './vendor/qrcode/qrcode.mjs';
 
 const $ = selector => document.querySelector(selector);
@@ -653,6 +653,7 @@ function attachEvents() {
     const chosen=$('#preset-options').querySelector(`[data-preset="${button.dataset.preset}"]`);
     chosen?.focus({preventScroll:true});
     playMotion(chosen?.querySelector('.preset-check'),'check');
+    playSymbol(chosen?.querySelector('.preset-icon svg'));
     // On a phone, the first choice brings step 2 into view so the next decision
     // is visible without hunting for it.
     if(firstChoice && phoneLike()){
@@ -681,6 +682,9 @@ function attachEvents() {
     if(calendarDevice.appleMobile) $('#wechat-banner-text').innerHTML=`${esc(calendarDevice.inAppBrowser)}会拦截“加入日历”。点右上角 <b>···</b>，选择“在 Safari 中打开”，再继续操作。已在 Safari 里加过的，在 Safari 里打开就能看到，不用再加。`;
     else $('#wechat-banner-text').innerHTML=`${esc(calendarDevice.inAppBrowser)}会拦截“加入日历”。点右上角 <b>···</b>，选择“在浏览器打开”，再继续操作。已在浏览器里加过的，在浏览器里打开就能看到，不用再加。`;
   }
+  // Clouds only drift while the banner is on screen: no work for a hidden layer.
+  const clouds=$('.masthead-clouds');
+  if(clouds && 'IntersectionObserver' in window) new IntersectionObserver(([entry])=>clouds.classList.toggle('is-paused',!entry.isIntersecting)).observe(clouds);
   const advanced=$('#advanced-settings');
   // Phones open in the simple three steps; computers show everything. A
   // person's own choice is remembered on this device.
@@ -723,7 +727,9 @@ function attachEvents() {
     if (event.target.checked) settings.events[id] = clone(lastActive.get(id) || {mode:'display',reminders:pref.reminders.length ? pref.reminders : defaultReminders()});
     else { lastActive.set(id,clone(pref)); pref.mode = 'off'; }
     stopped = false; refresh();
-    playMotion(document.getElementById(`event-${id}`),'check');
+    const box=document.getElementById(`event-${id}`);
+    playMotion(box,'check');
+    if(event.target.checked) playSymbol(box?.closest('.group-card')?.querySelector('.group-icon svg'));
   });
   $('#groups').addEventListener('click',event => {
     const button = event.target.closest('button'); if (!button) return;
@@ -737,6 +743,7 @@ function attachEvents() {
         else if (pref.mode === 'off') settings.events[item.id] = clone(lastActive.get(item.id) || {mode:'display',reminders:pref.reminders.length ? pref.reminders : defaultReminders()});
       }
       stopped = false; refresh();
+      if (button.dataset.selectGroup) playSymbol(document.querySelector(`.group-card[data-group-id="${CSS.escape(groupId)}"] .group-icon svg`));
     } else if (button.dataset.reminderEvent) {
       const item = data.catalog.events.find(item => item.id === button.dataset.reminderEvent);
       openReminders([item.id],item.title,button);
@@ -768,7 +775,19 @@ function attachEvents() {
   createMobileTabs();
   $('.skip').addEventListener('click',event=>{event.preventDefault();$('#tab-selection').click();$('#preset-options button')?.focus();});
   $('#my-subscription').addEventListener('click',()=>openSubscription());
-  $('#subscribe').addEventListener('click',() => openSubscription({prepare:true}));
+  // The panel grows out of the button that opened it, so the step reads as
+  // one continuous action rather than a page jump.
+  $('#subscribe').addEventListener('click',event => {
+    const dialog=$('#subscription-dialog'), wasOpen=dialog.open;
+    openSubscription({prepare:true});
+    if(wasOpen || !dialog.open) return;
+    const from=event.currentTarget.getBoundingClientRect(), to=dialog.getBoundingClientRect();
+    dialog.style.setProperty('--from-x',`${Math.round(from.left+from.width/2-(to.left+to.width/2))}px`);
+    dialog.style.setProperty('--from-y',`${Math.round(from.top+from.height/2-(to.top+to.height/2))}px`);
+    dialog.classList.add('from-cta');
+    dialog.addEventListener('animationend',()=>dialog.classList.remove('from-cta'),{once:true});
+    dialog.addEventListener('close',()=>dialog.classList.remove('from-cta'),{once:true});
+  });
   $('#create-subscription').addEventListener('click',()=>prepareSubscription({retry:true}));
   $('#restart-creation').addEventListener('click',()=>{
     if(requestPending||managementRestoring||subscription||!creationBlocked)return;

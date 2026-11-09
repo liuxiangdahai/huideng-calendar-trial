@@ -10,6 +10,7 @@
   .daily-date-help summary .icon { transition: transform 180ms ease; }
   :is(.primary,.secondary,.icon-button,.cal-arrow,.cal-today):active:not(:disabled) { transform: translateY(1px); }
   dialog[open] { animation: calendar-dialog-in 180ms cubic-bezier(.2,.7,.2,1); }
+  dialog[open].from-cta { animation: calendar-dialog-from-cta 320ms cubic-bezier(.2,.8,.2,1); }
   dialog[open]::backdrop { animation: calendar-backdrop-in 180ms ease; }
   .toast:not([hidden]) { animation: calendar-notice-in 180ms ease-out; }
 }
@@ -35,6 +36,11 @@
 
 /* Individual translate preserves the dialog/toast's existing centering transform. */
 @keyframes calendar-dialog-in { from { opacity: .65; translate: 0 8px; } to { opacity: 1; translate: 0 0; } }
+@keyframes calendar-dialog-from-cta {
+  from { opacity: 0; translate: var(--from-x, 0) var(--from-y, 40px); scale: .35; }
+  45% { opacity: 1; }
+  to { opacity: 1; translate: 0 0; scale: 1; }
+}
 @keyframes calendar-backdrop-in { from { opacity: .65; } to { opacity: 1; } }
 @keyframes calendar-notice-in { from { opacity: .65; translate: 0 4px; } to { opacity: 1; translate: 0 0; } }
 

@@ -575,3 +575,20 @@ input[type=time]::-webkit-datetime-edit { padding: 0; }
 .toast-undo:focus-visible { outline: 2px solid var(--gold-2); outline-offset: 2px; }
 .subscribed-hint { margin: 6px 0 4px 30px; font-size: var(--fs-sm); line-height: 1.7; color: var(--muted); }
 .step-add-note:empty { display: none; }
+
+/* ── 雪山流云 ─────────────────────────────────────────────────────────────
+   Two soft cloud bands drift across the range at different speeds. Pure CSS
+   gradients (no image, no request), moved only by transform so the GPU
+   composites them; paused off screen and absent under reduced motion. */
+.masthead-clouds { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.masthead-clouds>span { position: absolute; left: 0; width: 200%; will-change: transform; background-repeat: repeat-x; }
+.cloud-far { top: 22%; height: 46%; opacity: .55; background-size: 50% 100%;
+  background-image: radial-gradient(28% 34% at 12% 58%, #ffffff3d, #ffffff00 70%), radial-gradient(22% 26% at 36% 40%, #ffffff2e, #ffffff00 70%),
+    radial-gradient(34% 30% at 63% 62%, #ffffff33, #ffffff00 72%), radial-gradient(20% 24% at 88% 44%, #ffffff29, #ffffff00 70%);
+  filter: blur(6px); animation: cloud-drift 110s linear infinite; }
+.cloud-near { bottom: -8%; height: 52%; opacity: .7; background-size: 50% 100%;
+  background-image: radial-gradient(40% 40% at 20% 70%, #ffffff2b, #ffffff00 72%), radial-gradient(30% 34% at 55% 60%, #ffffff24, #ffffff00 70%),
+    radial-gradient(36% 38% at 86% 74%, #ffffff29, #ffffff00 72%);
+  filter: blur(10px); animation: cloud-drift 70s linear infinite; }
+.masthead-clouds.is-paused>span { animation-play-state: paused; }
+@keyframes cloud-drift { from { transform: translate3d(0,0,0); } to { transform: translate3d(-50%,0,0); } }
