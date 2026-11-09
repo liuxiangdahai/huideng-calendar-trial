@@ -42,7 +42,8 @@ test('month preview starts on device today and opens the original event reminder
   await expect(page.locator('.cal-day[tabindex="0"]')).toHaveCount(1);
   await expect(page.locator('.cal-week')).toHaveCount(6);
   await expect(page.locator('.cal-weekdays [role="columnheader"]')).toHaveText(['一', '二', '三', '四', '五', '六', '日']);
-  await expect(page.locator('.cal-legend')).toHaveCount(0);
+  // One legend line explains the dots (hidden while nothing is chosen).
+  await expect(page.locator('.cal-legend')).toHaveCount(1);
   await expect(page.locator('#preview-zone')).toHaveCount(0);
   await expect(page.locator('#zone-settings')).toBeVisible();
 

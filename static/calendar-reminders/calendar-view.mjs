@@ -144,6 +144,7 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
       <button type="button" data-cal-view="list" data-cal-focus="list-view">${icon('list')}<span>列表</span></button>
     </div></div><section class="cal-month-view" aria-label="月历预览">
     <div class="cal-grid" role="grid" aria-label="月历，使用方向键浏览日期，回车查看日程" data-cal-grid></div>
+    <p class="cal-legend" data-cal-legend></p>
     <section class="cal-day-detail" aria-label="所选日期的日程" data-cal-detail></section>
   </section><dialog class="cal-day-sheet" data-cal-sheet aria-label="当天日程">
     <div class="cal-sheet-bar" data-cal-sheet-bar><span class="cal-sheet-grip" aria-hidden="true"></span><button type="button" class="icon-button cal-sheet-close" data-cal-action="close-sheet" aria-label="关闭当天日程">${icon('close')}</button></div>
@@ -262,7 +263,9 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
         const presentation = eventPresentation(event, state.data?.catalog);
         return `<span class="cal-mini-event ${presentation.colorClass}${event.preference?.mode === 'remind' ? ' is-remind' : ''}" title="${escape(event.title)}"${markAttr(event, state.settings?.titleMarks)}>${escape(event.title)}</span>`;
       }).join('');
-      const mobileSummary = cellEvents.length ? `<span class="cal-mobile-events" aria-hidden="true"><span class="cal-mobile-event ${eventPresentation(cellEvents[0], state.data?.catalog).colorClass}${cellEvents[0].preference?.mode === 'remind' ? ' is-remind' : ''}" title="${escape(cellEvents[0].title)}"${markAttr(cellEvents[0], state.settings?.titleMarks)}>${escape(cellEvents[0].title)}</span>${cellEvents.length > 1 ? `<span class="cal-mobile-more">另 ${cellEvents.length - 1} 项</span>` : ''}</span>` : '';
+      // Phones: no text in the cell, only a dot per chosen day (carmine rings,
+      // gold only shows); tapping the date opens the full day.
+      const mobileSummary = cellEvents.length ? `<span class="cal-mobile-events" aria-hidden="true">${cellEvents.slice(0, 3).map(event => `<i class="cal-dot${event.preference?.mode === 'remind' ? ' is-remind' : ''}"></i>`).join('')}${cellEvents.length > 3 ? '<i class="cal-dot-more">+</i>' : ''}</span>` : '';
       return `<div role="gridcell" aria-selected="${cell.selected}" class="cal-cell"><button type="button" class="cal-day${cell.inMonth ? '' : ' cal-adjacent'}${cell.selected ? ' cal-selected' : ''}${cell.today ? ' cal-is-today' : ''}" data-cal-date="${cell.date}" data-cal-focus="date-${cell.date}" tabindex="${cell.date === focusDate && !cell.disabled ? 0 : -1}" aria-label="${escape(aria)}"${cell.today ? ' aria-current="date"' : ''}${cell.disabled ? ' disabled' : ''}>
         <span class="cal-day-date" aria-hidden="true"><span class="cal-gregorian">${cell.day}</span><span class="cal-tibetan">${escape(cell.tibetan ? dayPart(cell.tibetan) : '')}</span></span>${dailyLine(cell)}
         <span class="cal-marks" aria-hidden="true">${cell.tibetan?.monthLeap ? '<span class="cal-leap">闰月</span>' : ''}${cell.repeatNumber ? `<span class="cal-repeat">重日${cell.repeatNumber}</span>` : ''}${cellEvents.length ? `<span class="cal-category-marks">${markers.slice(0, 3).map(color => `<i class="cal-category-dot ${color}"></i>`).join('')}</span><span class="cal-event-count">${cell.count}</span>` : ''}</span>
@@ -277,6 +280,14 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     grid.innerHTML = header + rows;
     grid.dataset.month = month;
     grid.dataset.marks = state.settings?.titleMarks || 'none';
+    // One plain line under the grid explains the marks; on phones it also
+    // says where the names are and that each Tibetan date goes in daily.
+    const anyEvents = state.events.length > 0;
+    $('[data-cal-legend]').innerHTML = [
+      anyEvents ? '<span class="cal-legend-item"><i class="cal-dot is-remind"></i>会提醒</span><span class="cal-legend-item"><i class="cal-dot"></i>只显示</span><span class="cal-legend-tap">点日期看当天详情</span>' : '',
+      daily ? '<span class="cal-legend-daily">每天的藏历日期也会出现在你的日历里</span>' : ''
+    ].join('');
+    $('[data-cal-legend]').hidden = !anyEvents && !daily;
     if (before) [...grid.querySelectorAll('.cal-mini-event,.cal-mobile-event')].filter(node => !before.has(labelKey(node)) && node.offsetParent)
       .slice(0, 16).forEach(node => playMotion(node, 'appear'));
     renderDetail();

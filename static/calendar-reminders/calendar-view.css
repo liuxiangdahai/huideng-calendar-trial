@@ -209,3 +209,23 @@ dialog.cal-day-sheet::backdrop { background: #1d1b1859; }
 .cal-sheet-close { position: absolute; right: 6px; top: 0; }
 .cal-day-sheet .cal-day-detail { margin: 0; padding-top: 0; border-top: 0; }
 @media (min-width: 1024px) { dialog.cal-day-sheet { display: none; } }
+
+/* ── Phone month: dots, not text ─────────────────────────────────────────
+   A narrow cell holds the date, the Tibetan date and up to three dots; the
+   names live in the day sheet. Computers keep full labels. */
+.cal-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--gold-2); vertical-align: middle; }
+.cal-dot.is-remind { background: var(--red); }
+.cal-dot-more { display: inline-block; color: var(--muted); font: 600 11px/7px var(--font-ui); font-style: normal; vertical-align: middle; }
+.cal-mobile-events { display: flex; justify-content: center; align-items: center; gap: 3px; min-height: 9px; margin-top: 4px; }
+.cal-day.cal-adjacent .cal-mobile-events { opacity: .5; }
+.cal-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; margin: 10px 0 0; color: var(--muted); font-size: var(--fs-xs); line-height: 1.6; }
+.cal-legend[hidden] { display: none; }
+.cal-legend-item { display: inline-flex; align-items: center; gap: 5px; }
+.cal-legend-daily { flex-basis: 100%; color: var(--teal-2); }
+@media (min-width: 1024px) { .cal-legend-tap { display: none; } }
+@media (max-width: 1023px) {
+  .cal-daily-line { display: none; }
+  .cal-day { min-height: 62px; justify-content: flex-start; }
+}
+.cal-legend>span:last-child { margin-left: 0; }
+@media (min-width: 1024px) { .cal-mobile-events { display: none; } }
