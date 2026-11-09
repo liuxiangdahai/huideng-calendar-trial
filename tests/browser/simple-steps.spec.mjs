@@ -74,7 +74,7 @@ test('after subscribing, the page opens on a sync status with the next reminder;
   await page.locator('input[name="title-marks"][value="none"]').check();
   await expect(page.locator('#subscribed-card')).toBeHidden();
   await page.locator('#subscribe').click();
-  await expect(page.locator('#subscribe-label')).toHaveText('查看订阅');
+  await expect(page.locator('#subscribe-label')).toHaveText('我的订阅');
   const after=await (await request.get(feedUrl)).text();
   expect(after).toMatch(/SUMMARY:莲师荟供日/);
 });
@@ -84,6 +84,6 @@ test('inside WeChat the page says first how to open it in a browser',async({brow
     userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148 MicroMessenger/8.0.50'});
   const page=await context.newPage();await open(page);
   await expect(page.locator('#wechat-banner')).toBeVisible();
-  await expect(page.locator('#wechat-banner-text')).toContainText('在 Safari 中打开');
+  await expect(page.locator('#wechat-banner-text')).toContainText('在浏览器中打开');
   await context.close();
 });

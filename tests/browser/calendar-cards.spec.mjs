@@ -98,14 +98,14 @@ async function enableOneAndVerifyConversion(page, detail) {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 }
 
-test('desktop month shows at most two original titles and opens complete classified cards', async ({page}) => {
+test('desktop month shows every original title in the cell and opens complete classified cards', async ({page}) => {
   const detail = await openBusyDay(page, 1440);
   const cell = page.locator(`[data-cal-date="${busy[0]}"]`);
-  await expect(cell.locator('.cal-mini-event')).toHaveText(busy[1].slice(0, 2).map(event => event.title));
-  await expect(cell.locator('.cal-mini-event').first()).toBeVisible();
+  // Computers no longer fold a busy day: every chosen title is in the cell.
+  await expect(cell.locator('.cal-mini-event')).toHaveText(busy[1].map(event => event.title));
+  await expect(cell.locator('.cal-mini-event').last()).toBeVisible();
   await expect(cell.locator('.cal-mobile-events')).toBeHidden();
-  await expect(cell.locator('.cal-more-events')).toHaveText(`另有 ${busy[1].length - 2} 项`);
-  expect(await page.locator('.cal-day').evaluateAll(cells => cells.every(cell => cell.querySelectorAll('.cal-mini-event').length <= 2))).toBe(true);
+  await expect(cell.locator('.cal-more-events')).toHaveCount(0);
   const truncation = await cell.locator('.cal-mini-event').first().evaluate(element => ({
     overflow: getComputedStyle(element).overflow, ellipsis: getComputedStyle(element).textOverflow,
     title: element.title, text: element.textContent
