@@ -171,19 +171,20 @@ test('restored open categories do not replay expansion and daily dates retain th
   expect(audit).toEqual({errors: [], writes: []});
 });
 
-test('unchanged presets stay still and switching mobile tabs mid-effect preserves the detail reading position', async ({page}) => {
+test('a chosen preset toggles off with undo, and switching mobile tabs mid-effect preserves the detail reading position', async ({page}) => {
   const audit = await open(page);
   await page.locator('[data-preset="guru"]').click();
   await expect.poll(() => runningFeedback(page)).toBe(0);
   const before = await draft(page);
-  const unchanged = await page.evaluate(() => {
-    window.motionCalls = [];
-    const original = document.querySelector('[data-preset="guru"]');
-    for (let index = 0; index < 3; index++) document.querySelector('[data-preset="guru"]').click();
-    return {sameControl: original === document.querySelector('[data-preset="guru"]'), calls: window.motionCalls.length};
-  });
-  expect(unchanged).toEqual({sameControl: true, calls: 0});
+  // Tapping the chosen plan again cancels it (like the checkbox below); undo
+  // brings back exactly the same plan.
+  await page.locator('[data-preset="guru"]').click();
+  await expect(page.locator('[data-preset="guru"]')).toHaveAttribute('aria-pressed','false');
+  await expect(page.locator('#selection-count')).toHaveText('已选 0 项');
+  await page.locator('#toast .toast-undo').click();
+  await expect(page.locator('[data-preset="guru"]')).toHaveAttribute('aria-pressed','true');
   expect(await draft(page)).toEqual(before);
+  await page.locator('[data-preset="guru"]').focus();
   await expect(page.locator('[data-preset="guru"]')).toBeFocused();
 
   await page.locator('#clear-selection').click();

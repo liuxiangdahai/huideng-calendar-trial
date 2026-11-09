@@ -44,9 +44,18 @@ const currentApp = () => $('input[name="device"]:checked')?.value || '';
 const hasReminders = () => Object.values(settings.events).some(pref=>pref.mode==='remind');
 function persistUI() { try {localStorage.setItem(uiKey,JSON.stringify(ui));} catch {} }
 
-function notify(message) {
-  $('#toast').textContent = message; $('#toast').hidden = false;
-  clearTimeout(notify.timer); notify.timer = setTimeout(() => { $('#toast').hidden = true; }, 4000);
+// An optional undo keeps one-tap clearing safe for anyone who taps by mistake.
+function notify(message, undo) {
+  const toast=$('#toast'); toast.textContent = message; toast.hidden = false;
+  if(undo){
+    const button=document.createElement('button'); button.type='button'; button.className='toast-undo'; button.textContent='撤销';
+    button.addEventListener('click',()=>{toast.hidden=true;clearTimeout(notify.timer);undo();},{once:true});
+    toast.append(button);
+  }
+  clearTimeout(notify.timer); notify.timer = setTimeout(() => { toast.hidden = true; }, undo ? 7000 : 4000);
+}
+function restoreSnapshot(snapshot, message) {
+  settings=clone(snapshot);stopped=false;refresh();notify(message);
 }
 function persist() {
   try {
@@ -132,7 +141,7 @@ function checkDeviceTime() {
 }
 function renderPresets() {
   const current=matchingPreset(settings,data.catalog);
-  $('#preset-options').innerHTML=PRESETS.map(preset=>`<button class="preset-card" type="button" data-preset="${preset.id}" aria-pressed="${current===preset.id}"${preset.id==='practice'?' aria-describedby="preset-scope-note"':''}><span class="preset-icon">${icon(preset.icon)}</span><span class="preset-copy"><strong>${preset.title}<small>${presetIds(data.catalog,preset.id).length} 项</small></strong><span>${preset.description}</span><em>提醒：${preset.reminder}</em></span><span class="preset-check" aria-hidden="true">${current===preset.id?icon('check'):''}</span></button>`).join('');
+  $('#preset-options').innerHTML=PRESETS.map(preset=>`<button class="preset-card" type="button" data-preset="${preset.id}" aria-pressed="${current===preset.id}"${preset.id==='practice'?' aria-describedby="preset-scope-note"':''}><span class="preset-icon">${icon(preset.icon)}</span><span class="preset-copy"><strong>${preset.title}<small>${presetIds(data.catalog,preset.id).length} 项</small></strong><span>${preset.description}</span><em>${icon('bell')}${preset.reminder}</em></span><span class="preset-check" aria-hidden="true">${current===preset.id?icon('check'):''}</span></button>`).join('');
   $('#clear-selection').disabled=!hasSelectedContent();
   $('#include-daily-dates').checked=settings.includeDailyDates===true;
 }
@@ -187,28 +196,48 @@ function renderTimeChoices() {
   $('#time-choice-note').textContent=!prefs.length ? '先在上一步选择会提醒的日子' : !current ? '已逐项设置不同时间' :
     [...document.querySelectorAll('[data-time-choice]')].some(b=>b.dataset.timeChoice===current) ? '' : `当前：${reminderLabel(prefs[0].reminders)}`;
 }
-// Step 3 names the device it recognised. Computers can add Google, Outlook or
-// Mac calendars directly; the phone hand-off (QR) is offered, never required.
+// Step 3 names the device it recognised. A browser that reports a computer but
+// behaves like a phone (touch, narrow screen, e.g. a "desktop site" toggle) is
+// treated as a phone: phone readers never see computer instructions.
+const phoneLike=()=>calendarDevice.mobile || matchMedia('(pointer:coarse) and (max-width:767px)').matches;
 const deviceLabel=()=>calendarDevice.appleMobile ? '加入 iPhone 日历' : calendarDevice.mac ? '加入 Mac 日历' :
-  /Android/i.test(navigator.userAgent) ? '加入安卓手机日历' : calendarDevice.mobile ? '加入手机日历' : '加入我的日历';
+  calendarDevice.android ? '加入手机日历' : phoneLike() ? '加入手机日历' : '加入我的日历';
 function renderQuickAdd() {
-  $('#step-add-device').textContent=calendarDevice.appleMobile ? '已识别为 iPhone / iPad：点底部按钮，系统日历会直接询问是否添加。' :
-    calendarDevice.mac ? '已识别为 Mac：可直接加入 Mac 日历；也可选 Google 或 Outlook。' :
-    /Android/i.test(navigator.userAgent) ? '已识别为安卓手机：点底部按钮后，按你的日历应用（手机自带、Google 等）一步步添加。' :
-    calendarDevice.mobile ? '点底部按钮后，选择你使用的日历应用。' :
-    '在电脑上可直接加入 Google、Outlook 或 Mac 日历；想加到手机上，可用下方“扫码”在手机继续。';
-  $('#share-settings').lastChild.textContent=calendarDevice.mobile ? '把这套设置分享给师兄' : '用手机扫码继续 · 分享给师兄';
+  const phone=phoneLike();
+  $('#add-title-text').textContent=phone ? '加入手机日历' : '加入日历';
+  $('#step-add-device').textContent=subscription
+    ? (phone ? '已经加入过。以后改了选择，点底部“保存修改”，手机日历会自动更新，不用重新添加。' : '已经加入过。以后改了选择，点底部“保存修改”，日历会自动更新，不用重新添加。')
+    : calendarDevice.appleMobile ? '点底部按钮，iPhone 会问是否订阅这个日历，点“订阅”即可。'
+    : phone ? '点底部按钮，按提示把它加到手机自带的日历里。'
+    : calendarDevice.mac ? '可以直接加入 Mac 日历，也可以选 Google 或 Outlook。'
+    : '可以直接加入 Google 或 Outlook 日历；要加到手机上，用下方扫码。';
+  $('#step-add-note').textContent=subscription ? '' : '只需添加一次。已经加过的不用再加；如果日历里同一天出现两遍，删掉其中一个日历即可。';
+  $('#step-add-note').hidden=Boolean(subscription);
+  $('#share-settings').lastChild.textContent=phone ? '把这套设置分享给师兄' : '用手机扫码继续 · 分享给师兄';
   renderSubscribedCard();
 }
 function renderSubscribedCard() {
   const card=$('#subscribed-card'), show=Boolean(subscription) && !stopped && !conflict && !dirty();
   card.hidden=!show; if(!show)return;
+  // A web page cannot open the phone's settings, so give the one path that
+  // works on every phone: search the Settings app for the calendar.
+  $('#subscribed-hint').textContent=phoneLike()
+    ? '到时没有响铃？打开手机“设置”，搜索“日历”，确认已允许通知。改了设置后，手机日历通常几小时内更新。'
+    : '没有收到提醒？在日历应用的设置里确认已允许通知。改了设置后，日历通常几小时内更新。';
   const next=upcoming.find(event=>event.preference?.mode==='remind') || upcoming.find(event=>event.kind!=='daily-date');
   if(!next){$('#subscribed-next').textContent='目前没有即将到来的修行日。';return;}
   const [, month, day]=next.date.split('-').map(Number);
   $('#subscribed-next').textContent=next.preference?.mode==='remind'
     ? `下一次提醒：${month}月${day}日 ${next.title} · ${reminderLabel(next.preference.reminders)}`
     : `下一个修行日：${month}月${day}日 ${next.title}（仅显示）`;
+}
+// The bottom bar always says what happens next, in the person's own terms.
+function nextStepText() {
+  if(!hasSelectedContent()) return '第 1 步：选择要提醒的日子';
+  const prefs=remindPrefs();
+  if(!prefs.length) return '只显示日期，不响铃';
+  const times=new Set(prefs.map(pref=>JSON.stringify(pref.reminders)));
+  return times.size===1 ? `提醒：${reminderLabel(prefs[0].reminders)}` : '提醒时间已逐项设置';
 }
 // A share link carries the preset, the shared reminder time, the everyday
 // layer and the title style. Per-item fine tuning stays with its owner.
@@ -254,7 +283,7 @@ function renderSaveState() {
   $('#reminder-count').textContent = dailyOnly ? '仅显示' : `${Object.values(settings.events).filter(pref=>pref.mode==='remind').length} 项提醒`;
   $('#daily-date-count').hidden=!settings.includeDailyDates || !count;
   $('#subscribe').setAttribute('aria-busy',String(requestPending||managementRestoring));
-  $('#save-state').textContent = stopped ? '已停用，请在手机移除订阅日历' : conflict ? '设置已在其他设备修改' : changed ? '有未保存的修改' : subscription ? '设置已保存，等待日历同步' : !hasSelectedContent() ? '先选择修行日或每日藏历' : '随时调整你的选择';
+  $('#save-state').textContent = stopped ? '已停用，请在手机移除订阅日历' : conflict ? '设置已在其他设备修改' : changed ? '有改动，保存后同步到日历' : subscription ? '已保存，日历稍后自动更新' : nextStepText();
   $('#unsaved-dot').hidden = !changed;
   $('#subscribe-label').textContent = managementRestoring ? '正在恢复订阅…' : requestPending ? '正在保存…' : subscription ? (changed ? '保存修改' : '查看订阅') : deviceLabel();
   for(const input of document.querySelectorAll('input[name="title-marks"]')) input.checked=input.value===(settings.titleMarks||'symbols');
@@ -525,7 +554,7 @@ async function performSaveSubscription(create) {
     if (changedDuringSave) {
       settings = latestDraft; refresh(); renderSubscription();
       notify('已保存上次提交的设置；后续修改仍待保存。');
-    } else notify('设置已保存，等待日历同步');
+    } else notify(phoneLike()?'已保存。手机日历通常几小时内自动更新。':'已保存。日历通常几小时内自动更新。');
   } catch (error) { showSubscriptionError(error); }
   finally {
     requestPending = false; renderSubscription();
@@ -598,6 +627,16 @@ function attachEvents() {
   });
   $('#preset-options').addEventListener('click',event=>{
     const button=event.target.closest('[data-preset]');if(!button)return;
+    // Tapping the chosen plan again cancels it, like the checkbox below it.
+    if(button.getAttribute('aria-pressed')==='true'){
+      const before=clone(settings);
+      for(const [id,pref] of Object.entries(settings.events)){ if(pref.mode!=='off')lastActive.set(id,clone(pref)); pref.mode='off'; }
+      stopped=false;refresh();
+      $('#preset-options').querySelector(`[data-preset="${button.dataset.preset}"]`)?.focus({preventScroll:true});
+      notify(subscription?'已取消这个方案；保存修改后更新日历。':'已取消这个方案。',()=>restoreSnapshot(before,'已恢复之前的选择。'));
+      return;
+    }
+    const firstChoice=!hasSelectedContent();
     const next=applyPreset(settings,data.catalog,button.dataset.preset);
     // Days newly added by a preset follow the time already chosen in step 2.
     const chosenTimes=new Set(remindPrefs().map(pref=>JSON.stringify(pref.reminders)));
@@ -609,6 +648,13 @@ function attachEvents() {
     const chosen=$('#preset-options').querySelector(`[data-preset="${button.dataset.preset}"]`);
     chosen?.focus({preventScroll:true});
     playMotion(chosen?.querySelector('.preset-check'),'check');
+    // On a phone, the first choice brings step 2 into view so the next decision
+    // is visible without hunting for it.
+    if(firstChoice && phoneLike()){
+      const step=$('#time-title')?.closest('.quick-section'), action=$('.action-bar')?.getBoundingClientRect().top ?? innerHeight;
+      const box=step?.getBoundingClientRect();
+      if(box && box.bottom>action-8) step.scrollIntoView({block:'end',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+    }
   });
   $('#time-choices').addEventListener('click',event=>{
     const button=event.target.closest('[data-time-choice]');if(!button||button.disabled)return;
@@ -627,8 +673,8 @@ function attachEvents() {
   });
   if(calendarDevice.inAppBrowser){
     $('#wechat-banner').hidden=false;
-    if(calendarDevice.appleMobile) $('#wechat-banner-text').innerHTML=`${esc(calendarDevice.inAppBrowser)}会拦截“加入日历”。点右上角 <b>···</b>，选择“在 Safari 中打开”，再继续操作。`;
-    else $('#wechat-banner-text').innerHTML=`${esc(calendarDevice.inAppBrowser)}会拦截“加入日历”。点右上角 <b>···</b>，选择“在浏览器打开”，再继续操作。`;
+    if(calendarDevice.appleMobile) $('#wechat-banner-text').innerHTML=`${esc(calendarDevice.inAppBrowser)}会拦截“加入日历”。点右上角 <b>···</b>，选择“在 Safari 中打开”，再继续操作。已在 Safari 里加过的，在 Safari 里打开就能看到，不用再加。`;
+    else $('#wechat-banner-text').innerHTML=`${esc(calendarDevice.inAppBrowser)}会拦截“加入日历”。点右上角 <b>···</b>，选择“在浏览器打开”，再继续操作。已在浏览器里加过的，在浏览器里打开就能看到，不用再加。`;
   }
   const advanced=$('#advanced-settings');
   // Phones open in the simple three steps; computers show everything. A
@@ -645,6 +691,7 @@ function attachEvents() {
   $('#daily-calendar-copy').addEventListener('click',()=>void copy(dailyUrl.href,'每日藏历订阅地址'));
   $('#clear-selection').addEventListener('click',()=>{
     if(!hasSelectedContent())return;
+    const before=clone(settings);
     for(const [id,pref] of Object.entries(settings.events)) {
       if(pref.mode!=='off')lastActive.set(id,clone(pref));
       pref.mode='off';
@@ -652,7 +699,7 @@ function attachEvents() {
     settings.includeDailyDates=false;stopped=false;refresh();
     if($('.workspace').dataset.activeTab==='preview' && matchMedia('(max-width:1023px)').matches) $('[data-cal-view="month"]').focus({preventScroll:true});
     else $('#preset-options button').focus({preventScroll:true});
-    notify(subscription?'已清空选择；保存修改后更新订阅。':'已清空选择，可以重新挑选。');
+    notify(subscription?'已清空选择；保存修改后更新日历。':'已清空选择。',()=>restoreSnapshot(before,'已恢复之前的选择。'));
   });
   const openZone=()=>zonePicker.open({zone:settings.zone,deviceZone:observedZone});
   $('#zone-settings').addEventListener('click',openZone);
@@ -849,7 +896,13 @@ async function init() {
     const value=`${barHeight}px`;
     if(document.documentElement.style.getPropertyValue('--action-height')!==value)
       document.documentElement.style.setProperty('--action-height',value);
-    previewColumn.classList.toggle('can-stick',previewHeight<innerHeight-barHeight-40);
+    // A preview shorter than the window sticks to the top. A taller one scrolls
+    // with the page until its bottom edge meets the action bar, then stays,
+    // so the calendar remains beside a long list of categories.
+    const room=innerHeight-barHeight;
+    previewColumn.classList.add('can-stick');
+    const top=previewHeight<room-40 ? 16 : Math.round(room-previewHeight-16);
+    if(previewColumn.style.getPropertyValue('--stick-top')!==`${top}px`) previewColumn.style.setProperty('--stick-top',`${top}px`);
   };
   if(window.ResizeObserver){
     const observer=new ResizeObserver(entries=>{

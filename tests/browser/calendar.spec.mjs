@@ -198,7 +198,7 @@ test('edits made during delayed creation and saving remain an unsaved draft',asy
   await page.locator('[data-event="dakini-tsok"]').uncheck();
   release();
   await expect.poll(async() => (await credentials(page))?.revision).toBe(1);
-  await expect(page.locator('#save-state')).toHaveText('有未保存的修改');
+  await expect(page.locator('#save-state')).toHaveText('有改动，保存后同步到日历');
   expect((await draft(page)).events['dakini-tsok'].mode).toBe('off');
   expect((await credentials(page)).savedSettings.events['dakini-tsok'].mode).toBe('remind');
   await page.unroute('**/api/subscriptions',delayed);
@@ -211,7 +211,7 @@ test('edits made during delayed creation and saving remain an unsaved draft',asy
   release();
   await expect.poll(async() => (await credentials(page))?.revision).toBe(2);
   await expect(page.locator('#selection-count')).toHaveText('已选 0 项');
-  await expect(page.locator('#save-state')).toHaveText('有未保存的修改');
+  await expect(page.locator('#save-state')).toHaveText('有改动，保存后同步到日历');
   expect((await credentials(page)).savedSettings.events['guru-tsok'].mode).toBe('remind');
 });
 

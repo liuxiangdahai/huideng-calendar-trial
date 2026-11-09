@@ -1,6 +1,6 @@
 /* Quiet depth: one shared material and short, interruptible feedback. */
-.quick-panel { box-shadow: var(--shadow-1, 0 4px 14px #60461e09); }
-.primary { box-shadow: inset 0 1px #ffffff20, 0 2px 3px #421b1514; }
+.quick-panel { box-shadow: var(--shadow-1, 0 4px 14px #5e471d09); }
+.primary { box-shadow: inset 0 1px #ffffff20, 0 2px 3px #45181814; }
 
 @media (prefers-reduced-motion: no-preference) {
   :is(.primary,.secondary,.icon-button,.cal-arrow,.cal-today) {
@@ -19,6 +19,11 @@
   .masthead-next:not([hidden]) .icon :is(path) { stroke-dasharray: 64; stroke-dashoffset: 0; animation: calendar-knot-draw 1.1s cubic-bezier(.4,.1,.2,1) both; }
   .masthead-next:not([hidden]) { animation: calendar-notice-in 400ms ease-out both; }
   .cal-day { transition: background-color 120ms ease; }
+  /* Selection feedback eases in instead of snapping. */
+  :is(.preset-card,.time-choices button,.title-marks label,.daily-date-option) { transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease; }
+  .preset-check { transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease; }
+  .mobile-tabs button { transition: color 160ms ease, border-color 200ms ease; }
+  .subscribed-card:not([hidden]), .step-add-device { animation: calendar-notice-in 260ms ease-out both; }
 }
 @keyframes calendar-knot-draw { from { stroke-dashoffset: 64; } to { stroke-dashoffset: 0; } }
 

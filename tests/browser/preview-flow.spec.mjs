@@ -112,14 +112,14 @@ test('preview, calendar-app choice and guide confirmations never modify a saved 
   await page.locator('[data-guide-expand]>summary').click();
   await page.locator('#guide-reminders').check();
   await page.locator('[data-close="subscription-dialog"]').first().click();
-  await expect(page.locator('#save-state')).toHaveText('设置已保存，等待日历同步');
+  await expect(page.locator('#save-state')).toHaveText('已保存，日历稍后自动更新');
   await expect(page.locator('#subscribe')).not.toContainText('保存修改');
   expect(await readStored(page, settingsKey)).toEqual(settings);
   expect((await readStored(page, subscriptionKey)).revision).toBe(subscription.revision);
   expect((await readStored(page, subscriptionKey)).feedUrl).toBe(subscription.feedUrl);
   expect((await readStored(page, uiKey)).app).toBe('google');
   await page.reload();
-  await expect(page.locator('#save-state')).toHaveText('设置已保存，等待日历同步');
+  await expect(page.locator('#save-state')).toHaveText('已保存，日历稍后自动更新');
   await page.locator('#my-subscription').click();
   await expect(page.locator('input[name="device"][value="google"]')).toBeChecked();
   await expect(page.locator('#guide-seen')).toBeChecked();

@@ -8,6 +8,12 @@ const MAX_BODY_BYTES = 65536;
 const RETENTION_MS = 90 * 86400000;
 const SNAPSHOT_TTL_MS = 60 * 60 * 1000;
 const CREATION_REPLAY_MS = 7 * 86400000;
+// Twenty new feeds per address per day in production. Only the local preview
+// server raises it, so a full browser test run is not throttled.
+const dailyCreationCap = env => {
+  const cap = Number(env.CREATION_DAILY_LIMIT);
+  return Number.isInteger(cap) && cap > 0 ? cap : 20;
+};
 const DEVELOPMENT_RELEASE = Object.freeze({version: 'development', dataVersion: '',
   rendererVersion: 'snapshot-v2', environment: 'local'});
 const utf8 = new TextEncoder();
@@ -296,9 +302,9 @@ export function createCalendarService({getData, validateSettings, selectOccurren
     const insert = env.DB.prepare(`INSERT INTO subscriptions
       (id, feed_token, manage_token_hash, settings_json, created_at, updated_at, creation_key_hash, creation_body_hash)
       SELECT ?, ?, ?, ?, ?, ?, ?, ?
-      WHERE COALESCE((SELECT count FROM creation_limits WHERE bucket = ?), 0) < 20
+      WHERE COALESCE((SELECT count FROM creation_limits WHERE bucket = ?), 0) < ?
       ON CONFLICT(creation_key_hash) DO NOTHING`)
-      .bind(id, feedToken, manageHash, canonical(settings), timestamp, timestamp, keyHash, bodyHash, limit?.bucket ?? null);
+      .bind(id, feedToken, manageHash, canonical(settings), timestamp, timestamp, keyHash, bodyHash, limit?.bucket ?? null, dailyCreationCap(env));
     const statements = [insert];
     if (limit) statements.push(env.DB.prepare(`INSERT INTO creation_limits(bucket, count, expires_at)
       SELECT ?, 1, ? WHERE EXISTS (SELECT 1 FROM subscriptions WHERE id = ?)

@@ -5,10 +5,13 @@ export function calendarEnvironment(nav = globalThis.navigator) {
   const appleMobile = /iPhone|iPad|iPod/i.test(ua) ||
     (/Macintosh|MacIntel/i.test(`${ua} ${nav?.platform || ''}`) && nav?.maxTouchPoints > 1);
   const mac = !appleMobile && /Macintosh|MacIntel/i.test(`${ua} ${nav?.platform || ''}`);
-  const mobile = appleMobile || /Android|Mobile/i.test(ua);
+  const android = /Android/i.test(ua);
+  const mobile = appleMobile || android || /Mobile/i.test(ua);
   const inAppBrowser = /MicroMessenger/i.test(ua) ? '微信' : /DingTalk/i.test(ua) ? '钉钉' : '';
-  return { appleMobile, mac, mobile, inAppBrowser, apple: appleMobile || mac,
-    recommendedApp: appleMobile || mac ? 'iphone' : '' };
+  // Android phones mostly use the maker's own calendar ("其他日历"); a person
+  // who uses Google Calendar can switch, and the same feed is kept.
+  return { appleMobile, mac, android, mobile, inAppBrowser, apple: appleMobile || mac,
+    recommendedApp: appleMobile || mac ? 'iphone' : android ? 'other' : '' };
 }
 
 export function appleSubscriptionUrl(feedUrl) {
