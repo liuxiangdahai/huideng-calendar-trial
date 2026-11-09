@@ -29,8 +29,9 @@ try{
   const response=await feed(),text=await response.text(),events=components(text);
   assert.equal(events.length,6);assert.ok(!text.includes(created.manageToken),'凭证不能进入文件');
   for(const id of ['a','b','c','d','e','f'])assert.equal(item(events,id).getAllSubcomponents('valarm').length,{a:1,b:1,c:1,d:2,e:0,f:0}[id]);
-  assert.equal(item(events,'a').getFirstSubcomponent('valarm').getFirstProperty('trigger').type,'date-time');
-  assert.equal(item(events,'b').getFirstSubcomponent('valarm').getFirstProperty('trigger').type,'duration');
+  // Production (A/D) writes civil-day relative triggers since 2026-11-09; B keeps the legacy absolute form.
+  assert.equal(item(events,'a').getFirstSubcomponent('valarm').getFirstProperty('trigger').type,'duration');
+  assert.equal(item(events,'b').getFirstSubcomponent('valarm').getFirstProperty('trigger').type,'date-time');
   assert.equal(item(events,'c').getFirstPropertyValue('dtstart').isDate,false);
   assert.equal(await (await feed({method:'HEAD'})).text(),'');
   assert.equal((await feed({headers:{'If-None-Match':response.headers.get('etag')}})).status,304);
@@ -40,7 +41,8 @@ try{
   stage='reschedule';const settings=structuredClone(created.settings);
   settings.reminderProbe.startAt=new Date(Date.parse(settings.reminderProbe.startAt)+30*60000).toISOString();settings.reminderProbe.round++;
   let next=await patch(settings);const changed=item(next,'a');assert.equal(changed.getFirstPropertyValue('sequence'),1);
-  assert.equal(changed.getFirstSubcomponent('valarm').getFirstPropertyValue('trigger').toJSDate().toISOString(),settings.reminderProbe.startAt);
+  const shanghai=new Date(Date.parse(settings.reminderProbe.startAt)+8*3600000);
+  assert.equal(changed.getFirstSubcomponent('valarm').getFirstPropertyValue('trigger').toSeconds(),(shanghai.getUTCHours()*60+shanghai.getUTCMinutes())*60);
   checks.push({case:'同地址改时间、UID稳定、版本递增',result:'通过'});
   stage='quiet';settings.reminderProbe.silent=['a'];next=await patch(settings);assert.equal(item(next,'a').getAllSubcomponents('valarm').length,0);
   stage='cancel';settings.reminderProbe.omit=['a'];next=await patch(settings);assert.equal(item(next,'a').getFirstPropertyValue('status'),'CANCELLED');
