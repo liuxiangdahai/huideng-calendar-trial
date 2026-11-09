@@ -84,9 +84,11 @@ try{
   // Verify the real preset/save/Pages path, not just the presence of an ICS file.
   const today=dateInZone(new Date(),managed.settings.zone);
   const expected=new Map(selectCalendarOccurrences(data,managed.settings,{start:addDays(today,-90),end:rangeEnd(today,24)})
-    .map(event=>[`${event.uid}@calendar.huidengvan.org`,resolveAlarmInstants(event,managed.settings.zone)]));
+    .map(event=>[`${event.uid}@calendar.huidengvan.org`,resolveAlarmInstants(event,managed.settings.zone).length
+      ? [...new Set(event.preference.reminders.map(r=>{const [h,m]=r.time.split(':').map(Number);return (h*60+m-r.daysBefore*1440)*60;}))].sort((a,b)=>a-b) : []]));
   for(const event of active(entries)){
-    const actual=event.getAllSubcomponents('valarm').map(alarm=>alarm.getFirstPropertyValue('trigger').toJSDate().toISOString());
+    // All-day alarms are civil-day relative triggers (seconds from the day's start).
+    const actual=event.getAllSubcomponents('valarm').map(alarm=>alarm.getFirstPropertyValue('trigger').toSeconds()).sort((a,b)=>a-b);
     assert.deepEqual(actual,expected.get(event.getFirstPropertyValue('uid')),'公开订阅文件的提醒必须与实际保存的设置逐项一致');
   }
   assert.equal(new Set(entries.map(e=>e.getFirstPropertyValue('uid'))).size,entries.length);
