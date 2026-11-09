@@ -218,6 +218,12 @@ function renderQuickAdd() {
   $('#share-settings').lastChild.textContent=phone ? '把这套设置分享给师兄' : '用手机扫码继续 · 分享给师兄';
   renderSubscribedCard();
 }
+function nextReminderText() {
+  const next=upcoming.find(event=>event.preference?.mode==='remind') || upcoming.find(event=>event.kind!=='daily-date');
+  if(!next) return '目前没有即将到来的修行日';
+  const [, month, day]=next.date.split('-').map(Number);
+  return next.preference?.mode==='remind' ? `下一次提醒：${month}月${day}日 ${next.title} · ${reminderLabel(next.preference.reminders)}` : `下一个修行日：${month}月${day}日 ${next.title}（仅显示）`;
+}
 function renderSubscribedCard() {
   const card=$('#subscribed-card'), show=Boolean(subscription) && !stopped && !conflict && !dirty();
   card.hidden=!show; if(!show)return;
@@ -285,7 +291,7 @@ function renderSaveState() {
   $('#reminder-count').textContent = dailyOnly ? '仅显示' : `${Object.values(settings.events).filter(pref=>pref.mode==='remind').length} 项提醒`;
   $('#daily-date-count').hidden=!settings.includeDailyDates || !count;
   $('#subscribe').setAttribute('aria-busy',String(requestPending||managementRestoring));
-  $('#save-state').textContent = stopped ? '已停用，请在手机移除订阅日历' : conflict ? '设置已在其他设备修改' : changed ? '有改动，保存后同步到日历' : subscription ? '已保存，日历稍后自动更新' : nextStepText();
+  $('#save-state').textContent = stopped ? '已停用，请在手机移除订阅日历' : conflict ? '设置已在其他设备修改' : changed ? '有改动，保存后同步到日历' : subscription ? '已同步到日历，改动会自动更新' : nextStepText();
   $('#unsaved-dot').hidden = !changed;
   $('#subscribe-label').textContent = managementRestoring ? '正在恢复订阅…' : requestPending ? '正在保存…' : subscription ? (changed ? '保存修改' : '查看订阅') : deviceLabel();
   for(const input of document.querySelectorAll('input[name="title-marks"]')) input.checked=input.value===(settings.titleMarks||'symbols');
@@ -295,6 +301,9 @@ function renderSaveState() {
   if(renderSaveState.wasDisabled===true && !ctaDisabled && !subscription && !renderSaveState.nudged){renderSaveState.nudged=true;requestAnimationFrame(()=>playMotion($('#subscribe'),'nudge'));}
   renderSaveState.wasDisabled=ctaDisabled;
   $('#subscribe').disabled = ctaDisabled;
+  // With a saved subscription and nothing to save, the bar only reports the
+  // state; "我的订阅" in the header is the single way in.
+  $('#subscribe').hidden = Boolean(subscription) && !changed && !requestPending && !managementRestoring && !conflict && !stopped;
   // This opens the existing panel only. Keep it available while saving so a
   // user who closed the panel can return to progress, help or a failure state.
   $('#my-subscription').disabled = false;
@@ -408,6 +417,22 @@ async function checkConnection() {
 }
 function renderSubscription() {
   $('#subscription-summary').textContent = `${selectionSummary()} · 全天显示 · ${zoneLabel()}`;
+  // Once a calendar is added, this panel is "my subscription": status and
+  // actions first; the add-a-calendar guide folds behind one button.
+  // Only a subscription that already existed when the panel opened counts:
+  // someone in the middle of adding keeps the add steps in view.
+  const dialog=$('#subscription-dialog'), managing=Boolean(subscription) && dialog.dataset.mode==='manage';
+  dialog.classList.toggle('is-managing',managing);
+  if(!managing) dialog.classList.remove('show-add');
+  $('#manage-panel').hidden=!managing;
+  $('#manage-add').setAttribute('aria-expanded',String(dialog.classList.contains('show-add')));
+  $('#subscription-title').textContent=managing ? '我的订阅' : '加入日历';
+  $('#subscription-dialog .overline').textContent=managing ? '已加入日历' : '我的订阅';
+  $('#entry-title').lastChild.textContent=managing ? '订阅地址' : '添加到日历';
+  if(managing){
+    $('#manage-title').lastChild.textContent=stopped ? '这份订阅已停用' : conflict ? '设置已在其他设备修改' : dirty() ? '有改动尚未保存' : '已加入日历，正在同步';
+    $('#manage-next').textContent=dirty() ? '保存后，日历会在几小时内更新；订阅地址不变' : nextReminderText();
+  }
   $('#subscription-new').hidden = Boolean(subscription);
   $('#subscription-existing').hidden = !subscription;
   $('#subscription-management').hidden = !subscription;
@@ -434,6 +459,7 @@ function openSubscription({prepare=false}={}) {
     $(`input[name="device"][value="${calendarDevice.recommendedApp}"]`).checked=true;
     ui.app=calendarDevice.recommendedApp; persistUI();
   }
+  if (!$('#subscription-dialog').open) $('#subscription-dialog').dataset.mode=subscription ? 'manage' : 'add';
   renderSubscription();
   if (!$('#subscription-dialog').open) $('#subscription-dialog').showModal();
   if(prepare) {
@@ -675,6 +701,12 @@ function attachEvents() {
   });
   $('#share-settings').addEventListener('click',openShare);
   $('#subscribed-open').addEventListener('click',()=>openSubscription());
+  $('#manage-share').addEventListener('click',()=>openShare());
+  $('#manage-add').addEventListener('click',()=>{
+    const dialog=$('#subscription-dialog'), show=!dialog.classList.contains('show-add');
+    dialog.classList.toggle('show-add',show);$('#manage-add').setAttribute('aria-expanded',String(show));
+    if(show) $('.device-options')?.scrollIntoView({block:'nearest',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+  });
   for(const input of document.querySelectorAll('input[name="title-marks"]')) input.addEventListener('change',()=>{
     if(input.value==='symbols') delete settings.titleMarks; else settings.titleMarks=input.value;
     stopped=false;refresh(false);

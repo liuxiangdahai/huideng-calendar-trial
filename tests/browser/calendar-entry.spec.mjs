@@ -98,7 +98,10 @@ for (const [name, device] of Object.entries(devices).filter(([name]) => name !==
       await expect(page.locator('#guide-reminders')).not.toBeChecked();
       await expect(page.locator('[data-guide-status]')).not.toContainText('订阅成功');
       await page.locator('[data-close="subscription-dialog"]').first().click();
-      await page.locator('#subscribe').click();
+      // Saved and unchanged: the bottom button steps aside; "我的订阅" reopens it.
+      await expect(page.locator('#subscribe')).toBeHidden();
+      await page.locator('#my-subscription').click();
+      await expect(page.locator('#subscription-title')).toHaveText('我的订阅');
       expect(service.posts).toBe(1);
       expect((await read(page)).feedUrl).toBe(sub.feedUrl);
       if (name === 'mac') {

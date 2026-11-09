@@ -37,7 +37,7 @@
           <section id="subscribed-card" class="subscribed-card" aria-live="polite" hidden>
             <p class="subscribed-title"><span data-icon="calendar-check" aria-hidden="true"></span><span id="subscribed-title">你的日历已在同步</span></p>
             <p id="subscribed-next"></p><p id="subscribed-hint" class="subscribed-hint"></p>
-            <button id="subscribed-open" type="button" class="text-button">查看我的订阅<span data-icon="chevron-right" aria-hidden="true"></span></button>
+            <button id="subscribed-open" type="button" class="text-button" hidden>查看我的订阅<span data-icon="chevron-right" aria-hidden="true"></span></button>
           </section>
           <section class="quick-section" aria-labelledby="quick-title">
             <div class="quick-heading"><h3 id="quick-title"><span class="step-no">1</span>选择要提醒的日子</h3></div>
@@ -134,6 +134,11 @@
   <dialog id="subscription-dialog" aria-labelledby="subscription-title">
     <div class="dialog-head"><div><p class="overline">我的订阅</p><h2 id="subscription-title">加入日历</h2></div><button class="icon-button" type="button" data-close="subscription-dialog" aria-label="关闭订阅"><span data-icon="close" aria-hidden="true"></span></button></div>
     <p id="subscription-summary" class="field-note"></p>
+    <section id="manage-panel" class="manage-panel" aria-labelledby="manage-title" hidden>
+      <p id="manage-title" class="manage-title"><span data-icon="calendar-check" aria-hidden="true"></span>已加入日历，正在同步</p>
+      <p id="manage-next" class="manage-next"></p>
+      <div class="manage-actions"><button id="manage-share" type="button" class="secondary"><span data-icon="copy" aria-hidden="true"></span>分享给师兄</button><button id="manage-add" type="button" class="secondary" aria-expanded="false" aria-controls="device-guide"><span data-icon="calendar-plus" aria-hidden="true"></span>加到另一台设备或日历</button></div>
+    </section>
     <fieldset class="device-options"><legend><span class="guide-stage-number">1</span>选择你使用的日历应用</legend><label><input type="radio" name="device" value="iphone"><span data-icon="phone" aria-hidden="true"></span><span>Apple 日历<small>iPhone、iPad、Mac</small></span></label><label><input type="radio" name="device" value="google"><span data-icon="calendar" aria-hidden="true"></span><span>Google 日历<small>通过电脑添加订阅</small></span></label><label><input type="radio" name="device" value="outlook"><span data-icon="calendar" aria-hidden="true"></span><span>Outlook<small>网页版、经典桌面版</small></span></label><label><input type="radio" name="device" value="other"><span data-icon="phone" aria-hidden="true"></span><span>其他日历<small>华为、OPPO、小米等</small></span></label></fieldset>
     <section class="subscription-entry" aria-labelledby="entry-title">
     <h3 id="entry-title"><span class="guide-stage-number">2</span>添加到日历</h3>

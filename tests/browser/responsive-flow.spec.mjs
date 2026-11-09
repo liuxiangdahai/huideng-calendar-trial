@@ -83,7 +83,10 @@ test('landscape and keyboard-sized screens keep every form action and Chinese gu
     await page.locator('[data-reminder-group="tsok"]').click();await page.locator('#add-reminder').click();
     await page.locator('[data-reminder-index="1"][data-reminder-field="time"]').fill('20:30');
     await dialogFits(page,'#reminder-dialog');await page.locator('#reminder-form button[type="submit"]').click();
-    await page.locator('#subscribe').click();await page.locator('input[name="device"][value="other"]').check();
+    // Unsaved changes use the bottom button; a saved, unchanged subscription opens from "我的订阅".
+    await page.locator(await page.locator('#subscribe').isVisible()?'#subscribe':'#my-subscription').click();
+    if(await page.locator('#manage-add').isVisible())await page.locator('#manage-add').click();
+    await page.locator('input[name="device"][value="other"]').check();
     const brand=page.locator('[data-guide-help="huawei-import"]');
     if(!await brand.evaluate(node=>node.open))await brand.locator('summary').click();
     if(!await page.locator('[data-guide-expand]').evaluate(node=>node.open))await page.locator('[data-guide-expand]>summary').click();

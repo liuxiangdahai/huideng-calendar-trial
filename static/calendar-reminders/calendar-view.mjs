@@ -1,5 +1,5 @@
 import {ENGINE, tibetanDayDetails, dailyDateOccurrences} from './engine.mjs';
-import {addDays, reminderLabel, zonedInstant} from './core.mjs';
+import {addDays, reminderLabel, zonedInstant, markedTitle} from './core.mjs';
 import {icon} from './icons.mjs';
 import {eventPresentation, eventIcon} from './event-presentation.mjs';
 import {resolveTimeZone, wallTimeInZone, zoneInfo} from './timezones.mjs';
@@ -101,13 +101,20 @@ function eventMarkup(event, location, state) {
   const presentation = eventPresentation(event, state.data?.catalog);
   const localTimes = deviceReminderTimes(event, state.settings?.zone, state.deviceZone);
   const converted = localTimes.length ? `<p class="cal-device-time">设备当地 · ${escape(localTimes[0].zoneLabel)}<span>${localTimes.map(time => escape(`${dateTitle(time.date)} ${time.time}`)).join('；')}</span></p>` : '';
-  return `<article class="cal-event ${presentation.colorClass}"><div class="cal-event-heading"><span class="cal-event-icon">${eventIcon(event, state.data?.catalog)}</span><div class="cal-event-name"><h4>${escape(event.title)}</h4><div class="cal-event-meta"><span>${escape(presentation.label)}</span><span class="cal-all-day">全天</span></div></div></div>
+  return `<article class="cal-event ${presentation.colorClass}"><div class="cal-event-heading"><span class="cal-event-icon">${eventIcon(event, state.data?.catalog)}</span><div class="cal-event-name"><h4${markAttr(event, state.settings?.titleMarks)}>${escape(event.title)}</h4><div class="cal-event-meta"><span>${escape(presentation.label)}</span><span class="cal-all-day">全天</span></div></div></div>
     <button type="button" class="cal-reminder${event.preference?.mode === 'remind' ? ' is-active' : ''}" data-cal-event="${escape(id)}" data-cal-focus="${escape(location + '-' + event.uid)}" aria-label="调整${escape(event.title)}的提醒">${icon(event.preference?.mode === 'remind' ? 'bell' : 'bell-off')}<span>${escape(reminderText(event))}</span><span class="cal-edit">调整提醒</span></button>${converted}</article>`;
 }
 
-function dailyMarkup(date) {
+// The preview shows the same title mark the calendar app will show (◆/◇/◦,
+// 【提醒】… or none). The mark is drawn beside the original title, never
+// written into it, so the title text stays exactly the source's.
+function markAttr(event, style) {
+  const full = markedTitle(event, style), mark = full.slice(0, full.length - String(event.title).length);
+  return mark ? ` data-mark="${escape(mark)}"` : '';
+}
+function dailyMarkup(date, marks) {
   const event=dailyDateOccurrences(date,date)[0], day=tibetanDetails(date);
-  return `<article class="cal-daily-entry" data-cal-daily-date="${date}"><span class="cal-daily-icon" aria-hidden="true">${icon('calendar')}</span><div><h4>${escape(event.title)}</h4><p class="cal-daily-meta">每日藏历<span>全天 · 不设置提醒</span></p><p class="cal-daily-source">日期换算：<a href="${escape(ENGINE.url)}" target="_blank" rel="noopener noreferrer">藏历 PRO</a></p>${day.missingLabel ? `<p class="cal-daily-note">${escape(day.missingLabel)}</p>` : ''}</div></article>`;
+  return `<article class="cal-daily-entry" data-cal-daily-date="${date}"><span class="cal-daily-icon" aria-hidden="true">${icon('calendar')}</span><div><h4${markAttr(event, marks)}>${escape(event.title)}</h4><p class="cal-daily-meta">每日藏历<span>全天 · 不设置提醒</span></p><p class="cal-daily-source">日期换算：<a href="${escape(ENGINE.url)}" target="_blank" rel="noopener noreferrer">藏历 PRO</a></p>${day.missingLabel ? `<p class="cal-daily-note">${escape(day.missingLabel)}</p>` : ''}</div></article>`;
 }
 
 /**
@@ -183,9 +190,9 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
       const markers = [...new Set(cellEvents.map(event => eventPresentation(event, state.data?.catalog).colorClass))];
       const labels = cellEvents.slice(0, 2).map(event => {
         const presentation = eventPresentation(event, state.data?.catalog);
-        return `<span class="cal-mini-event ${presentation.colorClass}${event.preference?.mode === 'remind' ? ' is-remind' : ''}" title="${escape(event.title)}">${escape(event.title)}</span>`;
+        return `<span class="cal-mini-event ${presentation.colorClass}${event.preference?.mode === 'remind' ? ' is-remind' : ''}" title="${escape(event.title)}"${markAttr(event, state.settings?.titleMarks)}>${escape(event.title)}</span>`;
       }).join('');
-      const mobileSummary = cellEvents.length ? `<span class="cal-mobile-events" aria-hidden="true"><span class="cal-mobile-event ${eventPresentation(cellEvents[0], state.data?.catalog).colorClass}${cellEvents[0].preference?.mode === 'remind' ? ' is-remind' : ''}" title="${escape(cellEvents[0].title)}">${escape(cellEvents[0].title)}</span>${cellEvents.length > 1 ? `<span class="cal-mobile-more">另 ${cellEvents.length - 1} 项</span>` : ''}</span>` : '';
+      const mobileSummary = cellEvents.length ? `<span class="cal-mobile-events" aria-hidden="true"><span class="cal-mobile-event ${eventPresentation(cellEvents[0], state.data?.catalog).colorClass}${cellEvents[0].preference?.mode === 'remind' ? ' is-remind' : ''}" title="${escape(cellEvents[0].title)}"${markAttr(cellEvents[0], state.settings?.titleMarks)}>${escape(cellEvents[0].title)}</span>${cellEvents.length > 1 ? `<span class="cal-mobile-more">另 ${cellEvents.length - 1} 项</span>` : ''}</span>` : '';
       return `<div role="gridcell" aria-selected="${cell.selected}" class="cal-cell"><button type="button" class="cal-day${cell.inMonth ? '' : ' cal-adjacent'}${cell.selected ? ' cal-selected' : ''}${cell.today ? ' cal-is-today' : ''}" data-cal-date="${cell.date}" data-cal-focus="date-${cell.date}" tabindex="${cell.date === focusDate && !cell.disabled ? 0 : -1}" aria-label="${escape(aria)}"${cell.today ? ' aria-current="date"' : ''}${cell.disabled ? ' disabled' : ''}>
         <span class="cal-day-date" aria-hidden="true"><span class="cal-gregorian">${cell.day}</span><span class="cal-tibetan">${escape(cell.tibetan ? dayPart(cell.tibetan) : '')}</span></span>
         <span class="cal-marks" aria-hidden="true">${cell.tibetan?.monthLeap ? '<span class="cal-leap">闰月</span>' : ''}${cell.repeatNumber ? `<span class="cal-repeat">重日${cell.repeatNumber}</span>` : ''}${cellEvents.length ? `<span class="cal-category-marks">${markers.slice(0, 3).map(color => `<i class="cal-category-dot ${color}"></i>`).join('')}</span><span class="cal-event-count">${cell.count}</span>` : ''}</span>
@@ -208,7 +215,7 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     const tibetan = tibetanDetails(selected), events = state.events.filter(event => event.date === selected);
     const available = previewAvailability(state.data, state.settings, {start: selected, end: selected});
     let content;
-    if (state.settings?.includeDailyDates) content = dailyMarkup(selected) + events.map(event => eventMarkup(event, 'day', state)).join('');
+    if (state.settings?.includeDailyDates) content = dailyMarkup(selected, state.settings?.titleMarks) + events.map(event => eventMarkup(event, 'day', state)).join('');
     else if (!available.selectedCount) content = empty('还没有选择日程，请在“选择内容”中勾选你关注的日子。');
     else if (!events.length) content = empty(available.hasUnconfirmed
       ? '当天暂无已确认的所选日程；部分法会、节日或天象的安排尚待确认。'
@@ -230,7 +237,7 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
       : '近期没有已选日程。可以选择其他关注的日子。');
     else list.innerHTML = dates.slice(0, daily ? dailyShown : shown).map(date => {
       const tibetan = tibetanDetails(date);
-      return `<section class="cal-list-day" data-cal-list-date="${date}"><div class="cal-list-date"><span>${Number(date.slice(5, 7))}月</span><strong>${Number(date.slice(8))}</strong><span>${date.slice(0, 4)}年</span></div><div class="cal-list-content"><h3>星期${WEEKDAYS[weekIndex(date)]}${date === state.today ? '<span class="cal-today-label">今天</span>' : ''}</h3>${daily ? dailyMarkup(date) : `<p class="cal-list-tibetan">${escape(tibetan?.fullLabel || '')}</p>`}${state.events.filter(event => event.date === date).map(event => eventMarkup(event, 'list', state)).join('')}</div></section>`;
+      return `<section class="cal-list-day" data-cal-list-date="${date}"><div class="cal-list-date"><span>${Number(date.slice(5, 7))}月</span><strong>${Number(date.slice(8))}</strong><span>${date.slice(0, 4)}年</span></div><div class="cal-list-content"><h3>星期${WEEKDAYS[weekIndex(date)]}${date === state.today ? '<span class="cal-today-label">今天</span>' : ''}</h3>${daily ? dailyMarkup(date, state.settings?.titleMarks) : `<p class="cal-list-tibetan">${escape(tibetan?.fullLabel || '')}</p>`}${state.events.filter(event => event.date === date).map(event => eventMarkup(event, 'list', state)).join('')}</div></section>`;
     }).join('');
     $('[data-cal-action="more"]').hidden = daily ? !dates.length || dates.at(-1)>=state.end : dates.length <= shown;
     $('[data-cal-action="more"]').textContent = daily ? '再显示 30 天' : '查看更多日期';
