@@ -46,7 +46,9 @@ function persistUI() { try {localStorage.setItem(uiKey,JSON.stringify(ui));} cat
 
 // An optional undo keeps one-tap clearing safe for anyone who taps by mistake.
 function notify(message, undo) {
-  const toast=$('#toast'); toast.textContent = message; toast.hidden = false;
+  // A toast is a short note, not a sentence: no full stop at the end, and
+  // a second clause joins with a comma.
+  const toast=$('#toast'); toast.textContent = String(message).replace(/[。.]+$/,'').replace(/。/g,'，'); toast.hidden = false;
   if(undo){
     const button=document.createElement('button'); button.type='button'; button.className='toast-undo'; button.textContent='撤销';
     button.addEventListener('click',()=>{toast.hidden=true;clearTimeout(notify.timer);undo();},{once:true});
