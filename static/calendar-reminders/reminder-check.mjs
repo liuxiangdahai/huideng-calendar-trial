@@ -99,7 +99,8 @@ async function checkFeed(){
     const items=events.map(e=>({uid:e.getFirstPropertyValue('uid'),title:e.getFirstPropertyValue('summary'),
       status:e.getFirstPropertyValue('status'),sequence:e.getFirstPropertyValue('sequence'),
       allDay:e.getFirstPropertyValue('dtstart').isDate,alarms:e.getAllSubcomponents('valarm').map(a=>({
-        type:a.getFirstProperty('trigger').type,value:a.getFirstPropertyValue('trigger').toString()}))}));
+        type:a.getFirstProperty('trigger').type,value:a.getFirstPropertyValue('trigger').toString(),
+        seconds:a.getFirstProperty('trigger').type==='duration'?a.getFirstPropertyValue('trigger').toSeconds():null}))}));
     if(items.length!==6 || items.some(e=>!/^reminder-probe-[a-f]@/.test(e.uid)))throw new Error('测试日程不完整，请重新检查。');
     const expired=Date.now()>=Date.parse(probeExpiry(s.settings.reminderProbe));
     for(const expected of probeSchedule(s.settings)){
@@ -107,7 +108,12 @@ async function checkFeed(){
       const cancelled=s.disabled||expired||expected.omitted;
       const count=cancelled||expected.quiet?0:expected.instants.length;
       if(actual.alarms.length!==count || (actual.status==='CANCELLED')!==Boolean(cancelled))throw new Error(`测试 ${expected.id.toUpperCase()} 的文件提醒与保存设置不一致，请保留记录并反馈。`);
-      if(!cancelled && !expected.quiet && expected.variant==='absolute' && actual.alarms.some((a,i)=>new Date(a.value).toISOString()!==expected.instants[i]))throw new Error('文件提醒时间与保存设置不一致，请反馈。');
+      if(!cancelled && !expected.quiet && expected.variant==='absolute-legacy' && actual.alarms.some((a,i)=>new Date(a.value).toISOString()!==expected.instants[i]))throw new Error('文件提醒时间与保存设置不一致，请反馈。');
+      if(!cancelled && !expected.quiet && expected.variant==='relative'){
+        const wanted=expected.reminders.map(r=>{const [h,m]=r.time.split(':').map(Number);return (h*60+m-r.daysBefore*1440)*60;}).sort((a,b)=>a-b);
+        const got=actual.alarms.map(a=>a.seconds).sort((a,b)=>a-b);
+        if(got.some((v,i)=>v!==wanted[i]))throw new Error('文件提醒时间与保存设置不一致，请反馈。');
+      }
     }
     state.serverCheck={at:new Date().toISOString(),etag:r.headers.get('etag'),items};persist();
     const total=items.reduce((n,e)=>n+e.alarms.length,0);

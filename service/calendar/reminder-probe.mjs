@@ -51,7 +51,7 @@ export function reminderProbeAdapters({enabled = false, now = () => new Date()} 
       });
     },
     exportICS(events, options) {
-      // Baseline A/D/E/F is the exact production serializer. B and C change
+      // Baseline A/D/E/F is the exact production serializer (relative triggers). B and C change
       // only the properties under investigation, after the same publication.
       const text = core.exportICS(events,options);
       if (!enabled || !events.some(e=>e.probe)) return text;
@@ -63,13 +63,12 @@ export function reminderProbeAdapters({enabled = false, now = () => new Date()} 
           if (event.probe.variant === 'timed') {
             block = block.replace(/^DTSTART;VALUE=DATE:[^\r\n]*\r\n/m,`DTSTART:${stamp(event.probe.startAt)}\r\n`)
               .replace(/^DTEND;VALUE=DATE:[^\r\n]*\r\n/m,`DTEND:${stamp(Date.parse(event.probe.startAt)+5*60000)}\r\n`)
-              .replace(/^TRIGGER;VALUE=DATE-TIME:[^\r\n]*\r\n/gm,'TRIGGER:PT0S\r\n');
-          } else if (event.probe.variant === 'relative' && event.preference.mode === 'remind' && event.status !== 'CANCELLED') {
-            // DATE-relative alarms follow the client's timezone, not a fixed
-            // UTC instant. This is an experiment, never a production fallback.
-            const r=event.preference.reminders[0], [h,m]=r.time.split(':').map(Number);
-            const minutes=h*60+m-r.daysBefore*1440;
-            block=block.replace(/^TRIGGER;VALUE=DATE-TIME:[^\r\n]*\r\n/gm,`TRIGGER:${minutes<0?'-':''}PT${Math.abs(minutes)}M\r\n`);
+              .replace(/^TRIGGER[;:][^\r\n]*\r\n/gm,'TRIGGER:PT0S\r\n');
+          } else if (event.probe.variant === 'absolute-legacy' && event.preference.mode === 'remind' && event.status !== 'CANCELLED') {
+            // The pre-2026-11-09 form: one fixed UTC instant. Kept only so field
+            // tests can compare it with the relative form now used in production.
+            const instants=[...event.alarmInstants];
+            block=block.replace(/^TRIGGER:[^\r\n]*\r\n/gm,()=>`TRIGGER;VALUE=DATE-TIME:${stamp(instants.shift())}\r\n`);
           }
           return block;
         });

@@ -26,8 +26,10 @@ const yearName = year => '铁水木火土'[Math.floor((year - 1950) / 2) % 5] +
 
 /** Gregorian civil date -> PRO Tibetan calendar date, independent of reminder timezone. */
 export function getTibetanDate(date) {
+  // Only validated dates are ever cached, so a hit needs no re-validation.
+  const cached = dateCache.get(date);
+  if (cached) return {...cached};
   validateDate(date);
-  if (dateCache.has(date)) return {...dateCache.get(date)};
   const [gregorianYear, month, day] = date.split('-').map(Number);
   // Both the upstream origin and the input use the runtime's civil date. An ISO
   // UTC-midnight string would move the day backwards in America/Vancouver.
@@ -72,7 +74,16 @@ export function omittedTibetanDays(previous, tibetan) {
 }
 
 /** Shared civil-day detail for the month grid and the optional exported date layer. */
+const detailCache = new Map();
 export function tibetanDayDetails(date) {
+  const cached = detailCache.get(date);
+  if (cached) return {...cached, missingBefore: cached.missingBefore.map(day => ({...day}))};
+  const details = computeDayDetails(date);
+  if (detailCache.size >= 4096) detailCache.clear();
+  detailCache.set(date, details);
+  return {...details, missingBefore: details.missingBefore.map(day => ({...day}))};
+}
+function computeDayDetails(date) {
   const tibetan = getTibetanDate(date);
   const previous = date > ENGINE.supported.start ? getTibetanDate(shift(date, -1)) : null;
   const next = date < ENGINE.supported.end ? getTibetanDate(shift(date, 1)) : null;

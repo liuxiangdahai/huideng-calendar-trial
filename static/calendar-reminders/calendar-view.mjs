@@ -3,7 +3,7 @@ import {addDays, reminderLabel, zonedInstant} from './core.mjs';
 import {icon} from './icons.mjs';
 import {eventPresentation, eventIcon} from './event-presentation.mjs';
 import {resolveTimeZone, wallTimeInZone, zoneInfo} from './timezones.mjs';
-import {playMotion} from './motion.mjs';
+import {playMotion, playResize} from './motion.mjs';
 
 const WEEKDAYS = ['一', '二', '三', '四', '五', '六', '日'];
 const escape = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[char]));
@@ -122,7 +122,6 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
   let month = today.slice(0, 7), selected = today, focusDate = today, shown = 5, dailyShown = 30;
   let state = {data: null, settings: null, events: [], today,
     start: ENGINE.supported.start, end: ENGINE.supported.end};
-  const scrollByView = {};
   let disposed = false;
   root.classList.add('cal-view');
   root.innerHTML = `<div class="cal-control-bar"><div class="cal-toolbar" data-cal-navigation>
@@ -244,14 +243,20 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
 
   function setView(next) {
     if (!['month', 'list'].includes(next) || next === view) return;
-    scrollByView[view] = win?.scrollY || 0;
+    // Keep the switch the reader just tapped under their finger: anchor the
+    // scroll to it, then let the panel ease to its new height while the new
+    // view fades up, instead of jumping to an older scroll position.
+    const anchor = root.querySelector('.cal-view-switch');
+    const anchorTop = anchor?.getBoundingClientRect().top, fromHeight = root.getBoundingClientRect().height;
     view = next;
     monthRoot.hidden = view !== 'month'; listRoot.hidden = view !== 'list';
     $('[data-cal-navigation]').hidden = view !== 'month'; $('[data-cal-context]').hidden = view !== 'month';
     root.querySelectorAll('[data-cal-view]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.calView === view)));
     onViewChange(view);
-    if (Object.hasOwn(scrollByView, view)) win?.scrollTo({top: scrollByView[view], behavior: 'instant'});
-    playMotion(view === 'month' ? monthRoot : listRoot,'fade');
+    const moved = anchor ? anchor.getBoundingClientRect().top - anchorTop : 0;
+    if (Math.abs(moved) >= 1) win?.scrollBy({top: moved, behavior: 'instant'});
+    playResize(root, fromHeight);
+    playMotion(view === 'month' ? monthRoot : listRoot,'view');
   }
 
   function changeMonth(next) {

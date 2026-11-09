@@ -35,14 +35,35 @@ export function playMotion(node, kind = 'reveal', direction = 1) {
       ? [{opacity:.65,transform:`translateX(${direction * 8}px)`}, {opacity:1,transform:'translateX(0)'}]
       : kind === 'fade'
         ? [{opacity:.65}, {opacity:1}]
+        : kind === 'view'
+          ? [{opacity:0,transform:'translateY(6px)'}, {opacity:1,transform:'translateY(0)'}]
         : [{opacity:.65,transform:'translateY(6px)'}, {opacity:1,transform:'translateY(0)'}];
   try {
-    const animation = node.animate(frames, {duration:kind === 'month' ? 200 : 180, easing:'cubic-bezier(.2,.7,.2,1)'});
+    const animation = node.animate(frames, {duration:kind === 'month' ? 200 : kind === 'view' ? 240 : 180, easing:'cubic-bezier(.2,.7,.2,1)'});
     animation.id = `calendar-${kind}`;
     active.set(node, animation);
     const clean = () => { if (active.get(node) === animation) active.delete(node); };
     animation.finished.then(clean, clean);
   } catch { /* Older browsers retain the completed, fully usable UI. */ }
+}
+
+// Smooth a container whose content was just swapped: grow or shrink from the
+// previous height instead of snapping. Purely visual; layout is already final.
+export function playResize(node, fromHeight) {
+  if (!node?.isConnected || typeof node.animate !== 'function') return;
+  const doc = node.ownerDocument, {active} = contextFor(doc);
+  if (doc.defaultView.matchMedia(reducedMotionQuery).matches || doc.hidden) return;
+  const to = node.getBoundingClientRect().height;
+  if (!Number.isFinite(fromHeight) || Math.abs(to - fromHeight) < 2) return;
+  for (const [target, animation] of active) if (target === node) { animation.cancel(); active.delete(target); }
+  try {
+    const animation = node.animate([{height:`${fromHeight}px`, overflow:'hidden'}, {height:`${to}px`, overflow:'hidden'}],
+      {duration:240, easing:'cubic-bezier(.2,.7,.2,1)'});
+    animation.id = 'calendar-resize';
+    active.set(node, animation);
+    const clean = () => { if (active.get(node) === animation) active.delete(node); };
+    animation.finished.then(clean, clean);
+  } catch { /* The final height is already in place. */ }
 }
 
 export function installDisclosureMotion(doc = document) {
