@@ -170,7 +170,29 @@ function renderPreview() {
   }
   calendarView?.update({data,settings,events,today,start,end,deviceZone:observedZone});
   $('#reminder-settings').disabled=!countSelected();
+  renderTimeChoices(); renderQuickAdd();
   renderRegion(); renderSaveState();
+}
+// Step 2: one reminder time for every day that reminds. Detailed per-item
+// times stay possible; the step then says so instead of overwriting silently.
+function remindPrefs() { return Object.values(settings.events).filter(pref=>pref.mode==='remind'); }
+function renderTimeChoices() {
+  const prefs=remindPrefs(), keys=new Set(prefs.map(pref=>pref.reminders.map(r=>`${r.daysBefore}|${r.time}`).join(',')));
+  const current=keys.size===1 ? [...keys][0] : '';
+  for(const button of document.querySelectorAll('[data-time-choice]')) {
+    button.disabled=!prefs.length;
+    button.setAttribute('aria-pressed',String(button.dataset.timeChoice===current));
+  }
+  $('#time-choice-note').textContent=!prefs.length ? '先在上一步选择会提醒的日子' : !current ? '已逐项设置不同时间' :
+    [...document.querySelectorAll('[data-time-choice]')].some(b=>b.dataset.timeChoice===current) ? '' : `当前：${reminderLabel(prefs[0].reminders)}`;
+}
+// Step 3 names the device it recognised; the subscription panel still lets
+// the person choose another calendar application.
+function renderQuickAdd() {
+  const label=calendarDevice.appleMobile ? '加入 iPhone 日历' : calendarDevice.mac ? '加入 Mac 日历' :
+    /Android/i.test(navigator.userAgent) ? '加入安卓手机日历' : calendarDevice.mobile ? '加入手机日历' : '加入我的日历';
+  $('#quick-subscribe-label').textContent=subscription ? (dirty() ? '保存修改' : '查看我的订阅') : label;
+  $('#quick-subscribe').disabled=$('#subscribe').disabled;
 }
 function renderSaveState() {
   const changed = dirty(), count = countSelected();
@@ -186,6 +208,7 @@ function renderSaveState() {
   // This opens the existing panel only. Keep it available while saving so a
   // user who closed the panel can return to progress, help or a failure state.
   $('#my-subscription').disabled = false;
+  if (data) renderQuickAdd();
 }
 function refresh(rebuild = true) {
   const focusId = document.activeElement?.id;
@@ -522,6 +545,10 @@ function attachEvents() {
   $('#preset-options').addEventListener('click',event=>{
     const button=event.target.closest('[data-preset]');if(!button)return;
     const next=applyPreset(settings,data.catalog,button.dataset.preset);
+    // Days newly added by a preset follow the time already chosen in step 2.
+    const chosenTimes=new Set(remindPrefs().map(pref=>JSON.stringify(pref.reminders)));
+    if(chosenTimes.size===1){const reminders=JSON.parse([...chosenTimes][0]);
+      for(const [id,pref] of Object.entries(next.events)) if(pref.mode==='remind' && settings.events[id]?.mode!=='remind') pref.reminders=reminders.map(r=>({...r}));}
     if(JSON.stringify(next)===JSON.stringify(settings))return;
     settings=next;lastActive.clear();stopped=false;
     refresh();
@@ -529,6 +556,24 @@ function attachEvents() {
     chosen?.focus({preventScroll:true});
     playMotion(chosen?.querySelector('.preset-check'),'check');
   });
+  $('#time-choices').addEventListener('click',event=>{
+    const button=event.target.closest('[data-time-choice]');if(!button||button.disabled)return;
+    const [daysBefore,time]=button.dataset.timeChoice.split('|');
+    for(const pref of remindPrefs()) pref.reminders=[{daysBefore:Number(daysBefore),time}];
+    stopped=false;refresh();
+    button.focus({preventScroll:true});playMotion(button,'check');
+    notify(subscription?'提醒时间已改；保存修改后同步到日历。':`所有提醒改为${reminderLabel([{daysBefore:Number(daysBefore),time}])}。`);
+  });
+  $('#quick-subscribe').addEventListener('click',()=>openSubscription({prepare:true}));
+  const advanced=$('#advanced-settings');
+  // Phones open in the simple three steps; computers show everything. A
+  // person's own choice is remembered on this device.
+  advanced.open=typeof ui.advancedOpen==='boolean' ? ui.advancedOpen : !matchMedia('(max-width:1023px)').matches;
+  advanced.addEventListener('toggle',()=>{ui.advancedOpen=advanced.open;persistUI();});
+  const dailyUrl=new URL('./daily-dates.ics',location.href);
+  if(dailyUrl.protocol==='https:') $('#daily-calendar-apple').href=dailyUrl.href.replace(/^https:/,'webcal:');
+  $('#daily-calendar-apple').hidden=!calendarDevice.apple;
+  $('#daily-calendar-copy').addEventListener('click',()=>void copy(dailyUrl.href,'每日藏历订阅地址'));
   $('#clear-selection').addEventListener('click',()=>{
     if(!hasSelectedContent())return;
     for(const [id,pref] of Object.entries(settings.events)) {

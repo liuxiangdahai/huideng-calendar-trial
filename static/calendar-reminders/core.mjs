@@ -174,6 +174,16 @@ export function foldLine(line) {
   }
   return output;
 }
+// One subscription shows one colour, so a short leading mark tells the three
+// kinds apart in every calendar app: ◆ will remind, ◇ display-only festival,
+// ◦ everyday Tibetan date. In apps that order an all-day list by title, these
+// code points also sort reminders first and everyday dates last.
+export const TITLE_MARKS = Object.freeze({remind: '◆', display: '◇', daily: '◦'});
+export function markedTitle(event) {
+  const mark = event.kind === 'daily-date' ? TITLE_MARKS.daily
+    : event.preference?.mode === 'remind' ? TITLE_MARKS.remind : TITLE_MARKS.display;
+  return `${mark} ${event.title}`;
+}
 export function exportICS(events, {zone, name = '慧灯·藏历修行日', generatedAt = new Date(), sourceVersion = '2026-10-20', usePublishedAlarmInstants = false} = {}) {
   zone = resolveTimeZone(zone);
   if (!zone) throw new Error('请选择有效的提醒时区。');
@@ -195,7 +205,7 @@ export function exportICS(events, {zone, name = '慧灯·藏历修行日', gener
     lines.push('BEGIN:VEVENT', `UID:${event.uid}@calendar.huidengvan.org`, `DTSTAMP:${stamp(dtstamp)}`,
       `DTSTART;VALUE=DATE:${event.date.replaceAll('-', '')}`,
       `DTEND;VALUE=DATE:${addDays(event.date, 1).replaceAll('-', '')}`,
-      `SUMMARY:${escapeICS(event.title)}`, `DESCRIPTION:${escapeICS(description.join('\n'))}`,
+      `SUMMARY:${escapeICS(markedTitle(event))}`, `DESCRIPTION:${escapeICS(description.join('\n'))}`,
       `URL:${daily ? ENGINE.url : event.source}`, `STATUS:${status}`, 'TRANSP:TRANSPARENT', `SEQUENCE:${sequence}`);
     if (event.createdAt) lines.push(`CREATED:${stamp(asDate(event.createdAt))}`);
     if (event.lastModified) lines.push(`LAST-MODIFIED:${stamp(asDate(event.lastModified))}`);
@@ -218,4 +228,13 @@ export function exportICS(events, {zone, name = '慧灯·藏历修行日', gener
 }
 export function reminderLabel(reminders) {
   return reminders.map(r => `${r.daysBefore === 0 ? '当天' : `提前${r.daysBefore}天`} ${r.time}`).join('、');
+}
+
+// The everyday date layer is identical for every visitor, so it ships as one
+// static file on the CDN: no Worker CPU, no personal data, no alarms. Its UIDs
+// use a separate namespace so it can coexist with a feed that bundles them.
+export const DAILY_CALENDAR_PATH = 'daily-dates.ics';
+export function exportDailyCalendar(start, end) {
+  const events = dailyDateOccurrences(start, end).map(event => ({...event, uid: `daily-only-${event.date}`}));
+  return exportICS(events, {zone: 'UTC', name: '慧灯·每日藏历', generatedAt: new Date(`${start}T00:00:00Z`)});
 }
