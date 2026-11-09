@@ -629,6 +629,7 @@ function attachEvents() {
   $('#include-daily-dates').addEventListener('change',event=>{
     settings.includeDailyDates=event.target.checked;stopped=false;refresh(false);
     playMotion(event.target,'check');
+    if(event.target.checked) playSymbol($('.daily-date-icon svg'));
   });
   $('#preset-options').addEventListener('click',event=>{
     const button=event.target.closest('[data-preset]');if(!button)return;
@@ -721,6 +722,14 @@ function attachEvents() {
   window.addEventListener('focus',checkDeviceTime);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkDeviceTime();});
   window.addEventListener('hashchange',() => { void restoreManagementLink(); });
+  // Opening a category by hand plays its symbol; restored or re-drawn open
+  // categories stay still.
+  const openedByHand=new WeakSet();
+  $('#groups').addEventListener('click',event=>{const summary=event.target.closest('.group-card>summary');if(summary)openedByHand.add(summary.parentElement);});
+  $('#groups').addEventListener('toggle',event=>{
+    const card=event.target;if(!openedByHand.has(card))return;openedByHand.delete(card);
+    if(card.open) playSymbol(card.querySelector('.group-icon svg'));
+  },true);
   $('#groups').addEventListener('change',event => {
     const id = event.target.dataset.event; if (!id) return;
     const pref = settings.events[id];
