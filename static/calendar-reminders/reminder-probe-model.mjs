@@ -3,10 +3,10 @@ import {wallTimeInZone} from './timezones.mjs';
 
 export const PROBE_HOURS = 72;
 export const PROBE_CASES = [
-  {id:'a', label:'A · 全天日程', detail:'与正式订阅相同的提醒写法', minutes:[0], variant:'absolute'},
-  {id:'b', label:'B · 全天日程对照', detail:'相对提醒；测试时保持手机与所选时区一致', minutes:[3], variant:'relative'},
+  {id:'a', label:'A · 全天日程', detail:'与正式订阅相同的提醒写法（按手机当地时间）', minutes:[0], variant:'relative'},
+  {id:'b', label:'B · 全天日程对照', detail:'旧版绝对时间写法，仅作对照；部分安卓日历会提前或推后', minutes:[3], variant:'absolute-legacy'},
   {id:'c', label:'C · 定时日程对照', detail:'仅用于诊断，不改变正式修行日的全天显示', minutes:[6], variant:'timed'},
-  {id:'d', label:'D · 两次提醒', detail:'应分别收到两次通知', minutes:[9,12], variant:'absolute'},
+  {id:'d', label:'D · 两次提醒', detail:'应分别收到两次通知', minutes:[9,12], variant:'relative'},
   {id:'e', label:'E · 仅显示', detail:'不应收到通知', minutes:[], variant:'absolute'},
   {id:'f', label:'F · 每日藏历对照', detail:'不应收到通知', minutes:[], variant:'absolute'}
 ];

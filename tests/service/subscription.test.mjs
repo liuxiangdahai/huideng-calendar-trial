@@ -523,7 +523,8 @@ test('feeds retain stable publication timestamps and honor conditional and HEAD 
   assert.equal(event.getFirstPropertyValue('dtstart').toString(), date);
   assert.equal(event.getFirstPropertyValue('sequence'), 0);
   assert.equal(event.getAllSubcomponents('valarm').length, 1);
-  assert.equal(event.getFirstSubcomponent('valarm').getFirstPropertyValue('trigger').toString(), '2027-03-20T00:00:00Z');
+  // All-day alarms are relative to the civil day (08:00 = 480 minutes after midnight).
+  assert.equal(event.getFirstSubcomponent('valarm').getFirstPropertyValue('trigger').toSeconds(), 8 * 3600);
   assert.equal(content.includes(created.manageToken), false);
   assert.equal(content.includes(new URL(created.feedUrl).pathname), false);
   f.tick(300000);
@@ -553,7 +554,7 @@ test('editing preserves the feed and UID, increments publication sequence, and d
   assert.equal(event.getFirstPropertyValue('uid'), initial.getFirstPropertyValue('uid'));
   assert.equal(event.getFirstPropertyValue('sequence'), 1);
   assert.notEqual(event.getFirstPropertyValue('dtstamp').toString(), initial.getFirstPropertyValue('dtstamp').toString());
-  assert.equal(event.getFirstSubcomponent('valarm').getFirstPropertyValue('trigger').toString(), '2027-03-20T01:30:00Z');
+  assert.equal(event.getFirstSubcomponent('valarm').getFirstPropertyValue('trigger').toSeconds(), 9.5 * 3600);
   const stale = await f.api(`/api/subscriptions/${created.id}`, 'PATCH',
     {settings: makeSettings('off'), revision: 1}, created.manageToken);
   assert.equal(stale.status, 409);
@@ -562,7 +563,7 @@ test('editing preserves the feed and UID, increments publication sequence, and d
   assert.equal((await same.json()).revision, 2);
 });
 
-test('a timezone-rule change republishes exact UTC alarms with stable UID and a new sequence and ETag', async t => {
+test('a timezone-rule change republishes the ledger with stable UID, a new sequence and ETag; triggers stay civil', async t => {
   let shift = 0;
   const f = fixture(t, (event, zone) => resolveAlarmInstants(event, zone)
     .map(value => new Date(Date.parse(value) + shift).toISOString()));
@@ -582,8 +583,8 @@ test('a timezone-rule change republishes exact UTC alarms with stable UID and a 
   assert.notEqual(changed.headers.get('ETag'), first.headers.get('ETag'));
   assert.notEqual(changed.headers.get('Last-Modified'), first.headers.get('Last-Modified'));
   assert.notEqual(event.getFirstPropertyValue('dtstamp').toString(), initial.getFirstPropertyValue('dtstamp').toString());
-  assert.deepEqual(event.getAllSubcomponents('valarm').map(alarm => alarm.getFirstPropertyValue('trigger').toString()),
-    ['2027-03-20T01:00:00Z', '2027-03-19T13:00:00Z']);
+  assert.deepEqual(event.getAllSubcomponents('valarm').map(alarm => alarm.getFirstPropertyValue('trigger').toSeconds()),
+    [8 * 3600, -4 * 3600]);
   const stored = await f.db.prepare('SELECT * FROM calendar_entries').first();
   assert.deepEqual(JSON.parse(stored.event_json).alarmInstants,
     ['2027-03-20T01:00:00.000Z', '2027-03-19T13:00:00.000Z']);
@@ -606,7 +607,7 @@ test('legacy entries gain alarm instants once and subsequent unchanged refreshes
   f.tick(60000);
   const response = await f.fetch(created.feedUrl), [event] = f.entries(await response.text());
   assert.equal(event.getFirstPropertyValue('sequence'), 1);
-  assert.equal(event.getFirstSubcomponent('valarm').getFirstPropertyValue('trigger').toString(), '2027-03-20T00:00:00Z');
+  assert.equal(event.getFirstSubcomponent('valarm').getFirstPropertyValue('trigger').toSeconds(), 8 * 3600);
   f.tick(60000);
   assert.equal((await f.fetch(created.feedUrl, {headers: {'If-None-Match': response.headers.get('ETag')}})).status, 304);
 });
@@ -773,7 +774,8 @@ test('a rolling Los Angeles subscription survives a newly included autumn DST ov
   assert.equal(overlaps[0].getFirstPropertyValue('summary'), '观音菩萨加持日');
   const alarms = overlaps[0].getAllSubcomponents('valarm');
   assert.equal(alarms.length, 1);
-  assert.equal(alarms[0].getFirstPropertyValue('trigger').toString(), '2028-11-05T08:30:00Z');
+  // The phone resolves 01:30 on the overlap day itself; the feed carries one civil offset.
+  assert.equal(alarms[0].getFirstPropertyValue('trigger').toSeconds(), 90 * 60);
 });
 
 test('persisted snapshot GET, HEAD and 304 hits do not generate events, read the ledger or write D1', async t => {

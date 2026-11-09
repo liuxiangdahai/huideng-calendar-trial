@@ -308,6 +308,12 @@ legend { padding: 0 0 10px; font-size: 14px; color: var(--muted); }
 .reminder-row { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr) 44px; gap: 10px; align-items: end; margin: 14px 0; }
 .reminder-row label, .url-label { display: block; font-size: 14px; color: var(--muted); }
 input[type=time], .url-label input { display: block; width: 100%; min-width: 0; height: 48px; margin-top: 6px; padding: 8px 10px; border: 1px solid var(--control); border-radius: var(--r-sm); background: var(--surface); color: var(--ink); font-size: 16px; }
+/* iOS Safari gives native time fields a taller intrinsic box and top-aligned
+   value; drop the native chrome so it matches the 48px select beside it. */
+input[type=time] { -webkit-appearance: none; appearance: none; display: flex; align-items: center; min-height: 48px; max-height: 48px; line-height: 1.3; font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+input[type=time]::-webkit-date-and-time-value { margin: 0; text-align: left; }
+input[type=time]::-webkit-datetime-edit { padding: 0; }
+.reminder-row select { height: 48px; }
 .url-label input { font-size: 14px; font-family: var(--font-ui); }
 .reminder-row .icon-button { height: 48px; }
 .notice { margin: 14px 0; padding: 12px 14px; border: 1px solid #d8c29a; border-left: 3px solid var(--gold); border-radius: var(--r-sm); background: var(--gold-tint); color: #4f3f2a; font-size: 14px; line-height: 1.7; }

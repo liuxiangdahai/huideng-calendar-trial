@@ -9,7 +9,7 @@ const RETENTION_MS = 90 * 86400000;
 const SNAPSHOT_TTL_MS = 60 * 60 * 1000;
 const CREATION_REPLAY_MS = 7 * 86400000;
 const DEVELOPMENT_RELEASE = Object.freeze({version: 'development', dataVersion: '',
-  rendererVersion: 'snapshot-v1', environment: 'local'});
+  rendererVersion: 'snapshot-v2', environment: 'local'});
 const utf8 = new TextEncoder();
 
 class HttpError extends Error {
@@ -166,6 +166,9 @@ function publicEvent(event, zone, alarmInstants) {
       ? {mode: 'remind', reminders: event.preference.reminders}
       : {mode: 'display', reminders: []},
     reminderZone: remind ? zone : undefined,
+    // Marks the relative-trigger serializer so every reminder event is
+    // re-published once (SEQUENCE + 1) and clients replace the old alarm.
+    alarmForm: remind ? 'relative' : undefined,
     alarmInstants: remind ? alarmInstants : []
   };
 }
@@ -392,7 +395,10 @@ export function createCalendarService({getData, validateSettings, selectOccurren
     for (const occurrence of selection) {
       if (!occurrence.uid || next.has(occurrence.uid)) throw new Error('Duplicate or missing occurrence UID');
       const event = publicEvent(occurrence, settings.zone, resolveAlarmInstants(occurrence, settings.zone));
-      const content = canonical(event), hash = await digest(content), old = previous.get(event.uid);
+      const content = canonical(event), old = previous.get(event.uid);
+      // The ledger stores the exact canonical text it hashed. Identical text has
+      // the identical hash, so only new or changed events pay for SHA-256.
+      const hash = old && !old.cancelled_at && old.event_json === content && old.content_hash ? old.content_hash : await digest(content);
       const changed = !old || old.content_hash !== hash || Boolean(old.cancelled_at);
       const entry = !changed ? old : {
         subscription_id: record.id, uid: event.uid, content_hash: hash, event_json: content,

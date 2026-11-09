@@ -25,7 +25,7 @@ function fixture(t,enabled=true) {
       const r=await api('/api/subscriptions','POST',{settings});assert.equal(r.status,201,await r.clone().text());return r.json();
     }};
 }
-test('probe uses real saved settings and ledger; A baseline, B relative, C timed, D double, E/F silent',async t=>{
+test('probe uses real saved settings and ledger; A relative baseline, B legacy absolute, C timed, D double, E/F silent',async t=>{
   const f=fixture(t),created=await f.create();
   const saved=await (await f.api(`/api/subscriptions/${created.id}`,'GET',null,created.manageToken)).json();
   assert.deepEqual(saved.settings,created.settings);
@@ -33,8 +33,8 @@ test('probe uses real saved settings and ledger; A baseline, B relative, C timed
   assert.equal(list.length,6);assert.doesNotMatch(text,/\r\r|manageToken|Bearer/);
   for (const id of ['a','b','d','e','f']) assert.equal(byID(list,id).getFirstPropertyValue('dtstart').isDate,true);
   assert.equal(byID(list,'c').getFirstPropertyValue('dtstart').isDate,false);
-  assert.equal(byID(list,'a').getFirstSubcomponent('valarm').getFirstPropertyValue('trigger').toString(),'2026-11-03T06:30:00Z');
-  assert.equal(byID(list,'b').getFirstSubcomponent('valarm').getFirstPropertyValue('trigger').toSeconds(),(14*60+33)*60);
+  assert.equal(byID(list,'a').getFirstSubcomponent('valarm').getFirstPropertyValue('trigger').toSeconds(),(14*60+30)*60);
+  assert.equal(byID(list,'b').getFirstSubcomponent('valarm').getFirstPropertyValue('trigger').toString(),'2026-11-03T06:33:00Z');
   assert.equal(byID(list,'c').getFirstSubcomponent('valarm').getFirstPropertyValue('trigger').toSeconds(),0);
   assert.equal(byID(list,'c').getFirstPropertyValue('dtstart').toString(),'2026-11-03T06:36:00Z');
   assert.equal(byID(list,'d').getAllSubcomponents('valarm').length,2);
@@ -54,7 +54,7 @@ test('same probe address and UID survive reschedule, cancellation and stop; vers
   f.setTime('2026-11-03T06:01:00Z');settings.reminderProbe.startAt='2026-11-03T07:00:00.000Z';
   const moved=await patch();
   assert.equal(byID(moved,'a').getFirstPropertyValue('sequence'),byID(initial,'a').getFirstPropertyValue('sequence')+1);
-  assert.equal(byID(moved,'a').getFirstSubcomponent('valarm').getFirstPropertyValue('trigger').toString(),'2026-11-03T07:00:00Z');
+  assert.equal(byID(moved,'a').getFirstSubcomponent('valarm').getFirstPropertyValue('trigger').toSeconds(),15*3600);
   settings.reminderProbe.silent=['a'];let list=await patch();assert.equal(byID(list,'a').getAllSubcomponents('valarm').length,0);
   settings.reminderProbe.omit=['a'];list=await patch();assert.equal(byID(list,'a').getFirstPropertyValue('status'),'CANCELLED');
   settings.reminderProbe.omit=[];settings.reminderProbe.silent=[];list=await patch();assert.equal(byID(list,'a').getFirstPropertyValue('sequence'),4);

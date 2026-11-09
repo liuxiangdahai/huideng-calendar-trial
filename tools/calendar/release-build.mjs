@@ -81,7 +81,7 @@ export async function buildStandalone({output,release,config={apiBaseUrl:''}} = 
   const relative = path.relative(projectRoot,output);
   if (!relative || relative.startsWith('..') || path.isAbsolute(relative)) throw new Error('单文件输出必须位于本项目内。');
   const bytes = await fs.readFile(path.join(sourceRoot,'calendar-data.json'));
-  release ||= {version:'development',dataVersion:hash(bytes),rendererVersion:'snapshot-v1',environment:'offline'};
+  release ||= {version:'development',dataVersion:hash(bytes),rendererVersion:'snapshot-v2',environment:'offline'};
   let html = await normalizedHTML();
   const bundle = await build({entryPoints:[path.join(sourceRoot,'app.mjs')],bundle:true,format:'iife',
     platform:'browser',target:['safari15.4','chrome100','firefox102'],write:false,minify:true,legalComments:'inline'});
@@ -167,7 +167,7 @@ export async function buildRelease(options = {}, env = process.env) {
     {cwd:projectRoot,stdio:['ignore','pipe','pipe']});
   if(config.remote)assertReleaseInputs(config.version);
   const data = await fs.readFile(path.join(sourceRoot,'calendar-data.json'));
-  const release = {version:config.version,dataVersion:hash(data),rendererVersion:`snapshot-v1-${config.version}`,environment:config.mode};
+  const release = {version:config.version,dataVersion:hash(data),rendererVersion:`snapshot-v2-${config.version}`,environment:config.mode};
   // The exact absolute target has been verified inside this project's dist.
   await fs.rm(config.output,{recursive:true,force:true});
   const site = path.join(config.output,'site'), frontend = path.join(site,'calendar-reminders'), worker = path.join(config.output,'worker');

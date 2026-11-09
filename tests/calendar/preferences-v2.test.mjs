@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import ICAL from 'ical.js';
-import {defaults, selectOccurrences, exportICS, zonedInstant, normalizeSettings,
+import {defaults, selectOccurrences, exportICS, zonedInstant, normalizeSettings, relativeTrigger,
   validateSettings, addDays, rangeEnd} from '../../static/calendar-reminders/core.mjs';
 import {applyPreset} from '../../static/calendar-reminders/presets.mjs';
 const data=JSON.parse(fs.readFileSync('static/calendar-reminders/calendar-data.json','utf8'));
@@ -94,8 +94,7 @@ test('independent iCalendar parser validates UTF-8, all-day dates and two alarm 
     assert.equal(event.getFirstPropertyValue('summary'),source.title);
     const alarms=event.getAllSubcomponents('valarm');
     assert.equal(alarms.length,source.preference.mode==='remind'?2:0);
-    if(alarms.length)assert.equal(alarms[1].getFirstPropertyValue('trigger').toJSDate().toISOString(),
-      zonedInstant(addDays(source.date,-1),'20:00',settings.zone).toISOString());
+    if(alarms.length)assert.equal(alarms[1].getFirstPropertyValue('trigger').toSeconds(),-4*3600);
   }
   const special={...events[0],title:'测试,分号;反斜杠\\换行\n中文字'.repeat(12)};
   assert.equal(parsed(exportICS([special],{zone:settings.zone})).getFirstSubcomponent('vevent').getFirstPropertyValue('summary'),special.title);
@@ -124,11 +123,24 @@ test('browser exports ignore supplied alarm instants while publication exports s
   assert.equal(direct.getFirstSubcomponent('valarm').getFirstPropertyValue('trigger').toString(),
     baseline.getFirstSubcomponent('valarm').getFirstPropertyValue('trigger').toString());
   const published=parsed(exportICS([supplied],{zone:settings.zone,usePublishedAlarmInstants:true})).getFirstSubcomponent('vevent');
-  assert.equal(published.getFirstSubcomponent('valarm').getFirstPropertyValue('trigger').toString(),'2030-01-01T00:00:00Z');
+  // Published instants are validated but never serialized: the trigger stays the civil offset.
+  assert.equal(published.getFirstSubcomponent('valarm').getFirstPropertyValue('trigger').toString(),
+    baseline.getFirstSubcomponent('valarm').getFirstPropertyValue('trigger').toString());
   for(const alarmInstants of [undefined,[],['invalid'],['2030-02-30T00:00:00.000Z'],['2030-01-01T00:00:00Z'],
     ['2030-01-01T00:00:00.000Z\r\nACTION:AUDIO']]) {
     assert.throws(()=>exportICS([{...event,alarmInstants}],{zone:settings.zone,usePublishedAlarmInstants:true}),/已发布的提醒时间无效/);
   }
   const cancelled=parsed(exportICS([{...supplied,status:'CANCELLED'}],{zone:settings.zone,usePublishedAlarmInstants:true})).getFirstSubcomponent('vevent');
   assert.equal(cancelled.getAllSubcomponents('valarm').length,0);
+});
+
+test('all-day reminders use civil-day relative triggers that Android calendars keep at the chosen time',()=>{
+  assert.equal(relativeTrigger({daysBefore:0,time:'08:00'}),'TRIGGER:PT480M');
+  assert.equal(relativeTrigger({daysBefore:0,time:'00:00'}),'TRIGGER:PT0M');
+  assert.equal(relativeTrigger({daysBefore:1,time:'20:00'}),'TRIGGER:-PT240M');
+  assert.equal(relativeTrigger({daysBefore:7,time:'09:30'}),'TRIGGER:-PT9510M');
+  const settings=makeSettings(),event=selectOccurrences(data,settings,window).find(e=>e.preference.mode==='remind');
+  const ics=exportICS([event],{zone:'Asia/Shanghai'});
+  assert.doesNotMatch(ics,/VALUE=DATE-TIME|Asia\/Shanghai。/);
+  assert.match(ics.replace(/\r\n /g,''),/按手机当地时间/);
 });

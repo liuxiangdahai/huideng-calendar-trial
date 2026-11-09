@@ -102,7 +102,8 @@ test('all-day civil dates are invariant when reminder zone changes', () => {
   const parse = (settings) => new ICAL.Component(ICAL.parse(exportICS(events, {zone: settings.zone}))).getAllSubcomponents('vevent');
   const first = parse(a), second = parse(b);
   assert.deepEqual(first.map(e => e.getFirstPropertyValue('dtstart').toString()), second.map(e => e.getFirstPropertyValue('dtstart').toString()));
-  assert.notEqual(first[0].getFirstSubcomponent('valarm').getFirstPropertyValue('trigger').toString(),
-    second[0].getFirstSubcomponent('valarm').getFirstPropertyValue('trigger').toString());
+  // Relative all-day triggers ring at 08:00 on the phone's own clock in either zone.
+  assert.equal(first[0].getFirstSubcomponent('valarm').getFirstPropertyValue('trigger').toSeconds(), 8 * 3600);
+  assert.equal(second[0].getFirstSubcomponent('valarm').getFirstPropertyValue('trigger').toSeconds(), 8 * 3600);
   assert.equal(zonedInstant('2027-01-15', '08:00', 'Asia/Kathmandu').toISOString(), '2027-01-15T02:15:00.000Z');
 });

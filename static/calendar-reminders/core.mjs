@@ -148,8 +148,22 @@ function publishedAlarmInstants(event) {
   return values;
 }
 const stamp = date => date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+// All-day reminders are written relative to the event's civil midnight, the
+// form Apple Calendar itself uses. Field tests (2026-11-08) showed Xiaomi
+// Calendar turning absolute UTC triggers on all-day events into the UTC wall
+// time (08:00 Beijing became 00:00, 20:15 became 12:15); the relative form rang
+// at the chosen time. It follows the phone's own clock, so the selected zone
+// only labels the page and the rolling window.
+export function relativeTrigger(reminder) {
+  const [hours, minutes] = reminder.time.split(':').map(Number);
+  const offset = hours * 60 + minutes - reminder.daysBefore * 1440;
+  return `TRIGGER:${offset < 0 ? '-' : ''}PT${Math.abs(offset)}M`;
+}
 export const escapeICS = value => String(value).replace(/\\/g, '\\\\').replace(/\r\n|\r|\n/g, '\\n').replace(/;/g, '\\;').replace(/,/g, '\\,');
 export function foldLine(line) {
+  // Fast path: 25 UTF-16 units can never exceed 75 UTF-8 bytes, and an ASCII
+  // line is one byte per unit. Most ICS lines take this path unchanged.
+  if (line.length <= 25 || (line.length <= 75 && /^[\x00-\x7f]*$/.test(line))) return line;
   let output = '', bytes = 0;
   for (const char of line) {
     // Count UTF-8 bytes without allocating a typed array for every character.
@@ -173,7 +187,7 @@ export function exportICS(events, {zone, name = '慧灯·藏历修行日', gener
     const description = daily ? [event.description, ENGINE.url, '仅加入日历；请关闭此日历的默认通知。'] :
       [`藏历${event.tibetan}`, '日期换算：藏历 PRO；节日名称与安排：佛慧法语藏历。',
       `原站标注：${event.sourceLabel || event.title}`, event.source,
-      event.preference.mode === 'remind' ? `提醒时区：${zone}。提醒时间不代表共修开始时间。` : '仅加入日历；请关闭此日历的默认通知。'];
+      event.preference.mode === 'remind' ? `提醒：${reminderLabel(event.preference.reminders)}（按手机当地时间）。提醒时间不代表共修开始时间。` : '仅加入日历；请关闭此日历的默认通知。'];
     const asDate = value => value instanceof Date ? value : new Date(value);
     const dtstamp = asDate(event.dtstamp || event.lastModified || event.createdAt || generatedAt);
     const status = event.status === 'CANCELLED' ? 'CANCELLED' : 'CONFIRMED';
@@ -188,10 +202,13 @@ export function exportICS(events, {zone, name = '慧灯·藏历修行日', gener
     if (!daily && status !== 'CANCELLED' && event.preference.mode === 'remind') {
       // Only the server explicitly opts into its own publication ledger. Direct
       // exports ignore arbitrary alarmInstants copied into browser event data.
-      const alarms = usePublishedAlarmInstants ? publishedAlarmInstants(event) : resolveAlarmInstants(event, zone);
-      for (const instant of alarms) {
+      // Published instants are still validated: they keep the ledger honest and
+      // detect timezone-data changes, even though the trigger itself is relative.
+      if (usePublishedAlarmInstants) publishedAlarmInstants(event); else resolveAlarmInstants(event, zone);
+      for (const reminder of [...new Map(validateReminders(event.preference.reminders)
+        .map(reminder => [relativeTrigger(reminder), reminder])).values()]) {
         lines.push('BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:${escapeICS(event.title)}`,
-          `TRIGGER;VALUE=DATE-TIME:${stamp(new Date(instant))}`, 'END:VALARM');
+          relativeTrigger(reminder), 'END:VALARM');
       }
     }
     lines.push('END:VEVENT');
