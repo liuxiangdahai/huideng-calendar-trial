@@ -159,6 +159,7 @@ function renderPresets() {
   // The plan above and the categories below are one choice at two levels of
   // detail: say which plan filled them, or that they are now hand-picked.
   const plan=PRESETS.find(preset=>preset.id===current);
+  $('#daily-calendar-note').hidden=!settings.includeDailyDates;
   $('#category-source').textContent=plan ? `下面已按“${plan.title}”勾选；在这里改动后，就变成自选`
     : countSelected() ? '自选：已在下面逐项调整，上方方案不再选中' : '';
   $('#preset-options').innerHTML=PRESETS.map(preset=>`<button class="preset-card" type="button" data-preset="${preset.id}" aria-pressed="${current===preset.id}"${preset.id==='practice'?' aria-describedby="preset-scope-note"':''}><span class="preset-icon">${icon(preset.icon)}</span><span class="preset-copy"><strong>${preset.title}<small>${presetIds(data.catalog,preset.id).length} 项</small></strong><span>${preset.description}</span><em>${icon('bell')}${preset.reminder}</em></span><span class="preset-check" aria-hidden="true">${current===preset.id?icon('check'):''}</span></button>`).join('');
