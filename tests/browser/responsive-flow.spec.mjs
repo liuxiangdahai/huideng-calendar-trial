@@ -78,7 +78,10 @@ test('landscape and keyboard-sized screens keep every form action and Chinese gu
   await page.locator('[data-preset="guru"]').click();
   for(const size of [{width:844,height:390},{width:390,height:400},{width:1440,height:500}]){
     await page.setViewportSize(size);if(size.width<1024)await page.locator('#tab-selection').click();
-    await page.locator('#zone-settings').click();await page.locator('#zone-search').fill('Eucla');
+    // Phones reach the region from inside 详细设置; computers from the top bar.
+    if(size.width<1024){const details=page.locator('#advanced-settings');if(!await details.evaluate(n=>n.open))await details.locator('summary').click();await page.locator('#zone-settings-inline').click();}
+    else await page.locator('#zone-settings').click();
+    await page.locator('#zone-search').fill('Eucla');
     await page.locator('input[value="Australia/Eucla"]').check();await dialogFits(page,'#zone-dialog');await page.locator('#apply-zone').click();
     await page.locator('[data-reminder-group="tsok"]').click();await page.locator('#add-reminder').click();
     await page.locator('[data-reminder-index="1"][data-reminder-field="time"]').fill('20:30');

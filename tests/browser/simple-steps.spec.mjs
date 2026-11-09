@@ -10,13 +10,19 @@ test('phones start in three simple steps; computers show the detailed settings',
   await expect(page.locator('#time-choices button').first()).toBeDisabled();
   await expect(page.locator('#step-add-device')).not.toBeEmpty();
   await page.locator('#advanced-settings>summary').click();
-  await expect(page.locator('.region-bar')).toBeVisible();
+  // On phones the region lives inside the details, next to what it changes;
+  // nothing appears at the top of the page.
+  await expect(page.locator('.region-bar')).toBeHidden();
+  await expect(page.locator('#zone-settings-inline')).toBeVisible();
+  await expect(page.locator('#zone-summary-inline')).toHaveText(await page.locator('#zone-summary').textContent());
+  // Phones always start folded, even after someone opened the details.
   await page.reload();await expect(page.locator('#app')).toBeVisible();
-  await expect(page.locator('#advanced-settings')).toHaveAttribute('open','');
+  await expect(page.locator('#advanced-settings')).not.toHaveAttribute('open','');
   await page.setViewportSize({width:1440,height:960});
   await page.evaluate(()=>localStorage.clear());await page.reload();await expect(page.locator('#app')).toBeVisible();
   await expect(page.locator('#advanced-settings')).toHaveAttribute('open','');
   await expect(page.locator('.region-bar')).toBeVisible();
+  await expect(page.locator('#zone-settings-inline')).toBeHidden();
 });
 
 test('one reminder time applies to every reminding day and newly added preset days follow it',async({page})=>{

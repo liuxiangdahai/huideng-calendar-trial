@@ -104,7 +104,6 @@ button:disabled { cursor: default; }
 #my-subscription { position: relative; flex: none; min-height: 44px; padding-inline: 18px; border-color: #caa25c99; border-radius: 22px; background: #ffffff0a; color: #f2ede5; }
 #my-subscription:hover { background: #ffffff17; border-color: #caa25c; }
 #my-subscription>[data-icon] { display: inline-grid; width: 20px; height: 20px; flex: none; }
-.unsaved-dot { position: absolute; top: 7px; right: 9px; width: 7px; height: 7px; border-radius: 50%; background: #f6cd87; box-shadow: 0 0 0 2px #621118; }
 .site-header :focus-visible { outline-color: #f6cd87; }
 
 /* ── 雪山横幅 + 香布 ───────────────────────────────────────────────────── */
@@ -554,10 +553,6 @@ input[type=time]::-webkit-datetime-edit { padding: 0; }
 .share-body { display: grid; grid-template-columns: 180px minmax(0,1fr); gap: 18px; align-items: center; }
 .share-qr { width: 180px; padding: 8px; border: 1px solid var(--line-2); border-radius: var(--r); background: #ffffff; }
 .share-qr svg { display: block; width: 100%; height: auto; }
-@media (max-width: 1023px) {
-  /* Phones in the simple path: the clock and zone bar move out of the way. */
-  #app.advanced-closed .region-bar { display: none; }
-}
 @media (max-width: 480px) {
   .share-body { grid-template-columns: 1fr; justify-items: center; }
 }
@@ -625,3 +620,15 @@ input[type=time]::-webkit-datetime-edit { padding: 0; }
 :is(.cal-event-icon, .cal-daily-icon, .masthead-next) { cursor: pointer; -webkit-tap-highlight-color: transparent; }
 
 #save-state:empty { display: none; }
+
+/* Region: on phones it lives inside 详细设置 (next to what it changes), not
+   at the top of the page where opening the details made it appear. */
+.advanced-region { display: grid; grid-template-columns: auto minmax(0,1fr); align-items: center; gap: 2px 10px; margin: 4px 0 18px; padding: 10px 12px;
+  border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
+.advanced-region-label { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); font-size: var(--fs-md); }
+.advanced-region-label .icon { width: 16px; height: 16px; color: var(--wine); }
+.advanced-region .text-button { justify-self: end; gap: 4px; font-size: var(--fs-md); text-align: right; }
+.advanced-region .text-button .icon { width: 16px; height: 16px; }
+.advanced-region small { grid-column: 1 / -1; color: var(--muted); font-size: var(--fs-xs); line-height: 1.6; }
+@media (max-width: 1023px) { .region-bar { display: none; } }
+@media (min-width: 1024px) { .advanced-region { display: none; } }

@@ -16,6 +16,18 @@ import {createMobileTabs} from './mobile-tabs.mjs';
 import {playMotion,playSymbol,installDisclosureMotion} from './motion.mjs';
 import qrcode from './vendor/qrcode/qrcode.mjs';
 
+// Opening or closing a modal moves focus; Safari (WebKit) then scrolls the
+// page to the focused control even though the dialog is fixed, which made the
+// month jump when a date opened its day sheet. Keep the reader's place.
+if (globalThis.HTMLDialogElement) for (const method of ['showModal', 'close']) {
+  const native = HTMLDialogElement.prototype[method];
+  if (native) HTMLDialogElement.prototype[method] = function (...args) {
+    const x = scrollX, y = scrollY, result = native.apply(this, args);
+    if (scrollX !== x || scrollY !== y) scrollTo(x, y);
+    return result;
+  };
+}
+
 const $ = selector => document.querySelector(selector);
 const storageKey = 'huideng.calendar.v2', subscriptionKey = 'huideng.calendar.subscription';
 const uiKey = 'huideng.calendar.interface';
@@ -127,6 +139,7 @@ function renderNextPractice() {
 function renderRegion(now=new Date()) {
   const info=settings.zone ? zoneInfo(settings.zone,now) : null;
   $('#zone-summary').textContent=info ? `${info.label} · ${info.offset}` : '请选择提醒时区';
+  $('#zone-summary-inline').textContent=$('#zone-summary').textContent;
   const clocks=timeComparison(now,observedZone,settings.zone);
   const clock=(value,label)=>`<div class="clock-item"><span>${esc(label)}</span><strong>${esc(value.time)}</strong><small>${esc(value.label)}${clocks.reminder?.dayLabel ? ` · ${esc(value.date)}${value.dayLabel?`（${esc(value.dayLabel)}）`:''}` : ''}</small></div>`;
   $('#time-comparison').innerHTML=clock(clocks.device,clocks.merged?'设备与提醒时间':'设备时间')+(!clocks.merged&&clocks.reminder?clock(clocks.reminder,'提醒地区时间'):'');
@@ -299,7 +312,6 @@ function renderSaveState() {
   $('#daily-date-count').hidden=!settings.includeDailyDates || !count;
   $('#subscribe').setAttribute('aria-busy',String(requestPending||managementRestoring));
   $('#save-state').textContent = stopped ? '已停用，请在手机移除订阅日历' : conflict ? '设置已在其他设备修改' : changed ? '有改动，保存后同步到日历' : subscription ? '已同步到日历，改动会自动更新' : nextStepText();
-  $('#unsaved-dot').hidden = !changed;
   $('#subscribe-label').textContent = managementRestoring ? '正在恢复订阅…' : requestPending ? '正在保存…' : subscription ? (changed ? '保存修改' : '我的订阅') : deviceLabel();
   for(const input of document.querySelectorAll('input[name="title-marks"]')) input.checked=input.value===(settings.titleMarks||'none');
   const ctaDisabled = requestPending || managementRestoring || (!subscription && !hasSelectedContent());
@@ -677,7 +689,6 @@ function attachEvents() {
       notify(subscription?'已取消这个方案；保存修改后更新日历。':'已取消这个方案。',()=>restoreSnapshot(before,'已恢复之前的选择。'));
       return;
     }
-    const firstChoice=!hasSelectedContent();
     const next=applyPreset(settings,data.catalog,button.dataset.preset);
     // Days newly added by a preset follow the time already chosen in step 2.
     const chosenTimes=new Set(remindPrefs().map(pref=>JSON.stringify(pref.reminders)));
@@ -690,13 +701,6 @@ function attachEvents() {
     chosen?.focus({preventScroll:true});
     playMotion(chosen?.querySelector('.preset-check'),'check');
     playSymbol(chosen?.querySelector('.preset-icon svg'));
-    // On a phone, the first choice brings step 2 into view so the next decision
-    // is visible without hunting for it.
-    if(firstChoice && phoneLike()){
-      const step=$('#time-title')?.closest('.quick-section'), action=$('.action-bar')?.getBoundingClientRect().top ?? innerHeight;
-      const box=step?.getBoundingClientRect();
-      if(box && box.bottom>action-8) step.scrollIntoView({block:'end',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
-    }
   });
   $('#time-choices').addEventListener('click',event=>{
     const button=event.target.closest('[data-time-choice]');if(!button||button.disabled)return;
@@ -730,7 +734,10 @@ function attachEvents() {
   const advanced=$('#advanced-settings');
   // Phones open in the simple three steps; computers show everything. A
   // person's own choice is remembered on this device.
-  advanced.open=typeof ui.advancedOpen==='boolean' ? ui.advancedOpen : !matchMedia('(max-width:1023px)').matches;
+  // Phones always start with details folded (fewer things to read); a
+  // computer remembers the person's own choice.
+  const phoneLayout=matchMedia('(max-width:1023px)').matches;
+  advanced.open=phoneLayout ? false : typeof ui.advancedOpen==='boolean' ? ui.advancedOpen : true;
   const syncAdvanced=()=>$('#app').classList.toggle('advanced-closed',!advanced.open);
   syncAdvanced();
   advanced.addEventListener('toggle',()=>{ui.advancedOpen=advanced.open;persistUI();syncAdvanced();});
@@ -754,6 +761,7 @@ function attachEvents() {
   });
   const openZone=()=>zonePicker.open({zone:settings.zone,deviceZone:observedZone});
   $('#zone-settings').addEventListener('click',openZone);
+  $('#zone-settings-inline').addEventListener('click',openZone);
   $('#keep-zone').addEventListener('click',()=>{ui.lastDeviceZone=observedZone;persistUI();renderRegion();});
   $('#use-device-zone').addEventListener('click',()=>{
     if(!resolveTimeZone(observedZone)){openZone();return;}
