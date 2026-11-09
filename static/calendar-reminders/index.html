@@ -37,7 +37,7 @@
           <section id="subscribed-card" class="subscribed-card" aria-live="polite" hidden>
             <p class="subscribed-title"><span data-icon="calendar-check" aria-hidden="true"></span><span id="subscribed-title">你的日历已在同步</span></p>
             <p id="subscribed-next"></p><p id="subscribed-hint" class="subscribed-hint"></p>
-            <button id="subscribed-open" type="button" class="text-button">查看我的订阅<span data-icon="chevron-right" aria-hidden="true"></span></button>
+            <button id="subscribed-open" type="button" class="text-button" hidden>查看我的订阅<span data-icon="chevron-right" aria-hidden="true"></span></button>
           </section>
           <section class="quick-section" aria-labelledby="quick-title">
             <div class="quick-heading"><h3 id="quick-title"><span class="step-no">1</span>选择要提醒的日子</h3></div>
@@ -70,13 +70,12 @@
           </section>
           <details id="advanced-settings" class="advanced-settings">
             <summary><span data-icon="sliders" aria-hidden="true"></span><span><strong>详细设置</strong><small id="advanced-summary">分类、逐项提醒、地区、每日藏历单独日历</small></span><span data-icon="chevron" aria-hidden="true"></span></summary>
-          <div class="category-heading"><h3>按分类调整</h3><button id="reminder-settings" type="button" class="text-button"><span data-icon="bell-settings" aria-hidden="true"></span>批量提醒</button></div>
+          <div class="category-heading"><h3>按分类调整</h3><button id="reminder-settings" type="button" class="text-button"><span data-icon="bell-settings" aria-hidden="true"></span>批量提醒</button></div><p id="category-source" class="category-source" role="status"></p>
           <div id="groups"></div>
           <fieldset class="title-marks">
             <legend>日历里怎样区分</legend>
-            <label><input type="radio" name="title-marks" value="symbols"><span><strong>◆ 符号</strong><small>◆ 莲师荟供日　◇ 燃灯节　◦ 藏历九月廿九</small></span></label>
-            <label><input type="radio" name="title-marks" value="words"><span><strong>【文字】</strong><small>【提醒】莲师荟供日　【修行日】燃灯节</small></span></label>
-            <label><input type="radio" name="title-marks" value="none"><span><strong>不加标记</strong><small>只显示名称</small></span></label>
+            <label><input type="radio" name="title-marks" value="none"><span><strong>不加标记</strong><small>只显示名称，如：莲师荟供日</small></span></label>
+            <label><input type="radio" name="title-marks" value="symbols"><span><strong>加符号区分</strong><small>◆ 会提醒　◇ 只显示　◦ 每日藏历</small></span></label>
           </fieldset>
           <section class="daily-calendar" aria-labelledby="daily-calendar-title">
             <h3 id="daily-calendar-title"><span data-icon="calendar" aria-hidden="true"></span>每日藏历 · 单独日历</h3>
@@ -134,11 +133,16 @@
   <dialog id="subscription-dialog" aria-labelledby="subscription-title">
     <div class="dialog-head"><div><p class="overline">我的订阅</p><h2 id="subscription-title">加入日历</h2></div><button class="icon-button" type="button" data-close="subscription-dialog" aria-label="关闭订阅"><span data-icon="close" aria-hidden="true"></span></button></div>
     <p id="subscription-summary" class="field-note"></p>
+    <section id="manage-panel" class="manage-panel" aria-labelledby="manage-title" hidden>
+      <p id="manage-title" class="manage-title"><span data-icon="calendar-check" aria-hidden="true"></span>已加入日历，正在同步</p>
+      <p id="manage-next" class="manage-next"></p>
+      <div class="manage-actions"><button id="manage-share" type="button" class="secondary"><span data-icon="copy" aria-hidden="true"></span>分享给师兄</button><button id="manage-add" type="button" class="secondary" aria-expanded="false" aria-controls="device-guide"><span data-icon="calendar-plus" aria-hidden="true"></span>加到另一台设备或日历</button></div>
+    </section>
     <fieldset class="device-options"><legend><span class="guide-stage-number">1</span>选择你使用的日历应用</legend><label><input type="radio" name="device" value="iphone"><span data-icon="phone" aria-hidden="true"></span><span>Apple 日历<small>iPhone、iPad、Mac</small></span></label><label><input type="radio" name="device" value="google"><span data-icon="calendar" aria-hidden="true"></span><span>Google 日历<small>通过电脑添加订阅</small></span></label><label><input type="radio" name="device" value="outlook"><span data-icon="calendar" aria-hidden="true"></span><span>Outlook<small>网页版、经典桌面版</small></span></label><label><input type="radio" name="device" value="other"><span data-icon="phone" aria-hidden="true"></span><span>其他日历<small>华为、OPPO、小米等</small></span></label></fieldset>
     <section class="subscription-entry" aria-labelledby="entry-title">
     <h3 id="entry-title"><span class="guide-stage-number">2</span>添加到日历</h3>
     <aside id="apple-browser-notice" class="browser-handoff" aria-labelledby="apple-browser-title" hidden>
-      <div class="browser-handoff-heading"><span data-icon="globe" aria-hidden="true"></span><strong id="apple-browser-title">请先在 Safari 中打开</strong></div>
+      <div class="browser-handoff-heading"><span data-icon="globe" aria-hidden="true"></span><strong id="apple-browser-title">请先在浏览器中打开</strong></div>
       <p id="apple-browser-message"></p>
       <button id="copy-page" type="button" class="secondary" hidden><span data-icon="copy" aria-hidden="true"></span>复制网页地址</button>
       <button id="apple-browser-help" type="button" class="text-button">查看浏览器打开步骤<span data-icon="arrow-right" aria-hidden="true"></span></button>

@@ -157,3 +157,75 @@
   .cal-today { padding-inline: 7px; margin-left: 0; }
   .cal-view-switch button { gap: 4px; padding-inline: 8px; }
 }
+
+/* Title marks follow the chosen style; drawn, not part of the title text. */
+[data-mark]::before { content: attr(data-mark); content: attr(data-mark) / ""; color: inherit; opacity: .8; }
+
+/* ── Calendar colour roles (11-09) ───────────────────────────────────────
+   Three things must never look alike: the page (grey/white cells), a day
+   shown in the calendar (warm cream label, gold edge) and a day that rings
+   (carmine label). The chosen date is outlined in ink-wine, not gold, so it
+   is never mistaken for a label's gold edge. Repeated days use muted ink. */
+.cal-day.cal-adjacent { background: #f8f7f4; }
+.cal-day.cal-adjacent:hover:not(:disabled) { background: #f2f0eb; }
+.cal-mini-event, .cal-mobile-event { background: #f7efdf; color: #5b4a2d; }
+.cal-mini-event { border-left-color: var(--gold-2); }
+.cal-day.cal-adjacent :is(.cal-mini-event, .cal-mobile-event) { background: #f7efdf; color: #5b4a2d; border-left-color: var(--gold-2); opacity: .62; }
+.cal-day.cal-adjacent :is(.cal-mini-event.is-remind, .cal-mobile-event.is-remind) { background: var(--red-tint); color: var(--red); border-left-color: var(--red); }
+.cal-day.cal-selected, .cal-day.cal-selected:hover:not(:disabled) { border-color: var(--wine); background: var(--surface); box-shadow: inset 0 0 0 1px var(--wine); }
+.cal-day.cal-selected.cal-is-today .cal-gregorian { box-shadow: 0 0 0 2px var(--surface), 0 0 0 3px var(--wine); }
+.cal-leap, .cal-repeat { color: var(--muted); }
+
+/* ── Everyday layer in the grid ───────────────────────────────────────────
+   Its own quiet line in lapis ink — no fill, no edge — so it never reads
+   like a festival label (cream/gold) or a reminder (carmine). */
+.cal-daily-line { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; width: 100%; min-width: 0; margin-top: 2px; color: var(--teal-2);
+  font-size: var(--fs-2xs); line-height: 16px; text-align: left; overflow: hidden; overflow-wrap: anywhere; }
+.cal-daily-line[data-mark]::before { opacity: 1; }
+.cal-daily-short { display: none; }
+.cal-day.cal-adjacent .cal-daily-line { color: #8a9ab3; }
+@media (max-width: 1023px) {
+  .cal-daily-line { display: block; text-align: center; font-size: 11px; line-height: 14px; white-space: nowrap; }
+  .cal-daily-full { display: none; }
+  .cal-daily-short { display: inline; }
+}
+
+/* ── List: the everyday date is one quiet line ──────────────────────────── */
+.cal-daily-entry.is-compact { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; padding: 2px 0 6px; border-bottom: 0; }
+.cal-daily-entry.is-compact h4 { font: 500 var(--fs-md)/1.6 var(--font-serif); color: var(--teal-2); }
+.cal-daily-entry.is-compact .cal-daily-meta { font-size: var(--fs-xs); }
+.cal-daily-entry.is-compact+.cal-event { margin-top: 2px; }
+.cal-list-view:has(.is-compact) .cal-list-day { padding: 12px 0; }
+.cal-list-view:has(.is-compact) .cal-list-date strong { font-size: 26px; }
+.cal-list-caption a { color: var(--teal-2); }
+
+/* ── Day sheet (phones and tablets) ─────────────────────────────────────── */
+dialog.cal-day-sheet { top: auto; bottom: 0; transform: none; width: min(640px, 100%); max-width: 100%; max-height: min(82dvh, calc(var(--available-height, 100dvh) - 40px));
+  margin: 0 auto; padding: 0 18px calc(18px + env(safe-area-inset-bottom)); border: 0; border-top: 3px solid var(--wine); border-radius: var(--r-lg) var(--r-lg) 0 0;
+  box-shadow: 0 -12px 40px #1d1b1833; overflow: auto; overscroll-behavior: contain; transition: transform 160ms ease; }
+dialog.cal-day-sheet::backdrop { background: #1d1b1859; }
+.cal-sheet-bar { position: sticky; top: 0; z-index: 1; display: flex; justify-content: center; align-items: center; height: 40px; margin: 0 -18px; background: var(--surface); touch-action: none; }
+.cal-sheet-grip { width: 40px; height: 4px; border-radius: 2px; background: var(--line-2); }
+.cal-sheet-close { position: absolute; right: 6px; top: 0; }
+.cal-day-sheet .cal-day-detail { margin: 0; padding-top: 0; border-top: 0; }
+@media (min-width: 1024px) { dialog.cal-day-sheet { display: none; } }
+
+/* ── Phone month: dots, not text ─────────────────────────────────────────
+   A narrow cell holds the date, the Tibetan date and up to three dots; the
+   names live in the day sheet. Computers keep full labels. */
+.cal-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--gold-2); vertical-align: middle; }
+.cal-dot.is-remind { background: var(--red); }
+.cal-dot-more { display: inline-block; color: var(--muted); font: 600 11px/7px var(--font-ui); font-style: normal; vertical-align: middle; }
+.cal-mobile-events { display: flex; justify-content: center; align-items: center; gap: 3px; min-height: 9px; margin-top: 4px; }
+.cal-day.cal-adjacent .cal-mobile-events { opacity: .5; }
+.cal-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; margin: 10px 0 0; color: var(--muted); font-size: var(--fs-xs); line-height: 1.6; }
+.cal-legend[hidden] { display: none; }
+.cal-legend-item { display: inline-flex; align-items: center; gap: 5px; }
+.cal-legend-daily { flex-basis: 100%; color: var(--teal-2); }
+@media (min-width: 1024px) { .cal-legend-tap { display: none; } }
+@media (max-width: 1023px) {
+  .cal-daily-line { display: none; }
+  .cal-day { min-height: 62px; justify-content: flex-start; }
+}
+.cal-legend>span:last-child { margin-left: 0; }
+@media (min-width: 1024px) { .cal-mobile-events { display: none; } }

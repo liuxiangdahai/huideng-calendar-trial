@@ -47,3 +47,8 @@
 @media (prefers-reduced-motion: reduce) {
   *,*::before,*::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+@media (prefers-reduced-motion: no-preference) {
+  dialog.cal-day-sheet[open] { animation: cal-sheet-up 260ms cubic-bezier(.2,.8,.2,1); }
+  dialog.cal-day-sheet[open]::backdrop { animation: calendar-backdrop-in 200ms ease; }
+}
+@keyframes cal-sheet-up { from { translate: 0 100%; } to { translate: 0 0; } }

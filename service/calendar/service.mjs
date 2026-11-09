@@ -1,5 +1,5 @@
 import {civilDateInZone} from '../../static/calendar-reminders/timezones.mjs';
-import {addDays, selectCalendarOccurrences, resolveAlarmInstants as defaultAlarmInstants} from '../../static/calendar-reminders/core.mjs';
+import {addDays, selectCalendarOccurrences, DEFAULT_TITLE_MARKS, resolveAlarmInstants as defaultAlarmInstants} from '../../static/calendar-reminders/core.mjs';
 
 const JSON_HEADERS = {'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store'};
 const TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/;
@@ -15,7 +15,7 @@ const dailyCreationCap = env => {
   return Number.isInteger(cap) && cap > 0 ? cap : 20;
 };
 const DEVELOPMENT_RELEASE = Object.freeze({version: 'development', dataVersion: '',
-  rendererVersion: 'snapshot-v2', environment: 'local'});
+  rendererVersion: 'snapshot-v3', environment: 'local'});
 const utf8 = new TextEncoder();
 
 class HttpError extends Error {
@@ -159,7 +159,7 @@ function sqlGuard(record) {
   return [record.id, record.revision, record.render_version];
 }
 const GUARD = 'EXISTS (SELECT 1 FROM subscriptions WHERE id = ? AND revision = ? AND render_version = ?)';
-function publicEvent(event, zone, alarmInstants, titleMarks = 'symbols') {
+function publicEvent(event, zone, alarmInstants, titleMarks = DEFAULT_TITLE_MARKS) {
   // Keep the publication ledger small; never store tokens, UI state, or unused catalog metadata in it.
   const remind = event.kind !== 'daily-date' && event.preference.mode === 'remind';
   return {
@@ -173,7 +173,7 @@ function publicEvent(event, zone, alarmInstants, titleMarks = 'symbols') {
       : {mode: 'display', reminders: []},
     // Marked titles (◆/◇/◦) arrived on 2026-11-09; the marker re-publishes
     // each entry once so clients that compare SEQUENCE replace the old title.
-    titleForm: titleMarks || 'symbols',
+    titleForm: titleMarks || DEFAULT_TITLE_MARKS,
     reminderZone: remind ? zone : undefined,
     // Marks the relative-trigger serializer so every reminder event is
     // re-published once (SEQUENCE + 1) and clients replace the old alarm.

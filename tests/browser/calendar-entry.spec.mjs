@@ -98,7 +98,10 @@ for (const [name, device] of Object.entries(devices).filter(([name]) => name !==
       await expect(page.locator('#guide-reminders')).not.toBeChecked();
       await expect(page.locator('[data-guide-status]')).not.toContainText('订阅成功');
       await page.locator('[data-close="subscription-dialog"]').first().click();
+      // Saved and unchanged: the bottom button becomes a quiet "我的订阅".
+      await expect(page.locator('#subscribe-label')).toHaveText('我的订阅');
       await page.locator('#subscribe').click();
+      await expect(page.locator('#subscription-title')).toHaveText('我的订阅');
       expect(service.posts).toBe(1);
       expect((await read(page)).feedUrl).toBe(sub.feedUrl);
       if (name === 'mac') {
@@ -430,7 +433,7 @@ test('in-app browser help is explicit and never fabricates an external-browser o
     await openSelected(page);await page.locator('#my-subscription').click();
     const notice=page.locator('#apple-browser-notice');
     await expect(notice).toBeVisible();
-    await expect(notice).toContainText('请先在 Safari 中打开');
+    await expect(notice).toContainText('请先在浏览器中打开');
     await expect(notice).toContainText('右上角');
     expect(service.posts).toBe(0);
     await page.locator('[data-close="subscription-dialog"]').first().click();

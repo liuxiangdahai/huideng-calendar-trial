@@ -207,11 +207,14 @@ test('a chosen preset toggles off with undo, and switching mobile tabs mid-effec
   }, `${month}-11`);
   expect(effectCount).toBeGreaterThan(0);
   await frames(page);
-  // Start reading after selecting the date, as a real user does. Clicking a
-  // date while it is off-screen also tests unrelated browser focus scrolling.
+  // On a phone the chosen day opens in a bottom sheet; close it and keep
+  // reading the month, which the tabs must return to.
+  await expect(page.locator('[data-cal-sheet]')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('[data-cal-sheet]')).toBeHidden();
   await page.evaluate(() => {
-    const detail = document.querySelector('[data-cal-detail]');
-    scrollTo({top: scrollY + detail.getBoundingClientRect().top - 180, behavior: 'instant'});
+    const grid = document.querySelector('[data-cal-grid]');
+    scrollTo({top: scrollY + grid.getBoundingClientRect().top + 120, behavior: 'instant'});
   });
   await frames(page);
   const readingPosition = await page.evaluate(() => scrollY);

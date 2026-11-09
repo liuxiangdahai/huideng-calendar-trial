@@ -98,14 +98,14 @@ async function enableOneAndVerifyConversion(page, detail) {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 }
 
-test('desktop month shows at most two original titles and opens complete classified cards', async ({page}) => {
+test('desktop month shows every original title in the cell and opens complete classified cards', async ({page}) => {
   const detail = await openBusyDay(page, 1440);
   const cell = page.locator(`[data-cal-date="${busy[0]}"]`);
-  await expect(cell.locator('.cal-mini-event')).toHaveText(busy[1].slice(0, 2).map(event => event.title));
-  await expect(cell.locator('.cal-mini-event').first()).toBeVisible();
+  // Computers no longer fold a busy day: every chosen title is in the cell.
+  await expect(cell.locator('.cal-mini-event')).toHaveText(busy[1].map(event => event.title));
+  await expect(cell.locator('.cal-mini-event').last()).toBeVisible();
   await expect(cell.locator('.cal-mobile-events')).toBeHidden();
-  await expect(cell.locator('.cal-more-events')).toHaveText(`另有 ${busy[1].length - 2} 项`);
-  expect(await page.locator('.cal-day').evaluateAll(cells => cells.every(cell => cell.querySelectorAll('.cal-mini-event').length <= 2))).toBe(true);
+  await expect(cell.locator('.cal-more-events')).toHaveCount(0);
   const truncation = await cell.locator('.cal-mini-event').first().evaluate(element => ({
     overflow: getComputedStyle(element).overflow, ellipsis: getComputedStyle(element).textOverflow,
     title: element.title, text: element.textContent
@@ -134,23 +134,18 @@ test('desktop month shows at most two original titles and opens complete classif
   expect(indicator.selectedBorder).not.toBe(indicator.todayColor);
 });
 
-test('phone month shows a readable original event name and extra count at 390 and 320 pixels', async ({page}) => {
+test('phone month marks busy days with dots and keeps every name in the label and the day sheet at 390 and 320 pixels', async ({page}) => {
   const detail = await openBusyDay(page, 390);
   for (const width of [390, 320]) {
     await page.setViewportSize({width, height: 1000});
     const cell = page.locator(`[data-cal-date="${busy[0]}"]`);
     await expect(cell.locator('.cal-day-events')).toBeHidden();
-    const summary = cell.locator('.cal-mobile-event');
-    await expect(summary).toBeVisible();
-    await expect(summary).toHaveText(busy[1][0].title);
-    await expect(summary).toHaveAttribute('title', busy[1][0].title);
-    await expect(cell.locator('.cal-mobile-more')).toHaveText(`另 ${busy[1].length - 1} 项`);
-    const summaryStyle = await summary.evaluate(node => ({fontSize: parseFloat(getComputedStyle(node).fontSize),
-      lineClamp: getComputedStyle(node).webkitLineClamp, width: node.getBoundingClientRect().width,
+    // Phones show up to three dots, then "+"; names are in the sheet and the label.
+    await expect(cell.locator('.cal-mobile-events .cal-dot')).toHaveCount(Math.min(busy[1].length, 3));
+    await expect(cell.locator('.cal-dot-more')).toHaveCount(busy[1].length > 3 ? 1 : 0);
+    const box = await cell.locator('.cal-mobile-events').evaluate(node => ({width: node.getBoundingClientRect().width,
       cellWidth: node.closest('.cal-day').getBoundingClientRect().width}));
-    expect(summaryStyle.fontSize).toBeGreaterThanOrEqual(12);
-    expect(summaryStyle.lineClamp).toBe('2');
-    expect(summaryStyle.width).toBeLessThanOrEqual(summaryStyle.cellWidth);
+    expect(box.width).toBeLessThanOrEqual(box.cellWidth);
     for (const event of busy[1]) await expect(cell).toHaveAttribute('aria-label', new RegExp(event.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
     await verifyCards(page, detail);
     await verifyMonthHierarchy(page);

@@ -42,7 +42,8 @@ test('month preview starts on device today and opens the original event reminder
   await expect(page.locator('.cal-day[tabindex="0"]')).toHaveCount(1);
   await expect(page.locator('.cal-week')).toHaveCount(6);
   await expect(page.locator('.cal-weekdays [role="columnheader"]')).toHaveText(['一', '二', '三', '四', '五', '六', '日']);
-  await expect(page.locator('.cal-legend')).toHaveCount(0);
+  // One legend line explains the dots (hidden while nothing is chosen).
+  await expect(page.locator('.cal-legend')).toHaveCount(1);
   await expect(page.locator('#preview-zone')).toHaveCount(0);
   await expect(page.locator('#zone-settings')).toBeVisible();
 
@@ -107,19 +108,22 @@ test('preview, calendar-app choice and guide confirmations never modify a saved 
   await page.locator('[data-cal-view="list"]').click();
   await page.locator('[data-cal-action="more"]').click();
   await page.locator('#my-subscription').click();
+  await expect(page.locator('#manage-panel')).toBeVisible();
+  await expect(page.locator('input[name="device"][value="google"]')).toBeHidden();
+  await page.locator('#manage-add').click();
   await page.locator('input[name="device"][value="google"]').check();
   await page.locator('#guide-seen').check();
   await page.locator('[data-guide-expand]>summary').click();
   await page.locator('#guide-reminders').check();
   await page.locator('[data-close="subscription-dialog"]').first().click();
-  await expect(page.locator('#save-state')).toHaveText('已保存，日历稍后自动更新');
+  await expect(page.locator('#save-state')).toHaveText('已同步到日历，改动会自动更新');
   await expect(page.locator('#subscribe')).not.toContainText('保存修改');
   expect(await readStored(page, settingsKey)).toEqual(settings);
   expect((await readStored(page, subscriptionKey)).revision).toBe(subscription.revision);
   expect((await readStored(page, subscriptionKey)).feedUrl).toBe(subscription.feedUrl);
   expect((await readStored(page, uiKey)).app).toBe('google');
   await page.reload();
-  await expect(page.locator('#save-state')).toHaveText('已保存，日历稍后自动更新');
+  await expect(page.locator('#save-state')).toHaveText('已同步到日历，改动会自动更新');
   await page.locator('#my-subscription').click();
   await expect(page.locator('input[name="device"][value="google"]')).toBeChecked();
   await expect(page.locator('#guide-seen')).toBeChecked();

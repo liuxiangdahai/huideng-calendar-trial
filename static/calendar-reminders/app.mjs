@@ -143,6 +143,11 @@ function checkDeviceTime() {
 }
 function renderPresets() {
   const current=matchingPreset(settings,data.catalog);
+  // The plan above and the categories below are one choice at two levels of
+  // detail: say which plan filled them, or that they are now hand-picked.
+  const plan=PRESETS.find(preset=>preset.id===current);
+  $('#category-source').textContent=plan ? `下面已按“${plan.title}”勾选；在这里改动后，就变成自选`
+    : countSelected() ? '自选：已在下面逐项调整，上方方案不再选中' : '';
   $('#preset-options').innerHTML=PRESETS.map(preset=>`<button class="preset-card" type="button" data-preset="${preset.id}" aria-pressed="${current===preset.id}"${preset.id==='practice'?' aria-describedby="preset-scope-note"':''}><span class="preset-icon">${icon(preset.icon)}</span><span class="preset-copy"><strong>${preset.title}<small>${presetIds(data.catalog,preset.id).length} 项</small></strong><span>${preset.description}</span><em>${icon('bell')}${preset.reminder}</em></span><span class="preset-check" aria-hidden="true">${current===preset.id?icon('check'):''}</span></button>`).join('');
   $('#clear-selection').disabled=!hasSelectedContent();
   $('#include-daily-dates').checked=settings.includeDailyDates===true;
@@ -218,6 +223,12 @@ function renderQuickAdd() {
   $('#share-settings').lastChild.textContent=phone ? '把这套设置分享给师兄' : '用手机扫码继续 · 分享给师兄';
   renderSubscribedCard();
 }
+function nextReminderText() {
+  const next=upcoming.find(event=>event.preference?.mode==='remind') || upcoming.find(event=>event.kind!=='daily-date');
+  if(!next) return '目前没有即将到来的修行日';
+  const [, month, day]=next.date.split('-').map(Number);
+  return next.preference?.mode==='remind' ? `下一次提醒：${month}月${day}日 ${next.title} · ${reminderLabel(next.preference.reminders)}` : `下一个修行日：${month}月${day}日 ${next.title}（仅显示）`;
+}
 function renderSubscribedCard() {
   const card=$('#subscribed-card'), show=Boolean(subscription) && !stopped && !conflict && !dirty();
   card.hidden=!show; if(!show)return;
@@ -234,12 +245,12 @@ function renderSubscribedCard() {
     : `下一个修行日：${month}月${day}日 ${next.title}（仅显示）`;
 }
 // The bottom bar always says what happens next, in the person's own terms.
+// The bar speaks only when it has something to say: what to do first, or
+// that nothing will ring. Times can differ per day, so none is repeated here;
+// they are in step 2 and on each day.
 function nextStepText() {
   if(!hasSelectedContent()) return '第 1 步：选择要提醒的日子';
-  const prefs=remindPrefs();
-  if(!prefs.length) return '只显示日期，不响铃';
-  const times=new Set(prefs.map(pref=>JSON.stringify(pref.reminders)));
-  return times.size===1 ? `提醒：${reminderLabel(prefs[0].reminders)}` : '提醒时间已逐项设置';
+  return remindPrefs().length ? '' : '只显示日期，不响铃';
 }
 // A share link carries the preset, the shared reminder time, the everyday
 // layer and the title style. Per-item fine tuning stays with its owner.
@@ -274,7 +285,9 @@ function applySharedSettings() {
   const time=params.get('t')?.match(/^([0-7])-([01]\d|2[0-3])([0-5]\d)$/);
   if(time) for(const pref of Object.values(next.events)) if(pref.mode==='remind') pref.reminders=[{daysBefore:Number(time[1]),time:`${time[2]}:${time[3]}`}];
   if(params.get('d')==='1') next.includeDailyDates=true;
-  if(['words','none'].includes(params.get('m'))) next.titleMarks=params.get('m'); else delete next.titleMarks;
+  // Two styles are offered: none (default) or symbols. Anything else falls
+  // back to none.
+  if(params.get('m')==='symbols') next.titleMarks='symbols'; else delete next.titleMarks;
   settings=next;
   return '已按分享的设置选好，确认后点底部按钮加入日历。';
 }
@@ -285,16 +298,19 @@ function renderSaveState() {
   $('#reminder-count').textContent = dailyOnly ? '仅显示' : `${Object.values(settings.events).filter(pref=>pref.mode==='remind').length} 项提醒`;
   $('#daily-date-count').hidden=!settings.includeDailyDates || !count;
   $('#subscribe').setAttribute('aria-busy',String(requestPending||managementRestoring));
-  $('#save-state').textContent = stopped ? '已停用，请在手机移除订阅日历' : conflict ? '设置已在其他设备修改' : changed ? '有改动，保存后同步到日历' : subscription ? '已保存，日历稍后自动更新' : nextStepText();
+  $('#save-state').textContent = stopped ? '已停用，请在手机移除订阅日历' : conflict ? '设置已在其他设备修改' : changed ? '有改动，保存后同步到日历' : subscription ? '已同步到日历，改动会自动更新' : nextStepText();
   $('#unsaved-dot').hidden = !changed;
-  $('#subscribe-label').textContent = managementRestoring ? '正在恢复订阅…' : requestPending ? '正在保存…' : subscription ? (changed ? '保存修改' : '查看订阅') : deviceLabel();
-  for(const input of document.querySelectorAll('input[name="title-marks"]')) input.checked=input.value===(settings.titleMarks||'symbols');
+  $('#subscribe-label').textContent = managementRestoring ? '正在恢复订阅…' : requestPending ? '正在保存…' : subscription ? (changed ? '保存修改' : '我的订阅') : deviceLabel();
+  for(const input of document.querySelectorAll('input[name="title-marks"]')) input.checked=input.value===(settings.titleMarks||'none');
   const ctaDisabled = requestPending || managementRestoring || (!subscription && !hasSelectedContent());
   // The first time the main button becomes usable, it gives one gentle pulse
   // so the eye finds the next step. Not on load, not on later changes.
   if(renderSaveState.wasDisabled===true && !ctaDisabled && !subscription && !renderSaveState.nudged){renderSaveState.nudged=true;requestAnimationFrame(()=>playMotion($('#subscribe'),'nudge'));}
   renderSaveState.wasDisabled=ctaDisabled;
   $('#subscribe').disabled = ctaDisabled;
+  // With a saved subscription and nothing to save, the bottom button becomes
+  // a quiet "我的订阅": the thumb-reachable way back to the manage panel.
+  $('#subscribe').classList.toggle('is-quiet', Boolean(subscription) && !changed && !requestPending && !managementRestoring && !conflict && !stopped);
   // This opens the existing panel only. Keep it available while saving so a
   // user who closed the panel can return to progress, help or a failure state.
   $('#my-subscription').disabled = false;
@@ -309,7 +325,7 @@ function refresh(rebuild = true) {
 function renderReminderFields() {
   const enabled = reminderDraft.mode === 'remind';
   $('#reminder-fields').hidden = !enabled;
-  $('#reminder-fields').innerHTML = reminderDraft.reminders.map((reminder,index) => `<div class="reminder-row"><label>第 ${index+1} 次提醒<select data-reminder-index="${index}" data-reminder-field="daysBefore" aria-label="第${index+1}次提醒日期" ${!enabled ? 'disabled' : ''}>${[[0,'当天'],[1,'提前一天'],[2,'提前两天'],[7,'提前一周']].map(([value,label]) => `<option value="${value}" ${reminder.daysBefore === value ? 'selected' : ''}>${label}</option>`).join('')}</select></label><label>具体时间<input type="time" required value="${esc(reminder.time)}" data-reminder-index="${index}" data-reminder-field="time" aria-label="第${index+1}次提醒时间" ${!enabled ? 'disabled' : ''}></label><button type="button" class="icon-button" data-remove-reminder="${index}" aria-label="删除第${index+1}次提醒" ${reminderDraft.reminders.length === 1 ? 'disabled' : ''}>${icon('close')}</button></div>`).join('') + (reminderDraft.reminders.length < 2 ? `<button type="button" class="text-button" id="add-reminder">${icon('plus')}再加一次提醒</button>` : '');
+  $('#reminder-fields').innerHTML = reminderDraft.reminders.map((reminder,index) => `<div class="reminder-row${reminderDraft.reminders.length === 1 ? ' is-single' : ''}"><label>${reminderDraft.reminders.length === 1 ? '提醒日期' : `第 ${index+1} 次提醒`}<select data-reminder-index="${index}" data-reminder-field="daysBefore" aria-label="第${index+1}次提醒日期" ${!enabled ? 'disabled' : ''}>${[[0,'当天'],[1,'提前一天'],[2,'提前两天'],[7,'提前一周']].map(([value,label]) => `<option value="${value}" ${reminder.daysBefore === value ? 'selected' : ''}>${label}</option>`).join('')}</select></label><label>具体时间<input type="time" required value="${esc(reminder.time)}" data-reminder-index="${index}" data-reminder-field="time" aria-label="第${index+1}次提醒时间" ${!enabled ? 'disabled' : ''}></label>${reminderDraft.reminders.length === 1 ? '' : `<button type="button" class="icon-button" data-remove-reminder="${index}" aria-label="删除第${index+1}次提醒">${icon('close')}</button>`}</div>`).join('') + (reminderDraft.reminders.length < 2 ? `<button type="button" class="text-button" id="add-reminder">${icon('plus')}再加一次提醒</button>` : '');
 }
 function openReminders(ids, title, trigger=document.activeElement) {
   const key=['data-cal-focus','data-reminder-event','data-reminder-group'].find(name=>trigger?.hasAttribute(name));
@@ -335,7 +351,7 @@ function deviceGuide() {
   apple.tabIndex=ready ? 0 : -1;
   if(ready && appleUrl && !inAppApple) apple.href=appleUrl; else apple.removeAttribute('href');
   $('#apple-browser-notice').hidden=!inAppApple;
-  $('#apple-browser-title').textContent=calendarDevice.appleMobile ? '请先在 Safari 中打开' : '请先在系统浏览器中打开';
+  $('#apple-browser-title').textContent='请先在浏览器中打开';
   $('#apple-browser-message').textContent=inAppApple ? `当前在${calendarDevice.inAppBrowser}中，日历跳转可能被拦截。请点右上角“…”菜单，选择“在浏览器中打开”或“在 Safari 中打开”。` : '';
   const google=$('#google-subscribe');
   google.hidden=app!=='google'||calendarDevice.mobile||!subscription;
@@ -408,6 +424,22 @@ async function checkConnection() {
 }
 function renderSubscription() {
   $('#subscription-summary').textContent = `${selectionSummary()} · 全天显示 · ${zoneLabel()}`;
+  // Once a calendar is added, this panel is "my subscription": status and
+  // actions first; the add-a-calendar guide folds behind one button.
+  // Only a subscription that already existed when the panel opened counts:
+  // someone in the middle of adding keeps the add steps in view.
+  const dialog=$('#subscription-dialog'), managing=Boolean(subscription) && dialog.dataset.mode==='manage';
+  dialog.classList.toggle('is-managing',managing);
+  if(!managing) dialog.classList.remove('show-add');
+  $('#manage-panel').hidden=!managing;
+  $('#manage-add').setAttribute('aria-expanded',String(dialog.classList.contains('show-add')));
+  $('#subscription-title').textContent=managing ? '我的订阅' : '加入日历';
+  $('#subscription-dialog .overline').textContent=managing ? '已加入日历' : '我的订阅';
+  $('#entry-title').lastChild.textContent=managing ? '订阅地址' : '添加到日历';
+  if(managing){
+    $('#manage-title').lastChild.textContent=stopped ? '这份订阅已停用' : conflict ? '设置已在其他设备修改' : dirty() ? '有改动尚未保存' : '已加入日历，正在同步';
+    $('#manage-next').textContent=dirty() ? '保存后，日历会在几小时内更新；订阅地址不变' : nextReminderText();
+  }
   $('#subscription-new').hidden = Boolean(subscription);
   $('#subscription-existing').hidden = !subscription;
   $('#subscription-management').hidden = !subscription;
@@ -434,6 +466,7 @@ function openSubscription({prepare=false}={}) {
     $(`input[name="device"][value="${calendarDevice.recommendedApp}"]`).checked=true;
     ui.app=calendarDevice.recommendedApp; persistUI();
   }
+  if (!$('#subscription-dialog').open) $('#subscription-dialog').dataset.mode=subscription ? 'manage' : 'add';
   renderSubscription();
   if (!$('#subscription-dialog').open) $('#subscription-dialog').showModal();
   if(prepare) {
@@ -541,7 +574,7 @@ async function performSaveSubscription(create) {
     const attempt=create ? creationAttempt() : null;
     const submitted = clone(attempt ? attempt.settings : settings);
     const result = await api(create ? 'POST' : 'PATCH',create ? '/api/subscriptions' : `/api/subscriptions/${encodeURIComponent(subscription.id)}`,
-      create ? {settings:submitted} : {settings:{...submitted,titleMarks:submitted.titleMarks||'symbols'},revision:subscription.revision},undefined,attempt?.key);
+      create ? {settings:submitted} : {settings:{...submitted,titleMarks:submitted.titleMarks||'none'},revision:subscription.revision},undefined,attempt?.key);
     if(create && (!/^[a-f0-9-]{36}$/.test(result.id) || !/^[A-Za-z0-9_-]{43}$/.test(result.manageToken) ||
         !Number.isSafeInteger(result.revision) || result.revision<1 || !result.settings || result.disabled)) {
       throw new Error('订阅服务返回的信息不完整。创建进度已保留，请重试恢复同一份订阅。');
@@ -675,15 +708,21 @@ function attachEvents() {
   });
   $('#share-settings').addEventListener('click',openShare);
   $('#subscribed-open').addEventListener('click',()=>openSubscription());
+  $('#manage-share').addEventListener('click',()=>openShare());
+  $('#manage-add').addEventListener('click',()=>{
+    const dialog=$('#subscription-dialog'), show=!dialog.classList.contains('show-add');
+    dialog.classList.toggle('show-add',show);$('#manage-add').setAttribute('aria-expanded',String(show));
+    if(show) $('.device-options')?.scrollIntoView({block:'nearest',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+  });
   for(const input of document.querySelectorAll('input[name="title-marks"]')) input.addEventListener('change',()=>{
-    if(input.value==='symbols') delete settings.titleMarks; else settings.titleMarks=input.value;
+    if(input.value==='none') delete settings.titleMarks; else settings.titleMarks=input.value;
     stopped=false;refresh(false);
     notify(subscription?'标记样式已改；保存修改后，日历下次同步时更新。':'标记样式已改。');
   });
   if(calendarDevice.inAppBrowser){
     $('#wechat-banner').hidden=false;
-    if(calendarDevice.appleMobile) $('#wechat-banner-text').innerHTML=`${esc(calendarDevice.inAppBrowser)}会拦截“加入日历”。点右上角 <b>···</b>，选择“在 Safari 中打开”，再继续操作。已在 Safari 里加过的，在 Safari 里打开就能看到，不用再加。`;
-    else $('#wechat-banner-text').innerHTML=`${esc(calendarDevice.inAppBrowser)}会拦截“加入日历”。点右上角 <b>···</b>，选择“在浏览器打开”，再继续操作。已在浏览器里加过的，在浏览器里打开就能看到，不用再加。`;
+    // Any browser will do; naming one brand would confuse people on other phones.
+    $('#wechat-banner-text').innerHTML=`${esc(calendarDevice.inAppBrowser)}里不能直接加入日历。点右上角 <b>···</b>，选择“在浏览器中打开”再继续；已在浏览器里加过的，在浏览器里打开就能看到`;
   }
   // Clouds only drift while the banner is on screen: no work for a hidden layer.
   const clouds=$('.masthead-clouds');
@@ -724,6 +763,13 @@ function attachEvents() {
   window.addEventListener('focus',checkDeviceTime);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkDeviceTime();});
   window.addEventListener('hashchange',() => { void restoreManagementLink(); });
+  // Tapping a symbol anywhere it stands for a day (list, day cards, the
+  // masthead knot) plays its own motion — a small reward for curiosity.
+  document.addEventListener('click',event=>{
+    const holder=event.target.closest?.('.cal-event-icon, .cal-daily-icon, .masthead-next .icon, .masthead-next');
+    if(!holder)return;
+    playSymbol(holder.matches('svg') ? holder : holder.querySelector('svg'));
+  });
   // Opening a category by hand plays its symbol; restored or re-drawn open
   // categories stay still.
   const openedByHand=new WeakSet();
@@ -738,9 +784,7 @@ function attachEvents() {
     if (event.target.checked) settings.events[id] = clone(lastActive.get(id) || {mode:'display',reminders:pref.reminders.length ? pref.reminders : defaultReminders()});
     else { lastActive.set(id,clone(pref)); pref.mode = 'off'; }
     stopped = false; refresh();
-    const box=document.getElementById(`event-${id}`);
-    playMotion(box,'check');
-    if(event.target.checked) playSymbol(box?.closest('.group-card')?.querySelector('.group-icon svg'));
+    playMotion(document.getElementById(`event-${id}`),'check');
   });
   $('#groups').addEventListener('click',event => {
     const button = event.target.closest('button'); if (!button) return;
@@ -754,7 +798,6 @@ function attachEvents() {
         else if (pref.mode === 'off') settings.events[item.id] = clone(lastActive.get(item.id) || {mode:'display',reminders:pref.reminders.length ? pref.reminders : defaultReminders()});
       }
       stopped = false; refresh();
-      if (button.dataset.selectGroup) playSymbol(document.querySelector(`.group-card[data-group-id="${CSS.escape(groupId)}"] .group-icon svg`));
     } else if (button.dataset.reminderEvent) {
       const item = data.catalog.events.find(item => item.id === button.dataset.reminderEvent);
       openReminders([item.id],item.title,button);
