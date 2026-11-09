@@ -5,7 +5,7 @@ test('mobile sticky tabs preserve independent panel positions, month and focused
  await page.locator('[data-preset="practice"]').click();
  await page.locator('#advanced-settings>summary').click();
  const group=page.locator('[data-group-id="masters"]');await group.locator('summary').click();
- await page.locator('.selection-footer').scrollIntoViewIfNeeded();
+ await page.locator('.title-marks').scrollIntoViewIfNeeded();
  await expect.poll(()=>page.locator('.mobile-tabs').evaluate(n=>Math.round(n.getBoundingClientRect().top))).toBe(0);
  const saved=await page.evaluate(()=>scrollY);
  await tapTab('#tab-preview');

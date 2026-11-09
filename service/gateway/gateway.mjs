@@ -13,11 +13,12 @@ export const GATEWAY_FAILURE_STAGES = Object.freeze([
   'unexpected_response_type', 'response_forward', 'gateway_failure'
 ]);
 const FAILURE_HEADER = 'X-Calendar-Gateway-Stage';
+const RETRY_HEADER = 'X-Calendar-Gateway-Retry';
 
 function protect(response, request, isAPI = false) {
   const headers = new Headers(response.headers);
   // Only this gateway may label its own failures; do not trust a backend label.
-  headers.delete(FAILURE_HEADER);
+  headers.delete(FAILURE_HEADER); headers.delete(RETRY_HEADER);
   headers.set('X-Content-Type-Options', 'nosniff');
   headers.set('Referrer-Policy', 'no-referrer');
   headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
@@ -66,7 +67,17 @@ export function createGateway(release) {
       // No fetch to workers.dev. The original headers, body, client context and
       // conditional requests stay intact when crossing the Service Binding.
       stage = 'binding_fetch';
-      result = await env.CALENDAR_SERVICE.fetch(health && request.method === 'HEAD' ? new Request(request, {method:'GET'}) : request);
+      const call = () => env.CALENDAR_SERVICE.fetch(health && request.method === 'HEAD' ? new Request(request, {method:'GET'}) : request);
+      // A calendar app's feed read is idempotent and has no body. On the free
+      // plan a regeneration can occasionally be cut off; one immediate retry
+      // usually lands on a warm isolate. It is marked so smoke checks can still
+      // count it, and health checks and writes are never retried.
+      let retried = false;
+      try { result = await call(); }
+      catch (error) {
+        if (health || !['GET', 'HEAD'].includes(request.method) || !url.pathname.startsWith('/calendar/')) throw error;
+        retried = true; result = await call();
+      }
       if (result.status >= 300 && result.status < 400 && result.status !== 304) {
         stage = 'unexpected_redirect';
         await result.body?.cancel(); throw new Error('Unexpected redirect');
@@ -86,7 +97,9 @@ export function createGateway(release) {
         if (type !== expected) { stage = 'unexpected_response_type'; await result.body?.cancel(); throw new Error('Unexpected response type'); }
       }
       stage = 'response_forward';
-      return protect(result, request, isAPI);
+      const forwarded = protect(result, request, isAPI);
+      if (retried) forwarded.headers.set(RETRY_HEADER, '1');
+      return forwarded;
     } catch {
       // Do not include exception text: runtime errors can contain capability URLs.
       const response = protect(json({error:'暂时无法连接订阅服务，请稍后重试。'},503),request,isAPI);

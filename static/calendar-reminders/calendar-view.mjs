@@ -180,7 +180,7 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     const dx = event.changedTouches[0].clientX - swipe.x, dy = event.changedTouches[0].clientY - swipe.y; swipe = null;
     if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.6) {
       suppressClick = true; setTimeout(() => { suppressClick = false; }, 400);
-      changeMonth(shiftMonth(month + '-01', dx < 0 ? 1 : -1).slice(0, 7));
+      stay(() => changeMonth(shiftMonth(month + '-01', dx < 0 ? 1 : -1).slice(0, 7)));
     }
   }, {passive: true});
   let suppressClick = false;
@@ -371,8 +371,20 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     announce(monthTitle(month));
   }
 
+  // Safari can move the page while the month grid is re-drawn (seen in
+  // WebKit: a date tap jumped the page up by ~130px). Re-drawing never needs
+  // to move the reader, so every re-draw keeps the scroll position exactly.
+  function stay(fn) {
+    const x = win?.scrollX ?? 0, y = win?.scrollY ?? 0;
+    const result = fn();
+    if (win && (win.scrollX !== x || win.scrollY !== y)) win.scrollTo(x, y);
+    return result;
+  }
   function onClick(event) {
     if (suppressClick) return;
+    return stay(() => onClickInner(event));
+  }
+  function onClickInner(event) {
     const button = event.target.closest('button');
     if (!button || !root.contains(button)) return;
     if (button.dataset.calView) return setView(button.dataset.calView);
@@ -407,7 +419,8 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     }
   }
 
-  function onKeyDown(event) {
+  function onKeyDown(event) { return stay(() => onKeyDownInner(event)); }
+  function onKeyDownInner(event) {
     const button = event.target.closest('[data-cal-date]');
     if (!button || !root.contains(button) || event.altKey || event.ctrlKey || event.metaKey) return;
     const next = navigateDate(button.dataset.calDate, event.key, state);
@@ -419,7 +432,7 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     if(month!==previousMonth) playMotion($('[data-cal-grid]'),'month',month>previousMonth ? 1 : -1);
   }
   function onChange(event) {
-    if (event.target.matches('[data-cal-month]')) changeMonth(event.target.value);
+    if (event.target.matches('[data-cal-month]')) stay(() => changeMonth(event.target.value));
   }
   root.addEventListener('click', onClick);
   root.addEventListener('keydown', onKeyDown);
@@ -442,7 +455,7 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
       selected = clamp(selected, state.start, state.end); focusDate = clamp(focusDate, state.start, state.end);
       // A rolling-boundary update can remove the previously focused day from this month.
       if (focusDate.slice(0, 7) !== month) focusDate = clamp(month + '-01', state.start, state.end);
-      render();
+      stay(render);
       if (anchorDate && win) {
         const updated = [...root.querySelectorAll('[data-cal-list-date]')].find(node => node.dataset.calListDate === anchorDate);
         if (updated) win.scrollBy({top: updated.getBoundingClientRect().top - anchorTop, behavior: 'instant'});
