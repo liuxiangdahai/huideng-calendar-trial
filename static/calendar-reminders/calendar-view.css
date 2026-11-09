@@ -176,13 +176,24 @@
 .cal-day.cal-selected.cal-is-today .cal-gregorian { box-shadow: 0 0 0 2px var(--surface), 0 0 0 3px var(--wine); }
 .cal-leap, .cal-repeat { color: var(--muted); }
 
-/* ── Everyday layer in the grid ─────────────────────────────────────────── */
-.cal-tibetan.is-daily { color: var(--gold); font-weight: 500; }
-.cal-day.cal-adjacent .cal-tibetan.is-daily { color: #b9a37a; }
+/* ── Everyday layer in the grid ───────────────────────────────────────────
+   Its own quiet line in lapis ink — no fill, no edge — so it never reads
+   like a festival label (cream/gold) or a reminder (carmine). */
+.cal-daily-line { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; width: 100%; min-width: 0; margin-top: 2px; color: var(--teal-2);
+  font-size: var(--fs-2xs); line-height: 16px; text-align: left; overflow: hidden; overflow-wrap: anywhere; }
+.cal-daily-line[data-mark]::before { opacity: 1; }
+.cal-daily-short { display: none; }
+.cal-day.cal-adjacent .cal-daily-line { color: #8a9ab3; }
+@media (max-width: 1023px) {
+  .cal-daily-line { display: block; text-align: center; font-size: 11px; line-height: 14px; white-space: nowrap; }
+  [data-marks=words] :is(.cal-daily-line, .cal-mobile-event)[data-mark]::before { content: none; }
+  .cal-daily-full { display: none; }
+  .cal-daily-short { display: inline; }
+}
 
 /* ── List: the everyday date is one quiet line ──────────────────────────── */
 .cal-daily-entry.is-compact { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; padding: 2px 0 6px; border-bottom: 0; }
-.cal-daily-entry.is-compact h4 { font: 500 var(--fs-md)/1.6 var(--font-serif); color: var(--gold); }
+.cal-daily-entry.is-compact h4 { font: 500 var(--fs-md)/1.6 var(--font-serif); color: var(--teal-2); }
 .cal-daily-entry.is-compact .cal-daily-meta { font-size: var(--fs-xs); }
 .cal-daily-entry.is-compact+.cal-event { margin-top: 2px; }
 .cal-list-view:has(.is-compact) .cal-list-day { padding: 12px 0; }

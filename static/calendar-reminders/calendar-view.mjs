@@ -241,10 +241,18 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
       tibetanYears.set(cell.tibetan.yearName, months);
     }
     $('[data-cal-context]').textContent = [...tibetanYears].map(([year, months]) => `藏历${year}年 ${[...months].join(' · ')}`).join('　');
-    // With the everyday layer on, each Tibetan date in the grid is the entry
-    // that will appear in the calendar app: tinted, with the everyday mark.
+    // With the everyday layer on, each day gets its own quiet line showing
+    // the entry the calendar app will show, with the chosen mark (◦, 【每日】
+    // or none). A phone cell is too narrow for the date, so it shows “每日”
+    // (with ◦ in symbol style); word marks such as 【修行日】 would hide the
+    // name there, so phones show them in the day sheet and list instead.
     const daily = state.settings?.includeDailyDates === true;
-    const dailyMark = (state.settings?.titleMarks || 'symbols') === 'symbols' ? '◦' : '';
+    const dailyLine = cell => {
+      if (!daily || cell.disabled || !cell.tibetan) return '';
+      const entry = dailyDateOccurrences(cell.date, cell.date)[0];
+      if (!entry) return '';
+      return `<span class="cal-daily-line" aria-hidden="true"${markAttr(entry, state.settings?.titleMarks)}><span class="cal-daily-full">${escape(entry.title)}</span><span class="cal-daily-short">每日</span></span>`;
+    };
     const header = `<div class="cal-weekdays" role="row">${WEEKDAYS.map(day => `<span role="columnheader" aria-label="星期${day}">${day}</span>`).join('')}</div>`;
     const rows = Array.from({length: 6}, (_, row) => `<div class="cal-week" role="row">${cells.slice(row * 7, row * 7 + 7).map(cell => {
       const cellEvents = cell.disabled ? [] : cell.events;
@@ -257,7 +265,7 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
       }).join('');
       const mobileSummary = cellEvents.length ? `<span class="cal-mobile-events" aria-hidden="true"><span class="cal-mobile-event ${eventPresentation(cellEvents[0], state.data?.catalog).colorClass}${cellEvents[0].preference?.mode === 'remind' ? ' is-remind' : ''}" title="${escape(cellEvents[0].title)}"${markAttr(cellEvents[0], state.settings?.titleMarks)}>${escape(cellEvents[0].title)}</span>${cellEvents.length > 1 ? `<span class="cal-mobile-more">另 ${cellEvents.length - 1} 项</span>` : ''}</span>` : '';
       return `<div role="gridcell" aria-selected="${cell.selected}" class="cal-cell"><button type="button" class="cal-day${cell.inMonth ? '' : ' cal-adjacent'}${cell.selected ? ' cal-selected' : ''}${cell.today ? ' cal-is-today' : ''}" data-cal-date="${cell.date}" data-cal-focus="date-${cell.date}" tabindex="${cell.date === focusDate && !cell.disabled ? 0 : -1}" aria-label="${escape(aria)}"${cell.today ? ' aria-current="date"' : ''}${cell.disabled ? ' disabled' : ''}>
-        <span class="cal-day-date" aria-hidden="true"><span class="cal-gregorian">${cell.day}</span><span class="cal-tibetan${daily && cell.tibetan && !cell.disabled ? ' is-daily' : ''}"${daily && cell.tibetan && !cell.disabled && dailyMark ? ` data-mark="${escape(dailyMark)}"` : ''}>${escape(cell.tibetan ? dayPart(cell.tibetan) : '')}</span></span>
+        <span class="cal-day-date" aria-hidden="true"><span class="cal-gregorian">${cell.day}</span><span class="cal-tibetan">${escape(cell.tibetan ? dayPart(cell.tibetan) : '')}</span></span>${dailyLine(cell)}
         <span class="cal-marks" aria-hidden="true">${cell.tibetan?.monthLeap ? '<span class="cal-leap">闰月</span>' : ''}${cell.repeatNumber ? `<span class="cal-repeat">重日${cell.repeatNumber}</span>` : ''}${cellEvents.length ? `<span class="cal-category-marks">${markers.slice(0, 3).map(color => `<i class="cal-category-dot ${color}"></i>`).join('')}</span><span class="cal-event-count">${cell.count}</span>` : ''}</span>
         <span class="cal-day-events" aria-hidden="true">${labels}</span>${mobileSummary}</button></div>`;
     }).join('')}</div>`).join('');
@@ -269,6 +277,7 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     const before = grid.dataset.month === month ? new Set([...grid.querySelectorAll('.cal-mini-event,.cal-mobile-event')].map(labelKey)) : null;
     grid.innerHTML = header + rows;
     grid.dataset.month = month;
+    grid.dataset.marks = state.settings?.titleMarks || 'symbols';
     if (before) [...grid.querySelectorAll('.cal-mini-event,.cal-mobile-event')].filter(node => !before.has(labelKey(node)) && node.offsetParent)
       .slice(0, 16).forEach(node => playMotion(node, 'appear'));
     renderDetail();
