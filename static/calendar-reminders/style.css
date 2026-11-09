@@ -623,3 +623,5 @@ input[type=time]::-webkit-datetime-edit { padding: 0; }
 .category-source:empty { display: none; }
 /* Symbols that answer a tap */
 :is(.cal-event-icon, .cal-daily-icon, .masthead-next) { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+
+#save-state:empty { display: none; }

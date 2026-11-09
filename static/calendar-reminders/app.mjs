@@ -245,12 +245,12 @@ function renderSubscribedCard() {
     : `下一个修行日：${month}月${day}日 ${next.title}（仅显示）`;
 }
 // The bottom bar always says what happens next, in the person's own terms.
+// The bar speaks only when it has something to say: what to do first, or
+// that nothing will ring. Times can differ per day, so none is repeated here;
+// they are in step 2 and on each day.
 function nextStepText() {
   if(!hasSelectedContent()) return '第 1 步：选择要提醒的日子';
-  const prefs=remindPrefs();
-  if(!prefs.length) return '只显示日期，不响铃';
-  const times=new Set(prefs.map(pref=>JSON.stringify(pref.reminders)));
-  return times.size===1 ? `提醒：${reminderLabel(prefs[0].reminders)}` : '提醒时间已逐项设置';
+  return remindPrefs().length ? '' : '只显示日期，不响铃';
 }
 // A share link carries the preset, the shared reminder time, the everyday
 // layer and the title style. Per-item fine tuning stays with its owner.
