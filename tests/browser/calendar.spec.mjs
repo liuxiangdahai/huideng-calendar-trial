@@ -84,7 +84,7 @@ test('category and individual reminder settings export real all-day events and p
   expect(quiet).not.toContain('BEGIN:VALARM');
   await page.locator('input[name="device"][value="google"]').check();
   await expect(page.locator('#device-guide')).toContainText('电脑浏览器');
-  await expect(page.locator('#device-guide')).toContainText('提醒时间可能不会生效');
+  await expect(page.locator('#device-guide')).toContainText('不读取文件里的提醒');
   await page.locator('input[name="device"][value="other"]').check();
   await expect(page.locator('#device-guide')).toContainText('文件导入');
   await closeSubscription(page); await page.reload();
