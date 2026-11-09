@@ -37,9 +37,16 @@ export function playMotion(node, kind = 'reveal', direction = 1) {
         ? [{opacity:.65}, {opacity:1}]
         : kind === 'view'
           ? [{opacity:0,transform:'translateY(6px)'}, {opacity:1,transform:'translateY(0)'}]
+        : kind === 'pane'
+          ? [{opacity:.4,transform:`translateX(${direction * 14}px)`}, {opacity:1,transform:'translateX(0)'}]
+        : kind === 'appear'
+          ? [{opacity:0,transform:'scale(.9)'}, {opacity:1,transform:'scale(1)'}]
+        : kind === 'nudge'
+          ? [{transform:'scale(1)'}, {transform:'scale(1.035)',offset:.45}, {transform:'scale(1)'}]
         : [{opacity:.65,transform:'translateY(6px)'}, {opacity:1,transform:'translateY(0)'}];
   try {
-    const animation = node.animate(frames, {duration:kind === 'month' ? 200 : kind === 'view' ? 240 : 180, easing:'cubic-bezier(.2,.7,.2,1)'});
+    const duration = {month:200, view:240, pane:220, appear:220, nudge:460}[kind] || 180;
+    const animation = node.animate(frames, {duration, easing:'cubic-bezier(.2,.7,.2,1)'});
     animation.id = `calendar-${kind}`;
     active.set(node, animation);
     const clean = () => { if (active.get(node) === animation) active.delete(node); };

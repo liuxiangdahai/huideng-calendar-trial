@@ -93,7 +93,7 @@
 /* Redesign layer: quiet status before preparation, shared stage numerals. */
 .connection-status[data-prepared=false]{display:none}
 #entry-hint:empty{display:none}
-.guide-stage-number{background:var(--teal-tint,#efeeeb);color:var(--teal,#2f3e5a);font-family:var(--font-num,Georgia,serif)}
+.guide-stage-number{background:var(--red-tint,#f8ecea);color:var(--wine,#7a1824);font-family:var(--font-num,Georgia,serif)}
 .browser-handoff{background:var(--surface-2,#f6f3ee)}
 .guide-notifications{border-color:var(--line-2,#cdb894);border-radius:var(--r,6px)}
 .guide-add .secondary,.guide-check .secondary{border-radius:var(--r-sm,4px)}

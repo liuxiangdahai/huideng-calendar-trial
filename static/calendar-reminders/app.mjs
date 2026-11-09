@@ -287,7 +287,12 @@ function renderSaveState() {
   $('#unsaved-dot').hidden = !changed;
   $('#subscribe-label').textContent = managementRestoring ? '正在恢复订阅…' : requestPending ? '正在保存…' : subscription ? (changed ? '保存修改' : '查看订阅') : deviceLabel();
   for(const input of document.querySelectorAll('input[name="title-marks"]')) input.checked=input.value===(settings.titleMarks||'symbols');
-  $('#subscribe').disabled = requestPending || managementRestoring || (!subscription && !hasSelectedContent());
+  const ctaDisabled = requestPending || managementRestoring || (!subscription && !hasSelectedContent());
+  // The first time the main button becomes usable, it gives one gentle pulse
+  // so the eye finds the next step. Not on load, not on later changes.
+  if(renderSaveState.wasDisabled===true && !ctaDisabled && !subscription && !renderSaveState.nudged){renderSaveState.nudged=true;requestAnimationFrame(()=>playMotion($('#subscribe'),'nudge'));}
+  renderSaveState.wasDisabled=ctaDisabled;
+  $('#subscribe').disabled = ctaDisabled;
   // This opens the existing panel only. Keep it available while saving so a
   // user who closed the panel can return to progress, help or a failure state.
   $('#my-subscription').disabled = false;

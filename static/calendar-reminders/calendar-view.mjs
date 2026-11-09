@@ -191,7 +191,16 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
         <span class="cal-marks" aria-hidden="true">${cell.tibetan?.monthLeap ? '<span class="cal-leap">闰月</span>' : ''}${cell.repeatNumber ? `<span class="cal-repeat">重日${cell.repeatNumber}</span>` : ''}${cellEvents.length ? `<span class="cal-category-marks">${markers.slice(0, 3).map(color => `<i class="cal-category-dot ${color}"></i>`).join('')}</span><span class="cal-event-count">${cell.count}</span>` : ''}</span>
         <span class="cal-day-events" aria-hidden="true">${labels}${cellEvents.length > 2 ? `<span class="cal-more-events">另有 ${cellEvents.length - 2} 项</span>` : ''}</span>${mobileSummary}</button></div>`;
     }).join('')}</div>`).join('');
-    $('[data-cal-grid]').innerHTML = header + rows;
+    // When the same month is re-drawn because the selection changed, the
+    // newly added day labels fade in, so a tap on the left visibly lands on
+    // the calendar. Month navigation keeps its own slide; first paint is still.
+    const grid = $('[data-cal-grid]');
+    const labelKey = node => `${node.closest('[data-cal-date]')?.dataset.calDate}|${node.textContent}`;
+    const before = grid.dataset.month === month ? new Set([...grid.querySelectorAll('.cal-mini-event,.cal-mobile-event')].map(labelKey)) : null;
+    grid.innerHTML = header + rows;
+    grid.dataset.month = month;
+    if (before) [...grid.querySelectorAll('.cal-mini-event,.cal-mobile-event')].filter(node => !before.has(labelKey(node)) && node.offsetParent)
+      .slice(0, 16).forEach(node => playMotion(node, 'appear'));
     renderDetail();
   }
 

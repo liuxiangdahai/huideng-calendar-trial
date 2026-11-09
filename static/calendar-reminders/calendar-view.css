@@ -13,7 +13,7 @@
 .cal-toolbar { grid-area: nav; display: grid; grid-template-columns: 44px minmax(0,1fr) 44px auto; align-items: center; gap: 2px; min-width: 0; }
 .cal-arrow, .cal-today { display: flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; padding: 8px; border: 1px solid transparent; border-radius: var(--r-sm); background: transparent; color: var(--ink); }
 .cal-arrow .icon { width: 20px; height: 20px; }
-.cal-today { margin-left: 6px; padding-inline: 14px; border-color: var(--line-2); color: var(--teal); font-size: var(--fs-md); }
+.cal-today { margin-left: 6px; padding-inline: 14px; border-color: var(--line-2); color: var(--wine); font-size: var(--fs-md); }
 @media (hover: hover) { .cal-arrow:hover:not(:disabled), .cal-today:hover:not(:disabled) { background: var(--red-tint); } }
 .cal-arrow:disabled { opacity: .35; }
 .cal-month-picker { position: relative; min-width: 0; }
@@ -74,13 +74,13 @@
 /* Day detail: an 经页 heading, then plain rows. */
 .cal-day-detail { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
 .cal-detail-heading { position: relative; margin-bottom: 6px; }
-.cal-detail-heading h3 { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; color: var(--teal); font: 500 21px/1.5 var(--font-serif); letter-spacing: 1px; }
+.cal-detail-heading h3 { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; color: var(--wine); font: 500 21px/1.5 var(--font-serif); letter-spacing: 1px; }
 .cal-detail-heading h3>span { color: var(--muted); font: 400 var(--fs-md)/1.5 var(--font-ui); letter-spacing: 0; }
 .cal-detail-heading>p { margin-top: 2px; color: var(--muted); font-size: var(--fs-sm); line-height: 1.7; overflow-wrap: anywhere; }
 .cal-event { min-width: 0; padding: 14px 0; border-bottom: 1px solid var(--line); }
 .cal-event:last-child { border-bottom: 0; }
 .cal-event-heading { display: grid; grid-template-columns: 32px minmax(0,1fr); align-items: start; gap: 12px; min-width: 0; }
-.cal-event-icon { display: grid; place-items: center; width: 32px; height: 32px; color: var(--teal); }
+.cal-event-icon { display: grid; place-items: center; width: 32px; height: 32px; color: var(--wine); }
 .cal-event-icon .icon { width: 26px; height: 26px; stroke-width: 1.4; }
 .cal-event-name { min-width: 0; }
 .cal-event h4 { margin: 0; color: var(--ink); font: 500 var(--fs-base)/1.6 var(--font-ui); overflow-wrap: anywhere; }
