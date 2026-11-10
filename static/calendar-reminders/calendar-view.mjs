@@ -148,7 +148,7 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
       <button type="button" data-cal-view="month" data-cal-focus="month-view">${icon('calendar')}<span>月历</span></button>
       <button type="button" data-cal-view="list" data-cal-focus="list-view">${icon('list')}<span>列表</span></button>
     </div></div><section class="cal-month-view" aria-label="月历预览">
-    <p class="cal-key"><span class="cal-key-note">日期下的小字是藏历，与农历不同</span><span class="cal-key-dots" data-cal-key-dots></span></p>
+    <p class="cal-key"><span class="cal-key-note">日期<span class="cal-key-below">下</span><span class="cal-key-beside">旁</span>的小字是藏历，与农历不同</span><span class="cal-key-dots" data-cal-key-dots></span></p>
     <div class="cal-grid" role="grid" aria-label="月历，日期下方小字为藏历。使用方向键浏览日期，回车查看日程" data-cal-grid></div>
     <p class="cal-legend" data-cal-legend></p>
     <section class="cal-day-detail" aria-label="所选日期的日程" data-cal-detail></section>

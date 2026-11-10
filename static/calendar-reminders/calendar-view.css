@@ -240,9 +240,13 @@ dialog.cal-day-sheet::backdrop { background: #1d1b1859; }
    初一 read as an input field and the tint stacked a third stripe). The
    lapis 藏历 tag above and the lapis labels below carry the colour. */
 .cal-key { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2px 12px; margin: 0; padding: 0 0 8px; color: var(--muted); font-size: var(--fs-sm); line-height: 1.6; }
-.cal-key-note { display: inline-flex; align-items: center; gap: 6px; }
+.cal-key-note { display: inline; }
 .cal-key-dots { display: inline-flex; align-items: center; gap: 12px; color: var(--muted); }
 .cal-key-dots:empty { display: none; }
+/* Say where the label actually is: under the date on phones and tablets,
+   beside it on desktop, where the cell puts it to the right (11-10). */
+.cal-key-beside { display: none; }
+@media (min-width: 1024px) { .cal-key-below { display: none; } .cal-key-beside { display: inline; } }
 .cal-tibetan, .cal-day.cal-is-today .cal-tibetan { color: var(--teal-2); }
 .cal-day.cal-is-today .cal-tibetan { font-weight: 600; }
 .cal-day.cal-adjacent .cal-tibetan { color: #566a8c; }
