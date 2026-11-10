@@ -278,13 +278,28 @@ dialog.cal-day-sheet::backdrop { background: #1d1b1859; }
 }
 
 /* 11-10: the Tibetan months are the month's second title, not a footnote.
-   Same serif as 2026年11月, one step down, in lapis. They start on the grid's
-   left edge, as the head of the 藏历 block (months, note, grid); indented
-   under the dropdown they gave the page a third ragged left edge. */
+   Same serif as 2026年11月, one step down, in lapis. */
 .cal-month-context { color: var(--teal); font: 500 19px/1.4 var(--font-serif); letter-spacing: 1px; }
 .cal-context-tag { padding: 1px 8px 2px; font: 600 15px/1.45 var(--font-serif); letter-spacing: 2px; text-indent: 2px; }
 
 @media (max-width: 767px) {
   .cal-month-context { font-size: 16px; letter-spacing: 0; }
   .cal-context-tag { padding: 0 6px 1px; font-size: 13px; letter-spacing: 1px; text-indent: 1px; }
+}
+
+/* Tablet and desktop: a symmetric head over a symmetric grid (11-10). The
+   title pair sits on the grid's centre line, 公历 month above, 藏历 months
+   below; 今天 and the view switch balance it at the two ends. */
+@media (min-width: 768px) {
+  .cal-control-bar { grid-template-columns: minmax(0,1fr) auto auto auto minmax(0,1fr); grid-template-areas: "today prev month next switch" ". ctx ctx ctx ."; row-gap: 0; column-gap: 4px; }
+  .cal-toolbar:not([hidden]) { display: contents; }
+  .cal-toolbar [data-cal-action="previous"] { grid-area: prev; }
+  .cal-toolbar .cal-month-picker { grid-area: month; }
+  .cal-toolbar [data-cal-action="next"] { grid-area: next; }
+  .cal-toolbar .cal-today { grid-area: today; justify-self: start; margin-left: 0; }
+  .cal-view-switch { justify-self: end; }
+  .cal-month-picker select { width: 172px; padding: 6px 22px; text-align: center; text-align-last: center; }
+  .cal-month-context { grid-area: ctx; justify-self: center; margin-top: -2px; }
+  /* List view has no month to page through: the switch alone, on the right. */
+  .cal-control-bar:has([data-cal-navigation][hidden]) { grid-template-columns: 1fr; grid-template-areas: "switch"; }
 }
