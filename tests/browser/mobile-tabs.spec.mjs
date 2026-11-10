@@ -21,3 +21,21 @@ test('mobile sticky tabs preserve independent panel positions, month and focused
  await page.keyboard.press('Escape');await expect(page.locator('#subscription-dialog')).toBeHidden();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
+
+test('the tab bar never moves when 选择内容 or 日期预览 is tapped',async({page}) => {
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/calendar-reminders/'); await expect(page.locator('.cal-day')).toHaveCount(42);
+  await page.locator('[data-preset="practice"]').click();
+  for (const start of [0, 100, 600]) {
+    await page.locator('#tab-selection').click(); await page.evaluate(y => scrollTo(0, y), start);
+    for (const tab of ['preview', 'selection', 'preview', 'selection']) {
+      const [before, after] = await page.evaluate(async name => {
+        const bar = document.querySelector('.mobile-tabs'), before = bar.getBoundingClientRect().top;
+        document.querySelector(`#tab-${name}`).click();
+        await new Promise(resolve => requestAnimationFrame(resolve));
+        return [Math.round(before), Math.round(bar.getBoundingClientRect().top)];
+      }, tab);
+      expect(after, `start ${start}, tap ${tab}`).toBe(before);
+    }
+  }
+});
