@@ -96,6 +96,40 @@ async function metrics(token,account,target,window){
  return summarizeMetrics(data,schema,hasSampling);
 }
 
+// Free plan: 5,000,000 rows read and 100,000 rows written per day, shared by
+// every D1 database in the account and reset at 00:00 UTC.
+// https://developers.cloudflare.com/d1/platform/pricing/
+export const D1_FREE_DAILY={rowsRead:5000000,rowsWritten:100000};
+export function summarizeD1(data,databases,today){
+ const account=data?.viewer?.accounts;
+ if(!Array.isArray(account)||account.length!==1)throw failure('invalid_analytics','D1 用量返回格式无效。');
+ const names=new Map(Object.entries(databases).map(([name,id])=>[id,name]));
+ const days={};
+ for(const row of account[0].groups||[]){
+  const date=row?.dimensions?.date,name=names.get(row?.dimensions?.databaseId)||'other';
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(date||''))continue;
+  const day=days[date]??={byDatabase:{},rowsRead:0,rowsWritten:0};
+  const read=numeric(row?.sum?.rowsRead)??0,written=numeric(row?.sum?.rowsWritten)??0;
+  const entry=day.byDatabase[name]??={rowsRead:0,rowsWritten:0};
+  entry.rowsRead+=read;entry.rowsWritten+=written;day.rowsRead+=read;day.rowsWritten+=written;
+ }
+ for(const day of Object.values(days)){
+  day.share={rowsRead:Math.round(day.rowsRead/D1_FREE_DAILY.rowsRead*1000)/10,rowsWritten:Math.round(day.rowsWritten/D1_FREE_DAILY.rowsWritten*1000)/10};
+ }
+ return {status:'available',unit:'rows',limit:D1_FREE_DAILY,today,days,
+  note:'按 UTC 日汇总，整个账号共用免费额度；分析数据可能延迟几分钟，最近一次请求未必已计入。百分比为占免费日额度的比例。'};
+}
+async function d1Usage(token,account,databases,now=new Date()){
+ const today=now.toISOString().slice(0,10),yesterday=new Date(now.getTime()-86400000).toISOString().slice(0,10);
+ const data=await graphql(token,`query CalendarD1Usage($accountTag:string!,$start:Date!,$end:Date!) {
+  viewer { accounts(filter:{accountTag:$accountTag}) {
+   groups: d1AnalyticsAdaptiveGroups(limit:100,filter:{date_geq:$start,date_leq:$end}) {
+    sum { rowsRead rowsWritten } dimensions { date databaseId }
+   }
+  } }
+ }`,{accountTag:account,start:yesterday,end:today});
+ return summarizeD1(data,databases,today);
+}
 export async function run(args=process.argv.slice(2),env=process.env){
  const opt=options(args);
  const report={schemaVersion:1,checkedAt:new Date().toISOString(),mode:opt.preflight?'preflight':'metrics',environment:'acceptance',
@@ -126,6 +160,10 @@ export async function run(args=process.argv.slice(2),env=process.env){
    report.clientRecordedRequests=smoke.timing.length;
   }
   report.analytics=await metrics(token,account,target,report.window);
+  // Real D1 rows for today and yesterday, so a release shows what it cost the
+  // shared free budget instead of an estimate. Missing data never fails a release.
+  try{report.d1Usage=await d1Usage(token,account,{acceptance:target.databaseId,trial:trial.databaseId});}
+  catch{report.d1Usage={status:'pending',reason:'D1 用量暂时无法读取；不影响发布判断。'};}
   try{report.gatewayAnalytics=await pagesMetrics((q)=>graphql(token,q),account,pagesProject,report.window,summarizeMetrics,cpuSchema);}
   catch{report.gatewayAnalytics={status:'pending',reason:'Pages指标查询尚未完成，不能以后台指标替代。',performanceAcceptance:'pending'};}
   report.status=opt.preflight?'read_access_verified':report.analytics.status==='available'?'measured':'data_pending';
@@ -134,7 +172,9 @@ export async function run(args=process.argv.slice(2),env=process.env){
  }finally{
   await fs.mkdir(path.dirname(opt.output),{recursive:true});await fs.writeFile(opt.output,JSON.stringify(report,null,2)+'\n');
  }
- console.log(JSON.stringify({status:report.status,mode:report.mode,probes:report.probes,analytics:report.analytics?.status||null,failure:report.failure||null,releaseAcceptance:'pending'}));
+ const todayUsage=report.d1Usage?.days?.[report.d1Usage.today];
+ console.log(JSON.stringify({status:report.status,mode:report.mode,probes:report.probes,analytics:report.analytics?.status||null,
+  d1Today:todayUsage?{rowsRead:todayUsage.rowsRead,rowsWritten:todayUsage.rowsWritten,share:todayUsage.share}:null,failure:report.failure||null,releaseAcceptance:'pending'}));
  return report.status==='failed'?1:0;
 }
 if(process.argv[1] && path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){

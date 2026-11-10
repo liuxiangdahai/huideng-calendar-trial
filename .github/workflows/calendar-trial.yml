@@ -52,6 +52,8 @@ jobs:
       CALENDAR_EXPECTED_VERSION: ${{ github.sha }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -75,7 +77,12 @@ jobs:
       - run: node tools/calendar/ci-remote.mjs acceptance verify
       - name: Verify reminder controls through the isolated Pages subscription
         run: node tools/calendar/smoke-reminder-probe.mjs
+      - name: Choose full or light acceptance test
+        id: scope
+        run: node tools/calendar/smoke-scope.mjs https://huideng-calendar-trial.pages.dev "$GITHUB_SHA" >> "$GITHUB_OUTPUT"
       - name: Test only the isolated Pages public service
+        env:
+          CALENDAR_SMOKE_SCOPE: ${{ steps.scope.outputs.scope }}
         run: node tools/calendar/ci-remote.mjs acceptance smoke
       - name: Collect isolated service CPU evidence
         if: ${{ (success() || failure()) && hashFiles('artifacts/remote-smoke.json') != '' }}
