@@ -278,15 +278,12 @@ dialog.cal-day-sheet::backdrop { background: #1d1b1859; }
 }
 
 /* 11-10: the Tibetan months are the month's second title, not a footnote.
-   Same serif as 2026年11月, one step down, in lapis, set directly under the
-   title text so the two read as a pair. */
+   Same serif as 2026年11月, one step down, in lapis. They start on the grid's
+   left edge, as the head of the 藏历 block (months, note, grid); indented
+   under the dropdown they gave the page a third ragged left edge. */
 .cal-month-context { color: var(--teal); font: 500 19px/1.4 var(--font-serif); letter-spacing: 1px; }
 .cal-context-tag { padding: 1px 8px 2px; font: 600 15px/1.45 var(--font-serif); letter-spacing: 2px; text-indent: 2px; }
-@media (min-width: 768px) {
-  .cal-control-bar { row-gap: 0; }
-  /* 44px arrow + 2px gap + 10px padding = where 2026年11月 starts. */
-  .cal-month-context { padding-left: 56px; margin-top: -4px; }
-}
+
 @media (max-width: 767px) {
   .cal-month-context { font-size: 16px; letter-spacing: 0; }
   .cal-context-tag { padding: 0 6px 1px; font-size: 13px; letter-spacing: 1px; text-indent: 1px; }
