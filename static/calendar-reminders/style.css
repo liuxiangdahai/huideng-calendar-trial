@@ -8,17 +8,17 @@
    stained or muddy; depth comes from soft shadow, not borders or texture. */
 :root {
   color-scheme: light;
-  --paper: #f7f5f0; --paper-2: #efebe4;
-  --surface: #fffefb; --surface-2: #f9f7f2;
+  --paper: #fbfaf8; --paper-2: #f0eeea;
+  --surface: #ffffff; --surface-2: #f6f5f2;
   --ink: #1d1b18; --ink-2: #3a3631; --muted: #67625a;
-  --line: #e8e3da; --line-2: #d7cfc2; --control: #938a7d;
+  --line: #e9e6e1; --line-2: #d6d2cb; --control: #8e877c;
   --red: #a1232b; --red-2: #861a21; --red-tint: #f8ecea; --red-tint-2: #f0d9d6;
   --wine: #7a1824; --wine-2: #5e111b;
   --gold: #a5803f; --gold-2: #c9a764; --gold-tint: #f6efe0;
   --teal: #1f3a63; --teal-2: #2e4d7a; --teal-tint: #edf1f7;
   --focus: #a1232b;
-  --r-sm: 8px; --r: 12px; --r-lg: 16px;
-  --shadow-1: 0 1px 2px #1d1b180a, 0 8px 24px #1d1b180c;
+  --r-sm: 4px; --r: 6px; --r-lg: 8px;
+  --shadow-1: none;
   --shadow-2: 0 2px 8px #1d1b1814, 0 28px 64px #1d1b1829;
   --font-ui: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Segoe UI", "Microsoft YaHei", sans-serif;
   --font-serif: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", "SimSun", serif;
@@ -642,3 +642,78 @@ input[type=time]::-webkit-datetime-edit { padding: 0; }
 /* Unsaved changes: same card, same place, warmer tone. */
 .subscribed-card.is-dirty { border-color: #e2c9c4; background: var(--red-tint); }
 .subscribed-card.is-dirty .subscribed-title { color: var(--wine); }
+
+
+/* ============================================================
+   白墙红檐 (11-10). The page reads like a monastery front:
+   a 边玛 red eave closed by one gilt line, snow mountains
+   behind today's page, then a white wall where the work is done.
+   One colour, one job: cinnabar acts and reminds, lapis is every
+   Tibetan date, gilt only frames, ink is text.
+   ============================================================ */
+:root { --eave: #5f111c; --gilt: #b9975a; }
+body { background: var(--paper); }
+
+/* Eave: flat 边玛 red closed by one gilt line. The 香布 valance under the
+   mountains is the page's ornament; the eave stays plain (11-10: a row of
+   rafter-end dots here as well was too busy). */
+.site-header { background: var(--eave); border-bottom: 1px solid var(--gilt); box-shadow: none; }
+.brand-logo { box-shadow: 0 0 0 1px var(--gilt); }
+.brand h1 { letter-spacing: 4px; }
+.brand-type small { border-left-color: #b9975a80; color: #e9d3aa; }
+
+/* 历页: the Tibetan date is the largest thing on the page. */
+/* The 香布 valance under the mountains stays (11-10): it is the page's own ornament. */
+.editorial-masthead { height: 156px; }
+.editorial-masthead::before { background: linear-gradient(90deg, #131e33e6, #131e3399 46%, #131e334d 70%, #131e33a6); }
+.masthead-date .today { gap: 2px; }
+/* 藏历 + year sit directly above the date, large enough to be read with it
+   (11-10: the first draft made them too small beside a 60px date). */
+.masthead-date .today { gap: 0; }
+.today-era { display: flex; align-items: center; gap: 12px; margin-bottom: 2px; }
+.today-era b { padding: 1px 10px 2px; border-radius: 3px; background: #f4ead6; color: var(--teal); font: 600 17px/1.5 var(--font-serif); letter-spacing: 4px; text-indent: 4px; }
+#today-year { font: 500 20px/1.5 var(--font-serif); letter-spacing: 3px; color: #f4ead6; }
+#today-tibetan { min-height: 0; }
+/* 44px on desktop: clearly the headline, but in step with the 20px year and
+   the card beside it (11-10: 60px overpowered everything else). */
+.today-day { display: block; font: 500 44px/1.25 var(--font-serif); letter-spacing: 4px; color: #fdf9f1; text-shadow: 0 2px 14px #0b1322b3; }
+.masthead-date #today-gregorian { font: 16px/1.6 var(--font-ui); letter-spacing: .5px; color: #dcd6ca; }
+/* The next-tsok card is kept exactly as it was (11-10): dark glass, gilt
+   frame, endless knot, and its own rounder corners. */
+.masthead-next { border-radius: 12px; }
+
+/* White wall: sections are set on the wall with rules, not boxed in cards. */
+.region-bar { border-bottom-color: var(--line); }
+.section-heading h2 { font: 600 var(--fs-xl)/1.4 var(--font-ui); letter-spacing: 1px; color: var(--ink); }
+.section-heading::after, .section-heading::before { display: none; }
+.action-bar { background: #fffffff5; box-shadow: none; }
+.action-buttons>.primary { border-radius: var(--r-sm); font: 600 16px/1.4 var(--font-ui); letter-spacing: 1px; box-shadow: none; }
+.action-buttons>.primary:hover:not(:disabled) { box-shadow: none; }
+.action-buttons>.primary .icon { display: none; }
+
+@media (max-width: 767px) {
+  .site-header { min-height: 0; padding: 6px 16px; }
+  .editorial-masthead { height: auto; min-height: 0; }
+  /* Kept tight: the four choices and the daily-date row must all fit above the
+     action bar on a phone's first screen. */
+  .masthead-inner { min-height: 0; padding: 8px 16px 9px; gap: 3px; }
+  .masthead-date { width: 100%; }
+  .masthead-date .today { display: grid; grid-template-columns: 1fr auto; align-items: end; column-gap: 12px; width: 100%; }
+  .today-era { grid-column: 1 / -1; gap: 8px; margin-bottom: 0; }
+  .today-era b { padding: 0 7px 1px; font-size: 14px; letter-spacing: 3px; text-indent: 3px; }
+  #today-year { font-size: 16px; letter-spacing: 2px; }
+  .today-day { font-size: 40px; letter-spacing: 3px; }
+  .masthead-date #today-gregorian { padding-bottom: 8px; font-size: 13px; letter-spacing: 0; text-align: right; }
+  /* Phones: the next tsok is one line under a gilt rule, as before. */
+  .masthead-next { padding-top: 5px; border-top: 1px solid #b9975a66; width: 100%; }
+}
+@media (max-width: 767px) {
+  /* On a phone the calendar stands on the wall itself; a frame inside the
+     page margin only costs width. */
+  .preview-panel { padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+}
+@media (max-width: 359px) {
+  .masthead-date .today { grid-template-columns: 1fr; }
+  .masthead-date #today-gregorian { padding-bottom: 0; text-align: left; }
+  .today-day { font-size: 34px; letter-spacing: 2px; }
+}
