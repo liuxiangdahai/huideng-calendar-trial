@@ -279,7 +279,7 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12
 footer a { text-decoration: none; }
 footer a:hover { color: var(--red); }
 .footer-dot { margin: 0 8px; }
-.toast { position: fixed; z-index: 20; bottom: calc(var(--action-height) + 12px); left: 50%; transform: translateX(-50%); width: max-content; max-width: calc(100% - 32px); padding: 11px 18px; border-radius: 22px; background: var(--ink); color: #f9f6f1; font-size: var(--fs-md); line-height: 1.6; text-align: center; box-shadow: 0 6px 24px #26232033; }
+.toast { position: fixed; z-index: 20; inset: auto auto calc(var(--action-height) + 12px) 50%; margin: 0; border: 0; overflow: visible; transform: translateX(-50%); width: max-content; max-width: calc(100% - 32px); padding: 11px 18px; border-radius: 22px; background: var(--ink); color: #f9f6f1; font-size: var(--fs-md); line-height: 1.6; text-align: center; box-shadow: 0 6px 24px #26232033; }
 
 /* ── Dialogs: a page with the shambu at its head ──────────────────────── */
 dialog {
@@ -288,7 +288,9 @@ dialog {
   border: 1px solid var(--line-2); border-radius: var(--r); background: var(--surface); color: var(--ink);
   overflow: auto; overscroll-behavior: contain; scroll-padding: 96px 0 90px; box-shadow: var(--shadow-2);
 }
-dialog::backdrop { background: #26232066; -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
+/* No backdrop blur: re-blurring the page under a scrolling dialog halved the
+   frame rate (time-zone list, 11-09). A slightly deeper tint does the job. */
+dialog::backdrop { background: #26232073; }
 .dialog-head { position: sticky; top: 0; z-index: 3; display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 0 0 16px; padding: 22px 0 12px; background: var(--surface); border-bottom: 1px solid var(--line); }
 .dialog-head::before { content: ""; position: absolute; top: 0; left: -24px; right: -24px; height: 6px; background: repeating-linear-gradient(90deg, #00000014 0 1px, transparent 1px 10px), linear-gradient(#73161e 0 2px, #caa25c 2px 4px, #2f3e5a 4px 6px); }
 .dialog-head h2 { font: 500 var(--fs-2xl)/1.4 var(--font-serif); letter-spacing: 1px; overflow-wrap: anywhere; }
@@ -585,7 +587,7 @@ input[type=time]::-webkit-datetime-edit { padding: 0; }
   background-image: radial-gradient(40% 40% at 20% 70%, #ffffff2b, #ffffff00 72%), radial-gradient(30% 34% at 55% 60%, #ffffff24, #ffffff00 70%),
     radial-gradient(36% 38% at 86% 74%, #ffffff29, #ffffff00 72%);
   filter: blur(10px); animation: cloud-drift 70s linear infinite; }
-.masthead-clouds.is-paused>span { animation-play-state: paused; }
+.masthead-clouds.is-paused>span, body:has(dialog[open]) .masthead-clouds>span { animation-play-state: paused; }
 @keyframes cloud-drift { from { transform: translate3d(0,0,0); } to { transform: translate3d(-50%,0,0); } }
 
 /* ── 我的订阅 (managing an existing subscription) ─────────────────────────

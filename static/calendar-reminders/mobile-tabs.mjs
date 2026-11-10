@@ -12,7 +12,13 @@ export function createMobileTabs({onLayout = () => {}} = {}) {
   const pane = name => document.getElementById(`${name}-pane`);
   const tabHeight = () => mobile.matches ? tabs.getBoundingClientRect().height : 0;
   const pageTop = node => node.getBoundingClientRect().top + scrollY;
+  // Scroll position at which the tab bar sticks and a pane starts just below it.
+  // Both panes share this spot. Measured on the visible pane (a hidden one has no box).
+  const stickPoint = name => pageTop(pane(name)) - tabHeight() - 12;
   function remember(name) {
+    // Above the stick point (banner still showing) there is nothing to restore:
+    // the reader is at the start of the pane.
+    if (scrollY < stickPoint(name) - 1) { positions.delete(name); return; }
     const root = pane(name), edge = tabHeight() + 12;
     const candidates = [...root.querySelectorAll('summary, .preset-card, .cal-control-bar, .cal-day-detail, .cal-list-day')];
     const anchor = candidates.find(node => node.getBoundingClientRect().bottom > edge && node.getBoundingClientRect().top > -innerHeight);
@@ -20,6 +26,9 @@ export function createMobileTabs({onLayout = () => {}} = {}) {
   }
   function switchTo(next, {focus = false, top = false} = {}) {
     if (next !== current) {
+      // Read before the swap: hiding a pane lets WebKit reset the scroll
+      // position on its own (it landed at 23px whatever the start point).
+      const before = scrollY, wasStuck = mobile.matches && before >= stickPoint(current) - 1;
       if (mobile.matches) remember(current);
       current = next;
       workspace.dataset.activeTab = next;
@@ -30,14 +39,19 @@ export function createMobileTabs({onLayout = () => {}} = {}) {
       });
       onLayout();
       if (mobile.matches) {
-        const position = top ? null : positions.get(next);
-        const target = next === 'preview' ? pane(next).querySelector('.cal-control-bar') : pane(next);
-        const y = position?.node?.isConnected && pane(next).contains(position.node)
-          ? pageTop(position.node) - position.top
-          : position ? pageTop(pane(next)) + position.offset : pageTop(target) - tabHeight() - 12;
-        // Both panels use normal document scrolling; prevent anchor adjustments
-        // during the visibility change from overriding the chosen position.
-        scrollTo({top: Math.max(0, y), behavior: 'auto'});
+        // The tab bar must not move when tapped (11-10: switching from the top
+        // of the page used to scroll 188px down, and back up on return). While
+        // the banner is still visible keep the page where it is; once the bar
+        // is stuck, restore the reader's place in that pane, never above the
+        // stick point, so the bar stays pinned in the same spot.
+        if (!wasStuck) scrollTo({top: before, behavior: 'auto'});
+        else {
+          const position = top ? null : positions.get(next);
+          const y = position?.node?.isConnected && pane(next).contains(position.node)
+            ? pageTop(position.node) - position.top
+            : position ? pageTop(pane(next)) + position.offset : stickPoint(next);
+          scrollTo({top: Math.max(stickPoint(next), y), behavior: 'auto'});
+        }
         // A short slide from the side the tab sits on; transform only, so
         // remembered anchors and sticky geometry stay unchanged.
         playMotion(pane(next),'pane',next === 'preview' ? 1 : -1);

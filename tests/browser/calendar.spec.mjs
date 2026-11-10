@@ -305,3 +305,21 @@ test('standalone works offline, exports real ICS and never creates a fake subscr
   expect(text).toContain('BEGIN:VALARM');
   await expect(page.locator('#subscription-existing')).toBeHidden();
 });
+
+test('复制管理链接 inside 我的订阅 shows its note above the open dialog',async({page,context}) => {
+  if (test.info().project.name === 'chromium') await context.grantPermissions(['clipboard-read','clipboard-write'],{origin});
+  await open(page); await createSubscription(page);
+  await page.locator('details.management summary').click();
+  await page.locator('#copy-management').click();
+  const toast = page.locator('#toast');
+  await expect(toast).toHaveText('管理链接已复制');
+  // The note must be the topmost element where it is drawn, not hidden under the modal.
+  expect(await toast.evaluate(node => {
+    const box = node.getBoundingClientRect();
+    return node.contains(document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2));
+  })).toBe(true);
+  if (test.info().project.name === 'chromium') expect(await page.evaluate(() => navigator.clipboard.readText())).toMatch(/#manage=/);
+  // Closing the dialog brings the note back to the page for later messages.
+  await closeSubscription(page); await page.locator('[data-preset="tsok"]').click();
+  await expect(toast).toBeVisible();
+});

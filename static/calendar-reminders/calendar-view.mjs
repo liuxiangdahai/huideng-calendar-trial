@@ -117,7 +117,7 @@ function dailyMarkup(date, marks, compact = false) {
   // In the list each day's Tibetan date is one quiet line; the full card
   // (source, note) stays in the day view.
   if (compact) return `<article class="cal-daily-entry is-compact" data-cal-daily-date="${date}"><h4${markAttr(event, marks)}>${escape(event.title)}</h4><span class="cal-daily-meta">每日藏历 · 全天</span>${day.missingLabel ? `<p class="cal-daily-note">${escape(day.missingLabel)}</p>` : ''}</article>`;
-  return `<article class="cal-daily-entry" data-cal-daily-date="${date}"><span class="cal-daily-icon" aria-hidden="true">${icon('calendar')}</span><div><h4${markAttr(event, marks)}>${escape(event.title)}</h4><p class="cal-daily-meta">每日藏历<span>全天 · 不设置提醒</span></p><p class="cal-daily-source">日期换算：<a href="${escape(ENGINE.url)}" target="_blank" rel="noopener noreferrer">藏历 PRO</a></p>${day.missingLabel ? `<p class="cal-daily-note">${escape(day.missingLabel)}</p>` : ''}</div></article>`;
+  return `<article class="cal-daily-entry" data-cal-daily-date="${date}"><span class="cal-daily-icon" aria-hidden="true">${icon('calendar')}</span><div><h4${markAttr(event, marks)}>${escape(event.title)}</h4><p class="cal-daily-meta">每日藏历<span>全天 · 不设置提醒</span></p>${day.missingLabel ? `<p class="cal-daily-note">${escape(day.missingLabel)}</p>` : ''}</div></article>`;
 }
 
 /**
@@ -312,7 +312,7 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
       : [...new Set(state.events.filter(event => event.date >= state.today).map(event => event.date))].sort();
     const available = previewAvailability(state.data, state.settings, {start: state.today, end: state.end});
     const list = $('[data-cal-list]');
-    $('.cal-list-caption').innerHTML=daily ? `从今天起，每天一行藏历日期（换算：<a href="${escape(ENGINE.url)}" target="_blank" rel="noopener noreferrer">藏历 PRO</a>），当天已选的节日列在下面` : '从今天起，查看已选择的日程';
+    $('.cal-list-caption').innerHTML=daily ? '从今天起，每天一行藏历日期，当天已选的节日列在下面' : '从今天起，查看已选择的日程';
     if (!daily && !available.selectedCount) list.innerHTML = empty('还没有选择日程，请在“选择内容”中勾选你关注的日子。');
     else if (!dates.length) list.innerHTML = empty(available.hasUnconfirmed
       ? '所选日程的后续安排尚待确认。确认后会随订阅更新。'

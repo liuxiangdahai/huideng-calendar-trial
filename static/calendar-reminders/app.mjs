@@ -63,10 +63,23 @@ function notify(message, undo) {
   const toast=$('#toast'); toast.textContent = String(message).replace(/[。.]+$/,'').replace(/。/g,'，'); toast.hidden = false;
   if(undo){
     const button=document.createElement('button'); button.type='button'; button.className='toast-undo'; button.textContent='撤销';
-    button.addEventListener('click',()=>{toast.hidden=true;clearTimeout(notify.timer);undo();},{once:true});
+    button.addEventListener('click',()=>{hideToast();clearTimeout(notify.timer);undo();},{once:true});
     toast.append(button);
   }
-  clearTimeout(notify.timer); notify.timer = setTimeout(() => { toast.hidden = true; }, undo ? 7000 : 4000);
+  // An open dialog sits in the browser's top layer and would cover a plain
+  // fixed toast, so 复制管理链接 inside 我的订阅 looked like it did nothing.
+  // Showing the toast as a popover puts it above whatever dialog is open.
+  // Inside the dialog's subtree so the open modal does not make it inert.
+  const host = document.querySelector('dialog[open]') || document.body;
+  if (toast.parentElement !== host) host.append(toast);
+  if (toast.showPopover) {
+    try { if (!toast.hasAttribute('popover')) toast.setAttribute('popover','manual'); if (toast.matches(':popover-open')) toast.hidePopover(); toast.showPopover(); } catch {}
+  }
+  clearTimeout(notify.timer); notify.timer = setTimeout(hideToast, undo ? 7000 : 4000);
+}
+function hideToast() {
+  const toast=$('#toast'); toast.hidden = true;
+  try { if (toast.matches(':popover-open')) toast.hidePopover(); } catch {}
 }
 function restoreSnapshot(snapshot, message) {
   settings=clone(snapshot);stopped=false;refresh();notify(message);
@@ -642,7 +655,8 @@ async function copy(value, label) {
   try { await navigator.clipboard.writeText(value); notify(`${label}已复制`); return true; }
   catch {
     const input = document.createElement('textarea'); input.value = value;
-    input.style.cssText = 'position:fixed;opacity:0'; document.body.append(input); input.select();
+    // Outside an open modal dialog the page is inert and cannot be selected.
+    input.style.cssText = 'position:fixed;opacity:0'; (document.querySelector('dialog[open]') || document.body).append(input); input.select();
     let copied=false;
     try {copied=document.execCommand('copy');} catch {}
     input.remove();
