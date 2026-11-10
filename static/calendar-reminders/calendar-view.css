@@ -236,12 +236,13 @@ dialog.cal-day-sheet::backdrop { background: #1d1b1859; }
 .cal-month-context[hidden] { display: none; }
 .cal-context-tag { flex: none; padding: 1px 7px 2px; border-radius: 4px; background: var(--teal); color: #f6f3ec; font-size: var(--fs-sm); letter-spacing: 2px; text-indent: 2px; }
 .cal-context-text { min-width: 0; }
-.cal-key { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2px 12px; margin: 0; padding: 6px 10px; border-top: 1px solid var(--line-2); background: var(--teal-tint); color: var(--teal-2); font-size: var(--fs-xs); line-height: 1.6; }
+/* A quiet caption, not a band: no fill, no boxed sample (11-10: the boxed
+   初一 read as an input field and the tint stacked a third stripe). The
+   lapis 藏历 tag above and the lapis labels below carry the colour. */
+.cal-key { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2px 12px; margin: 0; padding: 0 0 8px; color: var(--muted); font-size: var(--fs-sm); line-height: 1.6; }
 .cal-key-note { display: inline-flex; align-items: center; gap: 6px; }
-.cal-key-sample { padding: 0 5px; border: 1px solid #b9c5d8; border-radius: 3px; background: var(--surface); font-style: normal; line-height: 1.5; }
 .cal-key-dots { display: inline-flex; align-items: center; gap: 12px; color: var(--muted); }
 .cal-key-dots:empty { display: none; }
-.cal-key+.cal-grid .cal-weekdays { border-top-color: #d5dbe6; }
 .cal-tibetan, .cal-day.cal-is-today .cal-tibetan { color: var(--teal-2); }
 .cal-day.cal-is-today .cal-tibetan { font-weight: 600; }
 .cal-day.cal-adjacent .cal-tibetan { color: #566a8c; }
@@ -251,8 +252,7 @@ dialog.cal-day-sheet::backdrop { background: #1d1b1859; }
 @media (max-width: 767px) {
   .cal-month-context { gap: 6px; font-size: var(--fs-sm); letter-spacing: 0; white-space: nowrap; }
   .cal-context-tag { padding-inline: 5px; font-size: var(--fs-xs); letter-spacing: 1px; text-indent: 1px; }
-  .cal-key { gap: 2px 8px; padding: 6px; }
-  .cal-key-note { gap: 5px; }
+  .cal-key { gap: 2px 8px; font-size: var(--fs-xs); }
   .cal-key-dots { gap: 8px; }
 }
 @media (min-width: 1024px) {
@@ -264,4 +264,11 @@ dialog.cal-day-sheet::backdrop { background: #1d1b1859; }
   .cal-key-dots .cal-legend-item.is-remind { border-left-color: var(--red); background: var(--red-tint); color: var(--red); }
   /* With daily dates on, the lapis line already gives the full Tibetan date. */
   .cal-day:has(.cal-daily-line) .cal-tibetan { display: none; }
+}
+@media (max-width: 359px) {
+  /* The narrowest phones keep the months and drop the year, which the page
+     header already shows in large type. */
+  .cal-context-year { display: none; }
+  .cal-month-context { gap: 4px; }
+  .cal-context-tag { padding-inline: 4px; letter-spacing: 0; text-indent: 0; }
 }

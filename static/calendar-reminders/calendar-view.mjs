@@ -148,7 +148,7 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
       <button type="button" data-cal-view="month" data-cal-focus="month-view">${icon('calendar')}<span>月历</span></button>
       <button type="button" data-cal-view="list" data-cal-focus="list-view">${icon('list')}<span>列表</span></button>
     </div></div><section class="cal-month-view" aria-label="月历预览">
-    <p class="cal-key"><span class="cal-key-note"><i class="cal-key-sample" aria-hidden="true">初一</i>小字为藏历，与农历不同</span><span class="cal-key-dots" data-cal-key-dots></span></p>
+    <p class="cal-key"><span class="cal-key-note">日期下的小字是藏历，与农历不同</span><span class="cal-key-dots" data-cal-key-dots></span></p>
     <div class="cal-grid" role="grid" aria-label="月历，日期下方小字为藏历。使用方向键浏览日期，回车查看日程" data-cal-grid></div>
     <p class="cal-legend" data-cal-legend></p>
     <section class="cal-day-detail" aria-label="所选日期的日程" data-cal-detail></section>
@@ -251,7 +251,7 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     // the labels read as Tibetan dates rather than the 农历 that every other
     // Chinese calendar prints in that spot (11-10 feedback).
     $('[data-cal-context]').innerHTML = `<span class="cal-context-tag">藏历</span><span class="cal-context-text">${
-      [...tibetanYears].map(([year, months]) => escape(`${year}年 ${[...months].join(' · ')}`)).join('　')}</span>`;
+      [...tibetanYears].map(([year, months]) => `<span class="cal-context-year">${escape(year)}年 </span>${escape([...months].join(' · '))}`).join('　')}</span>`;
     // With the everyday layer on, each day gets its own quiet line showing
     // the entry the calendar app will show, with the chosen mark (◦, 【每日】
     // or none). A phone cell is too narrow for the full date, so it shows

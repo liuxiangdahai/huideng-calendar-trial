@@ -331,7 +331,7 @@ test('the month grid says its small labels are Tibetan dates before the dates ar
     if (viewport.width < 1024) await page.locator('#tab-preview').click();
     await expect(page.locator('.cal-context-tag')).toHaveText('藏历');
     const key = page.locator('.cal-key');
-    await expect(key).toContainText('小字为藏历，与农历不同');
+    await expect(key).toContainText('日期下的小字是藏历，与农历不同');
     // The key sits above the weekday row, on one line, in the same lapis as the labels.
     const [keyBox, weekdays] = [await key.boundingBox(), await page.locator('.cal-weekdays').boundingBox()];
     expect(keyBox.y + keyBox.height).toBeLessThanOrEqual(weekdays.y + 1);
@@ -345,7 +345,21 @@ test('the month grid says its small labels are Tibetan dates before the dates ar
     });
     expect(marks.keyDots).toBe(marks.gridDots);
     if (!marks.gridDots) expect(marks.keyStrip).toBe(marks.gridStrip);
-    expect(await page.evaluate(() => getComputedStyle(document.querySelector('.cal-day:not(.cal-adjacent) .cal-tibetan')).color ===
-      getComputedStyle(document.querySelector('.cal-key-note')).color)).toBe(true);
+    // The labels are lapis, the colour family of the 藏历 tag beside the month.
+    expect(await page.evaluate(() => {
+      const probe = document.createElement('i'); probe.style.color = 'var(--teal-2)'; document.body.append(probe);
+      const lapis = getComputedStyle(probe).color; probe.remove();
+      return getComputedStyle(document.querySelector('.cal-day:not(.cal-adjacent) .cal-tibetan')).color === lapis;
+    })).toBe(true);
+  }
+});
+
+test('the 藏历 month line is never cut off, down to 320 pixels',async({page}) => {
+  for (const width of [320, 390, 820, 1366]) {
+    await page.setViewportSize({width, height: 800}); await open(page);
+    if (width < 1024) await page.locator('#tab-preview').click();
+    const fit = await page.locator('.cal-context-text').evaluate(node => node.scrollWidth <= node.clientWidth);
+    expect(fit, `${width}px`).toBe(true);
+    await expect(page.locator('.cal-context-text')).toContainText('月');
   }
 });
