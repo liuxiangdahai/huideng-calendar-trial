@@ -331,7 +331,14 @@ test('the month grid says its small labels are Tibetan dates before the dates ar
     if (viewport.width < 1024) await page.locator('#tab-preview').click();
     await expect(page.locator('.cal-context-tag')).toHaveText('藏历');
     const key = page.locator('.cal-key');
-    await expect(key).toContainText('日期下的小字是藏历，与农历不同');
+    // The wording matches where the label sits at this width.
+    const beside = await page.evaluate(() => {
+      const day = document.querySelector('.cal-day:not(.cal-adjacent)');
+      const [date, label] = [day.querySelector('.cal-gregorian'), day.querySelector('.cal-tibetan')].map(n => n.getBoundingClientRect());
+      return label.left >= date.right - 1;
+    });
+    expect(await page.locator('.cal-key-note').evaluate(n => n.innerText)).toBe(`日期${beside ? '旁' : '下'}的小字是藏历，与农历不同`);
+    expect(beside).toBe(viewport.width >= 1024);
     // The key sits above the weekday row, on one line, in the same lapis as the labels.
     const [keyBox, weekdays] = [await key.boundingBox(), await page.locator('.cal-weekdays').boundingBox()];
     expect(keyBox.y + keyBox.height).toBeLessThanOrEqual(weekdays.y + 1);
