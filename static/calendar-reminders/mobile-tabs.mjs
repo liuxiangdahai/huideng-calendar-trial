@@ -15,10 +15,14 @@ export function createMobileTabs({onLayout = () => {}} = {}) {
   // Scroll position at which the tab bar sticks and a pane starts just below it.
   // Both panes share this spot. Measured on the visible pane (a hidden one has no box).
   const stickPoint = name => pageTop(pane(name)) - tabHeight() - 12;
+  // Whether the bar is pinned is read from the bar itself (sticky at top 0).
+  // Comparing scrollY with a computed stick point failed whenever the preview
+  // shifted a pixel or two after rendering: the reader's place was then lost
+  // on the way back (intermittent in WebKit, 11-10).
+  const stuck = () => mobile.matches && tabs.getBoundingClientRect().top <= 1;
   function remember(name) {
-    // Above the stick point (banner still showing) there is nothing to restore:
-    // the reader is at the start of the pane.
-    if (scrollY < stickPoint(name) - 1) { positions.delete(name); return; }
+    // Banner still showing: nothing to restore, the reader is at the pane's start.
+    if (!stuck()) { positions.delete(name); return; }
     const root = pane(name), edge = tabHeight() + 12;
     const candidates = [...root.querySelectorAll('summary, .preset-card, .cal-control-bar, .cal-day-detail, .cal-list-day')];
     const anchor = candidates.find(node => node.getBoundingClientRect().bottom > edge && node.getBoundingClientRect().top > -innerHeight);
@@ -28,7 +32,7 @@ export function createMobileTabs({onLayout = () => {}} = {}) {
     if (next !== current) {
       // Read before the swap: hiding a pane lets WebKit reset the scroll
       // position on its own (it landed at 23px whatever the start point).
-      const before = scrollY, wasStuck = mobile.matches && before >= stickPoint(current) - 1;
+      const before = scrollY, wasStuck = stuck();
       if (mobile.matches) remember(current);
       current = next;
       workspace.dataset.activeTab = next;
@@ -44,14 +48,14 @@ export function createMobileTabs({onLayout = () => {}} = {}) {
         // the banner is still visible keep the page where it is; once the bar
         // is stuck, restore the reader's place in that pane, never above the
         // stick point, so the bar stays pinned in the same spot.
-        if (!wasStuck) scrollTo({top: before, behavior: 'auto'});
-        else {
-          const position = top ? null : positions.get(next);
-          const y = position?.node?.isConnected && pane(next).contains(position.node)
-            ? pageTop(position.node) - position.top
-            : position ? pageTop(pane(next)) + position.offset : stickPoint(next);
+        // A place remembered in the other pane always wins, even when this
+        // pane is too short to pin the bar (a month with fewer weeks).
+        const position = top ? null : positions.get(next);
+        if (position) {
+          const y = position.node?.isConnected && pane(next).contains(position.node)
+            ? pageTop(position.node) - position.top : pageTop(pane(next)) + position.offset;
           scrollTo({top: Math.max(stickPoint(next), y), behavior: 'auto'});
-        }
+        } else scrollTo({top: wasStuck ? stickPoint(next) : before, behavior: 'auto'});
         // A short slide from the side the tab sits on; transform only, so
         // remembered anchors and sticky geometry stay unchanged.
         playMotion(pane(next),'pane',next === 'preview' ? 1 : -1);
