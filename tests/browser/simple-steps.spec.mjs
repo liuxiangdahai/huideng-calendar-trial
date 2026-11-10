@@ -80,7 +80,10 @@ test('after subscribing, the page opens on a sync status with the next reminder;
   // Choosing symbols is a normal settings change that the feed follows.
   await page.locator('#advanced-settings>summary').click();
   await page.locator('input[name="title-marks"][value="symbols"]').check();
-  await expect(page.locator('#subscribed-card')).toBeHidden();
+  // The card keeps its place and says what to do; it must not vanish and pop back.
+  await expect(page.locator('#subscribed-card')).toBeVisible();
+  await expect(page.locator('#subscribed-title')).toHaveText('有改动还没保存');
+  await expect(page.locator('#subscribed-hint')).toContainText('部分安卓手机可能要等一天');
   await page.locator('#subscribe').click();
   await expect(page.locator('#subscribe-label')).toHaveText('我的订阅');
   const after=await (await request.get(feedUrl)).text();
@@ -94,4 +97,24 @@ test('inside WeChat the page says first how to open it in a browser',async({brow
   await expect(page.locator('#wechat-banner')).toBeVisible();
   await expect(page.locator('#wechat-banner-text')).toContainText('在浏览器中打开');
   await context.close();
+});
+
+test('with a subscription, changing the choice and changing it back never moves the choices',async({page})=>{
+  for (const viewport of [{width:390,height:844},{width:1366,height:900}]) {
+    await page.setViewportSize(viewport); await open(page);
+    await page.evaluate(()=>localStorage.clear()); await page.reload(); await expect(page.locator('.cal-day')).toHaveCount(42);
+    await page.locator('[data-preset="tsok"]').click();
+    await page.locator('#subscribe').click();
+    await page.locator('input[name="device"][value="other"]').check();
+    await expect(page.locator('#copy-feed')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#subscribed-title')).toHaveText('你的日历已在同步');
+    const top=()=>page.locator('#preset-options').evaluate(node=>Math.round(node.getBoundingClientRect().top+scrollY));
+    const start=await top();
+    for (const [preset,title] of [['practice','有改动还没保存'],['tsok','你的日历已在同步'],['guru','有改动还没保存'],['tsok','你的日历已在同步']]) {
+      await page.locator(`[data-preset="${preset}"]`).click();
+      await expect(page.locator('#subscribed-title')).toHaveText(title);
+      expect(await top(),`${viewport.width}px after ${preset}`).toBe(start);
+    }
+  }
 });

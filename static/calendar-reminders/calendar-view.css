@@ -228,3 +228,34 @@ dialog.cal-day-sheet::backdrop { background: #1d1b1859; }
 }
 .cal-legend>span:last-child { margin-left: 0; }
 @media (min-width: 1024px) { .cal-mobile-events { display: none; } }
+
+/* 11-10: the grid's small labels are Tibetan dates, and must not read as 农历.
+   One lapis thread ties them together: the 藏历 tag by the month, the key
+   above the weekdays, and every small label in the cells. */
+.cal-month-context { display: flex; align-items: center; gap: 8px; color: var(--ink); font: 500 var(--fs-base)/1.5 var(--font-serif); letter-spacing: .5px; }
+.cal-month-context[hidden] { display: none; }
+.cal-context-tag { flex: none; padding: 1px 7px 2px; border-radius: 4px; background: var(--teal); color: #f6f3ec; font-size: var(--fs-sm); letter-spacing: 2px; text-indent: 2px; }
+.cal-context-text { min-width: 0; }
+.cal-key { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2px 12px; margin: 0; padding: 6px 10px; border-top: 1px solid var(--line-2); background: var(--teal-tint); color: var(--teal-2); font-size: var(--fs-xs); line-height: 1.6; }
+.cal-key-note { display: inline-flex; align-items: center; gap: 6px; }
+.cal-key-sample { padding: 0 5px; border: 1px solid #b9c5d8; border-radius: 3px; background: var(--surface); font-style: normal; line-height: 1.5; }
+.cal-key-dots { display: inline-flex; align-items: center; gap: 12px; color: var(--muted); }
+.cal-key-dots:empty { display: none; }
+.cal-key+.cal-grid .cal-weekdays { border-top-color: #d5dbe6; }
+.cal-tibetan, .cal-day.cal-is-today .cal-tibetan { color: var(--teal-2); }
+.cal-day.cal-is-today .cal-tibetan { font-weight: 600; }
+.cal-day.cal-adjacent .cal-tibetan { color: #566a8c; }
+/* Festival names break at the <wbr> between the name and the kind of day;
+   names too long for that still wrap anywhere and end in an ellipsis. */
+.cal-mini-event { word-break: keep-all; overflow-wrap: anywhere; }
+@media (max-width: 767px) {
+  .cal-month-context { gap: 6px; font-size: var(--fs-sm); letter-spacing: 0; white-space: nowrap; }
+  .cal-context-tag { padding-inline: 5px; font-size: var(--fs-xs); letter-spacing: 1px; text-indent: 1px; }
+  .cal-key { gap: 2px 8px; padding: 6px; }
+  .cal-key-note { gap: 5px; }
+  .cal-key-dots { gap: 8px; }
+}
+@media (min-width: 1024px) {
+  /* With daily dates on, the lapis line already gives the full Tibetan date. */
+  .cal-day:has(.cal-daily-line) .cal-tibetan { display: none; }
+}

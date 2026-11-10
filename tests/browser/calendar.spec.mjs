@@ -323,3 +323,19 @@ test('复制管理链接 inside 我的订阅 shows its note above the open dialo
   await closeSubscription(page); await page.locator('[data-preset="tsok"]').click();
   await expect(toast).toBeVisible();
 });
+
+test('the month grid says its small labels are Tibetan dates before the dates are read',async({page}) => {
+  for (const viewport of [{width:390,height:844},{width:1366,height:900}]) {
+    await page.setViewportSize(viewport); await open(page);
+    if (viewport.width < 1024) await page.locator('#tab-preview').click();
+    await expect(page.locator('.cal-context-tag')).toHaveText('藏历');
+    const key = page.locator('.cal-key');
+    await expect(key).toContainText('小字为藏历，与农历不同');
+    // The key sits above the weekday row, on one line, in the same lapis as the labels.
+    const [keyBox, weekdays] = [await key.boundingBox(), await page.locator('.cal-weekdays').boundingBox()];
+    expect(keyBox.y + keyBox.height).toBeLessThanOrEqual(weekdays.y + 1);
+    expect(keyBox.height).toBeLessThan(40);
+    expect(await page.evaluate(() => getComputedStyle(document.querySelector('.cal-day:not(.cal-adjacent) .cal-tibetan')).color ===
+      getComputedStyle(document.querySelector('.cal-key-note')).color)).toBe(true);
+  }
+});

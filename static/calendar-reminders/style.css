@@ -638,3 +638,7 @@ input[type=time]::-webkit-datetime-edit { padding: 0; }
 .title-marks-note { margin-top: 2px; color: var(--muted); font-size: var(--fs-xs); line-height: 1.5; }
 .recommend-tag { margin-left: 8px; padding: 0 7px; border-radius: 9px; background: var(--red-tint); color: var(--wine); font: 500 var(--fs-xs)/20px var(--font-ui); letter-spacing: 0; }
 .daily-calendar-note { margin: -4px 0 10px; padding: 8px 10px; border-radius: var(--r-sm); background: var(--gold-tint); color: #5b4a2d; font-size: var(--fs-sm); line-height: 1.6; }
+
+/* Unsaved changes: same card, same place, warmer tone. */
+.subscribed-card.is-dirty { border-color: #e2c9c4; background: var(--red-tint); }
+.subscribed-card.is-dirty .subscribed-title { color: var(--wine); }

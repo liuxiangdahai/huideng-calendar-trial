@@ -124,6 +124,11 @@ function dailyMarkup(date, marks, compact = false) {
  * Browser controller. Caller owns the device-local today, settings and occurrences.
  * All view/navigation state stays here and never modifies subscription settings.
  */
+// A festival name that needs two lines should break between the name and what
+// the day is (观音菩萨 / 加持日), never inside a name (观音菩 / 萨加持日).
+const BREAK_BEFORE = /(圆寂纪念日|诞辰纪念日|纪念日|加持日|荟供日|诞辰日|诞生日|圆寂日|开始|结束)(?=（|$)/;
+export const breakHint = title => title.length > 5 ? title.replace(BREAK_BEFORE, '<wbr>$1') : title;
+
 export function createCalendarView(root, {onEditEvent = () => {}, onViewChange = () => {},
   initialView = 'month', today} = {}) {
   validDate(today);
@@ -143,7 +148,8 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
       <button type="button" data-cal-view="month" data-cal-focus="month-view">${icon('calendar')}<span>月历</span></button>
       <button type="button" data-cal-view="list" data-cal-focus="list-view">${icon('list')}<span>列表</span></button>
     </div></div><section class="cal-month-view" aria-label="月历预览">
-    <div class="cal-grid" role="grid" aria-label="月历，使用方向键浏览日期，回车查看日程" data-cal-grid></div>
+    <p class="cal-key"><span class="cal-key-note"><i class="cal-key-sample" aria-hidden="true">初一</i>小字为藏历，与农历不同</span><span class="cal-key-dots" data-cal-key-dots></span></p>
+    <div class="cal-grid" role="grid" aria-label="月历，日期下方小字为藏历。使用方向键浏览日期，回车查看日程" data-cal-grid></div>
     <p class="cal-legend" data-cal-legend></p>
     <section class="cal-day-detail" aria-label="所选日期的日程" data-cal-detail></section>
   </section><dialog class="cal-day-sheet" data-cal-sheet aria-label="当天日程">
@@ -241,7 +247,11 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
       months.add(`${cell.tibetan.display.split('月')[0]}月`);
       tibetanYears.set(cell.tibetan.yearName, months);
     }
-    $('[data-cal-context]').textContent = [...tibetanYears].map(([year, months]) => `藏历${year}年 ${[...months].join(' · ')}`).join('　');
+    // "藏历" is a tag in the same lapis as the small date labels in the grid, so
+    // the labels read as Tibetan dates rather than the 农历 that every other
+    // Chinese calendar prints in that spot (11-10 feedback).
+    $('[data-cal-context]').innerHTML = `<span class="cal-context-tag">藏历</span><span class="cal-context-text">${
+      [...tibetanYears].map(([year, months]) => escape(`${year}年 ${[...months].join(' · ')}`)).join('　')}</span>`;
     // With the everyday layer on, each day gets its own quiet line showing
     // the entry the calendar app will show, with the chosen mark (◦, 【每日】
     // or none). A phone cell is too narrow for the full date, so it shows
@@ -261,7 +271,7 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
       // Computers show every chosen day in the cell; the row grows to fit.
       const labels = cellEvents.map(event => {
         const presentation = eventPresentation(event, state.data?.catalog);
-        return `<span class="cal-mini-event ${presentation.colorClass}${event.preference?.mode === 'remind' ? ' is-remind' : ''}" title="${escape(event.title)}"${markAttr(event, state.settings?.titleMarks)}>${escape(event.title)}</span>`;
+        return `<span class="cal-mini-event ${presentation.colorClass}${event.preference?.mode === 'remind' ? ' is-remind' : ''}" title="${escape(event.title)}"${markAttr(event, state.settings?.titleMarks)}>${breakHint(escape(event.title))}</span>`;
       }).join('');
       // Phones: no text in the cell, only a dot per chosen day (carmine rings,
       // gold only shows); tapping the date opens the full day.
@@ -280,11 +290,13 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     grid.innerHTML = header + rows;
     grid.dataset.month = month;
     grid.dataset.marks = state.settings?.titleMarks || 'none';
-    // One plain line under the grid explains the marks; on phones it also
-    // says where the names are and that each Tibetan date goes in daily.
+    // The key sits above the grid, where it is read before the dates: what the
+    // small labels are, and what the two dot colours mean. Under the grid stay
+    // only the hints that matter after looking.
     const anyEvents = state.events.length > 0;
+    $('[data-cal-key-dots]').innerHTML = anyEvents ? '<span class="cal-legend-item"><i class="cal-dot is-remind"></i>会提醒</span><span class="cal-legend-item"><i class="cal-dot"></i>只显示</span>' : '';
     $('[data-cal-legend]').innerHTML = [
-      anyEvents ? '<span class="cal-legend-item"><i class="cal-dot is-remind"></i>会提醒</span><span class="cal-legend-item"><i class="cal-dot"></i>只显示</span><span class="cal-legend-tap">点日期看当天详情</span>' : '',
+      anyEvents ? '<span class="cal-legend-tap">点日期看当天详情</span>' : '',
       daily ? '<span class="cal-legend-daily">每天的藏历日期也会出现在你的日历里</span>' : ''
     ].join('');
     $('[data-cal-legend]').hidden = !anyEvents && !daily;
