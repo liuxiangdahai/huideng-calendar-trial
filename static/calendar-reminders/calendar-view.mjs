@@ -15,6 +15,9 @@ const dateTitle = date => `${Number(date.slice(0, 4))}年${Number(date.slice(5, 
 const weekIndex = date => (civil(date).getUTCDay() + 6) % 7;
 const idOf = event => event.eventId || event.id;
 const dayPart = tibetan => tibetan.display.split('月').at(-1);
+// The small label in a cell: the day, except on the first day of a Tibetan
+// month, which shows the month (十月), as paper calendars do (11-10).
+const cellLabel = tibetan => tibetan.day === 1 ? `${tibetan.display.split('月')[0]}月` : dayPart(tibetan);
 
 function validDate(date) {
   if (typeof date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(date) ||
@@ -151,6 +154,7 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     <p class="cal-key"><span class="cal-key-note">日期<span class="cal-key-below">下</span><span class="cal-key-beside">旁</span>的小字是藏历，与农历不同</span><span class="cal-key-dots" data-cal-key-dots></span></p>
     <div class="cal-grid" role="grid" aria-label="月历，日期下方小字为藏历。使用方向键浏览日期，回车查看日程" data-cal-grid></div>
     <p class="cal-legend" data-cal-legend></p>
+    <section class="cal-month-list" aria-label="本月已选的日子" data-cal-month-list></section>
     <section class="cal-day-detail" aria-label="所选日期的日程" data-cal-detail></section>
   </section><dialog class="cal-day-sheet" data-cal-sheet aria-label="当天日程">
     <div class="cal-sheet-bar" data-cal-sheet-bar><span class="cal-sheet-grip" aria-hidden="true"></span><button type="button" class="icon-button cal-sheet-close" data-cal-action="close-sheet" aria-label="关闭当天日程">${icon('close')}</button></div>
@@ -163,18 +167,45 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
   const $ = selector => root.querySelector(selector);
   const monthRoot = $('.cal-month-view'), listRoot = $('.cal-list-view');
 
-  // Phones and tablets: tapping a date opens that day in a bottom sheet, so
-  // the reader never scrolls between the grid and the cards. Computers keep
-  // the day under the grid. The same detail node moves between the two.
+  // Tapping a date opens that day right away. Phones and tablets: a bottom
+  // sheet over a dimmed page. Computers: a card beside the date that follows
+  // each click, so the day is never a screen below the grid (11-10: on a
+  // computer the click used to look like it did nothing).
   const sheet = $('[data-cal-sheet]'), detailNode = $('[data-cal-detail]');
   const sheetQuery = win?.matchMedia ? win.matchMedia('(max-width: 1023px)') : null;
   const sheetMode = () => Boolean(sheetQuery?.matches);
+  $('[data-cal-sheet-body]').append(detailNode);
+  let placedMode = null;
   function placeDetail() {
-    if (sheetMode()) { if (detailNode.parentElement !== $('[data-cal-sheet-body]')) $('[data-cal-sheet-body]').append(detailNode); }
-    else { if (sheet.open) sheet.close(); if (detailNode.parentElement !== monthRoot) monthRoot.append(detailNode); }
+    // Only a real switch between the sheet and the card closes it.
+    if (placedMode === sheetMode()) return;
+    placedMode = sheetMode(); closeSheet(); sheet.classList.toggle('is-popover', !placedMode);
   }
   placeDetail();
   sheetQuery?.addEventListener?.('change', placeDetail);
+  if (win && root.ownerDocument && win.getComputedStyle?.(root).position === 'static') root.style.position = 'relative';
+  // The card never covers the date that opened it: beside it (right, else
+  // left), level with it; when neither side has room (narrow windows),
+  // under it, or above it near the bottom. It always stays over the grid.
+  function placePopover() {
+    if (!sheet.open || sheetMode()) return;
+    const cell = root.querySelector(`[data-cal-date="${selected}"]`), grid = $('[data-cal-grid]');
+    if (!cell || !grid) return closeSheet();
+    const box = cell.getBoundingClientRect(), area = grid.getBoundingClientRect(), base = root.getBoundingClientRect();
+    const width = sheet.offsetWidth, height = sheet.offsetHeight, gap = 8;
+    let left, top;
+    if (box.right + gap + width <= area.right) left = box.right + gap;
+    else if (box.left - gap - width >= area.left) left = box.left - gap - width;
+    if (left !== undefined) {
+      top = box.top;
+      if (top + height > area.bottom) top = Math.max(area.top, box.bottom - height);
+    } else {
+      left = Math.max(area.left, Math.min(box.left + box.width / 2 - width / 2, area.right - width));
+      top = box.bottom + gap + height <= area.bottom ? box.bottom + gap : Math.max(area.top, box.top - gap - height);
+    }
+    sheet.style.left = `${Math.round(left - base.left)}px`;
+    sheet.style.top = `${Math.round(top - base.top)}px`;
+  }
   // Swipe the month grid sideways to change month on touch screens.
   let swipe = null;
   monthRoot.addEventListener('touchstart', event => {
@@ -191,12 +222,36 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
   }, {passive: true});
   let suppressClick = false;
   function openSheet() {
-    if (!sheetMode() || sheet.open || typeof sheet.showModal !== 'function') return;
+    if (typeof sheet.showModal !== 'function') return;
+    if (!sheetMode()) {
+      // show() moves focus into the card; keep it on the date so the arrow
+      // keys go on walking the month. The card is next in the Tab order.
+      const keep = page?.activeElement;
+      if (!sheet.open) sheet.show();
+      placePopover();
+      if (keep && keep !== page.body && root.contains(keep)) keep.focus({preventScroll: true});
+      return;
+    }
+    if (sheet.open) return;
     sheet.showModal();
     sheet.querySelector('.cal-sheet-body').scrollTop = 0;
   }
   function closeSheet() { if (sheet.open) sheet.close(); }
-  sheet.addEventListener('close', () => restoreFocus('date-' + selected));
+  // Computers: Esc, or a click anywhere but a date or the card, closes it.
+  // Clicks inside another dialog (the reminder editor opened from the card)
+  // leave it open.
+  const page = root.ownerDocument;
+  function outside(event) {
+    if (!sheet.open || sheetMode()) return;
+    const target = event.target;
+    if (sheet.contains(target) || target.closest?.('[data-cal-date]') || target.closest?.('dialog[open]')) return;
+    closeSheet();
+  }
+  function escape_(event) { if (event.key === 'Escape' && sheet.open && !sheetMode() && !page.querySelector('dialog[open]:not([data-cal-sheet])')) { closeSheet(); } }
+  page?.addEventListener('pointerdown', outside, true);
+  page?.addEventListener('keydown', escape_);
+  let openedFrom = null;
+  sheet.addEventListener('close', () => restoreFocus(openedFrom || 'date-' + selected));
   // Tap outside the sheet (on the dimmed page) closes it.
   sheet.addEventListener('click', event => { if (event.target === sheet) closeSheet(); });
   // Drag the handle down to dismiss, as on a phone's own sheets.
@@ -252,21 +307,13 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     // Chinese calendar prints in that spot (11-10 feedback).
     $('[data-cal-context]').innerHTML = `<span class="cal-context-tag">藏历</span><span class="cal-context-text">${
       [...tibetanYears].map(([year, months]) => `<span class="cal-context-year">${escape(year)}年 </span>${escape([...months].join(' · '))}`).join('　')}</span>`;
-    // With the everyday layer on, each day gets its own quiet line showing
-    // the entry the calendar app will show, with the chosen mark (◦, 【每日】
-    // or none). A phone cell is too narrow for the full date, so it shows
-    // “藏历” (with ◦ if chosen); the day sheet and list carry the full line.
+    // Each cell keeps the short Tibetan label even with daily dates on: the
+    // key above says what it is, and 藏历 forty-two times was noise (11-10).
     const daily = state.settings?.includeDailyDates === true;
-    const dailyLine = cell => {
-      if (!daily || cell.disabled || !cell.tibetan) return '';
-      const entry = dailyDateOccurrences(cell.date, cell.date)[0];
-      if (!entry) return '';
-      return `<span class="cal-daily-line" aria-hidden="true"${markAttr(entry, state.settings?.titleMarks)}><span class="cal-daily-full">${escape(entry.title)}</span><span class="cal-daily-short">藏历</span></span>`;
-    };
     const header = `<div class="cal-weekdays" role="row">${WEEKDAYS.map(day => `<span role="columnheader" aria-label="星期${day}">${day}</span>`).join('')}</div>`;
     const rows = Array.from({length: 6}, (_, row) => `<div class="cal-week" role="row">${cells.slice(row * 7, row * 7 + 7).map(cell => {
       const cellEvents = cell.disabled ? [] : cell.events;
-      const aria = `${dateTitle(cell.date)}，星期${WEEKDAYS[weekIndex(cell.date)]}，${cell.tibetan?.fullLabel || '超出藏历换算范围'}，${cell.disabled ? '超出预览范围' : `${cell.count}项已选日程`}${cellEvents.length ? `，${cellEvents.map(event => event.title).join('；')}` : ''}`;
+      const aria = `${dateTitle(cell.date)}，星期${WEEKDAYS[weekIndex(cell.date)]}，${cell.tibetan?.fullLabel || '超出藏历换算范围'}${cell.tibetan?.missingLabel ? `，${cell.tibetan.missingLabel}` : ''}，${cell.disabled ? '超出预览范围' : `${cell.count}项已选日程`}${cellEvents.length ? `，${cellEvents.map(event => event.title).join('；')}` : ''}`;
       const markers = [...new Set(cellEvents.map(event => eventPresentation(event, state.data?.catalog).colorClass))];
       // Computers show every chosen day in the cell; the row grows to fit.
       const labels = cellEvents.map(event => {
@@ -277,8 +324,8 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
       // gold only shows); tapping the date opens the full day.
       const mobileSummary = cellEvents.length ? `<span class="cal-mobile-events" aria-hidden="true">${cellEvents.slice(0, 3).map(event => `<i class="cal-dot${event.preference?.mode === 'remind' ? ' is-remind' : ''}"></i>`).join('')}${cellEvents.length > 3 ? '<i class="cal-dot-more">+</i>' : ''}</span>` : '';
       return `<div role="gridcell" aria-selected="${cell.selected}" class="cal-cell"><button type="button" class="cal-day${cell.inMonth ? '' : ' cal-adjacent'}${cell.selected ? ' cal-selected' : ''}${cell.today ? ' cal-is-today' : ''}" data-cal-date="${cell.date}" data-cal-focus="date-${cell.date}" tabindex="${cell.date === focusDate && !cell.disabled ? 0 : -1}" aria-label="${escape(aria)}"${cell.today ? ' aria-current="date"' : ''}${cell.disabled ? ' disabled' : ''}>
-        <span class="cal-day-date" aria-hidden="true"><span class="cal-gregorian">${cell.day}</span><span class="cal-tibetan">${escape(cell.tibetan ? dayPart(cell.tibetan) : '')}</span></span>${dailyLine(cell)}
-        <span class="cal-marks" aria-hidden="true">${cell.tibetan?.monthLeap ? '<span class="cal-leap">闰月</span>' : ''}${cell.repeatNumber ? `<span class="cal-repeat">重日${cell.repeatNumber}</span>` : ''}${cellEvents.length ? `<span class="cal-category-marks">${markers.slice(0, 3).map(color => `<i class="cal-category-dot ${color}"></i>`).join('')}</span><span class="cal-event-count">${cell.count}</span>` : ''}</span>
+        <span class="cal-day-date" aria-hidden="true"><span class="cal-gregorian">${cell.day}</span><span class="cal-tibetan${cell.tibetan?.day === 1 ? ' is-month-start' : ''}">${escape(cell.tibetan ? cellLabel(cell.tibetan) : '')}</span></span>
+        <span class="cal-marks" aria-hidden="true">${cell.tibetan?.monthLeap ? '<span class="cal-leap">闰月</span>' : ''}${cell.tibetan?.missingBefore?.length ? `<span class="cal-miss">缺${escape(cell.tibetan.missingBefore.map(dayPart).join(''))}</span>` : ''}${cell.repeatNumber ? '<span class="cal-repeat">重日</span>' : ''}${cellEvents.length ? `<span class="cal-category-marks">${markers.slice(0, 3).map(color => `<i class="cal-category-dot ${color}"></i>`).join('')}</span><span class="cal-event-count">${cell.count}</span>` : ''}</span>
         <span class="cal-day-events" aria-hidden="true">${labels}</span>${mobileSummary}</button></div>`;
     }).join('')}</div>`).join('');
     // When the same month is re-drawn because the selection changed, the
@@ -302,7 +349,25 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     $('[data-cal-legend]').hidden = !anyEvents && !daily;
     if (before) [...grid.querySelectorAll('.cal-mini-event,.cal-mobile-event')].filter(node => !before.has(labelKey(node)) && node.offsetParent)
       .slice(0, 16).forEach(node => playMotion(node, 'appear'));
+    renderMonthList(cells);
     renderDetail();
+    placePopover();
+  }
+
+  // Phones and tablets: the dots say that a day is chosen, not what it is.
+  // Under the grid, this month's chosen days are listed by name, so nobody
+  // has to tap dot after dot; a row opens that day (11-10).
+  function renderMonthList(cells) {
+    const node = $('[data-cal-month-list]');
+    const days = cells.filter(cell => cell.inMonth && !cell.disabled && cell.events.length);
+    if (!state.events.length) { node.hidden = true; node.innerHTML = ''; return; }
+    node.hidden = false;
+    node.innerHTML = `<h3 class="cal-month-list-title">${escape(monthTitle(month).replace(/^\d+年/, ''))}已选的日子<span>${days.length ? `${days.length} 天` : ''}</span></h3>${days.length
+      ? `<ul>${days.map(cell => {
+          const remind = cell.events.some(event => event.preference?.mode === 'remind');
+          return `<li><button type="button" class="cal-month-row${cell.today ? ' is-today' : ''}" data-cal-pick="${cell.date}" data-cal-focus="month-list-${cell.date}"><span class="cal-month-row-date"><b>${cell.day}</b><span>周${WEEKDAYS[weekIndex(cell.date)]}</span></span><span class="cal-month-row-tibetan">${escape(cell.tibetan?.display || '')}</span><span class="cal-month-row-names">${cell.events.map(event => `<span${event.preference?.mode === 'remind' ? ' class="is-remind"' : ''}>${escape(event.title)}</span>`).join('')}</span>${remind ? `<span class="cal-month-row-bell" aria-label="会提醒">${icon('bell')}</span>` : ''}</button></li>`;
+        }).join('')}</ul>`
+      : '<p class="cal-empty">这个月没有已选的日子。</p>'}`;
   }
 
   function renderDetail() {
@@ -358,7 +423,7 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     // view fades up, instead of jumping to an older scroll position.
     const anchor = root.querySelector('.cal-view-switch');
     const anchorTop = anchor?.getBoundingClientRect().top, fromHeight = root.getBoundingClientRect().height;
-    view = next;
+    view = next; closeSheet();
     monthRoot.hidden = view !== 'month'; listRoot.hidden = view !== 'list';
     $('[data-cal-navigation]').hidden = view !== 'month'; $('[data-cal-context]').hidden = view !== 'month';
     root.querySelectorAll('[data-cal-view]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.calView === view)));
@@ -377,6 +442,7 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     const last = Number(addDays(shiftMonth(safeMonth + '-01', 1), -1).slice(8));
     selected = clamp(`${safeMonth}-${String(Math.min(oldDay, last)).padStart(2, '0')}`, state.start, state.end);
     month = safeMonth; focusDate = selected;
+    if (!sheetMode()) closeSheet();
     const focus = activeKey(); renderMonth(); restoreFocus(focus);
     playMotion($('[data-cal-grid]'),'month',direction);
     playMotion($('[data-cal-detail]'),'fade');
@@ -401,13 +467,14 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     if (!button || !root.contains(button)) return;
     if (button.dataset.calView) return setView(button.dataset.calView);
     if (button.dataset.calEvent) return onEditEvent(button.dataset.calEvent, button);
-    if (button.dataset.calDate) {
-      const previousMonth=month, previousDate=selected;
-      selected = button.dataset.calDate; focusDate = selected; month = selected.slice(0, 7);
-      renderMonth(); restoreFocus('date-' + focusDate);
+    if (button.dataset.calDate || button.dataset.calPick) {
+      const previousMonth=month, previousDate=selected, fromList = Boolean(button.dataset.calPick);
+      selected = button.dataset.calDate || button.dataset.calPick; focusDate = selected; month = selected.slice(0, 7);
+      renderMonth(); restoreFocus(fromList ? 'month-list-' + selected : 'date-' + focusDate);
       if(month!==previousMonth) playMotion($('[data-cal-grid]'),'month',month>previousMonth ? 1 : -1);
       if(selected!==previousDate) playMotion($('[data-cal-detail]'),'fade');
       announce(`${dateTitle(selected)}，${state.events.filter(item => item.date === selected).length}项已选日程`);
+      openedFrom = fromList ? 'month-list-' + selected : null;
       openSheet();
       return;
     }
@@ -475,7 +542,9 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     },
     setView,
     destroy() {
-      disposed = true;
+      disposed = true; closeSheet();
+      page?.removeEventListener('pointerdown', outside, true);
+      page?.removeEventListener('keydown', escape_);
       root.removeEventListener('click', onClick);
       root.removeEventListener('keydown', onKeyDown);
       root.removeEventListener('change', onChange);
