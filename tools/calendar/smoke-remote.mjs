@@ -15,6 +15,10 @@ if(process.env.CALENDAR_EXPECTED_VERSION)assert.equal(health.version,process.env
 const data=JSON.parse(await fs.readFile('static/calendar-reminders/calendar-data.json','utf8'));
 const parse=text=>new ICAL.Component(ICAL.parse(text)).getAllSubcomponents('vevent');
 const startedAt=new Date().toISOString();
+// Light runs skip what only matters when feed content or storage changes; see
+// tools/calendar/smoke-scope.mjs. Unset means full, so a manual run stays thorough.
+const SCOPE=process.env.CALENDAR_SMOKE_SCOPE==='light'?'light':'full';
+const full=SCOPE==='full';
 const timing=[],dailyMeasurements=[];let created;let scenario='create';let passed=false,failedScenario;
 const dailyEntries=entries=>entries.filter(event=>String(event.getFirstPropertyValue('uid')).startsWith('daily-date-'));
 const active=entries=>entries.filter(event=>event.getFirstPropertyValue('status')!=='CANCELLED');
@@ -66,7 +70,7 @@ try{
   assert.ok(replay.id===created.id && replay.feedUrl===created.feedUrl && replay.manageToken===created.manageToken,'重复创建必须恢复同一订阅和凭证');
  }
  let managed=await call('GET',`/api/subscriptions/${created.id}`);
- for(const preset of ['guru','tsok','practice','dual']){
+ for(const preset of full?['guru','tsok','practice','dual']:['guru','tsok']){
   scenario=preset;
   settings=applyPreset(settings,data.catalog,preset==='dual'?'practice':preset);
   if(preset==='dual')for(const value of Object.values(settings.events))if(value.mode!=='off'){value.mode='remind';value.reminders=[{daysBefore:0,time:'08:00'},{daysBefore:1,time:'20:00'}];}
@@ -100,8 +104,8 @@ try{
   for(const response of parallel){assert.equal(response.status,200);assert.equal(response.headers.get('etag'),etag);await response.arrayBuffer();}
   console.log(JSON.stringify({preset,events:entries.length,status:'passed'}));
  }
- scenario='modify-read-30';
- for(let i=0;i<30;i++){
+ scenario=full?'modify-read-30':'modify-read-3';
+ for(let i=0;i<(full?30:3);i++){
   settings.events['guru-tsok'].reminders[0].time=i%2?'08:00':'09:00';
   managed=await call('PATCH',`/api/subscriptions/${created.id}`,{settings,revision:managed.revision});
   const response=await feed();assert.equal(response.status,200);await response.arrayBuffer();
@@ -109,6 +113,7 @@ try{
  // Daily dates use the same public feed. Test actual deployment, not only a
  // synthetic file; no personal address or credential is written to evidence.
  let dailyBaseline;
+ if(full){
  for(const mode of ['daily-only','practice-daily','dual-daily']){
   scenario=mode;
   settings=mode==='daily-only'?defaults(data.catalog,'Asia/Shanghai'):applyPreset(settings,data.catalog,'practice');
@@ -145,6 +150,7 @@ try{
  const reopened=verifyDaily(parse(await (await feed()).text()));
  for(const event of reopened)assert.ok(Number(event.getFirstPropertyValue('sequence'))>dailyBaseline.get(event.getFirstPropertyValue('uid'))+1);
  assert.equal(managed.feedUrl,created.feedUrl);
+ }
  scenario='cancel-disable';
  settings.includeDailyDates=false;
  for(const value of Object.values(settings.events))value.mode='off';
@@ -154,10 +160,10 @@ try{
  assert.ok(cancelled.every(e=>e.getFirstPropertyValue('status')==='CANCELLED' && e.getAllSubcomponents('valarm').length===0));
  await call('DELETE',`/api/subscriptions/${created.id}`);
  assert.ok(parse(await (await feed()).text()).every(e=>e.getFirstPropertyValue('status')==='CANCELLED'));
- console.log(JSON.stringify({status:'passed',requests:timing.length,version:health.version,note:'wallMs is network latency, not Worker CPU'}));
+ console.log(JSON.stringify({status:'passed',scope:SCOPE,requests:timing.length,version:health.version,note:'wallMs is network latency, not Worker CPU'}));
  passed=true;
 }catch(error){failedScenario=scenario;throw error;}
 finally{
  if(created)await call('DELETE',`/api/subscriptions/${created.id}`).catch(()=>console.error('验收订阅清理失败，请在隔离环境检查。'));
- await fs.mkdir('artifacts',{recursive:true});await fs.writeFile('artifacts/remote-smoke.json',JSON.stringify({version:health.version,dataVersion:health.dataVersion,passed,failedScenario,startedAt,finishedAt:new Date().toISOString(),timing,dailyMeasurements},null,2));
+ await fs.mkdir('artifacts',{recursive:true});await fs.writeFile('artifacts/remote-smoke.json',JSON.stringify({version:health.version,dataVersion:health.dataVersion,scope:SCOPE,passed,failedScenario,startedAt,finishedAt:new Date().toISOString(),timing,dailyMeasurements},null,2));
 }

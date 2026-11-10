@@ -35,3 +35,18 @@ test('aggregation cannot average percentiles or leak untrusted dimension fields'
  assert.deepEqual(result.outcomes,[{status:'other',requests:1,errors:1}]);
  assert.ok(!JSON.stringify(result).includes('credential'));
 });
+test('D1 usage is summed per UTC day across the shared free account',async()=>{
+ const {summarizeD1,D1_FREE_DAILY}=await import('../../tools/calendar/cloudflare-metrics.mjs');
+ const groups=[
+  {sum:{rowsRead:40000,rowsWritten:61000},dimensions:{date:'2026-11-09',databaseId:'acc'}},
+  {sum:{rowsRead:9000,rowsWritten:7000},dimensions:{date:'2026-11-09',databaseId:'tri'}},
+  {sum:{rowsRead:500,rowsWritten:300},dimensions:{date:'2026-11-10',databaseId:'tri'}},
+  {sum:{rowsRead:-5,rowsWritten:'x'},dimensions:{date:'2026-11-10',databaseId:'zzz'}}];
+ const result=summarizeD1({viewer:{accounts:[{groups}]}},{acceptance:'acc',trial:'tri'},'2026-11-10');
+ assert.equal(D1_FREE_DAILY.rowsWritten,100000);
+ assert.deepEqual(result.days['2026-11-09'].byDatabase,{acceptance:{rowsRead:40000,rowsWritten:61000},trial:{rowsRead:9000,rowsWritten:7000}});
+ assert.equal(result.days['2026-11-09'].rowsWritten,68000);
+ assert.equal(result.days['2026-11-09'].share.rowsWritten,68);
+ assert.deepEqual(result.days['2026-11-10'].byDatabase.other,{rowsRead:0,rowsWritten:0},'invalid numbers count as zero, not as data');
+ assert.throws(()=>summarizeD1({viewer:{accounts:[]}},{},'2026-11-10'));
+});
