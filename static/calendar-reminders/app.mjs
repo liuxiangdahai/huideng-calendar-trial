@@ -123,8 +123,10 @@ function safeHTTP(value) {
 function renderToday() {
   const now=new Date(); today=deviceDate(now);
   $('#today-gregorian').textContent = new Intl.DateTimeFormat('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'short'}).format(now);
-  try { const tibetan=getTibetanDate(today); $('#today-tibetan').textContent = `藏历${tibetan.yearName}年 ${tibetan.display}`; }
-  catch { $('#today-tibetan').textContent = ''; }
+  // 历页: the Tibetan date is the page's headline, the civil date its footnote.
+  // 藏历 and the year sit right above it, large enough to be read as one with the date.
+  try { const tibetan=getTibetanDate(today); $('#today-tibetan').innerHTML = `<strong class="today-day">${esc(tibetan.display)}</strong>`; $('#today-year').textContent = `${tibetan.yearName}年`; }
+  catch { $('#today-tibetan').textContent = ''; $('#today-year').textContent = ''; }
   renderNextPractice();
 }
 // Read-only orientation for every visitor: the next guru or dakini tsok day,

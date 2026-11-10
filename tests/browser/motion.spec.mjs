@@ -44,7 +44,8 @@ test('published motion stylesheet loads as CSS and drives dialog feedback with a
   const css = await response;
   expect(css.status()).toBe(200);
   expect(css.headers()['content-type']).toContain('text/css');
-  expect(await page.locator('.quick-panel').evaluate(node => getComputedStyle(node).boxShadow)).not.toBe('none');
+  // The stylesheet is applied, not just fetched. (Panels are flat since the 11-10 redesign, so a shadow is no longer the probe.)
+  expect(await page.evaluate(() => [...document.styleSheets].some(sheet => sheet.href?.endsWith('/motion.css') && sheet.cssRules.length > 0))).toBe(true);
   await page.locator('[data-preset="guru"]').click();
   await page.locator('#reminder-settings').click();
   const dialog = page.locator('#reminder-dialog');
