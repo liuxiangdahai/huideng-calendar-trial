@@ -327,6 +327,7 @@ test('复制管理链接 inside 我的订阅 shows its note above the open dialo
 test('the month grid says its small labels are Tibetan dates before the dates are read',async({page}) => {
   for (const viewport of [{width:390,height:844},{width:1366,height:900}]) {
     await page.setViewportSize(viewport); await open(page);
+    await page.locator('[data-preset="practice"]').click();
     if (viewport.width < 1024) await page.locator('#tab-preview').click();
     await expect(page.locator('.cal-context-tag')).toHaveText('藏历');
     const key = page.locator('.cal-key');
@@ -335,6 +336,15 @@ test('the month grid says its small labels are Tibetan dates before the dates ar
     const [keyBox, weekdays] = [await key.boundingBox(), await page.locator('.cal-weekdays').boundingBox()];
     expect(keyBox.y + keyBox.height).toBeLessThanOrEqual(weekdays.y + 1);
     expect(keyBox.height).toBeLessThan(40);
+    // The key shows the same marks as the grid at this width: dots on phones, name strips on desktop.
+    const marks = await page.evaluate(() => {
+      const shown = selector => [...document.querySelectorAll(selector)].some(node => node.offsetParent && getComputedStyle(node).display !== 'none');
+      const strip = node => node && getComputedStyle(node).backgroundColor;
+      return {gridDots: shown('.cal-grid .cal-mobile-events .cal-dot'), keyDots: shown('.cal-key .cal-dot'),
+        gridStrip: strip(document.querySelector('.cal-day:not(.cal-adjacent) .cal-mini-event.is-remind')), keyStrip: strip(document.querySelector('.cal-key .cal-legend-item.is-remind'))};
+    });
+    expect(marks.keyDots).toBe(marks.gridDots);
+    if (!marks.gridDots) expect(marks.keyStrip).toBe(marks.gridStrip);
     expect(await page.evaluate(() => getComputedStyle(document.querySelector('.cal-day:not(.cal-adjacent) .cal-tibetan')).color ===
       getComputedStyle(document.querySelector('.cal-key-note')).color)).toBe(true);
   }

@@ -256,6 +256,12 @@ dialog.cal-day-sheet::backdrop { background: #1d1b1859; }
   .cal-key-dots { gap: 8px; }
 }
 @media (min-width: 1024px) {
+  /* The key must show what the grid shows. Phones mark days with dots; here
+     the cells carry name strips, so the key is two strips, not two dots. */
+  .cal-key-dots { gap: 8px; }
+  .cal-key-dots .cal-dot { display: none; }
+  .cal-key-dots .cal-legend-item { padding: 0 7px; border-left: 2px solid var(--gold-2); border-radius: 0 3px 3px 0; background: #f7efdf; color: #5b4a2d; font-size: var(--fs-2xs); line-height: 18px; }
+  .cal-key-dots .cal-legend-item.is-remind { border-left-color: var(--red); background: var(--red-tint); color: var(--red); }
   /* With daily dates on, the lapis line already gives the full Tibetan date. */
   .cal-day:has(.cal-daily-line) .cal-tibetan { display: none; }
 }

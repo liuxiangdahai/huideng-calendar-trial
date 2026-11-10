@@ -294,7 +294,7 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     // small labels are, and what the two dot colours mean. Under the grid stay
     // only the hints that matter after looking.
     const anyEvents = state.events.length > 0;
-    $('[data-cal-key-dots]').innerHTML = anyEvents ? '<span class="cal-legend-item"><i class="cal-dot is-remind"></i>会提醒</span><span class="cal-legend-item"><i class="cal-dot"></i>只显示</span>' : '';
+    $('[data-cal-key-dots]').innerHTML = anyEvents ? '<span class="cal-legend-item is-remind"><i class="cal-dot is-remind"></i>会提醒</span><span class="cal-legend-item"><i class="cal-dot"></i>只显示</span>' : '';
     $('[data-cal-legend]').innerHTML = [
       anyEvents ? '<span class="cal-legend-tap">点日期看当天详情</span>' : '',
       daily ? '<span class="cal-legend-daily">每天的藏历日期也会出现在你的日历里</span>' : ''
