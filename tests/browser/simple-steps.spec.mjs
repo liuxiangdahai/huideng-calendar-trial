@@ -99,12 +99,13 @@ test('inside WeChat the page says first how to open it in a browser',async({brow
   await context.close();
 });
 
-test('with a subscription, changing the choice and changing it back never moves the choices',async({page})=>{
-  for (const viewport of [{width:390,height:844},{width:1366,height:900}]) {
+for (const viewport of [{width:390,height:844},{width:1366,height:900}]) test(`with a subscription, changing the choice and changing it back never moves the choices at ${viewport.width}px`,async({page})=>{
+  {
+    // One fresh page per width: no subscription carried over from another run.
     await page.setViewportSize(viewport); await open(page);
-    await page.evaluate(()=>localStorage.clear()); await page.reload(); await expect(page.locator('.cal-day')).toHaveCount(42);
     await page.locator('[data-preset="tsok"]').click();
     await page.locator('#subscribe').click();
+    await expect(page.locator('#subscription-dialog')).toBeVisible();
     await page.locator('input[name="device"][value="other"]').check();
     await expect(page.locator('#copy-feed')).toBeVisible();
     await page.keyboard.press('Escape');

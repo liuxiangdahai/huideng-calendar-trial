@@ -13,9 +13,15 @@ test('mobile sticky tabs preserve independent panel positions, month and focused
  expect(toolbar.y).toBeGreaterThanOrEqual(tabs.y+tabs.height-1);expect(toolbar.y).toBeLessThan(140);
  await page.locator('[data-cal-action="next"]').click();const month=await page.locator('[data-cal-month]').inputValue();
  await page.locator('[data-cal-grid] .cal-week:last-child').scrollIntoViewIfNeeded();const preview=await page.evaluate(()=>scrollY);
+ // A short month may not scroll far enough to pin the bar; then the preview is
+ // simply at its start, and returning shows it from the start with the bar pinned.
+ const previewPinned=await page.locator('.mobile-tabs').evaluate(n=>n.getBoundingClientRect().top<=1);
  await tapTab('#tab-selection');await expect.poll(()=>page.evaluate(()=>scrollY)).toBeCloseTo(saved,0);
  await expect(group).toHaveAttribute('open','');
- await tapTab('#tab-preview');await expect(page.locator('[data-cal-month]')).toHaveValue(month);await expect.poll(()=>page.evaluate(()=>scrollY)).toBeCloseTo(preview,0);
+ await tapTab('#tab-preview');await expect(page.locator('[data-cal-month]')).toHaveValue(month);
+ if(previewPinned)await expect.poll(()=>page.evaluate(()=>scrollY)).toBeCloseTo(preview,0);
+ else{const [bar,controls]=await Promise.all(['.mobile-tabs','.cal-control-bar'].map(s=>page.locator(s).boundingBox()));
+  expect(controls.y).toBeGreaterThanOrEqual(bar.y+bar.height-1);expect(controls.y).toBeLessThan(bar.y+bar.height+40);}
  await page.locator('#tab-preview').press('ArrowLeft');await expect(page.locator('#tab-selection')).toBeFocused();
  await page.locator('#subscribe').click();await expect(page.locator('#subscription-dialog')).toBeVisible();
  await page.keyboard.press('Escape');await expect(page.locator('#subscription-dialog')).toBeHidden();
