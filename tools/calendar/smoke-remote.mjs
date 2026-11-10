@@ -142,13 +142,12 @@ try{
  verifyDaily(parse(await (await feed()).text()));
  scenario='daily-disable';settings.includeDailyDates=false;
  managed=await call('PATCH',`/api/subscriptions/${created.id}`,{settings,revision:managed.revision});
- const cancelledDaily=dailyEntries(parse(await (await feed()).text()));
- assert.equal(cancelledDaily.length,dailyBaseline.size);
- for(const event of cancelledDaily){assert.equal(event.getFirstPropertyValue('status'),'CANCELLED');assert.equal(event.getAllSubcomponents('valarm').length,0);assert.ok(Number(event.getFirstPropertyValue('sequence'))>dailyBaseline.get(event.getFirstPropertyValue('uid')));}
+ // Daily dates are generated live (11-10): turning them off leaves them out of the feed.
+ assert.equal(dailyEntries(parse(await (await feed()).text())).length,0,'关闭每日藏历后订阅里不应再有每日日期');
  scenario='daily-reenable';settings.includeDailyDates=true;
  managed=await call('PATCH',`/api/subscriptions/${created.id}`,{settings,revision:managed.revision});
  const reopened=verifyDaily(parse(await (await feed()).text()));
- for(const event of reopened)assert.ok(Number(event.getFirstPropertyValue('sequence'))>dailyBaseline.get(event.getFirstPropertyValue('uid'))+1);
+ for(const event of reopened)assert.ok(Number(event.getFirstPropertyValue('sequence'))>dailyBaseline.get(event.getFirstPropertyValue('uid')),'重新打开后版本号只能升高');
  assert.equal(managed.feedUrl,created.feedUrl);
  }
  scenario='cancel-disable';

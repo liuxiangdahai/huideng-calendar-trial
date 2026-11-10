@@ -200,6 +200,31 @@ function publicEvent(event, zone, alarmInstants, titleMarks = DEFAULT_TITLE_MARK
     alarmInstants: remind ? alarmInstants : []
   };
 }
+// 每日藏历 is the same for everyone, so it is computed fresh for each feed and
+// never written to a subscriber's ledger (11-10). That removes ~820 rows per
+// subscriber with daily dates, the daily slide (one insert + one cancel each
+// day) and the release-day rewrite of those rows.
+//
+// SEQUENCE must never go backwards for a UID a calendar has already seen. The
+// ledger used small numbers (0..~10), so live entries start far above them.
+// They rise with every settings save (revision; title marks can change the
+// text) and with every data import (updatedOn; a 藏历 PRO correction can change
+// it). Both only ever increase, so their sum does too.
+export const DAILY_UID_PREFIX = 'daily-date-';
+export const DAILY_SEQUENCE_BASE = 1000;
+const DATA_DAY_ORIGIN = Date.UTC(2026, 0, 1);
+const isDailyUid = uid => typeof uid === 'string' && uid.startsWith(DAILY_UID_PREFIX);
+function dataDay(updatedOn) {
+  const time = Date.parse(`${updatedOn}T00:00:00Z`);
+  return /^\d{4}-\d{2}-\d{2}$/.test(updatedOn || '') && Number.isFinite(time) ? Math.max(0, Math.floor((time - DATA_DAY_ORIGIN) / 86400000)) : 0;
+}
+export function liveDailyVersion(record, data) {
+  const day = dataDay(data?.updatedOn);
+  const dataTime = day ? new Date(DATA_DAY_ORIGIN + day * 86400000).toISOString() : '';
+  return {sequence: DAILY_SEQUENCE_BASE + record.revision + day,
+    modified: dataTime > record.updated_at ? dataTime : record.updated_at};
+}
+
 function publishedEvent(entry) {
   return {
     ...JSON.parse(entry.event_json),
@@ -424,10 +449,16 @@ export function createCalendarService({getData, validateSettings, selectOccurren
     const selection = record.disabled ? [] : selectCalendarOccurrences(data, settings, rollingWindow(time, settings.zone), selectOccurrences);
     const prior = (await env.DB.prepare('SELECT * FROM calendar_entries WHERE subscription_id = ?')
       .bind(record.id).all()).results;
-    const previous = new Map(prior.map(entry => [entry.uid, entry])), next = new Map(), changes = [];
+    const previous = new Map(prior.map(entry => [entry.uid, entry])), next = new Map(), changes = [], live = [];
+    const dailyVersion = liveDailyVersion(record, data);
     for (const occurrence of selection) {
       if (!occurrence.uid || next.has(occurrence.uid)) throw new Error('Duplicate or missing occurrence UID');
       const event = publicEvent(occurrence, settings.zone, resolveAlarmInstants(occurrence, settings.zone), settings.titleMarks);
+      if (isDailyUid(event.uid)) {
+        live.push({...event, sequence: dailyVersion.sequence, createdAt: record.created_at,
+          lastModified: dailyVersion.modified, dtstamp: dailyVersion.modified, status: 'CONFIRMED'});
+        continue;
+      }
       const content = canonical(event), old = previous.get(event.uid);
       // The ledger stores the exact canonical text it hashed. Identical text has
       // the identical hash, so only new or changed events pay for SHA-256.
@@ -441,8 +472,11 @@ export function createCalendarService({getData, validateSettings, selectOccurren
       next.set(event.uid, entry);
       if (changed) changes.push(entry);
     }
+    // Daily rows left from before 11-10 are removed once, below; they are never
+    // cancelled here, so turning daily dates off simply leaves them out.
+    const legacyDaily = prior.some(entry => isDailyUid(entry.uid));
     for (const old of prior) {
-      if (next.has(old.uid)) continue;
+      if (next.has(old.uid) || isDailyUid(old.uid)) continue;
       const entry = old.cancelled_at ? old : {...old, sequence: old.sequence + 1,
         modified_at: timestamp, cancelled_at: timestamp};
       if (time.getTime() - Date.parse(entry.cancelled_at) < RETENTION_MS) {
@@ -451,9 +485,10 @@ export function createCalendarService({getData, validateSettings, selectOccurren
       }
     }
     const entries = [...next.values()];
-    const events = entries.map(publishedEvent).sort((a, b) =>
+    const events = [...entries.map(publishedEvent), ...live].sort((a, b) =>
       a.date.localeCompare(b.date) || a.uid.localeCompare(b.uid));
-    const modified = entries.reduce((latest, entry) => entry.modified_at > latest ? entry.modified_at : latest, record.updated_at);
+    const modified = entries.reduce((latest, entry) => entry.modified_at > latest ? entry.modified_at : latest,
+      live.length && dailyVersion.modified > record.updated_at ? dailyVersion.modified : record.updated_at);
     const ics = exportICS(events, {zone: settings.zone, name: '慧灯藏历',
       generatedAt: new Date(modified), sourceVersion: data.sourceVersion || data.updatedOn || '',
       usePublishedAlarmInstants: true, titleMarks: settings.titleMarks});
@@ -470,6 +505,9 @@ export function createCalendarService({getData, validateSettings, selectOccurren
         event_json = excluded.event_json, sequence = excluded.sequence,
         modified_at = excluded.modified_at, cancelled_at = excluded.cancelled_at`,
     [JSON.stringify(changes), ...sqlGuard(record)]));
+    if (legacyDaily) statements.push(bound(env.DB, `DELETE FROM calendar_entries
+      WHERE subscription_id = ? AND uid >= ? AND uid < ? AND ${GUARD}`,
+    [record.id, DAILY_UID_PREFIX, DAILY_UID_PREFIX.slice(0, -1) + '.', ...sqlGuard(record)]));
     // Preserve UID/sequence after removal; re-selecting the same occurrence must
     // not look like an old, out-of-order revision to a calendar client.
     statements.push(bound(env.DB, `UPDATE calendar_entries SET event_json = '{}', content_hash = ''
