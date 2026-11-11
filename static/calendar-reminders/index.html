@@ -17,7 +17,7 @@
   <a class="skip" href="#preset-options">跳至选择内容</a>
   <header class="site-header">
     <div class="heading"><a href="/" class="brand" aria-label="慧灯小组首页"><span class="brand-seal brand-logo"><img src="./assets/huideng-logo.png" width="144" height="153" alt="慧灯小组" decoding="async"></span><span class="brand-type"><h1>藏历</h1><small>慧灯小组</small></span></a></div>
-    <button id="my-subscription" type="button" class="secondary"><span data-icon="calendar-check" aria-hidden="true"></span>我的订阅</button>
+    <button id="my-subscription" type="button" class="secondary"><span class="to-subscribe"><span data-icon="calendar-check" aria-hidden="true"></span><span id="my-subscription-label">加入日历</span></span><span class="to-home"><span data-icon="chevron-left" aria-hidden="true"></span>藏历</span></button>
   </header>
   <section class="editorial-masthead" aria-label="今日藏历"><div class="masthead-clouds" aria-hidden="true"><span class="cloud-far"></span><span class="cloud-near"></span></div><div class="masthead-inner"><div class="masthead-date"><div class="today"><span class="today-era"><b>藏历</b><span id="today-year"></span></span><span id="today-tibetan"></span><span id="today-gregorian">正在读取日期</span></div><p id="today-feast" class="today-feast" hidden></p></div><p id="next-practice" class="masthead-next" aria-live="off" hidden></p></div></section>
   <main>
@@ -25,7 +25,7 @@
     <noscript><p class="notice">请启用浏览器 JavaScript，或查看<a href="https://www.fohuifayu.com/index.php/calendar">佛慧法语藏历</a>。</p></noscript>
     <div id="app" hidden>
       <div id="device-zone-notice" class="notice zone-change" role="status" hidden><p id="device-zone-message"></p><div class="feed-actions"><button id="keep-zone" class="secondary" type="button">保持原时区</button><button id="use-device-zone" class="primary" type="button">改用设备时区</button></div></div>
-      <div id="wechat-banner" class="wechat-banner" role="note" hidden><span data-icon="globe" aria-hidden="true"></span><div><strong>请在浏览器中打开本页</strong><p id="wechat-banner-text">微信会拦截“加入日历”。点右上角 <b>···</b>，选择“在浏览器打开”，再继续操作。</p></div></div>
+      <div id="wechat-banner" class="wechat-banner" role="note" data-page-part="subscribe" hidden><span data-icon="globe" aria-hidden="true"></span><p id="wechat-banner-text">微信里不能直接加入日历</p><button id="wechat-banner-help" type="button" class="text-button">怎么打开<span data-icon="chevron-right" aria-hidden="true"></span></button></div>
       <div id="home" class="home" data-page-part="home">
         <div class="home-side">
           <section class="home-upcoming" aria-labelledby="home-upcoming-title">
@@ -52,7 +52,7 @@
           <section id="subscribed-card" class="subscribed-card" aria-live="polite" hidden>
             <p class="subscribed-title"><span data-icon="calendar-check" aria-hidden="true"></span><span id="subscribed-title">你的日历已在同步</span></p>
             <p id="subscribed-next"></p><p id="subscribed-hint" class="subscribed-hint"></p>
-            <button id="subscribed-open" type="button" class="text-button" hidden>查看我的订阅<span data-icon="chevron-right" aria-hidden="true"></span></button>
+            <button id="subscribed-open" type="button" class="text-button">查看我的订阅<span data-icon="chevron-right" aria-hidden="true"></span></button>
           </section>
           <section class="quick-section" aria-labelledby="quick-title">
             <div class="quick-heading"><h3 id="quick-title"><span class="step-no">1</span>选择要提醒的日子</h3></div>
@@ -135,6 +135,18 @@
       <div class="dialog-actions"><button type="button" class="secondary" data-close="reminder-dialog">取消</button><button class="primary" type="submit">应用设置</button></div>
     </form>
   </dialog>
+  <!-- WeChat and DingTalk block calendar links: say once, plainly, how to get
+       to a browser, with pictures of the two taps and an arrow on the dimmed
+       page toward the ··· button above it (11-11). -->
+  <dialog id="wechat-dialog" class="wechat-dialog" aria-labelledby="wechat-title">
+      <div class="dialog-head"><div><p id="wechat-why" class="overline">微信里不能直接加入日历</p><h2 id="wechat-title">请在浏览器里打开</h2></div><button type="button" class="icon-button" data-close="wechat-dialog" aria-label="关闭"><span data-icon="close" aria-hidden="true"></span></button></div>
+      <ol class="wechat-steps">
+        <li><span class="wechat-pic" aria-hidden="true"><span class="wechat-bar"><i></i><b class="wechat-dots"><i></i><i></i><i></i></b></span></span><div><small>第一步</small><strong>点右上角 ···</strong></div></li>
+        <li><span class="wechat-pic" aria-hidden="true"><span class="wechat-bar"><i></i></span><span class="wechat-sheet"><b data-icon="copy"></b><b class="is-on" data-icon="globe"></b><b></b></span></span><div><small>第二步</small><strong>选“在浏览器打开”</strong></div></li>
+      </ol>
+      <p class="wechat-note">在浏览器里加过的，打开后点“我的订阅”就能看到。找不到这一项，可以复制网址，粘贴到手机浏览器里打开。</p>
+      <div class="dialog-actions"><button id="wechat-copy" type="button" class="secondary"><span data-icon="copy" aria-hidden="true"></span>复制网址</button><button type="button" class="primary" data-close="wechat-dialog">知道了</button></div>
+    </dialog>
   <dialog id="share-dialog" aria-labelledby="share-title">
       <div class="dialog-head"><div><p class="overline">分享设置</p><h2 id="share-title">发给师兄，或用手机扫码</h2></div><button type="button" class="icon-button" data-close="share-dialog" aria-label="关闭分享"><span data-icon="close" aria-hidden="true"></span></button></div>
       <p id="share-summary" class="field-note"></p>

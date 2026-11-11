@@ -164,11 +164,34 @@ function wantedPage() {
 function setPage(next,{push=false,scroll=false}={}) {
   page=next; document.body.dataset.page=next;
   document.title=next==='home' ? '藏历 · 慧灯小组' : '加入日历 · 藏历 · 慧灯小组';
-  if(push){ try{history.pushState(null,'',`${location.pathname}${location.search}${next==='home'?'':'#subscribe'}`);}catch{} }
+  // Remember when the choices were opened from the calendar, so going back
+  // to it is a real step back (the phone's back button agrees).
+  if(push){ try{history.pushState(next==='subscribe'?{fromHome:true}:null,'',`${location.pathname}${location.search}${next==='home'?'':'#subscribe'}`);}catch{} }
   if(scroll) window.scrollTo({top:0,behavior:'instant'});
   if(next==='home') renderHome();
   else if(data && !calendarView) renderPreview();
   else if(data && !settings.zone && !zoneAsked && !document.querySelector('dialog[open]')) { zoneAsked=true; zonePicker?.open({zone:'',deviceZone:observedZone}); }
+}
+const inAppBrowser=()=>Boolean(calendarDevice.inAppBrowser);
+function openBrowserHelp() {
+  const dialog=$('#wechat-dialog'); if(dialog.open) return;
+  const app=calendarDevice.inAppBrowser||'微信';
+  $('#wechat-why').textContent=`${app}里不能直接加入日历`;
+  // "在浏览器打开" takes the address shown now, so point it at the choices
+  // while the window is up; closing it puts the 藏历 address back.
+  if(page==='home'){
+    try{history.replaceState(history.state,'',`${location.pathname}${location.search}#subscribe`);}catch{}
+    dialog.addEventListener('close',()=>{ if(page==='home' && location.hash==='#subscribe') try{history.replaceState(history.state,'',location.pathname+location.search);}catch{} },{once:true});
+  }
+  dialog.showModal();
+}
+function wantChoices() {
+  if(inAppBrowser()){ openBrowserHelp(); return; }
+  setPage('subscribe',{push:true,scroll:true});
+}
+function goHome() {
+  if(history.state?.fromHome){ history.back(); return; }
+  setPage('home',{push:true,scroll:true});
 }
 function categoryLabel(event) {
   const group=eventPresentation(event,data.catalog).groupId;
@@ -214,6 +237,7 @@ function renderHome() {
   homeView.update({data,settings,events,spare:[],today,start,end,deviceZone:observedZone});
   // Already added: the card offers changing the choices instead.
   $('#home-subscribe-label').textContent=subscription ? '修改选择' : '加入日历';
+  $('#my-subscription-label').textContent=subscription ? '我的订阅' : '加入日历';
   $('#home-cta-title').textContent=subscription ? '你的日历已在同步' : '到日子想收到提醒？';
   $('#home-cta-text').textContent=subscription ? '想改选的日子或提醒时间，点这里；保存后日历会自动更新。' : '把荟供日等加入手机日历，到时自动提醒。';
 }
@@ -368,7 +392,10 @@ function nextReminderText() {
 // How soon a saved change shows up is decided by each calendar app, not by us:
 // Apple refreshes within minutes to hours, Google about once a day, and some
 // Android calendars are as slow or copy the calendar only once (11-10 tests).
-const UPDATE_PACE = '苹果日历通常较快，Google 日历和部分安卓手机可能要等一天';
+// Seen on the trial (11-11): iPhone and Xiaomi pick a change up as soon as
+// the calendar is refreshed; Google, which cannot be refreshed by hand, came
+// three hours later. No brand is singled out; the slow case is still said.
+const UPDATE_PACE = '日历一般几个小时内跟着更新，个别要等到第二天';
 function renderSubscribedCard() {
   // The card stays in place for anyone with a subscription. It used to vanish
   // while there were unsaved changes and pop back when the choice matched the
@@ -452,7 +479,9 @@ function renderSaveState() {
   $('#save-state').textContent = stopped ? '已停用，请在手机移除订阅日历' : conflict ? '设置已在其他设备修改' : changed ? '有改动，保存后同步到日历' : subscription ? '已同步到日历，改动会自动更新' : nextStepText();
   $('#subscribe-label').textContent = managementRestoring ? '正在恢复订阅…' : requestPending ? '正在保存…' : subscription ? (changed ? '保存修改' : '我的订阅') : deviceLabel();
   for(const input of document.querySelectorAll('input[name="title-marks"]')) input.checked=input.value===(settings.titleMarks||'none');
-  const ctaDisabled = requestPending || managementRestoring || (!subscription && !hasSelectedContent());
+  // While saving or restoring, the button shows it and opens the panel with
+  // the progress (the header button now leads back to the calendar instead).
+  const ctaDisabled = !requestPending && !managementRestoring && !subscription && !hasSelectedContent();
   // The first time the main button becomes usable, it gives one gentle pulse
   // so the eye finds the next step. Not on load, not on later changes.
   if(renderSaveState.wasDisabled===true && !ctaDisabled && !subscription && !renderSaveState.nudged){renderSaveState.nudged=true;requestAnimationFrame(()=>playMotion($('#subscribe'),'nudge'));}
@@ -465,8 +494,6 @@ function renderSaveState() {
   // With a saved subscription and nothing to save, the bottom button becomes
   // a quiet "我的订阅": the thumb-reachable way back to the manage panel.
   $('#subscribe').classList.toggle('is-quiet', Boolean(subscription) && !changed && !requestPending && !managementRestoring && !conflict && !stopped);
-  // This opens the existing panel only. Keep it available while saving so a
-  // user who closed the panel can return to progress, help or a failure state.
   $('#my-subscription').disabled = false;
   if (data) renderQuickAdd();
 }
@@ -878,10 +905,14 @@ function attachEvents() {
     stopped=false;refresh(false);
     notify(subscription?'标记样式已改；保存修改后，日历下次同步时更新。':'标记样式已改。');
   });
+  // Inside WeChat the 藏历 page reads as anywhere else; the way to a browser is
+  // shown only when someone wants to add days (11-11). Any browser will do;
+  // naming one brand would confuse people on other phones.
   if(calendarDevice.inAppBrowser){
     $('#wechat-banner').hidden=false;
-    // Any browser will do; naming one brand would confuse people on other phones.
-    $('#wechat-banner-text').innerHTML=`${esc(calendarDevice.inAppBrowser)}里不能直接加入日历。点右上角 <b>···</b>，选择“在浏览器中打开”再继续；已在浏览器里加过的，在浏览器里打开就能看到`;
+    $('#wechat-banner-text').textContent=`${calendarDevice.inAppBrowser}里不能直接加入日历`;
+    $('#wechat-banner-help').addEventListener('click',openBrowserHelp);
+    $('#wechat-copy').addEventListener('click',()=>{const url=new URL(location.href);url.hash='subscribe';void copy(url.href,'网址');});
   }
   // Clouds only drift while the banner is on screen: no work for a hidden layer.
   const clouds=$('.masthead-clouds');
@@ -993,12 +1024,12 @@ function attachEvents() {
   // From the 藏历 page both lead to the 加入日历 page, where the choices are
   // changed; there 我的订阅 opens the subscription itself (11-11 feedback:
   // with a subscription, the 藏历 page had no way back to the choices).
-  $('#my-subscription').addEventListener('click',()=>{ if(page==='home') setPage('subscribe',{push:true,scroll:true}); else openSubscription(); });
-  $('#home-subscribe').addEventListener('click',()=>setPage('subscribe',{push:true,scroll:true}));
+  $('#my-subscription').addEventListener('click',()=>{ if(page==='home') wantChoices(); else goHome(); });
+  $('#home-subscribe').addEventListener('click',wantChoices);
   $('#home-upcoming-list').addEventListener('click',event=>{ const row=event.target.closest('[data-home-date]'); if(row) openHomeDate(row.dataset.homeDate); });
   $('#today-feast').addEventListener('click',event=>{ if(event.target.closest('[data-feast-more]')) openHomeDate(today); });
   window.addEventListener('popstate',()=>setPage(wantedPage()));
-  for(const link of document.querySelectorAll('[data-go-home]')) link.addEventListener('click',event=>{event.preventDefault();setPage('home',{push:true,scroll:true});});
+  for(const link of document.querySelectorAll('[data-go-home]')) link.addEventListener('click',event=>{event.preventDefault();goHome();});
   // The panel grows out of the button that opened it, so the step reads as
   // one continuous action rather than a page jump.
   $('#step-add-button').addEventListener('click',()=>$('#subscribe').click());
@@ -1178,6 +1209,9 @@ async function init() {
     try { await loadSubscription(); }
     catch (error) { notify(error.message); }
   }
+  // Arriving in WeChat at the choices (a shared link): say how to get to a
+  // browser before anything else.
+  if(page==='subscribe'&&inAppBrowser()&&!document.querySelector('dialog[open]')) openBrowserHelp();
   if(page==='subscribe'&&!settings.zone&&!document.querySelector('dialog[open]')){zoneAsked=true;zonePicker.open({zone:'',deviceZone:observedZone});}
 }
 init().catch(error => {

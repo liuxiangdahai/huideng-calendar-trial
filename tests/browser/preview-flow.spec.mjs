@@ -111,7 +111,7 @@ test('preview, calendar-app choice and guide confirmations never modify a saved 
   await page.locator('.cal-day:not(.cal-adjacent)').nth(10).click();
   await page.locator('[data-cal-view="list"]').click();
   await page.locator('[data-cal-action="more"]').click();
-  await page.locator('#my-subscription').click();
+  await page.locator('#subscribed-open').click();
   await expect(page.locator('#manage-panel')).toBeVisible();
   await expect(page.locator('input[name="device"][value="google"]')).toBeHidden();
   await page.locator('#manage-add').click();
@@ -128,7 +128,7 @@ test('preview, calendar-app choice and guide confirmations never modify a saved 
   expect((await readStored(page, uiKey)).app).toBe('google');
   await page.reload();
   await expect(page.locator('#save-state')).toHaveText('已同步到日历，改动会自动更新');
-  await page.locator('#my-subscription').click();
+  await page.locator('#subscribed-open').click();
   await expect(page.locator('input[name="device"][value="google"]')).toBeChecked();
   await expect(page.locator('#guide-seen')).toBeChecked();
   await expect(page.locator('#guide-reminders')).toBeChecked();

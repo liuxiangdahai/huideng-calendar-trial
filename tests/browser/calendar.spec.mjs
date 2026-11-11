@@ -183,9 +183,9 @@ test('remote disable clears stale credentials while retaining unsaved local choi
   await expect.poll(() => credentials(page)).toBeNull();
   await expect(page.locator('#save-state')).toContainText('已停用');
   expect((await draft(page)).events['dakini-tsok'].mode).toBe('off');
-  await page.locator('#my-subscription').click();
-  await expect(page.locator('#create-subscription')).toBeVisible();
-  await expect(page.locator('#subscription-existing')).toBeHidden();
+  // The old subscription is gone: the bottom button starts a new one.
+  await expect(page.locator('#subscribed-card')).toBeHidden();
+  await expect(page.locator('#subscribe-label')).toHaveText('加入日历');
 });
 
 test('edits made during delayed creation and saving remain an unsaved draft',async({page}) => {
@@ -430,11 +430,16 @@ test('with a subscription, the 藏历 page leads back to the choices to change t
   await expect(page).toHaveURL(/#subscribe$/);
   await expect(page.locator('#preset-options')).toBeVisible();
   await expect(page.locator('#subscribed-card')).toBeVisible();
-  await page.goBack();
+  // On the choices page the header leads back to the calendar, as a real step back.
+  await expect(page.locator('#my-subscription')).toHaveText('藏历',{useInnerText:true});
+  await page.locator('#my-subscription').click();
+  await expect(page).not.toHaveURL(/#subscribe$/);
+  await expect(page.locator('#home-calendar')).toBeVisible();
+  await expect(page.locator('#my-subscription')).toHaveText('我的订阅',{useInnerText:true});
   await page.locator('#my-subscription').click();
   await expect(page).toHaveURL(/#subscribe$/);
   await expect(page.locator('#subscription-dialog')).toBeHidden();
-  // On the 加入日历 page, 我的订阅 opens the subscription itself.
-  await page.locator('#my-subscription').click();
+  // The subscription itself opens from the status card or the bottom button.
+  await page.locator('#subscribed-open').click();
   await expect(page.locator('#subscription-dialog')).toBeVisible();
 });

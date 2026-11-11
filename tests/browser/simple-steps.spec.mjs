@@ -98,7 +98,7 @@ test('after subscribing, the page opens on a sync status with the next reminder;
   // The card keeps its place and says what to do; it must not vanish and pop back.
   await expect(page.locator('#subscribed-card')).toBeVisible();
   await expect(page.locator('#subscribed-title')).toHaveText('有改动还没保存');
-  await expect(page.locator('#subscribed-hint')).toContainText('部分安卓手机可能要等一天');
+  await expect(page.locator('#subscribed-hint')).toContainText('几个小时内跟着更新');
   await page.locator('#subscribe').click();
   await expect(page.locator('#subscribe-label')).toHaveText('我的订阅');
   const after=await (await request.get(feedUrl)).text();
@@ -108,9 +108,32 @@ test('after subscribing, the page opens on a sync status with the next reminder;
 test('inside WeChat the page says first how to open it in a browser',async({browser})=>{
   const context=await browser.newContext({viewport:{width:390,height:844},baseURL:'http://127.0.0.1:4173',
     userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148 MicroMessenger/8.0.50'});
-  const page=await context.newPage();await open(page);
+  const page=await context.newPage();
+  // The 藏历 page reads as anywhere else: no banner, no window.
+  await page.goto('/calendar-reminders/');await expect(page.locator('#home-calendar')).toBeVisible();
+  await expect(page.locator('#wechat-banner')).toBeHidden();
+  await expect(page.locator('#wechat-dialog')).toBeHidden();
+  // Wanting to add days opens the way to a browser, and points the address
+  // at the choices while it is up, so "在浏览器打开" lands there.
+  await page.locator('#home-subscribe').click();
+  await expect(page.locator('#wechat-dialog')).toBeVisible();
+  await expect(page.locator('#wechat-dialog')).toContainText('在浏览器打开');
+  await expect(page).toHaveURL(/#subscribe$/);
+  expect(await page.evaluate(()=>document.body.dataset.page)).toBe('home');
+  await page.locator('#wechat-dialog [data-close]').last().click();
+  await expect(page).not.toHaveURL(/#subscribe$/);
+  await page.locator('#my-subscription').click();
+  await expect(page.locator('#wechat-dialog')).toBeVisible();
+  await page.keyboard.press('Escape');
+  // Arriving at the choices (a shared link) says it at once; the banner stays
+  // on that page and opens the window again.
+  await page.goto('about:blank');await page.goto('/calendar-reminders/#subscribe');
+  await expect(page.locator('#wechat-dialog')).toBeVisible();
+  await page.keyboard.press('Escape');
   await expect(page.locator('#wechat-banner')).toBeVisible();
-  await expect(page.locator('#wechat-banner-text')).toContainText('在浏览器中打开');
+  await expect(page.locator('#wechat-banner-text')).toHaveText('微信里不能直接加入日历');
+  await page.locator('#wechat-banner-help').click();
+  await expect(page.locator('#wechat-dialog')).toBeVisible();
   await context.close();
 });
 

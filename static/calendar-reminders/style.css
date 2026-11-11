@@ -107,7 +107,13 @@ button:disabled { cursor: default; }
 .brand-type small { padding-left: 12px; border-left: 1px solid #caa25c80; font: 14px/1.4 var(--font-serif); letter-spacing: 3px; color: #eace9f; }
 #my-subscription { position: relative; flex: none; min-height: 44px; padding-inline: 18px; border-color: #caa25c99; border-radius: 22px; background: #ffffff0a; color: #f2ede5; }
 #my-subscription:hover { background: #ffffff17; border-color: #caa25c; }
-#my-subscription>[data-icon] { display: inline-grid; width: 20px; height: 20px; flex: none; }
+#my-subscription [data-icon] { display: inline-grid; width: 20px; height: 20px; flex: none; }
+/* One place, one job per page: on 藏历 it leads to the choices, on 加入日历
+   it leads back to the calendar. The subscription itself opens from the
+   bottom button and the status card on the choices page (11-11). */
+#my-subscription :is(.to-subscribe, .to-home) { display: inline-flex; align-items: center; gap: inherit; }
+body:not([data-page="subscribe"]) #my-subscription .to-home, body[data-page="subscribe"] #my-subscription .to-subscribe { display: none; }
+body[data-page="subscribe"] #my-subscription { padding-inline-start: 12px; }
 .site-header :focus-visible { outline-color: #f6cd87; }
 
 /* ── 雪山横幅 + 香布 ───────────────────────────────────────────────────── */
@@ -551,10 +557,43 @@ input[type=time]::-webkit-datetime-edit { padding: 0; }
 
 .step-add-device { padding: 12px 14px; border: 1px solid var(--line-2); border-left: 3px solid var(--wine); border-radius: 0 var(--r) var(--r) 0; background: var(--surface); font-size: var(--fs-base); line-height: 1.7; color: var(--ink); }
 #share-settings { margin-top: 4px; padding-left: 0; font-size: var(--fs-md); }
-.wechat-banner { display: flex; gap: 12px; align-items: flex-start; margin: 14px 0 0; padding: 12px 14px; border: 1px solid #d9c19a; border-left: 3px solid var(--gold); border-radius: 0 var(--r) var(--r) 0; background: var(--gold-tint); color: #45423b; }
-.wechat-banner .icon { margin-top: 3px; color: var(--gold); }
-.wechat-banner strong { display: block; font: 600 var(--fs-base)/1.5 var(--font-serif); color: var(--ink); }
-.wechat-banner p { font-size: var(--fs-md); line-height: 1.7; }
+.wechat-banner { display: flex; gap: 10px; align-items: center; margin: 14px 0 0; padding: 8px 8px 8px 14px; border: 1px solid #e2cfa6; border-radius: var(--r); background: var(--gold-tint); color: var(--ink-2); }
+.wechat-banner .icon { flex: none; color: var(--gold); }
+.wechat-banner p { flex: 1; min-width: 0; font-size: var(--fs-md); line-height: 1.5; }
+.wechat-banner .text-button { flex: none; min-height: 40px; color: var(--red); font-weight: 600; }
+/* The way out of WeChat (11-11). The dimmed page carries a gilt arrow up to
+   the ··· button, which sits in WeChat's own bar just above the page. */
+#wechat-dialog::backdrop { background:
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 150' fill='none' stroke='%23d8b672' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M14 146C22 82 62 48 104 16' stroke-dasharray='1 9'/%3E%3Cpath d='M84 12l22 2-5 22'/%3E%3C/svg%3E") no-repeat right 10px top 6px / 104px auto,
+  #2a0a10b8; }
+.wechat-steps { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.wechat-steps li { display: grid; grid-template-columns: 112px 1fr; gap: 14px; align-items: center; padding: 12px; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface-2); }
+.wechat-steps small { display: block; color: var(--muted); font-size: var(--fs-sm); line-height: 1.4; }
+.wechat-steps strong { display: block; color: var(--ink); font: 600 var(--fs-lg)/1.5 var(--font-serif); }
+/* Two small pictures of WeChat itself: its top bar with the ··· button, and
+   the menu with the browser globe ringed. Drawn, so they never go stale. */
+.wechat-pic { position: relative; display: block; height: 64px; overflow: hidden; border-radius: var(--r); background: #ececec; }
+.wechat-bar { position: absolute; inset: 0 0 auto; height: 30px; border-bottom: 1px solid #dcdcdc; background: #f7f7f7; }
+.wechat-bar>i { position: absolute; left: 8px; top: 12px; width: 42px; height: 6px; border-radius: 3px; background: #cfcfcf; }
+.wechat-dots { position: absolute; right: 6px; top: 5px; display: flex; gap: 3px; align-items: center; padding: 6px 7px; border: 1.5px solid var(--red); border-radius: 999px; background: #fff; }
+.wechat-dots i { width: 4px; height: 4px; border-radius: 50%; background: #222; }
+.wechat-sheet { position: absolute; inset: auto 0 0; display: flex; gap: 7px; height: 44px; padding: 6px 8px; background: #f7f7f7; }
+.wechat-sheet b { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 7px; background: #fff; color: #9a9a9a; }
+.wechat-sheet b .icon { width: 18px; height: 18px; }
+.wechat-sheet b.is-on { color: #2f6fd6; box-shadow: 0 0 0 2px var(--red); }
+.wechat-note { margin: 16px 2px 0; color: var(--muted); font-size: var(--fs-md); line-height: 1.7; }
+#wechat-dialog .dialog-actions { justify-content: stretch; }
+#wechat-dialog .dialog-actions>button { flex: 1; }
+@media (max-width: 767px) {
+  /* A sheet from the bottom, under the thumb; the arrow keeps the top clear. */
+  #wechat-dialog { top: auto; bottom: 0; transform: none; width: 100%; max-width: none; margin: 0; border-width: 1px 0 0; border-radius: 10px 10px 0 0; }
+  #wechat-dialog .dialog-head { border-radius: 10px 10px 0 0; }
+  .wechat-steps li { grid-template-columns: 100px 1fr; }
+}
+@media (max-width: 359px) {
+  .wechat-steps li { grid-template-columns: 78px 1fr; gap: 10px; }
+  .wechat-steps strong { font-size: var(--fs-base); }
+}
 .subscribed-card { margin: 0 0 20px; padding: 14px 16px; border: 1px solid #cac7c1; border-radius: var(--r); background: var(--teal-tint); }
 .subscribed-title { display: flex; align-items: center; gap: 8px; font: 600 var(--fs-base)/1.5 var(--font-serif); color: var(--teal); }
 .subscribed-title .icon { width: 22px; height: 22px; }
