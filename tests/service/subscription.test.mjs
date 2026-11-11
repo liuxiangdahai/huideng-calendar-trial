@@ -5,7 +5,7 @@ import {tmpdir} from 'node:os';
 import {join, dirname, basename} from 'node:path';
 import ICAL from 'ical.js';
 import {SQLiteD1} from '../../service/calendar/sqlite-d1.mjs';
-import {createCalendarService, digest} from '../../service/calendar/service.mjs';
+import {createCalendarService, digest, clientFamily} from '../../service/calendar/service.mjs';
 import {validateSettings, exportICS, selectOccurrences, defaults, addDays, rangeEnd, resolveAlarmInstants} from '../../static/calendar-reminders/core.mjs';
 import {dailyDateOccurrences} from '../../static/calendar-reminders/engine.mjs';
 
@@ -151,8 +151,9 @@ test('daily dates are live: enable, disable, re-enable and stop keep URL and UID
   assert.equal((await f.api(`/api/subscriptions/${created.id}`, 'DELETE', undefined, created.manageToken)).status, 200);
   const stoppedText = await (await f.fetch(created.feedUrl)).text(), stopped = f.entries(stoppedText);
   assert.doesNotMatch(stoppedText, /BEGIN:VALARM/);
-  assert.equal(stopped.length, 1, 'a stopped subscription keeps only its cancelled festival; daily dates are simply absent');
-  assert.ok(stopped.every(event => event.getFirstPropertyValue('status') === 'CANCELLED'));
+  assert.equal(stopped.length, 0, 'a stopped subscription lists nothing; calendar apps drop what the feed no longer lists');
+  assert.equal((await f.db.prepare('SELECT count(*) AS count FROM calendar_entries WHERE cancelled_at IS NOT NULL').first()).count, 1,
+    'the ledger keeps the cancelled festival so a return continues its SEQUENCE');
   assert.equal((await f.db.prepare('SELECT settings_json FROM subscriptions').first()).settings_json, '{}');
 });
 
@@ -645,7 +646,7 @@ test('display entries stay alarm-free and ignore timezone-rule changes', async t
   assert.equal((await f.fetch(created.feedUrl, {headers: {'If-None-Match': first.headers.get('ETag')}})).status, 304);
 });
 
-test('date corrections use the same UID and deselection creates alarm-free cancellation tombstones', async t => {
+test('date corrections use the same UID; deselection drops the event from the feed and keeps a ledger tombstone', async t => {
   const f = fixture(t), created = await f.create();
   const initial = f.entries(await (await f.fetch(created.feedUrl)).text())[0];
   f.data.occurrences[0].date = '2027-03-21'; f.tick(60000);
@@ -655,10 +656,10 @@ test('date corrections use the same UID and deselection creates alarm-free cance
   assert.equal(corrected.getFirstPropertyValue('dtstart').toString(), '2027-03-21');
   await f.api(`/api/subscriptions/${created.id}`, 'PATCH',
     {settings: makeSettings('off'), revision: 1}, created.manageToken);
-  const [cancelled] = f.entries(await (await f.fetch(created.feedUrl)).text());
-  assert.equal(cancelled.getFirstPropertyValue('status'), 'CANCELLED');
-  assert.equal(cancelled.getFirstPropertyValue('sequence'), 2);
-  assert.equal(cancelled.getAllSubcomponents('valarm').length, 0);
+  assert.equal(f.entries(await (await f.fetch(created.feedUrl)).text()).length, 0, 'a deselected day leaves the feed');
+  const tombstone = await f.db.prepare('SELECT * FROM calendar_entries').first();
+  assert.ok(tombstone.cancelled_at);
+  assert.equal(tombstone.sequence, 2);
   f.tick(91 * 86400000);
   await f.service.scheduled(null, f.env);
   assert.equal(f.entries(await (await f.fetch(created.feedUrl)).text()).length, 0);
@@ -671,31 +672,30 @@ test('date corrections use the same UID and deselection creates alarm-free cance
   assert.equal(restored.getFirstPropertyValue('sequence'), 3);
 });
 
-test('source removals cancel events and an advancing rolling window publishes new dates automatically', async t => {
+test('source removals drop events from the feed and an advancing rolling window publishes new dates automatically', async t => {
   const f = fixture(t), created = await f.create();
   await f.fetch(created.feedUrl);
   f.data.occurrences.length = 0;
-  const [cancelled] = f.entries(await (await f.fetch(created.feedUrl)).text());
-  assert.equal(cancelled.getFirstPropertyValue('status'), 'CANCELLED');
+  assert.equal(f.entries(await (await f.fetch(created.feedUrl)).text()).length, 0);
   f.data.occurrences.push({id: 'test', eventId: 'test', uid: 'test-2028-month-1', date: '2028-10-25',
     title: '莲师荟供日', tibetan: '九月初十', source: 'https://www.fohuifayu.com/index.php/calendar'});
-  assert.equal(f.entries(await (await f.fetch(created.feedUrl)).text()).length, 1);
+  assert.equal(f.entries(await (await f.fetch(created.feedUrl)).text()).length, 0, 'not yet inside the rolling window');
   f.tick(10 * 86400000);
   const all = f.entries(await (await f.fetch(created.feedUrl)).text());
-  assert.equal(all.length, 2);
+  assert.equal(all.length, 1);
   assert.equal(all.filter(event => event.getFirstPropertyValue('status') === 'CONFIRMED').length, 1);
 });
 
-test('disable erases preferences, cancels published events, and purges event content after retention', async t => {
+test('disable erases preferences, empties the feed, and purges event content after retention', async t => {
   const f = fixture(t), created = await f.create();
   await f.fetch(created.feedUrl);
   const removed = await f.api(`/api/subscriptions/${created.id}`, 'DELETE', undefined, created.manageToken);
   assert.equal(removed.status, 200);
   const stored = await f.db.prepare('SELECT * FROM subscriptions').first();
   assert.equal(stored.settings_json, '{}');
-  const [cancelled] = f.entries(await (await f.fetch(created.feedUrl)).text());
-  assert.equal(cancelled.getFirstPropertyValue('status'), 'CANCELLED');
-  assert.equal(cancelled.getAllSubcomponents('valarm').length, 0);
+  const stoppedText = await (await f.fetch(created.feedUrl)).text();
+  assert.equal(f.entries(stoppedText).length, 0);
+  assert.doesNotMatch(stoppedText, /BEGIN:VALARM/);
   assert.equal((await f.api(`/api/subscriptions/${created.id}`, 'PATCH',
     {settings: makeSettings(), revision: 2}, created.manageToken)).status, 410);
   f.tick(91 * 86400000);
@@ -897,10 +897,10 @@ test('editing and disabling atomically remove cached private settings before the
   assert.equal((await f.db.prepare('SELECT settings_revision FROM feed_snapshots').first()).settings_revision, 2);
   assert.equal((await f.api(`/api/subscriptions/${created.id}`, 'DELETE', undefined, created.manageToken)).status, 200);
   assert.equal((await f.db.prepare('SELECT count(*) AS count FROM feed_snapshots').first()).count, 0);
-  const cancelled = await f.fetch(created.feedUrl);
-  const text = await cancelled.text();
+  const stopped = await f.fetch(created.feedUrl);
+  const text = await stopped.text();
   assert.doesNotMatch(text, /BEGIN:VALARM/);
-  assert.match(text, /STATUS:CANCELLED/);
+  assert.doesNotMatch(text, /BEGIN:VEVENT/);
   assert.equal((await f.db.prepare('SELECT settings_revision FROM feed_snapshots').first()).settings_revision, 3);
 });
 
@@ -956,9 +956,11 @@ test('disable racing a refresh cannot resurrect cached reminders or overwrite ca
   };
   const response = await f.fetch(created.feedUrl), text = await response.text();
   assert.equal(response.status, 200);
-  assert.match(text, /STATUS:CANCELLED/);
+  assert.doesNotMatch(text, /BEGIN:VEVENT/);
   assert.doesNotMatch(text, /BEGIN:VALARM/);
-  assert.equal(f.entries(text)[0].getFirstPropertyValue('sequence'), 1);
+  const row = await f.db.prepare('SELECT * FROM calendar_entries').first();
+  assert.ok(row.cancelled_at, 'the cancellation is kept in the ledger');
+  assert.equal(row.sequence, 1);
   assert.equal((await f.db.prepare('SELECT settings_revision FROM feed_snapshots').first()).settings_revision, 2);
 });
 
@@ -1030,4 +1032,36 @@ test('health is read-only, validates configuration and migrations, and exposes o
   f.db.prepare = prepare;
   await f.db.exec('DROP TABLE feed_snapshots');
   assert.equal((await f.fetch('/healthz')).status, 503);
+});
+
+test('feed fetches are recorded per calendar app at most once an hour, never blocking the feed', async t => {
+  const f = fixture(t), created = await f.create();
+  const google = 'Google-Calendar-Importer', iphone = 'iOS/18.1 (22B83) dataaccessd/1.0';
+  const rows = async () => (await f.db.prepare('SELECT client, user_agent, first_seen_at, last_seen_at FROM feed_fetches ORDER BY client').all()).results;
+  assert.equal((await f.fetch(created.feedUrl, {headers: {'User-Agent': google}})).status, 200);
+  assert.equal((await f.fetch(created.feedUrl, {headers: {'User-Agent': iphone}})).status, 200);
+  let seen = await rows();
+  assert.deepEqual(seen.map(row => row.client), ['apple', 'google']);
+  const first = seen.find(row => row.client === 'google').last_seen_at;
+  f.tick(20 * 60000);
+  await f.fetch(created.feedUrl, {headers: {'User-Agent': google}});
+  assert.equal((await rows()).find(row => row.client === 'google').last_seen_at, first, 'within the hour: no write');
+  f.tick(61 * 60000);
+  await f.fetch(created.feedUrl, {headers: {'User-Agent': google}});
+  seen = await rows();
+  assert.notEqual(seen.find(row => row.client === 'google').last_seen_at, first);
+  assert.equal(seen.find(row => row.client === 'google').first_seen_at, first);
+  // A broken log never breaks the feed.
+  await f.db.prepare('DROP TABLE feed_fetches').run();
+  assert.equal((await f.fetch(created.feedUrl, {headers: {'User-Agent': google}})).status, 200);
+});
+
+test('calendar apps are told apart by User-Agent', () => {
+  assert.equal(clientFamily('Google-Calendar-Importer'), 'google');
+  assert.equal(clientFamily('iOS/18.1 (22B83) dataaccessd/1.0'), 'apple');
+  assert.equal(clientFamily('macOS/15.1 (24B83) CalendarAgent/1000'), 'apple');
+  assert.equal(clientFamily('Mozilla/5.0 (Linux; Android 14; 23078RKD5C Build/UKQ1) MIUI/V816'), 'xiaomi');
+  assert.equal(clientFamily('Microsoft Office/16.0 (Windows NT 10.0; Microsoft Outlook 16.0)'), 'outlook');
+  assert.equal(clientFamily('okhttp/4.12.0'), 'android');
+  assert.equal(clientFamily(''), 'other');
 });

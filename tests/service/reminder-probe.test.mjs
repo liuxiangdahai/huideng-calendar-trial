@@ -56,11 +56,11 @@ test('same probe address and UID survive reschedule, cancellation and stop; vers
   assert.equal(byID(moved,'a').getFirstPropertyValue('sequence'),byID(initial,'a').getFirstPropertyValue('sequence')+1);
   assert.equal(byID(moved,'a').getFirstSubcomponent('valarm').getFirstPropertyValue('trigger').toSeconds(),15*3600);
   settings.reminderProbe.silent=['a'];let list=await patch();assert.equal(byID(list,'a').getAllSubcomponents('valarm').length,0);
-  settings.reminderProbe.omit=['a'];list=await patch();assert.equal(byID(list,'a').getFirstPropertyValue('status'),'CANCELLED');
+  settings.reminderProbe.omit=['a'];list=await patch();assert.equal(list.some(e=>e.getFirstPropertyValue('uid')===byID(initial,'a').getFirstPropertyValue('uid')),false,'a removed entry leaves the feed');
   settings.reminderProbe.omit=[];settings.reminderProbe.silent=[];list=await patch();assert.equal(byID(list,'a').getFirstPropertyValue('sequence'),4);
   assert.equal((await f.api(`/api/subscriptions/${c.id}`,'DELETE',null,c.manageToken)).status,200);
   const stopped=await (await f.fetch(c.feedUrl)).text();assert.doesNotMatch(stopped,/BEGIN:VALARM/);
-  assert.equal(entries(stopped).every(e=>e.getFirstPropertyValue('status')==='CANCELLED'),true);
+  assert.equal(entries(stopped).length,0,'a stopped subscription lists nothing, so calendar apps empty it');
 });
 test('probe expires at 72 hours even with a fresh snapshot; expiry produces cancellation once',async t=>{
   const f=fixture(t),c=await f.create();await f.fetch(c.feedUrl);

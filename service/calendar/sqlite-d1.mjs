@@ -16,6 +16,8 @@ export class SQLiteD1 {
     const creationKey = this.database.prepare('PRAGMA table_info(subscriptions)').all()
       .some(column => column.name === 'creation_key_hash');
     if (!creationKey) this.database.exec(readFileSync(new URL('./migrations/0003_creation_idempotency.sql', import.meta.url), 'utf8'));
+    const fetches = this.database.prepare("SELECT name FROM sqlite_master WHERE name = 'feed_fetches'").get();
+    if (!fetches) this.database.exec(readFileSync(new URL('./migrations/0004_feed_fetches.sql', import.meta.url), 'utf8'));
   }
   prepare(sql) { return new Statement(this, sql, []); }
   async batch(statements) {

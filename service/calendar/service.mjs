@@ -230,9 +230,24 @@ function publishedEvent(entry) {
     ...JSON.parse(entry.event_json),
     sequence: entry.sequence, createdAt: entry.created_at,
     lastModified: entry.modified_at, dtstamp: entry.modified_at,
-    status: entry.cancelled_at ? 'CANCELLED' : 'CONFIRMED'
+    status: 'CONFIRMED'
   };
 }
+
+// The calendar app a feed request comes from, by its User-Agent. Only the
+// family and the raw string are kept, to see whether Google, Apple or Xiaomi
+// actually came back after a change (11-11).
+export function clientFamily(userAgent = '') {
+  const agent = String(userAgent).toLowerCase();
+  if (agent.includes('google')) return 'google';
+  if (/xiaomi|miui|hyperos|redmi/.test(agent)) return 'xiaomi';
+  if (/microsoft|outlook|office/.test(agent)) return 'outlook';
+  if (/iphone|ipad|ios\/|mac ?os|darwin|dataaccessd|calendaragent|cfnetwork/.test(agent)) return 'apple';
+  if (/android|okhttp|dalvik/.test(agent)) return 'android';
+  if (/mozilla|chrome|safari|firefox/.test(agent)) return 'browser';
+  return 'other';
+}
+const FETCH_LOG_INTERVAL_MS = 3600000;
 
 /**
  * The D1 binding is the only mutable dependency. Both production and SQLite tests
@@ -437,7 +452,7 @@ export function createCalendarService({getData, validateSettings, selectOccurren
         snapshot.renderer_version === release.rendererVersion && snapshot.local_day === localDay &&
         Date.parse(snapshot.generated_at) <= time.getTime() &&
         time.getTime() - Date.parse(snapshot.generated_at) < SNAPSHOT_TTL_MS && Date.parse(snapshot.expires_at) > time.getTime()) {
-      return {ics: snapshot.ics, etag: snapshot.etag, modified: snapshot.last_modified};
+      return {id: record.id, ics: snapshot.ics, etag: snapshot.etag, modified: snapshot.last_modified};
     }
     data ??= await getData();
     // Catalog retirement can remove a previously valid choice. New API input is
@@ -485,7 +500,11 @@ export function createCalendarService({getData, validateSettings, selectOccurren
       }
     }
     const entries = [...next.values()];
-    const events = [...entries.map(publishedEvent), ...live].sort((a, b) =>
+    // A removed day leaves the feed instead of staying as STATUS:CANCELLED:
+    // Google and Xiaomi kept cancelled days for over a day, iPhone strikes them
+    // through (11-11). Calendar apps drop what a subscription no longer lists.
+    // The ledger row stays, so a day that comes back continues its SEQUENCE.
+    const events = [...entries.filter(entry => !entry.cancelled_at).map(publishedEvent), ...live].sort((a, b) =>
       a.date.localeCompare(b.date) || a.uid.localeCompare(b.uid));
     const modified = entries.reduce((latest, entry) => entry.modified_at > latest ? entry.modified_at : latest,
       live.length && dailyVersion.modified > record.updated_at ? dailyVersion.modified : record.updated_at);
@@ -536,10 +555,23 @@ export function createCalendarService({getData, validateSettings, selectOccurren
       if (attempt >= 2) throw new HttpError(503, '订阅正在更新，请稍后重试。');
       return materialize(env, feedToken, attempt + 1);
     }
-    return {ics, etag, modified};
+    return {id: record.id, ics, etag, modified};
+  }
+  // At most one write per subscription, app family and hour: enough to answer
+  // "when did Google last fetch?", far below the free D1 write allowance.
+  async function recordFetch(env, id, userAgent) {
+    const time = now(), timestamp = time.toISOString(), agent = String(userAgent || '').slice(0, 200);
+    try {
+      await env.DB.prepare(`INSERT INTO feed_fetches (subscription_id, client, user_agent, first_seen_at, last_seen_at)
+        VALUES (?, ?, ?, ?, ?)
+        ON CONFLICT(subscription_id, client) DO UPDATE SET last_seen_at = excluded.last_seen_at, user_agent = excluded.user_agent
+        WHERE feed_fetches.last_seen_at <= ?`)
+        .bind(id, clientFamily(agent), agent, timestamp, timestamp, new Date(time.getTime() - FETCH_LOG_INTERVAL_MS).toISOString()).run();
+    } catch { /* The record is diagnostic; a feed is never refused for it. */ }
   }
   async function feed(request, env, feedToken) {
-    const {ics, etag, modified} = await materialize(env, feedToken);
+    const {id, ics, etag, modified} = await materialize(env, feedToken);
+    await recordFetch(env, id, request.headers.get('User-Agent'));
     const headers = {
       'Content-Type': 'text/calendar; charset=utf-8', 'ETag': etag,
       'Last-Modified': new Date(modified).toUTCString(),
