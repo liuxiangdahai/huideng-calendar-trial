@@ -353,15 +353,17 @@ test('the month grid says its small labels are Tibetan dates before the dates ar
     const [keyBox, weekdays] = [await key.boundingBox(), await page.locator('.cal-weekdays').boundingBox()];
     expect(keyBox.y + keyBox.height).toBeLessThanOrEqual(weekdays.y + 1);
     expect(keyBox.height).toBeLessThan(viewport.width >= 1024 ? 40 : 60);
-    // The key shows the same marks as the grid at this width: dots on phones, name strips on desktop.
+    // The key shows the same marks as the grid at this width: tint swatches on
+    // phones (the tinted day's colour), name strips on desktop.
     const marks = await page.evaluate(() => {
-      const shown = selector => [...document.querySelectorAll(selector)].some(node => node.offsetParent && getComputedStyle(node).display !== 'none');
-      const strip = node => node && getComputedStyle(node).backgroundColor;
-      return {gridDots: shown('.cal-grid .cal-mobile-events .cal-dot'), keyDots: shown('.cal-key .cal-dot'),
-        gridStrip: strip(document.querySelector('.cal-day:not(.cal-adjacent) .cal-mini-event.is-remind')), keyStrip: strip(document.querySelector('.cal-key .cal-legend-item.is-remind'))};
+      const color = node => node && getComputedStyle(node).backgroundColor;
+      const swatch = document.querySelector('.cal-key .cal-dot.is-remind');
+      return {phone: innerWidth < 1024, keySwatch: swatch && getComputedStyle(swatch).display !== 'none' ? color(swatch) : null,
+        gridTint: color(document.querySelector('.cal-day:not(.cal-adjacent).has-remind')),
+        gridStrip: color(document.querySelector('.cal-day:not(.cal-adjacent) .cal-mini-event.is-remind')), keyStrip: color(document.querySelector('.cal-key .cal-legend-item.is-remind'))};
     });
-    expect(marks.keyDots).toBe(marks.gridDots);
-    if (!marks.gridDots) expect(marks.keyStrip).toBe(marks.gridStrip);
+    if (marks.phone) expect(marks.keySwatch).toBe(marks.gridTint);
+    else { expect(marks.keySwatch).toBeNull(); expect(marks.keyStrip).toBe(marks.gridStrip); }
     // The labels are lapis, the colour family of the 藏历 tag beside the month.
     expect(await page.evaluate(() => {
       const probe = document.createElement('i'); probe.style.color = 'var(--teal-2)'; document.body.append(probe);

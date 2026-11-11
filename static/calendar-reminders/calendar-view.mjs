@@ -176,7 +176,7 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     <p class="cal-key"><span class="cal-key-note">日期<span class="cal-key-below">下</span><span class="cal-key-beside">旁</span>的小字是藏历，与农历不同</span><span class="cal-key-dots" data-cal-key-dots></span></p>
     <div class="cal-grid" role="grid" aria-label="月历，日期下方小字为藏历。使用方向键浏览日期，回车查看日程" data-cal-grid></div>
     <p class="cal-legend" data-cal-legend></p>
-    <section class="cal-month-list" aria-label="本月的日子" data-cal-month-list></section>
+    <section class="cal-month-list" aria-label="本月已选的日子" data-cal-month-list></section>
     <section class="cal-day-detail" aria-label="所选日期的日程" data-cal-detail></section>
   </section><dialog class="cal-day-sheet" data-cal-sheet aria-label="当天日程">
     <div class="cal-sheet-bar" data-cal-sheet-bar><span class="cal-sheet-grip" aria-hidden="true"></span><button type="button" class="icon-button cal-sheet-close" data-cal-action="close-sheet" aria-label="关闭当天日程">${icon('close')}</button></div>
@@ -342,12 +342,13 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
         const presentation = eventPresentation(event, state.data?.catalog);
         return `<span class="cal-mini-event ${presentation.colorClass}${event.preference?.mode === 'remind' ? ' is-remind' : ''}" title="${escape(event.title)}"${markAttr(event, state.settings?.titleMarks)}>${breakHint(escape(event.title))}</span>`;
       }).join('') + cellSpare.map(event => `<span class="cal-mini-event is-spare" title="${escape(event.title)}（未选）">${breakHint(escape(event.title))}</span>`).join('');
-      // Phones: no text in the cell, only a dot per day (carmine: reminds,
-      // gold: only shows, hollow ring: not chosen); the list under the grid
-      // names them all, and tapping the date opens the full day.
-      const dots = [...cellEvents.map(event => `<i class="cal-dot${event.preference?.mode === 'remind' ? ' is-remind' : ''}"></i>`), ...cellSpare.map(() => '<i class="cal-dot is-spare"></i>')];
-      const mobileSummary = dots.length ? `<span class="cal-mobile-events" aria-hidden="true">${dots.slice(0, 3).join('')}${dots.length > 3 ? '<i class="cal-dot-more">+</i>' : ''}</span>` : '';
-      return `<div role="gridcell" aria-selected="${cell.selected}" class="cal-cell"><button type="button" class="cal-day${cell.inMonth ? '' : ' cal-adjacent'}${cell.selected ? ' cal-selected' : ''}${cell.today ? ' cal-is-today' : ''}" data-cal-date="${cell.date}" data-cal-focus="date-${cell.date}" tabindex="${cell.date === focusDate && !cell.disabled ? 0 : -1}" aria-label="${escape(aria)}"${cell.today ? ' aria-current="date"' : ''}${cell.disabled ? ' disabled' : ''}>
+      // Phones: a chosen day is marked like a highlighter on a paper calendar,
+      // the whole date tinted (carmine: reminds, gold: only shows); the list
+      // under the grid names them, and tapping the date opens the full day.
+      // Days not chosen leave the phone grid alone (11-11 feedback).
+      const tint = cellEvents.length ? (cellEvents.some(event => event.preference?.mode === 'remind') ? ' has-remind' : ' has-display') : '';
+      const mobileSummary = '';
+      return `<div role="gridcell" aria-selected="${cell.selected}" class="cal-cell"><button type="button" class="cal-day${cell.inMonth ? '' : ' cal-adjacent'}${cell.selected ? ' cal-selected' : ''}${cell.today ? ' cal-is-today' : ''}${tint}" data-cal-date="${cell.date}" data-cal-focus="date-${cell.date}" tabindex="${cell.date === focusDate && !cell.disabled ? 0 : -1}" aria-label="${escape(aria)}"${cell.today ? ' aria-current="date"' : ''}${cell.disabled ? ' disabled' : ''}>
         <span class="cal-day-date" aria-hidden="true"><span class="cal-gregorian">${cell.day}</span><span class="cal-tibetan${cell.tibetan?.day === 1 ? ' is-month-start' : ''}">${escape(cell.tibetan ? cellLabel(cell.tibetan) : '')}</span></span>
         <span class="cal-marks" aria-hidden="true">${cell.tibetan?.monthLeap ? '<span class="cal-leap">闰月</span>' : ''}${cell.tibetan?.missingBefore?.length ? `<span class="cal-miss">缺${escape(cell.tibetan.missingBefore.map(dayPart).join(''))}</span>` : ''}${cell.repeatNumber ? '<span class="cal-repeat">重日</span>' : ''}${cellEvents.length ? `<span class="cal-category-marks">${markers.slice(0, 3).map(color => `<i class="cal-category-dot ${color}"></i>`).join('')}</span><span class="cal-event-count">${cell.count}</span>` : ''}</span>
         <span class="cal-day-events" aria-hidden="true">${labels}</span>${mobileSummary}</button></div>`;
@@ -379,23 +380,27 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     placePopover();
   }
 
-  // Phones and tablets: the dots say that a day has something, not what it is.
-  // Under the grid, every day of this month with something on it is listed by
-  // name, chosen or not, so nobody has to tap dot after dot; a row opens that
-  // day (11-10). Days not chosen are grey and say 未选 (11-11).
+  // Phones and tablets: the tint says that a day is chosen, not what it is.
+  // Under the grid the month's chosen days are listed by name, so nobody has
+  // to tap date after date; a row opens that day (11-10). Before anything is
+  // chosen, the list shows this month's days in grey instead, so the first
+  // visit is not an empty month (11-11).
   function renderMonthList(cells) {
     const node = $('[data-cal-month-list]');
-    const days = cells.filter(cell => cell.inMonth && !cell.disabled && (cell.events.length || cell.spare.length));
-    if (!state.events.length && !state.spare.length) { node.hidden = true; node.innerHTML = ''; return; }
+    const live = cells.filter(cell => cell.inMonth && !cell.disabled);
+    const chosen = state.events.length > 0;
+    const days = chosen ? live.filter(cell => cell.events.length) : live.filter(cell => cell.spare.length);
+    if (!chosen && !state.spare.length) { node.hidden = true; node.innerHTML = ''; return; }
     node.hidden = false;
-    const chosen = days.filter(cell => cell.events.length).length;
-    node.innerHTML = `<h3 class="cal-month-list-title">${escape(monthTitle(month).replace(/^\d+年/, ''))}的日子<span>${chosen ? `已选 ${chosen} 天` : '还没有选'}</span></h3>${days.length
+    const name = escape(monthTitle(month).replace(/^\d+年/, ''));
+    const title = chosen ? `${name}已选的日子<span>${days.length} 天</span>` : `${name}的修行日<span>还没有选</span>`;
+    node.innerHTML = `<h3 class="cal-month-list-title">${title}</h3>${days.length
       ? `<ul>${days.map(cell => {
-          const remind = cell.events.some(event => event.preference?.mode === 'remind');
-          const onlySpare = !cell.events.length;
-          return `<li><button type="button" class="cal-month-row${cell.today ? ' is-today' : ''}${onlySpare ? ' is-spare' : ''}" data-cal-pick="${cell.date}" data-cal-focus="month-list-${cell.date}"><span class="cal-month-row-date"><b>${cell.day}</b><span>周${WEEKDAYS[weekIndex(cell.date)]}</span></span><span class="cal-month-row-tibetan">${escape(cell.tibetan?.display || '')}</span><span class="cal-month-row-names">${cell.events.map(event => `<span${event.preference?.mode === 'remind' ? ' class="is-remind"' : ''}>${escape(event.title)}</span>`).join('')}${cell.spare.map(event => `<span class="is-spare">${escape(event.title)}<small>未选</small></span>`).join('')}</span>${remind ? `<span class="cal-month-row-bell" aria-label="会提醒">${icon('bell')}</span>` : ''}</button></li>`;
-        }).join('')}</ul>`
-      : '<p class="cal-empty">这个月没有修行日。</p>'}`;
+          const items = chosen ? cell.events : cell.spare;
+          const remind = chosen && items.some(event => event.preference?.mode === 'remind');
+          return `<li><button type="button" class="cal-month-row${cell.today ? ' is-today' : ''}${chosen ? '' : ' is-spare'}" data-cal-pick="${cell.date}" data-cal-focus="month-list-${cell.date}"><span class="cal-month-row-date"><b>${cell.day}</b><span>周${WEEKDAYS[weekIndex(cell.date)]}</span></span><span class="cal-month-row-tibetan">${escape(cell.tibetan?.display || '')}</span><span class="cal-month-row-names">${items.map(event => `<span${chosen ? (event.preference?.mode === 'remind' ? ' class="is-remind"' : '') : ' class="is-spare"'}>${escape(event.title)}</span>`).join('')}</span>${remind ? `<span class="cal-month-row-bell" aria-label="会提醒">${icon('bell')}</span>` : ''}</button></li>`;
+        }).join('')}</ul>${chosen ? '' : '<p class="cal-month-list-hint">在“选择内容”里选好，选中的日子会在上面的月历里标出颜色。</p>'}`
+      : `<p class="cal-empty">${chosen ? '这个月没有已选的日子。' : '这个月没有修行日。'}</p>`}`;
   }
 
   function renderDetail() {

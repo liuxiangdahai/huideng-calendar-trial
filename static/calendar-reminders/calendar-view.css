@@ -380,10 +380,8 @@ dialog.cal-day-sheet.is-popover { position: absolute; inset: auto; z-index: 30; 
    first visit is never an empty month. Grey text with a dotted edge on
    computers, a hollow ring on phones, 未选 in the month list and the day card. */
 .cal-mini-event.is-spare, .cal-day.cal-adjacent .cal-mini-event.is-spare { border-left: 2px dotted #c9c3b8; background: none; color: #8f8a82; opacity: 1; }
-.cal-dot.is-spare { box-sizing: border-box; border: 1.5px solid #a8a196; background: none; }
 .cal-legend-item.is-spare { color: var(--muted); }
 .cal-month-row-names .is-spare { color: #8f8a82; font-weight: 400; }
-.cal-month-row-names .is-spare small { margin-left: 4px; padding: 0 4px; border: 1px solid var(--line-2); border-radius: 3px; font: 400 var(--fs-xs)/1.4 var(--font-ui); vertical-align: 2px; }
 .cal-month-row.is-spare .cal-month-row-date b { color: #8f8a82; }
 .cal-spare { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--line-2); color: var(--muted); }
 .cal-spare h4 { display: flex; align-items: center; gap: 8px; margin: 0 0 6px; color: var(--ink-2); font: 500 var(--fs-md)/1.5 var(--font-ui); }
@@ -399,3 +397,21 @@ dialog.cal-day-sheet.is-popover { position: absolute; inset: auto; z-index: 30; 
   .cal-key-dots .cal-legend-item.is-spare { border-left: 2px dotted #c9c3b8; background: none; color: #8f8a82; }
 }
 .cal-detail-heading + .cal-spare { margin-top: 0; padding-top: 0; border-top: 0; }
+
+/* Phones and tablets (11-11): a chosen day is tinted like a highlighter on a
+   paper calendar, with a short bar at its foot — carmine reminds, gold only
+   shows. No dots, no marks for days not chosen. */
+@media (max-width: 1023px) {
+  .cal-day { position: relative; }
+  .cal-day.has-remind, .cal-day.has-remind:hover:not(:disabled) { background: var(--red-tint-2); }
+  .cal-day.has-display, .cal-day.has-display:hover:not(:disabled) { background: #f3e6c8; }
+  .cal-day:is(.has-remind, .has-display)::after { content: ""; position: absolute; left: 22%; right: 22%; bottom: 6px; height: 3px; border-radius: 2px; background: var(--red); }
+  .cal-day.has-display::after { background: var(--gold); }
+  .cal-day.cal-adjacent:is(.has-remind, .has-display) { opacity: .55; }
+  .cal-day.cal-selected:is(.has-remind, .has-display) { box-shadow: inset 0 0 0 2px var(--wine); }
+  /* The key shows the same tints as small swatches. */
+  .cal-key-dots .cal-dot { display: inline-block; width: 16px; height: 12px; border-radius: 2px; background: #f3e6c8; box-shadow: inset 0 -3px 0 var(--gold); }
+  .cal-key-dots .cal-dot.is-remind { background: var(--red-tint-2); box-shadow: inset 0 -3px 0 var(--red); }
+  .cal-key-dots .cal-legend-item.is-spare { display: none; }
+  .cal-month-list-hint { margin: 10px 2px 0; color: var(--muted); font-size: var(--fs-sm); line-height: 1.6; }
+}
