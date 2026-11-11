@@ -149,7 +149,7 @@ test('the month head controls never overlap, from phone to wide desktop', async 
     await page.goto(width < 1024 ? '/calendar-reminders/' : '/calendar-reminders/#subscribe');
     await expect(page.locator('.cal-day')).toHaveCount(42);
     const boxes = await page.evaluate(() => ['[data-cal-action="previous"]', '.cal-month-picker', '[data-cal-action="next"]', '.cal-today', '.cal-month-context', '.cal-view-switch']
-      .map(selector => [selector, document.querySelector(selector).getBoundingClientRect().toJSON()]));
+      .filter(selector => document.querySelector(selector)).map(selector => [selector, document.querySelector(selector).getBoundingClientRect().toJSON()]));
     for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) {
       const [[na, a], [nb, b]] = [boxes[i], boxes[j]];
       const overlap = a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom - 1 && b.top < a.bottom - 1;
@@ -197,10 +197,24 @@ test('the 藏历 page leaves out daily dates even for a subscription that has th
   await expect(home.locator('[data-cal-sheet]')).toBeVisible();
   await expect(home.locator('[data-cal-sheet] .cal-daily-entry')).toHaveCount(0);
   await page.keyboard.press('Escape');
-  await home.locator('[data-cal-view="list"]').click();
-  await expect(home.locator('.cal-list-day').first()).toBeVisible();
+  await expect(home.locator('.cal-month-list li').first()).toBeVisible();
   await expect(home.locator('.cal-daily-entry')).toHaveCount(0);
-  await expect(home.locator('.cal-list-caption')).toHaveText('从今天起的修行日');
+});
+
+for (const width of [390, 1366]) test(`the 藏历 page has no 月历/列表 switch; the month list under the grid follows the month at ${width}px`, async ({page}) => {
+  await page.setViewportSize({width, height: 900});
+  await page.goto('/calendar-reminders/');
+  const home = page.locator('#home-calendar');
+  await expect(home.locator('.cal-day')).toHaveCount(42);
+  await expect(home.locator('[data-cal-view]')).toHaveCount(0);
+  await expect(home.locator('.cal-list-view')).toBeHidden();
+  if (width < 1024) {
+    await home.locator('[data-cal-month]').selectOption('2026-12');
+    await expect(home.locator('.cal-month-list-title')).toContainText('12月的修行日');
+  }
+  // The subscription preview keeps its own switch.
+  await page.goto('about:blank'); await page.goto('/calendar-reminders/#subscribe');
+  if (width >= 1024) await expect(page.locator('#calendar-preview [data-cal-view]')).toHaveCount(2);
 });
 
 test('a tapped date keeps one frame after its day card closes (11-11)', async ({browser}) => {

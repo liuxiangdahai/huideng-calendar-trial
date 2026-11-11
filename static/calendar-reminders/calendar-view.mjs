@@ -190,7 +190,10 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
   initialView = 'month', today, reading = false} = {}) {
   validDate(today);
   const doc = root.ownerDocument, win = doc.defaultView;
-  let view = initialView === 'list' ? 'list' : 'month';
+  // The 藏历 page has no 月历/列表 switch (11-11): "接下来" already lists the
+  // days from today, and under the grid the month's own list follows the
+  // month shown. Only the subscription preview offers a list of its own.
+  let view = !reading && initialView === 'list' ? 'list' : 'month';
   let month = today.slice(0, 7), selected = today, focusDate = today, shown = 5, dailyShown = 30;
   let state = {data: null, settings: null, events: [], spare: [], today, reading,
     start: ENGINE.supported.start, end: ENGINE.supported.end};
@@ -204,10 +207,10 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
       <label class="cal-month-picker"><span class="sr-only">选择月份</span><select data-cal-month data-cal-focus="month-picker" aria-label="选择月份"></select>${icon('chevron')}</label>
       <button type="button" class="cal-arrow" data-cal-action="next" data-cal-focus="next" aria-label="下一月">${icon('chevron-right')}</button>
       <button type="button" class="cal-today" data-cal-action="today" data-cal-focus="today">今天</button>
-    </div><p class="cal-month-context" data-cal-context></p><div class="cal-view-switch" role="group" aria-label="${reading ? '查看方式' : '日期预览方式'}">
+    </div><p class="cal-month-context" data-cal-context></p>${reading ? '' : `<div class="cal-view-switch" role="group" aria-label="日期预览方式">
       <button type="button" data-cal-view="month" data-cal-focus="month-view">${icon('calendar')}<span>月历</span></button>
       <button type="button" data-cal-view="list" data-cal-focus="list-view">${icon('list')}<span>列表</span></button>
-    </div></div><section class="cal-month-view" aria-label="${reading ? '藏历月历' : '月历预览'}">
+    </div>`}</div><section class="cal-month-view" aria-label="${reading ? '藏历月历' : '月历预览'}">
     <p class="cal-key"><span class="cal-key-note">日期<span class="cal-key-below">下</span><span class="cal-key-beside">旁</span>的小字是藏历，与农历不同</span><span class="cal-key-dots" data-cal-key-dots></span></p>
     <div class="cal-grid" role="grid" aria-label="月历，日期下方小字为藏历。使用方向键浏览日期，回车查看日程" data-cal-grid></div>
     <p class="cal-legend" data-cal-legend></p>${reading ? `<div class="cal-turn-hint" data-cal-turn><span class="cal-turn-phone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="7" y="3" width="10" height="18" rx="2.2"/><path d="M11 18h2"/></svg></span><p class="cal-turn-text"><b>把手机横过来</b>格子里会写出节日全名</p><p class="cal-turn-demo" aria-hidden="true"><i class="cal-turn-short">莲师</i><span class="cal-turn-arrow">→</span><i class="cal-turn-full">莲师荟供日</i></p></div>` : ''}

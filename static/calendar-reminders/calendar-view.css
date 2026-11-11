@@ -307,6 +307,11 @@ dialog.cal-day-sheet::backdrop { background: #1d1b1859; }
   /* List view has no month to page through: the switch alone, on the right. */
   .cal-control-bar:has([data-cal-navigation][hidden]) { grid-template-columns: 1fr; grid-template-areas: "switch"; }
 }
+/* The 藏历 page has no view switch: the month head and its 藏历 line, each a
+   full row, until the wide symmetric head takes over (11-11). */
+@container calendar (max-width: 619px) {
+  .cal-view.is-reading .cal-control-bar { grid-template-columns: minmax(0,1fr); grid-template-areas: "nav" "context"; }
+}
 
 
 /* ── 11-10: reading the month ─────────────────────────────────────────── */

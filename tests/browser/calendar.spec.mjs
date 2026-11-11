@@ -395,10 +395,14 @@ test('on tablet and desktop the month title pair sits on the grid centre line',a
       const box = document.querySelector(selector).getBoundingClientRect(); return box.left + box.width / 2;
     }));
     for (const value of centre.slice(1)) expect(Math.abs(value - centre[0]), `${width}px`).toBeLessThan(2);
-    // 今天 and the view switch balance the title at the two ends.
-    const [today, grid, views] = await Promise.all(['.cal-today', '.cal-grid', '.cal-view-switch'].map(selector => page.locator(selector).boundingBox()));
+    // 今天 at the start; the preview's view switch, where there is one (the
+    // 藏历 page has none), at the end.
+    const [today, grid] = await Promise.all(['.cal-today', '.cal-grid'].map(selector => page.locator(selector).boundingBox()));
     expect(Math.abs(today.x - grid.x)).toBeLessThan(2);
-    expect(Math.abs(views.x + views.width - grid.x - grid.width)).toBeLessThan(2);
+    if (await page.locator('.cal-view-switch').count()) {
+      const views = await page.locator('.cal-view-switch').boundingBox();
+      expect(Math.abs(views.x + views.width - grid.x - grid.width)).toBeLessThan(2);
+    }
   }
 });
 
