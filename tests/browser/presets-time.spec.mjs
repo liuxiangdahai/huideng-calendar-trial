@@ -3,7 +3,7 @@ import {showMoreSettings, openZonePicker} from './more-settings.mjs';
 import ICAL from 'ical.js';
 const draft=page=>page.evaluate(()=>JSON.parse(localStorage.getItem('huideng.calendar.v2')));
 const creds=page=>page.evaluate(()=>JSON.parse(localStorage.getItem('huideng.calendar.subscription')));
-async function open(page){await page.goto('/calendar-reminders/');await expect(page.locator('#app')).toBeVisible();await showMoreSettings(page,{computerOnly:true});}
+async function open(page){await page.goto('/calendar-reminders/#subscribe');await expect(page.locator('#app')).toBeVisible();await showMoreSettings(page,{computerOnly:true});}
 test('presets replace choices without undo and clearing preserves local timezone and reminder times',async({page})=>{
   await open(page);await expect(page.locator('[data-event]:checked')).toHaveCount(0);await expect(page.locator('[data-preset][aria-pressed="true"]')).toHaveCount(0);
   await page.locator('[data-preset="guru"]').click();await expect(page.locator('[data-preset="guru"]')).toHaveAttribute('aria-pressed','true');

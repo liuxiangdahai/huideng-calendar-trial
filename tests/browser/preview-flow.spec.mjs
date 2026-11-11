@@ -13,7 +13,7 @@ const browserToday = page => page.evaluate(() => {
 
 async function open(page) {
   await page.setViewportSize({width: 1440, height: 1100});
-  await page.goto(route);
+  await page.goto(route+'#subscribe');
   await expect(page.locator('#app')).toBeVisible();
   await expect(page.locator('#preview-error')).toBeHidden();
   await expect(page.locator('.cal-day')).toHaveCount(42);

@@ -1,7 +1,7 @@
 import {test,expect} from '@playwright/test';
 import ICAL from 'ical.js';
 
-const open=async(page,path='/calendar-reminders/')=>{await page.goto(path);await expect(page.locator('#app')).toBeVisible();};
+const open=async(page,path='/calendar-reminders/#subscribe')=>{await page.goto(path);await expect(page.locator('#app')).toBeVisible();};
 
 test('phones start in three simple steps; computers show the detailed settings',async({page})=>{
   await page.setViewportSize({width:390,height:844});await open(page);

@@ -9,7 +9,7 @@ const subscription=page=>page.evaluate(()=>JSON.parse(localStorage.getItem('huid
 const events=text=>new ICAL.Component(ICAL.parse(text)).getAllSubcomponents('vevent');
 const daily=event=>String(event.getFirstPropertyValue('uid')).startsWith('daily-date-');
 const close=page=>page.locator('[data-close="subscription-dialog"]').first().click();
-async function open(page){await page.goto(route);await expect(page.locator('#app')).toBeVisible();await expect(page.locator('#load-error')).toBeHidden();await expect(page.locator('#preview-error')).toBeHidden();await showMoreSettings(page,{computerOnly:true});}
+async function open(page){await page.goto(route+'#subscribe');await expect(page.locator('#app')).toBeVisible();await expect(page.locator('#load-error')).toBeHidden();await expect(page.locator('#preview-error')).toBeHidden();await showMoreSettings(page,{computerOnly:true});}
 async function downloadText(page){const pending=page.waitForEvent('download');await page.locator('[data-download="display"]').click();return fs.readFile(await (await pending).path(),'utf8');}
 
 test('daily date layer starts off, preserves legacy choices and presets, and clear removes both layers',async({page})=>{
@@ -53,13 +53,13 @@ test('month marks only festivals while daily details and list show real consecut
  await page.addInitScript(now=>{const NativeDate=Date;window.Date=class Date extends NativeDate{
   constructor(...args){super(...(args.length?args:[now]));}static now(){return now;}
  };},Date.parse('2026-10-01T04:00:00Z'));
- await page.setViewportSize({width:390,height:844});await open(page);
- await page.locator('#include-daily-dates').check();await page.locator('#tab-preview').click();
+ await page.setViewportSize({width:1280,height:900});await open(page);
+ await page.locator('#include-daily-dates').check();
  await expect(page.locator('.cal-day')).toHaveCount(42);await expect(page.locator('.cal-event-count')).toHaveCount(0);
  await page.locator('[data-cal-date="2026-10-19"]').click();await expect(page.locator('[data-cal-detail]')).toContainText('重日1');
  await expect(page.locator('[data-cal-detail] [data-cal-daily-date]')).toHaveCount(1);await expect(page.locator('[data-cal-detail]')).not.toContainText('藏历 PRO');await expect(page.locator('footer')).toContainText('藏历 PRO');
  await expect(page.locator('[data-cal-detail] [data-cal-event]')).toHaveCount(0);
- // Phones show the day in a bottom sheet; close it before choosing another date.
+ // The day opens as a card beside the date; close it before choosing another date.
  const closeSheet=async()=>{await page.keyboard.press('Escape');await expect(page.locator('[data-cal-sheet]')).toBeHidden();};
  await expect(page.locator('[data-cal-sheet]')).toBeVisible();await closeSheet();
  await page.locator('[data-cal-date="2026-10-20"]').click();await expect(page.locator('[data-cal-detail]')).toContainText('重日2');
@@ -71,12 +71,12 @@ test('month marks only festivals while daily details and list show real consecut
  await expect(page.locator('.cal-list-view [data-cal-daily-date]')).toHaveCount(30);
  await page.locator('[data-cal-action="more"]').click();await expect(page.locator('[data-cal-list-date]')).toHaveCount(60);
  await page.locator('[data-cal-view="month"]').click();await page.locator('[data-cal-view="list"]').click();await expect(page.locator('[data-cal-list-date]')).toHaveCount(60);
- await page.locator('#tab-selection').click();await page.locator('[data-preset="guru"]').click();await page.locator('#tab-preview').click();
+ await page.locator('[data-preset="guru"]').click();
  await page.locator('[data-cal-view="month"]').click();
  await expect(page.locator('[data-cal-date="2026-10-21"] .cal-event-count')).toHaveText('1');
  await page.locator('[data-cal-date="2026-10-21"]').click();
  await expect(page.locator('[data-cal-detail] [data-cal-daily-date]')).toHaveCount(1);await expect(page.locator('[data-cal-detail] [data-cal-event]')).toHaveCount(1);
- await closeSheet();await page.locator('#tab-selection').click();await page.locator('#include-daily-dates').uncheck();await page.locator('#tab-preview').click();await page.locator('[data-cal-view="list"]').click();
+ await closeSheet();await page.locator('#include-daily-dates').uncheck();await page.locator('[data-cal-view="list"]').click();
  await expect(page.locator('[data-cal-list-date]')).toHaveCount(5);await expect(page.locator('.cal-list-view [data-cal-daily-date]')).toHaveCount(0);
 });
 

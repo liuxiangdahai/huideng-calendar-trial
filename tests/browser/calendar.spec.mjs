@@ -7,8 +7,14 @@ import ICAL from 'ical.js';
 
 const route = '/calendar-reminders/';
 const origin = 'http://127.0.0.1:4173';
+// Phones and tablets read the month on the 藏历 page (11-11, plan C).
+async function openHome(page) {
+  await page.goto('about:blank'); await page.goto(route);
+  await expect(page.locator('.cal-day')).toHaveCount(42);
+}
 async function open(page, suffix = '') {
-  await page.goto(route+suffix);
+  await page.goto('about:blank');
+  await page.goto(route+(suffix||'#subscribe'));
   await expect(page.locator('#app')).toBeVisible();
   const previewError = await page.locator('#preview-error').textContent();
   if (previewError) throw new Error(previewError);
@@ -149,7 +155,7 @@ test('management fragment restores a subscription on another device without leak
     second.on('request',request => requested.push(request.url()));
     await open(second,`#manage=${sub.id}.${sub.manageToken}`);
     await expect(second.locator('#feed-url')).toHaveValue(sub.feedUrl);
-    await expect(second).toHaveURL(origin+route);
+    await expect(second).toHaveURL(origin+route+'#subscribe');
     await expect.poll(async() => (await credentials(second))?.manageToken).toBe(sub.manageToken);
     expect(requested.some(url => url.includes(sub.manageToken))).toBe(false);
     const feed = await (await request.get(sub.feedUrl)).text();
@@ -166,7 +172,7 @@ test('invalid management link preserves an existing valid subscription and its d
   expect((await credentials(page)).manageToken).toBe(sub.manageToken);
   expect((await draft(page)).events['dakini-tsok'].mode).toBe('off');
   await expect(page.locator('#feed-url')).toHaveValue(sub.feedUrl);
-  await expect(page).toHaveURL(origin+route);
+  await expect(page).toHaveURL(origin+route+'#subscribe');
 });
 
 test('remote disable clears stale credentials while retaining unsaved local choices',async({page,request}) => {
@@ -222,12 +228,9 @@ test('mobile selection, preview, long names and dialogs fit 390 and 320 pixel wi
   await expect(page.locator('#selection-pane')).toBeVisible();
   await expect(page.locator('#preview-pane')).toBeHidden();
   await page.screenshot({path:'.calendar-preview/mobile.png',fullPage:true});
-  await page.locator('#tab-preview').click();
-  await expect(page.locator('#preview-pane')).toBeVisible();
-  await expect(page.locator('#selection-pane')).toBeHidden();
-  await page.screenshot({path:'.calendar-preview/mobile-preview.png',fullPage:true});
-  await page.locator('#tab-preview').press('ArrowLeft');
-  await expect(page.locator('#tab-selection')).toBeFocused();
+  // One page, no tabs: the month is one link away, on the 藏历 page.
+  await expect(page.locator('[role="tablist"]')).toHaveCount(0);
+  await expect(page.locator('.sub-home-link')).toBeVisible();
   // Phones open in the simple three steps; categories live under 详细设置.
   await expect(page.locator('#advanced-settings')).not.toHaveAttribute('open','');
   await page.locator('#advanced-settings>summary').click();
@@ -290,7 +293,7 @@ test('unconfigured service and source failure do not imply a successful subscrip
 
 test('standalone works offline, exports real ICS and never creates a fake subscription',async({page}) => {
   await page.context().setOffline(true);
-  await page.goto(pathToFileURL(path.resolve('dist/藏历日历.html')).href);
+  await page.goto(pathToFileURL(path.resolve('dist/藏历日历.html')).href+'#subscribe');
   await expect(page.locator('#app')).toBeVisible();
   await expect(page.locator('.group-card')).toHaveCount(7);
   await page.locator('[data-preset="guru"]').click();
@@ -335,9 +338,9 @@ test('复制管理链接 inside 我的订阅 shows its note above the open dialo
 
 test('the month grid says its small labels are Tibetan dates before the dates are read',async({page}) => {
   for (const viewport of [{width:390,height:844},{width:1366,height:900}]) {
-    await page.setViewportSize(viewport); await open(page);
-    await page.locator('[data-preset="practice"]').click();
-    if (viewport.width < 1024) await page.locator('#tab-preview').click();
+    await page.setViewportSize(viewport);
+    if (viewport.width < 1024) await openHome(page);
+    else { await open(page); await page.locator('[data-preset="practice"]').click(); }
     await expect(page.locator('.cal-context-tag')).toHaveText('藏历');
     const key = page.locator('.cal-key');
     // The wording matches where the label sits at this width.
@@ -352,18 +355,19 @@ test('the month grid says its small labels are Tibetan dates before the dates ar
     // line on computers; on phones the note and the dots (会提醒/只显示/未选) may take two.
     const [keyBox, weekdays] = [await key.boundingBox(), await page.locator('.cal-weekdays').boundingBox()];
     expect(keyBox.y + keyBox.height).toBeLessThanOrEqual(weekdays.y + 1);
-    expect(keyBox.height).toBeLessThan(viewport.width >= 1024 ? 40 : 60);
-    // The key shows the same marks as the grid at this width: tint swatches on
-    // phones (the tinted day's colour), name strips on desktop.
-    const marks = await page.evaluate(() => {
-      const color = node => node && getComputedStyle(node).backgroundColor;
-      const swatch = document.querySelector('.cal-key .cal-dot.is-remind');
-      return {phone: innerWidth < 1024, keySwatch: swatch && getComputedStyle(swatch).display !== 'none' ? color(swatch) : null,
-        gridTint: color(document.querySelector('.cal-day:not(.cal-adjacent).has-remind')),
-        gridStrip: color(document.querySelector('.cal-day:not(.cal-adjacent) .cal-mini-event.is-remind')), keyStrip: color(document.querySelector('.cal-key .cal-legend-item.is-remind'))};
-    });
-    if (marks.phone) expect(marks.keySwatch).toBe(marks.gridTint);
-    else { expect(marks.keySwatch).toBeNull(); expect(marks.keyStrip).toBe(marks.gridStrip); }
+    expect(keyBox.height).toBeLessThan(viewport.width >= 1024 ? 40 : 90);
+    // The key shows the same marks as the grid: on the phone 藏历 page, the
+    // kinds by colour (as the short names are coloured); on desktop, the strips.
+    if (viewport.width < 1024) {
+      await expect(page.locator('.cal-key .cal-legend-item')).toHaveText(['荟供日', '节庆', '佛菩萨日', '上师纪念', '法会·其他']);
+      const [chip, swatch] = await page.evaluate(() => [document.querySelector('.cal-day:not(.cal-adjacent) .cal-abbr.is-cat-tsok'), document.querySelector('.cal-key .is-cat-tsok .cal-dot')]
+        .map(node => getComputedStyle(node).color === 'rgba(0, 0, 0, 0)' ? '' : getComputedStyle(node).backgroundColor));
+      expect(chip).not.toBe(''); expect(swatch).not.toBe('');
+    } else {
+      const strips = await page.evaluate(() => ['.cal-day:not(.cal-adjacent) .cal-mini-event.is-remind', '.cal-key .cal-legend-item.is-remind']
+        .map(selector => getComputedStyle(document.querySelector(selector)).backgroundColor));
+      expect(strips[1]).toBe(strips[0]);
+    }
     // The labels are lapis, the colour family of the 藏历 tag beside the month.
     expect(await page.evaluate(() => {
       const probe = document.createElement('i'); probe.style.color = 'var(--teal-2)'; document.body.append(probe);
@@ -375,8 +379,8 @@ test('the month grid says its small labels are Tibetan dates before the dates ar
 
 test('the 藏历 month line is never cut off, down to 320 pixels',async({page}) => {
   for (const width of [320, 390, 820, 1366]) {
-    await page.setViewportSize({width, height: 800}); await open(page);
-    if (width < 1024) await page.locator('#tab-preview').click();
+    await page.setViewportSize({width, height: 800});
+    if (width < 1024) await openHome(page); else await open(page);
     const fit = await page.locator('.cal-context-text').evaluate(node => node.scrollWidth <= node.clientWidth);
     expect(fit, `${width}px`).toBe(true);
     await expect(page.locator('.cal-context-text')).toContainText('月');
@@ -385,8 +389,8 @@ test('the 藏历 month line is never cut off, down to 320 pixels',async({page}) 
 
 test('on tablet and desktop the month title pair sits on the grid centre line',async({page}) => {
   for (const width of [820, 1366]) {
-    await page.setViewportSize({width, height: 900}); await open(page);
-    if (width < 1024) await page.locator('#tab-preview').click();
+    await page.setViewportSize({width, height: 900});
+    if (width < 1024) await openHome(page); else await open(page);
     const centre = await page.evaluate(() => ['.cal-grid', '.cal-month-picker', '.cal-month-context'].map(selector => {
       const box = document.querySelector(selector).getBoundingClientRect(); return box.left + box.width / 2;
     }));

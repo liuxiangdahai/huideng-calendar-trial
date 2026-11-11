@@ -23,7 +23,6 @@
   /* Selection feedback eases in instead of snapping. */
   :is(.preset-card,.time-choices button,.title-marks label,.daily-date-option) { transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease; }
   .preset-check { transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease; }
-  .mobile-tabs button { transition: color 160ms ease, border-color 200ms ease; }
   .subscribed-card:not([hidden]), .step-add-device { animation: calendar-notice-in 260ms ease-out both; }
 }
 @keyframes calendar-knot-draw { from { stroke-dashoffset: 64; } to { stroke-dashoffset: 0; } }

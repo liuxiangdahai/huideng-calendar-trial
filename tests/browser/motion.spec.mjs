@@ -33,7 +33,7 @@ async function open(page, {reducedMotion = 'no-preference', missingAnimationAPI 
       return animation;
     };
   }, {missingAnimationAPI});
-  await page.goto(path);
+  await page.goto(path+(path.includes('#')||path.includes('?')?'':'#subscribe'));
   await expect(page.locator('#app')).toBeVisible();
   await showMoreSettings(page);
   await expect(page.locator('#preview-error')).toBeHidden();
@@ -174,7 +174,7 @@ test('restored open categories do not replay expansion and daily dates retain th
   expect(audit).toEqual({errors: [], writes: []});
 });
 
-test('a chosen preset toggles off with undo, and switching mobile tabs mid-effect preserves the detail reading position', async ({page}) => {
+test('a chosen preset toggles off with undo and keeps keyboard focus on the plan', async ({page}) => {
   const audit = await open(page);
   await page.locator('[data-preset="guru"]').click();
   await expect.poll(() => runningFeedback(page)).toBe(0);
@@ -190,46 +190,5 @@ test('a chosen preset toggles off with undo, and switching mobile tabs mid-effec
   await page.locator('[data-preset="guru"]').focus();
   await expect(page.locator('[data-preset="guru"]')).toBeFocused();
 
-  await page.locator('#clear-selection').click();
-  await page.locator('#include-daily-dates').check();
-  await page.setViewportSize({width: 390, height: 844});
-  await page.locator('#tab-preview').click();
-  const month = await page.locator('[data-cal-month]').inputValue();
-  await page.locator(`[data-cal-date="${month}-10"]`).click();
-  await expect.poll(() => runningFeedback(page)).toBe(0);
-  const effectCount = await page.evaluate(date => {
-    window.motionAnimations = [];
-    document.querySelector(`[data-cal-date="${date}"]`).click();
-    const detail = document.querySelector('[data-cal-detail]');
-    const effects = window.motionAnimations.filter(animation => animation.effect.target === detail);
-    // Pause at the first frame to expose any accidental translation of the
-    // very element that mobile tabs use to remember the reading position.
-    for (const effect of effects) { effect.pause(); effect.currentTime = 0; }
-    window.pausedDetailEffects = effects;
-    return effects.length;
-  }, `${month}-11`);
-  expect(effectCount).toBeGreaterThan(0);
-  await frames(page);
-  // On a phone the chosen day opens in a bottom sheet; close it and keep
-  // reading the month, which the tabs must return to.
-  await expect(page.locator('[data-cal-sheet]')).toBeVisible();
-  await page.keyboard.press('Escape');
-  await expect(page.locator('[data-cal-sheet]')).toBeHidden();
-  await page.evaluate(() => {
-    const grid = document.querySelector('[data-cal-grid]');
-    scrollTo({top: scrollY + grid.getBoundingClientRect().top + 120, behavior: 'instant'});
-  });
-  await frames(page);
-  const readingPosition = await page.evaluate(() => scrollY);
-  await page.evaluate(() => document.querySelector('#tab-selection').click());
-  await expect(page.locator('.workspace')).toHaveAttribute('data-active-tab', 'selection');
-  await page.evaluate(() => {
-    for (const effect of window.pausedDetailEffects) effect.finish();
-    document.querySelector('#tab-preview').click();
-  });
-  await expect(page.locator('.workspace')).toHaveAttribute('data-active-tab', 'preview');
-  await expect.poll(() => page.evaluate(() => scrollY)).toBeCloseTo(readingPosition, 0);
-  await expect(page.locator(`[data-cal-date="${month}-11"]`)).toHaveClass(/cal-selected/);
-  await expect(page.locator('[data-cal-month]')).toHaveValue(month);
   expect(audit).toEqual({errors: [], writes: []});
 });

@@ -19,19 +19,34 @@
     <div class="heading"><a href="/" class="brand" aria-label="慧灯小组首页"><span class="brand-seal brand-logo"><img src="./assets/huideng-logo.png" width="144" height="153" alt="慧灯小组" decoding="async"></span><span class="brand-type"><h1>藏历</h1><small>慧灯小组</small></span></a></div>
     <button id="my-subscription" type="button" class="secondary"><span data-icon="calendar-check" aria-hidden="true"></span>我的订阅</button>
   </header>
-  <section class="editorial-masthead" aria-label="今日藏历"><div class="masthead-clouds" aria-hidden="true"><span class="cloud-far"></span><span class="cloud-near"></span></div><div class="masthead-inner"><div class="masthead-date"><div class="today"><span class="today-era"><b>藏历</b><span id="today-year"></span></span><span id="today-tibetan"></span><span id="today-gregorian">正在读取日期</span></div></div><p id="next-practice" class="masthead-next" aria-live="off" hidden></p></div></section>
+  <section class="editorial-masthead" aria-label="今日藏历"><div class="masthead-clouds" aria-hidden="true"><span class="cloud-far"></span><span class="cloud-near"></span></div><div class="masthead-inner"><div class="masthead-date"><div class="today"><span class="today-era"><b>藏历</b><span id="today-year"></span></span><span id="today-tibetan"></span><span id="today-gregorian">正在读取日期</span></div><p id="today-feast" class="today-feast" hidden></p></div><p id="next-practice" class="masthead-next" aria-live="off" hidden></p></div></section>
   <main>
     <p id="load-error" class="notice error" role="alert" hidden></p>
     <noscript><p class="notice">请启用浏览器 JavaScript，或查看<a href="https://www.fohuifayu.com/index.php/calendar">佛慧法语藏历</a>。</p></noscript>
     <div id="app" hidden>
       <div id="device-zone-notice" class="notice zone-change" role="status" hidden><p id="device-zone-message"></p><div class="feed-actions"><button id="keep-zone" class="secondary" type="button">保持原时区</button><button id="use-device-zone" class="primary" type="button">改用设备时区</button></div></div>
       <div id="wechat-banner" class="wechat-banner" role="note" hidden><span data-icon="globe" aria-hidden="true"></span><div><strong>请在浏览器中打开本页</strong><p id="wechat-banner-text">微信会拦截“加入日历”。点右上角 <b>···</b>，选择“在浏览器打开”，再继续操作。</p></div></div>
-      <div class="region-bar"><div id="time-comparison" class="time-comparison" aria-label="设备与提醒地区时间"></div><div class="region-setting"><span>提醒地区</span><button id="zone-settings" class="text-button" type="button" aria-haspopup="dialog"><span data-icon="globe" aria-hidden="true"></span><span id="zone-summary">选择时区</span><span data-icon="chevron" aria-hidden="true"></span></button></div></div>
-      <div class="mobile-tabs" role="tablist" aria-label="日历设置视图">
-        <button id="tab-selection" type="button" role="tab" aria-selected="true" aria-controls="selection-pane" data-tab="selection">选择内容</button>
-        <button id="tab-preview" type="button" role="tab" aria-selected="false" aria-controls="preview-pane" data-tab="preview" tabindex="-1">日期预览</button>
+      <div id="home" class="home" data-page-part="home">
+        <div class="home-side">
+          <section class="home-upcoming" aria-labelledby="home-upcoming-title">
+            <div class="home-heading"><h2 id="home-upcoming-title">接下来</h2><small id="home-upcoming-note"></small></div>
+            <ol id="home-upcoming-list" class="home-list"></ol>
+          </section>
+          <section class="home-cta" aria-labelledby="home-cta-title">
+            <div><h2 id="home-cta-title">到日子想收到提醒？</h2><p>把荟供日等加入手机日历，到时自动提醒。</p></div>
+            <button id="home-subscribe" type="button"><span data-icon="calendar-plus" aria-hidden="true"></span><span id="home-subscribe-label">加入日历</span></button>
+          </section>
+          <section id="home-monthly" class="home-monthly" aria-labelledby="home-monthly-title">
+            <h2 id="home-monthly-title">每月固定的日子<small>藏历</small></h2><ul id="home-monthly-list"></ul>
+          </section>
+        </div>
+        <section class="home-main" aria-labelledby="home-calendar-title">
+          <h2 id="home-calendar-title" class="sr-only">藏历月历</h2>
+          <div id="home-calendar"></div>
+        </section>
       </div>
-      <div class="workspace" data-active-tab="selection">
+      <div class="region-bar" data-page-part="subscribe"><div id="time-comparison" class="time-comparison" aria-label="设备与提醒地区时间"></div><div class="region-setting"><span>提醒地区</span><button id="zone-settings" class="text-button" type="button" aria-haspopup="dialog"><span data-icon="globe" aria-hidden="true"></span><span id="zone-summary">选择时区</span><span data-icon="chevron" aria-hidden="true"></span></button></div></div>
+      <div class="workspace" data-page-part="subscribe">
         <section id="selection-pane" class="selection-column" aria-labelledby="selection-title">
           <div class="section-heading selection-heading"><h2 id="selection-title">选择内容</h2></div>
           <section id="subscribed-card" class="subscribed-card" aria-live="polite" hidden>
@@ -45,6 +60,12 @@
               <div id="preset-options" class="preset-options"></div>
               <p id="preset-scope-note" class="preset-scope-note">全部修行日不含节气及其他纪念日。</p>
             </div>
+            <section id="sub-upcoming" class="sub-upcoming" aria-labelledby="sub-upcoming-title" hidden>
+              <h4 id="sub-upcoming-title">接下来会出现在你日历里</h4>
+              <ol id="sub-upcoming-list"></ol>
+              <p id="sub-upcoming-more" class="sub-upcoming-more"></p>
+              <a class="sub-upcoming-all" href="#calendar" data-go-home>在藏历里看全部日子<span data-icon="chevron-right" aria-hidden="true"></span></a>
+            </section>
             <div class="quick-panel daily-date-panel">
               <section class="daily-date-option" aria-labelledby="daily-date-title">
                 <label class="event-label" for="include-daily-dates">
@@ -89,6 +110,7 @@
             <button id="share-settings" type="button" class="text-button"><span data-icon="copy" aria-hidden="true"></span>把这套设置分享给师兄</button>
           </section>
         </section>
+        <a class="sub-home-link" href="#calendar" data-go-home>查看整月藏历<span data-icon="chevron-right" aria-hidden="true"></span></a>
         <aside id="preview-pane" class="preview-column" aria-labelledby="preview-title">
           <section class="preview-panel">
             <div class="section-heading preview-heading"><h2 id="preview-title">日期预览</h2></div>
@@ -98,7 +120,7 @@
         </aside>
       </div>
   <footer><a href="https://www.huidengvan.org/">慧灯小组</a><span>历法：<a href="https://zangli.pro/" target="_blank" rel="noopener noreferrer">藏历 PRO</a><span class="footer-dot">·</span>节日：<a href="https://www.fohuifayu.com/index.php/calendar" target="_blank" rel="noopener noreferrer">佛慧法语</a></span></footer>
-      <div class="action-bar"><div class="action-inner"><div class="action-summary"><div class="selection-totals"><strong id="selection-count">已选 0 项</strong><span id="reminder-count">0 项提醒</span><span id="daily-date-count" hidden>含每日藏历</span></div><p id="save-state">第 1 步：选择要提醒的日子</p></div><div class="action-buttons"><button id="clear-selection" class="text-button" type="button" aria-label="清空全部选择">清空选择</button><button id="subscribe" type="button" class="primary"><span id="subscribe-label">加入日历</span><span data-icon="arrow-right" aria-hidden="true"></span></button></div></div></div>
+      <div class="action-bar" data-page-part="subscribe"><div class="action-inner"><div class="action-summary"><div class="selection-totals"><strong id="selection-count">已选 0 项</strong><span id="reminder-count">0 项提醒</span><span id="daily-date-count" hidden>含每日藏历</span></div><p id="save-state">第 1 步：选择要提醒的日子</p></div><div class="action-buttons"><button id="clear-selection" class="text-button" type="button" aria-label="清空全部选择">清空选择</button><button id="subscribe" type="button" class="primary"><span id="subscribe-label">加入日历</span><span data-icon="arrow-right" aria-hidden="true"></span></button></div></div></div>
     </div>
   </main>
 

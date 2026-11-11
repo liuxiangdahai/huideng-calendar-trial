@@ -77,15 +77,17 @@ try{
  }
  if(!process.argv.includes('--cold-only')){
  const {context,page,cdp}=await prepare();await page.waitForTimeout(500);
+ // Interactions are measured on the 加入日历 page (the 藏历 page is the cold start).
+ await page.locator('#home-subscribe').click();await page.locator('#preset-options').waitFor();
  if(!process.argv.includes('--stress-only')){
  await series(page,'preset',i=>page.locator(`[data-preset=${i%2?'guru':'practice'}]`).click());
  await series(page,'checkbox',()=>page.locator('#event-dakini-tsok').click());
  await series(page,'category',()=>page.locator('[data-group-id="masters"]>summary').click());
  if(process.argv.includes('--daily'))await series(page,'daily-dates',()=>page.locator('#include-daily-dates').click());
- await page.locator('[data-preset=practice]').click();await page.locator('#tab-preview').click();
- await series(page,'month',i=>page.locator(`[data-cal-action=${i%2?'previous':'next'}]`).click());
- await series(page,'view',i=>page.locator(`[data-cal-view=${i%2?'month':'list'}]`).click());
- await page.locator('#tab-selection').click();
+ await page.locator('[data-preset=practice]').click();await page.locator('.sub-upcoming-all').click();await page.locator('#home-calendar [data-cal-month]').waitFor();
+ await series(page,'month',i=>page.locator(`#home-calendar [data-cal-action=${i%2?'previous':'next'}]`).click());
+ await series(page,'view',i=>page.locator(`#home-calendar [data-cal-view=${i%2?'month':'list'}]`).click());
+ await page.locator('#home-subscribe').click();await page.locator('#preset-options').waitFor();
  await series(page,'open-reminder',()=>page.locator('[data-reminder-event="guru-tsok"]').click(),'click',()=>page.locator('[aria-label="关闭提醒设置"]').click());
  // Separate diagnostic profile; its instrumentation is outside measured samples.
  await cdp.send('Profiler.enable');await cdp.send('Profiler.start');
