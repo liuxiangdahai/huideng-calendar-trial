@@ -375,3 +375,27 @@ dialog.cal-day-sheet.is-popover { position: absolute; inset: auto; z-index: 30; 
 .cal-month-row-bell { grid-area: bell; color: var(--red); }
 .cal-month-row-bell .icon { width: 18px; height: 18px; }
 @media (min-width: 1024px) { .cal-month-list { display: none; } }
+
+/* Days not chosen yet (11-11): the preview shows what exists, in grey, so a
+   first visit is never an empty month. Grey text with a dotted edge on
+   computers, a hollow ring on phones, 未选 in the month list and the day card. */
+.cal-mini-event.is-spare, .cal-day.cal-adjacent .cal-mini-event.is-spare { border-left: 2px dotted #c9c3b8; background: none; color: #8f8a82; opacity: 1; }
+.cal-dot.is-spare { box-sizing: border-box; border: 1.5px solid #a8a196; background: none; }
+.cal-legend-item.is-spare { color: var(--muted); }
+.cal-month-row-names .is-spare { color: #8f8a82; font-weight: 400; }
+.cal-month-row-names .is-spare small { margin-left: 4px; padding: 0 4px; border: 1px solid var(--line-2); border-radius: 3px; font: 400 var(--fs-xs)/1.4 var(--font-ui); vertical-align: 2px; }
+.cal-month-row.is-spare .cal-month-row-date b { color: #8f8a82; }
+.cal-spare { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--line-2); color: var(--muted); }
+.cal-spare h4 { display: flex; align-items: center; gap: 8px; margin: 0 0 6px; color: var(--ink-2); font: 500 var(--fs-md)/1.5 var(--font-ui); }
+.cal-spare h4 small { padding: 0 5px; border: 1px solid var(--line-2); border-radius: 3px; color: var(--muted); font-size: var(--fs-xs); }
+.cal-spare ul { margin: 0; padding: 0; list-style: none; }
+.cal-spare li { display: grid; grid-template-columns: 26px minmax(0,1fr); align-items: center; gap: 10px; padding: 6px 0; color: #8f8a82; }
+.cal-spare li .cal-event-icon { width: 26px; height: 26px; color: #a8a196; opacity: .8; }
+.cal-spare li .icon { width: 22px; height: 22px; }
+.cal-spare li>span:last-child { font: 500 var(--fs-base)/1.5 var(--font-serif); }
+.cal-spare li small { display: block; color: var(--muted); font: 400 var(--fs-xs)/1.5 var(--font-ui); }
+.cal-spare p { margin: 6px 0 0; font-size: var(--fs-sm); line-height: 1.6; }
+@media (min-width: 1024px) {
+  .cal-key-dots .cal-legend-item.is-spare { border-left: 2px dotted #c9c3b8; background: none; color: #8f8a82; }
+}
+.cal-detail-heading + .cal-spare { margin-top: 0; padding-top: 0; border-top: 0; }

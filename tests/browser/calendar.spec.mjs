@@ -1,4 +1,5 @@
 import {test,expect} from '@playwright/test';
+import {showMoreSettings, openZonePicker} from './more-settings.mjs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import {pathToFileURL} from 'node:url';
@@ -12,6 +13,7 @@ async function open(page, suffix = '') {
   const previewError = await page.locator('#preview-error').textContent();
   if (previewError) throw new Error(previewError);
   await expect(page.locator('.cal-day')).toHaveCount(42);
+  await showMoreSettings(page,{computerOnly:true});
 }
 const credentials = page => page.evaluate(() => JSON.parse(localStorage.getItem('huideng.calendar.subscription')));
 const draft = page => page.evaluate(() => JSON.parse(localStorage.getItem('huideng.calendar.v2')));
@@ -61,7 +63,7 @@ test('new visitors begin empty, all categories retain exact source names, and ch
 test('category and individual reminder settings export real all-day events and persist',async({page}) => {
   await open(page);
   await page.locator('[data-preset="tsok"]').click();
-  await page.locator('#zone-settings').click();
+  await openZonePicker(page);
   await page.locator('#zone-search').fill('Vancouver');
   await page.locator('input[name="timezone"][value="America/Vancouver"]').check();
   await page.locator('#apply-zone').click();
@@ -346,10 +348,11 @@ test('the month grid says its small labels are Tibetan dates before the dates ar
     });
     expect(await page.locator('.cal-key-note').evaluate(n => n.innerText)).toBe(`日期${beside ? '旁' : '下'}的小字是藏历，与农历不同`);
     expect(beside).toBe(viewport.width >= 1024);
-    // The key sits above the weekday row, on one line, in the same lapis as the labels.
+    // The key sits above the weekday row, in the same lapis as the labels: one
+    // line on computers; on phones the note and the dots (会提醒/只显示/未选) may take two.
     const [keyBox, weekdays] = [await key.boundingBox(), await page.locator('.cal-weekdays').boundingBox()];
     expect(keyBox.y + keyBox.height).toBeLessThanOrEqual(weekdays.y + 1);
-    expect(keyBox.height).toBeLessThan(40);
+    expect(keyBox.height).toBeLessThan(viewport.width >= 1024 ? 40 : 60);
     // The key shows the same marks as the grid at this width: dots on phones, name strips on desktop.
     const marks = await page.evaluate(() => {
       const shown = selector => [...document.querySelectorAll(selector)].some(node => node.offsetParent && getComputedStyle(node).display !== 'none');

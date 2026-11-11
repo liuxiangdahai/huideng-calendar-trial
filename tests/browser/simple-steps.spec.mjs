@@ -18,11 +18,25 @@ test('phones start in three simple steps; computers show the detailed settings',
   // Phones always start folded, even after someone opened the details.
   await page.reload();await expect(page.locator('#app')).toBeVisible();
   await expect(page.locator('#advanced-settings')).not.toHaveAttribute('open','');
+  // Computers start folded too (11-11): 更多设置 sits before step 3 and is
+  // optional. The region is inside it; the top bar only shows when the zones differ.
   await page.setViewportSize({width:1440,height:960});
   await page.evaluate(()=>localStorage.clear());await page.reload();await expect(page.locator('#app')).toBeVisible();
-  await expect(page.locator('#advanced-settings')).toHaveAttribute('open','');
-  await expect(page.locator('.region-bar')).toBeVisible();
-  await expect(page.locator('#zone-settings-inline')).toBeHidden();
+  await expect(page.locator('#advanced-settings')).not.toHaveAttribute('open','');
+  await expect(page.locator('.region-bar')).toBeHidden();
+  await page.locator('#advanced-settings>summary').click();
+  await expect(page.locator('#zone-settings-inline')).toBeVisible();
+  // Step 3 carries the real button, named like the bottom bar.
+  await page.locator('[data-preset="tsok"]').click();
+  await expect(page.locator('#step-add-button')).toBeEnabled();
+  await expect(page.locator('#step-add-label')).toHaveText(await page.locator('#subscribe-label').textContent());
+  await page.locator('#step-add-button').click();
+  await expect(page.locator('#subscription-dialog')).toBeVisible();
+  // The dialog's own steps are a progress line, not a second 1-2-3. A browser
+  // that already names its calendar app starts at 添加.
+  await expect(page.locator('#subscription-dialog .guide-stage-number')).toHaveCount(0);
+  const app = await page.locator('input[name="device"]:checked').count();
+  await expect(page.locator('#subscription-progress [aria-current]')).toHaveText(app ? '添加' : '选日历应用');
 });
 
 test('one reminder time applies to every reminding day and newly added preset days follow it',async({page})=>{
@@ -42,6 +56,7 @@ test('a shared link pre-fills preset, time, everyday dates and title style, then
   await page.locator('[data-preset="tsok"]').click();
   await page.locator('[data-time-choice="0|07:00"]').click();
   await page.locator('#include-daily-dates').check();
+  await page.locator('#advanced-settings>summary').click();
   await page.locator('input[name="title-marks"][value="symbols"]').check();
   await expect(page.locator('input[name="title-marks"]')).toHaveCount(2);
   await page.locator('#share-settings').click();

@@ -1,15 +1,16 @@
 import {test,expect} from '@playwright/test';
+import {showMoreSettings, openZonePicker} from './more-settings.mjs';
 const read=page=>page.evaluate(()=>JSON.parse(localStorage.getItem('huideng.calendar.v2')));
 const credentials=page=>page.evaluate(()=>JSON.parse(localStorage.getItem('huideng.calendar.subscription')));
-async function open(page){await page.goto('/calendar-reminders/');await expect(page.locator('#app')).toBeVisible();await page.locator('[data-preset="guru"]').click();}
-async function zone(page,value){await page.locator('#zone-settings').click();await page.locator('#zone-search').fill(value);await page.locator(`input[name="timezone"][value="${value}"]`).check();await page.locator('#apply-zone').click();}
+async function open(page){await page.goto('/calendar-reminders/');await expect(page.locator('#app')).toBeVisible();await showMoreSettings(page,{computerOnly:true});await page.locator('[data-preset="guru"]').click();}
+async function zone(page,value){await openZonePicker(page);await page.locator('#zone-search').fill(value);await page.locator(`input[name="timezone"][value="${value}"]`).check();await page.locator('#apply-zone').click();}
 async function create(page){await page.locator('#subscribe').click();await page.locator('input[name="device"][value="iphone"]').check();await expect(page.locator('#feed-url')).not.toHaveValue('');await page.locator('[data-close="subscription-dialog"]').first().click();}
 
 test('global region search and changing only zone preserve individual reminder settings',async({page})=>{
   await open(page);const original=await read(page);
   expect(original.zone).toBe('Asia/Shanghai');
   const header=await page.locator('#today-gregorian').textContent();
-  await page.locator('#zone-settings').click();
+  await openZonePicker(page);
   expect(await page.locator('.zone-option').count()).toBeGreaterThan(400);
   await page.locator('#zone-search').fill('加德满都');
   await expect(page.locator('#zone-options')).toContainText('尼泊尔');

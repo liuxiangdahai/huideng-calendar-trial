@@ -1,8 +1,9 @@
 import {test,expect} from '@playwright/test';
+import {showMoreSettings, openZonePicker} from './more-settings.mjs';
 import ICAL from 'ical.js';
 const draft=page=>page.evaluate(()=>JSON.parse(localStorage.getItem('huideng.calendar.v2')));
 const creds=page=>page.evaluate(()=>JSON.parse(localStorage.getItem('huideng.calendar.subscription')));
-async function open(page){await page.goto('/calendar-reminders/');await expect(page.locator('#app')).toBeVisible();}
+async function open(page){await page.goto('/calendar-reminders/');await expect(page.locator('#app')).toBeVisible();await showMoreSettings(page,{computerOnly:true});}
 test('presets replace choices without undo and clearing preserves local timezone and reminder times',async({page})=>{
   await open(page);await expect(page.locator('[data-event]:checked')).toHaveCount(0);await expect(page.locator('[data-preset][aria-pressed="true"]')).toHaveCount(0);
   await page.locator('[data-preset="guru"]').click();await expect(page.locator('[data-preset="guru"]')).toHaveAttribute('aria-pressed','true');
@@ -55,7 +56,7 @@ test('preset saves retain feed URL, remind only on tsok days and clocks remain U
 test('device clock is primary overseas and cross-zone detail follows actual alarm dates',async({browser})=>{
   const context=await browser.newContext({baseURL:'http://127.0.0.1:4173',timezoneId:'Asia/Singapore'});try{
     const page=await context.newPage();await open(page);await page.locator('[data-preset="guru"]').click();expect((await draft(page)).zone).toBe('Asia/Singapore');await expect(page.locator('#time-comparison')).toContainText('新加坡时间');
-    await page.locator('#zone-settings').click();await page.locator('#zone-search').fill('America/New_York');await page.locator('input[value="America/New_York"]').check();await page.locator('#apply-zone').click();
+    await openZonePicker(page);await page.locator('#zone-search').fill('America/New_York');await page.locator('input[value="America/New_York"]').check();await page.locator('#apply-zone').click();
     await expect(page.locator('.clock-item')).toHaveCount(2);await expect(page.locator('.clock-item').first()).toContainText('设备时间');await expect(page.locator('.clock-item').last()).toContainText('提醒地区时间');
     const before=await draft(page);await page.locator('[data-cal-view="list"]').click();await expect(page.locator('.cal-device-time').first()).toContainText('新加坡时间');await page.evaluate(()=>window.dispatchEvent(new Event('focus')));expect(await draft(page)).toEqual(before);
   }finally{await context.close();}

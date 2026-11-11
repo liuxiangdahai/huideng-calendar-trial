@@ -105,14 +105,19 @@ function occurrenceWindow(settings, {start, end} = {}) {
   }
   return {start, end};
 }
-export function selectOccurrences(data, settings, range = {}) {
+// Every catalog day in the window with its preference, chosen or not. The
+// preview shows the days not chosen yet in grey, so people see what exists.
+export function catalogOccurrences(data, settings, range = {}) {
   const {start, end} = occurrenceWindow(settings, range);
   const definitions = new Map(data.catalog.events.map(e => [e.id, e]));
   return generateOccurrences(data, {start,end}).map(o => {
     const definition = definitions.get(o.eventId);
     return {...definition, ...o, id: definition.id, title: o.title || definition.title,
       preference: eventPreference(definition, settings)};
-  }).filter(o => o.preference.mode !== 'off');
+  });
+}
+export function selectOccurrences(data, settings, range = {}) {
+  return catalogOccurrences(data, settings, range).filter(o => o.preference.mode !== 'off');
 }
 
 // The grid's festival selection remains separate from the optional everyday

@@ -1,4 +1,5 @@
 import {test, expect} from '@playwright/test';
+import {showMoreSettings, openZonePicker} from './more-settings.mjs';
 
 const path = '/calendar-reminders/';
 const draft = page => page.evaluate(() => JSON.parse(localStorage.getItem('huideng.calendar.v2')));
@@ -34,6 +35,7 @@ async function open(page, {reducedMotion = 'no-preference', missingAnimationAPI 
   }, {missingAnimationAPI});
   await page.goto(path);
   await expect(page.locator('#app')).toBeVisible();
+  await showMoreSettings(page);
   await expect(page.locator('#preview-error')).toBeHidden();
   return {errors, writes};
 }

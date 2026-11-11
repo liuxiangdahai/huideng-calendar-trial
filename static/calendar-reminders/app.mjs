@@ -1,4 +1,4 @@
-import {defaults, normalizeSettings, selectOccurrences, selectCalendarOccurrences, exportICS, reminderLabel, addDays, rangeEnd} from './core.mjs';
+import {defaults, normalizeSettings, catalogOccurrences, selectCalendarOccurrences, exportICS, reminderLabel, addDays, rangeEnd} from './core.mjs';
 import {getTibetanDate,generateOccurrences} from './engine.mjs';
 import {icon, fillIcons} from './icons.mjs';
 import {deviceTimeZone,resolveTimeZone,zoneInfo} from './timezones.mjs';
@@ -158,6 +158,9 @@ function renderRegion(now=new Date()) {
   const clocks=timeComparison(now,observedZone,settings.zone);
   const clock=(value,label)=>`<div class="clock-item"><span>${esc(label)}</span><strong>${esc(value.time)}</strong><small>${esc(value.label)}${clocks.reminder?.dayLabel ? ` · ${esc(value.date)}${value.dayLabel?`（${esc(value.dayLabel)}）`:''}` : ''}</small></div>`;
   $('#time-comparison').innerHTML=clock(clocks.device,clocks.merged?'设备与提醒时间':'设备时间')+(!clocks.merged&&clocks.reminder?clock(clocks.reminder,'提醒地区时间'):'');
+  // The region lives in 更多设置. The bar at the top only appears when it
+  // matters: reminders follow a different zone from this device, or none yet.
+  $('.region-bar').hidden=Boolean(settings.zone) && clocks.merged;
   const changed=changedDeviceZone(ui.lastDeviceZone,observedZone,settings.zone);
   $('#device-zone-notice').hidden=!changed;
   if(changed) $('#device-zone-message').textContent=`设备已使用${zoneInfo(observedZone).label}。提醒仍使用${zoneLabel()}，可选择是否调整。`;
@@ -207,14 +210,16 @@ function renderPreview() {
   $('#preview-error').hidden = true;
   renderToday();
   const start=addDays(today,-90),end=rangeEnd(today,24);
-  let events=[];
+  let events=[], spare=[];
   try {
-    events=(countSelected() ? selectOccurrences(data,settings,{start,end}) : []).sort((a,b) => a.date.localeCompare(b.date) || a.title.localeCompare(b.title,'zh'));
+    const all=catalogOccurrences(data,settings,{start,end}).sort((a,b) => a.date.localeCompare(b.date) || a.title.localeCompare(b.title,'zh'));
+    events=all.filter(event=>event.preference.mode!=='off');
+    spare=all.filter(event=>event.preference.mode==='off');
     upcoming = events.filter(event=>event.date>=today);
   } catch (error) {
     upcoming = []; $('#preview-error').textContent = error.message; $('#preview-error').hidden = false;
   }
-  calendarView?.update({data,settings,events,today,start,end,deviceZone:observedZone});
+  calendarView?.update({data,settings,events,spare,today,start,end,deviceZone:observedZone});
   $('#reminder-settings').disabled=!countSelected();
   renderTimeChoices(); renderQuickAdd();
   renderRegion(); renderSaveState();
@@ -236,15 +241,16 @@ function renderTimeChoices() {
 // behaves like a phone (touch, narrow screen, e.g. a "desktop site" toggle) is
 // treated as a phone: phone readers never see computer instructions.
 const phoneLike=()=>calendarDevice.mobile || matchMedia('(pointer:coarse) and (max-width:767px)').matches;
-const deviceLabel=()=>calendarDevice.appleMobile ? '加入 iPhone 日历' : calendarDevice.mac ? '加入 Mac 日历' :
-  calendarDevice.android ? '加入手机日历' : phoneLike() ? '加入手机日历' : '加入我的日历';
+// One name for one action everywhere (11-11): the step, its button, the
+// bottom bar and the dialog all say 加入日历; once added it is 我的订阅.
+const deviceLabel=()=>'加入日历';
 function renderQuickAdd() {
   const phone=phoneLike();
-  $('#add-title-text').textContent=phone ? '加入手机日历' : '加入日历';
+  $('#add-title-text').textContent='加入日历';
   $('#step-add-device').textContent=subscription
-    ? (phone ? '已经加入过。以后改了选择，点底部“保存修改”，手机日历会自动更新，不用重新添加。' : '已经加入过。以后改了选择，点底部“保存修改”，日历会自动更新，不用重新添加。')
-    : calendarDevice.appleMobile ? '点底部按钮，iPhone 会问是否订阅这个日历，点“订阅”即可。'
-    : phone ? '点底部按钮，按提示把它加到手机自带的日历里。'
+    ? (phone ? '已经加入过。以后改了选择，点“保存修改”，手机日历会自动更新，不用重新添加。' : '已经加入过。以后改了选择，点“保存修改”，日历会自动更新，不用重新添加。')
+    : calendarDevice.appleMobile ? '点下面的按钮，iPhone 会问是否订阅这个日历，点“订阅”即可。'
+    : phone ? '点下面的按钮，按提示把它加到手机自带的日历里。'
     : calendarDevice.mac ? '可以直接加入 Mac 日历，也可以选 Google 或 Outlook。'
     : '可以直接加入 Google 或 Outlook 日历；要加到手机上，用下方扫码。';
   $('#step-add-note').textContent=subscription ? '' : '只需添加一次。已经加过的不用再加；如果日历里同一天出现两遍，删掉其中一个日历即可。';
@@ -280,7 +286,7 @@ function renderSubscribedCard() {
   $('#subscribed-hint').textContent=changed ? pace : (phoneLike()
     ? '到时没有响铃？打开手机“设置”，搜索“日历”，确认已允许通知。'
     : '没有收到提醒？在日历应用的设置里确认已允许通知。')+`改了设置并${pace}`;
-  if(changed){$('#subscribed-next').textContent=`点${phoneLike()?'底部':'右下角'}“保存修改”，日历才会跟着更新。`;return;}
+  if(changed){$('#subscribed-next').textContent='点“保存修改”，日历才会跟着更新。';return;}
   const next=upcoming.find(event=>event.preference?.mode==='remind') || upcoming.find(event=>event.kind!=='daily-date');
   if(!next){$('#subscribed-next').textContent='目前没有即将到来的修行日。';return;}
   const [, month, day]=next.date.split('-').map(Number);
@@ -333,7 +339,7 @@ function applySharedSettings() {
   // back to none.
   if(params.get('m')==='symbols') next.titleMarks='symbols'; else delete next.titleMarks;
   settings=next;
-  return '已按分享的设置选好，确认后点底部按钮加入日历。';
+  return '已按分享的设置选好，确认后点“加入日历”。';
 }
 function renderSaveState() {
   const changed = dirty(), count = countSelected();
@@ -351,6 +357,10 @@ function renderSaveState() {
   if(renderSaveState.wasDisabled===true && !ctaDisabled && !subscription && !renderSaveState.nudged){renderSaveState.nudged=true;requestAnimationFrame(()=>playMotion($('#subscribe'),'nudge'));}
   renderSaveState.wasDisabled=ctaDisabled;
   $('#subscribe').disabled = ctaDisabled;
+  // Step 3 carries the same button as the bottom bar, same words, same state.
+  $('#step-add-label').textContent=$('#subscribe-label').textContent;
+  $('#step-add-button').disabled=ctaDisabled;
+  $('#step-add-button').setAttribute('aria-busy',String(requestPending||managementRestoring));
   // With a saved subscription and nothing to save, the bottom button becomes
   // a quiet "我的订阅": the thumb-reachable way back to the manage panel.
   $('#subscribe').classList.toggle('is-quiet', Boolean(subscription) && !changed && !requestPending && !managementRestoring && !conflict && !stopped);
@@ -465,6 +475,17 @@ async function checkConnection() {
   if(result.state!=='cancelled') connection=result;
   renderConnection();
 }
+// The dialog's own steps are a progress line, not a second 1-2-3: the page
+// already numbers its steps, and step 3 is what opened this dialog.
+function renderProgress() {
+  const stage=!$('#entry-attempt').hidden ? 'check' : document.querySelector('input[name="device"]:checked') ? 'add' : 'app';
+  const order=['app','add','check'];
+  for(const item of document.querySelectorAll('#subscription-progress [data-stage]')){
+    const at=order.indexOf(item.dataset.stage), now=order.indexOf(stage);
+    item.toggleAttribute('aria-current',at===now); if(at===now) item.setAttribute('aria-current','step');
+    item.classList.toggle('is-done',at<now);
+  }
+}
 function renderSubscription() {
   $('#subscription-summary').textContent = `${selectionSummary()} · 全天显示 · ${zoneLabel()}`;
   // Once a calendar is added, this panel is "my subscription": status and
@@ -477,6 +498,7 @@ function renderSubscription() {
   $('#manage-panel').hidden=!managing;
   $('#manage-add').setAttribute('aria-expanded',String(dialog.classList.contains('show-add')));
   $('#subscription-title').textContent=managing ? '我的订阅' : '加入日历';
+  renderProgress();
   $('#subscription-dialog .overline').textContent=managing ? '已加入日历' : '我的订阅';
   $('#entry-title').lastChild.textContent=managing ? '订阅地址' : '添加到日历';
   if(managing){
@@ -769,7 +791,8 @@ function attachEvents() {
   // Phones always start with details folded (fewer things to read); a
   // computer remembers the person's own choice.
   const phoneLayout=matchMedia('(max-width:1023px)').matches;
-  advanced.open=phoneLayout ? false : typeof ui.advancedOpen==='boolean' ? ui.advancedOpen : true;
+  // 更多设置 sits before step 3 and is optional, so it starts folded everywhere.
+  advanced.open=phoneLayout ? false : typeof ui.advancedOpen==='boolean' ? ui.advancedOpen : false;
   const syncAdvanced=()=>$('#app').classList.toggle('advanced-closed',!advanced.open);
   syncAdvanced();
   advanced.addEventListener('toggle',()=>{ui.advancedOpen=advanced.open;persistUI();syncAdvanced();});
@@ -871,6 +894,7 @@ function attachEvents() {
   $('#my-subscription').addEventListener('click',()=>openSubscription());
   // The panel grows out of the button that opened it, so the step reads as
   // one continuous action rather than a page jump.
+  $('#step-add-button').addEventListener('click',()=>$('#subscribe').click());
   $('#subscribe').addEventListener('click',event => {
     const dialog=$('#subscription-dialog'), wasOpen=dialog.open;
     openSubscription({prepare:true});
@@ -895,7 +919,7 @@ function attachEvents() {
     try { if(await loadSubscription(true)){ $('#subscription-error').hidden = true; notify('已载入最新设置'); } }
     catch (error) { showSubscriptionError(error); }
   });
-  document.querySelectorAll('input[name="device"]').forEach(input => input.addEventListener('change',()=>{ui.app=input.value;persistUI();$('#entry-attempt').hidden=true;deviceGuide();void prepareSubscription();}));
+  document.querySelectorAll('input[name="device"]').forEach(input => input.addEventListener('change',()=>{ui.app=input.value;persistUI();$('#entry-attempt').hidden=true;renderProgress();deviceGuide();void prepareSubscription();}));
   $('#copy-feed').addEventListener('click',async() => {
     if(!subscription||requestPending||managementRestoring||dirty()||conflict)return;
     const feed=subscription.feedUrl,app=currentApp(),copied=await copy(feed,'订阅地址');
@@ -917,7 +941,7 @@ function attachEvents() {
   for(const selector of ['#iphone-subscribe','#google-subscribe','#outlook-subscribe']) $(selector).addEventListener('click',event=>{
     if(!subscription || requestPending || managementRestoring || dirty() || conflict || !event.currentTarget.hasAttribute('href')) {event.preventDefault();return;}
     // No success signal: only the user can confirm seeing the events.
-    $('#entry-attempt').hidden=false;
+    $('#entry-attempt').hidden=false; renderProgress();
     $('#entry-attempt').textContent=selector==='#iphone-subscribe' ? '请在日历中确认添加。若没有打开，可查看下方帮助或复制订阅地址。' : selector==='#outlook-subscribe' ? '请在 Outlook 网页版的“从 Web 订阅”中粘贴地址并确认添加。工作或学校账号也可使用所在组织的 Outlook 网页版。' : '请在 Google 日历网页中粘贴订阅地址并确认添加。';
   });
   $('#copy-management').addEventListener('click',() => {

@@ -78,13 +78,16 @@ test('a card near the bottom of the grid opens upward and stays over the calenda
   expect(card.y + card.height).toBeLessThanOrEqual(grid.y + grid.height + 1);
 });
 
-for (const width of [390, 820]) test(`phones and tablets list the month's chosen days by name under the grid at ${width}px`, async ({page}) => {
+for (const width of [390, 820]) test(`phones and tablets list the month's days by name under the grid at ${width}px`, async ({page}) => {
   await open(page, width);
   const list = page.locator('[data-cal-month-list]');
   await expect(list).toBeVisible();
-  await expect(list.locator('.cal-month-list-title')).toContainText('11月已选的日子');
-  const chosen = await page.locator('.cal-day:not(.cal-adjacent) .cal-mobile-events').count();
-  await expect(list.locator('.cal-month-row')).toHaveCount(chosen);
+  await expect(list.locator('.cal-month-list-title')).toContainText('11月的日子');
+  // Every day with a dot, chosen or not, has its row; the count names only the chosen.
+  const marked = await page.locator('.cal-day:not(.cal-adjacent) .cal-mobile-events').count();
+  await expect(list.locator('.cal-month-row')).toHaveCount(marked);
+  const chosen = await page.locator('.cal-day:not(.cal-adjacent):has(.cal-mobile-events .cal-dot:not(.is-spare))').count();
+  await expect(list.locator('.cal-month-list-title')).toContainText(`已选 ${chosen} 天`);
   const tsok = list.locator('[data-cal-pick="2026-11-19"]');
   await expect(tsok).toContainText('莲师荟供日');
   await expect(tsok).toContainText('十月初十');
@@ -137,4 +140,37 @@ test('the month head controls never overlap, from phone to wide desktop', async 
       expect(overlap, `${width}px: ${na} overlaps ${nb}`).toBe(false);
     }
   }
+});
+
+// 11-11: a first visit is never an empty month. Days not chosen show in grey
+// (computers: grey names; phones: hollow rings and 未选 rows), never counted.
+for (const width of [390, 1366]) test(`days not chosen show in grey and say 未选 at ${width}px`, async ({page}) => {
+  await page.setViewportSize({width, height: 900});
+  await page.goto('/calendar-reminders/');
+  await expect(page.locator('.cal-day')).toHaveCount(42);
+  if (width < 1024) await page.locator('#tab-preview').click();
+  await page.locator('[data-cal-month]').selectOption('2026-11');
+  const day = page.locator('[data-cal-date="2026-11-19"]');
+  await expect(day).toHaveAttribute('aria-label', /0项已选日程，未选：莲师荟供日/);
+  await expect(page.locator('.cal-key .cal-legend-item.is-spare')).toHaveText('未选');
+  if (width < 1024) {
+    await expect(day.locator('.cal-dot.is-spare')).toHaveCount(1);
+    const list = page.locator('[data-cal-month-list]');
+    await expect(list.locator('.cal-month-list-title')).toContainText('还没有选');
+    await expect(list.locator('[data-cal-pick="2026-11-19"]')).toContainText('莲师荟供日未选');
+  } else {
+    await expect(day.locator('.cal-mini-event.is-spare')).toHaveText('莲师荟供日');
+  }
+  await day.click();
+  const sheet = page.locator('[data-cal-sheet]');
+  await expect(sheet.locator('.cal-spare')).toContainText('这天有未选');
+  await expect(sheet.locator('.cal-spare')).toContainText('莲师荟供日');
+  await expect(sheet.locator('.cal-reminder')).toHaveCount(0);
+  // Choosing it turns the grey day into a chosen one.
+  await page.keyboard.press('Escape');
+  if (width < 1024) await page.locator('#tab-selection').click();
+  await page.locator('[data-preset="guru"]').click();
+  if (width < 1024) await page.locator('#tab-preview').click();
+  await expect(day).toHaveAttribute('aria-label', /1项已选日程，莲师荟供日/);
+  await expect(day.locator('.is-spare')).toHaveCount(0);
 });

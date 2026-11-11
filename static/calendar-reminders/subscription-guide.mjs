@@ -298,7 +298,7 @@ export function createSubscriptionGuide(root, { notificationRoot = root, initial
     const onComputer = onMac || (app === 'outlook' && !device.mobile);
     const deviceName = onMac ? 'Mac' : onComputer ? '电脑' : '手机';
     const addHtml = `<section class="guide-add" aria-label="中文添加帮助">${addition(app, context, device)}</section>`;
-    const notificationHtml = `<section class="guide-check" aria-labelledby="guide-check-title"><h3 id="guide-check-title"><span class="guide-stage-number">3</span>${context.hasReminders ? '检查日历提醒' : '确认日程显示'}</h3>
+    const notificationHtml = `<section class="guide-check" aria-labelledby="guide-check-title"><h3 id="guide-check-title">${context.hasReminders ? '检查日历提醒' : '确认日程显示'}</h3>
       ${location(onMac ? '在电脑上操作 · Mac · 添加之后' : onComputer ? '在电脑上操作 · 添加之后' : '在手机上操作 · 添加之后', onComputer ? 'calendar' : 'phone')}
       <label class="guide-confirm"><input id="guide-seen" data-guide-confirm="seen" type="checkbox"${progress.seen ? ' checked' : ''}><span>我已看到日程<small>已在自己的日历应用中确认日期与内容。</small></span></label>
       ${context.hasReminders ? `<details class="guide-notifications" data-guide-expand${state.expanded[app] ? ' open' : ''}><summary>${icon('bell')}<span>查看开启步骤</span>${icon('chevron')}</summary><div class="guide-notification-body">${notificationSteps(app, device)}
