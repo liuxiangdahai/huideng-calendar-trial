@@ -51,7 +51,7 @@
 .cal-day:focus-visible { position: relative; z-index: 1; outline-offset: -2px; }
 .cal-day:disabled { opacity: .45; }
 .cal-marks { display: none; flex-wrap: wrap; align-items: center; justify-content: center; gap: 1px 3px; min-height: 15px; max-width: 100%; color: var(--muted); font-size: var(--fs-2xs); line-height: 15px; }
-.cal-marks:has(.cal-leap, .cal-repeat) { display: flex; gap: 1px 2px; }
+.cal-marks:has(.cal-leap, .cal-repeat, .cal-miss) { display: flex; gap: 1px 2px; }
 .cal-leap, .cal-repeat { color: var(--teal); }
 .cal-category-marks, .cal-event-count { display: none; }
 .cal-category-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--gold); flex: none; }
@@ -133,7 +133,7 @@
   .cal-day { align-items: stretch; min-height: 88px; }
   .cal-day-date { flex-direction: row; justify-content: space-between; align-items: center; gap: 2px; }
   .cal-day-events { display: block; margin-top: 4px; }
-  .cal-marks:has(.cal-leap, .cal-repeat) { justify-content: flex-start; }
+  .cal-marks:has(.cal-leap, .cal-repeat, .cal-miss) { justify-content: flex-start; }
 }
 @media (max-width: 480px) {
   .cal-toolbar { grid-template-columns: 40px minmax(0,1fr) 40px auto; }
@@ -207,7 +207,7 @@ dialog.cal-day-sheet::backdrop { background: #1d1b1859; }
 .cal-sheet-grip { width: 40px; height: 4px; border-radius: 2px; background: var(--line-2); }
 .cal-sheet-close { position: absolute; right: 6px; top: 0; }
 .cal-day-sheet .cal-day-detail { margin: 0; padding-top: 0; border-top: 0; }
-@media (min-width: 1024px) { dialog.cal-day-sheet { display: none; } }
+
 
 /* ── Phone month: dots, not text ─────────────────────────────────────────
    A narrow cell holds the date, the Tibetan date and up to three dots; the
@@ -221,7 +221,8 @@ dialog.cal-day-sheet::backdrop { background: #1d1b1859; }
 .cal-legend[hidden] { display: none; }
 .cal-legend-item { display: inline-flex; align-items: center; gap: 5px; }
 .cal-legend-daily { flex-basis: 100%; color: var(--teal-2); }
-@media (min-width: 1024px) { .cal-legend-tap { display: none; } }
+/* The tap hint is for computers; phones have the list of the month's days. */
+@media (max-width: 1023px) { .cal-legend-tap { display: none; } }
 @media (max-width: 1023px) {
   .cal-daily-line { display: none; }
   .cal-day { min-height: 62px; justify-content: flex-start; }
@@ -276,3 +277,103 @@ dialog.cal-day-sheet::backdrop { background: #1d1b1859; }
   .cal-month-context { gap: 4px; }
   .cal-context-tag { padding-inline: 4px; letter-spacing: 0; text-indent: 0; }
 }
+
+/* 11-10: the Tibetan months are the month's second title, not a footnote.
+   Same serif as 2026年11月, one step down, in lapis. */
+.cal-month-context { color: var(--teal); font: 500 19px/1.4 var(--font-serif); letter-spacing: 1px; }
+.cal-context-tag { padding: 1px 8px 2px; font: 600 15px/1.45 var(--font-serif); letter-spacing: 2px; text-indent: 2px; }
+
+@media (max-width: 767px) {
+  .cal-month-context { font-size: 16px; letter-spacing: 0; }
+  .cal-context-tag { padding: 0 6px 1px; font-size: 13px; letter-spacing: 1px; text-indent: 1px; }
+}
+
+/* A symmetric head over a symmetric grid (11-10): the title pair on the
+   grid's centre line, 公历 month above, 藏历 months below; 今天 and the view
+   switch balance it at the two ends. It needs about 620px of calendar, so it
+   follows the calendar's own width: a 1024px laptop window (about 570px of
+   calendar) keeps the two-row head, where nothing overlaps. */
+@container calendar (min-width: 620px) {
+  .cal-control-bar { grid-template-columns: minmax(0,1fr) auto auto auto minmax(0,1fr); grid-template-areas: "today prev month next switch" ". ctx ctx ctx ."; row-gap: 0; column-gap: 4px; }
+  .cal-toolbar:not([hidden]) { display: contents; }
+  .cal-toolbar [data-cal-action="previous"] { grid-area: prev; }
+  .cal-toolbar .cal-month-picker { grid-area: month; }
+  .cal-toolbar [data-cal-action="next"] { grid-area: next; }
+  .cal-toolbar .cal-today { grid-area: today; justify-self: start; margin-left: 0; }
+  .cal-view-switch { justify-self: end; }
+  .cal-month-picker select { width: 172px; padding: 6px 22px; text-align: center; text-align-last: center; }
+  .cal-month-context { grid-area: ctx; justify-self: center; }
+  /* List view has no month to page through: the switch alone, on the right. */
+  .cal-control-bar:has([data-cal-navigation][hidden]) { grid-template-columns: 1fr; grid-template-areas: "switch"; }
+}
+
+
+/* ── 11-10: reading the month ─────────────────────────────────────────── */
+/* First day of a Tibetan month shows the month, a little firmer. */
+.cal-tibetan.is-month-start { font-weight: 600; }
+/* Skipped and repeated Tibetan days are said in the cell, so a jump from
+   二十 to 廿二 reads as the calendar, not as a mistake. */
+.cal-miss, .cal-repeat { padding: 0 3px; border: 1px solid #c3cddd; border-radius: 3px; background: var(--surface); color: var(--teal-2); font-size: 11px; line-height: 15px; white-space: nowrap; }
+.cal-day.cal-adjacent .cal-miss, .cal-day.cal-adjacent .cal-repeat { opacity: .7; }
+
+/* The day opens under a small eave (11-11): the page header in miniature.
+   A 边玛 red band holds the Tibetan date (藏历 + month, the day as the
+   headline, the day in Tibetan script in gilt, the civil date), closed by the
+   same 香布 valance as under the mountains; the festivals sit on white.
+   Phones show it at the top of the sheet; computers as a card by the date. */
+.cal-day-sheet .cal-detail-heading { position: relative; margin: 0 -18px 22px; padding: 4px 18px 14px; border: 0; background: #5f111c; color: #f4ead6; }
+.cal-day-sheet .cal-detail-heading::after { content: ""; position: absolute; left: 0; right: 0; bottom: -13px; height: 13px; pointer-events: none;
+  background: repeating-linear-gradient(90deg, #0000001a 0 1px, transparent 1px 8px), var(--shambu); background-size: auto, 100% 9px; background-repeat: repeat, no-repeat; background-color: #2f3e5a;
+  -webkit-mask: linear-gradient(#000 0 9px, transparent 9px), radial-gradient(circle 4px at 4px 9px, #000 95%, transparent) 0 0/8px 13px repeat-x;
+  mask: linear-gradient(#000 0 9px, transparent 9px), radial-gradient(circle 4px at 4px 9px, #000 95%, transparent) 0 0/8px 13px repeat-x; }
+.cal-detail-heading .cal-detail-era { display: flex; align-items: center; gap: 8px; margin: 0; color: #f1e4cb; font: 500 15px/1.5 var(--font-serif); letter-spacing: 2px; }
+.cal-detail-era b { padding: 0 6px 1px; border-radius: 3px; background: #f4ead6; color: var(--teal); font: 600 13px/1.5 var(--font-serif); letter-spacing: 2px; text-indent: 2px; }
+.cal-detail-heading .cal-detail-day { display: flex; align-items: baseline; gap: 12px; margin: 2px 0 0; }
+.cal-detail-day strong { color: #fdf9f1; font: 500 40px/1.15 var(--font-serif); letter-spacing: 4px; }
+.cal-detail-tib { color: #d9b56a; font: 400 28px/1 "Noto Serif Tibetan", "Noto Sans Tibetan", Kailasa, "Microsoft Himalaya", Jomolhari, serif; letter-spacing: 2px; }
+.cal-detail-day .cal-repeat { align-self: center; border-color: #f1e4cb80; background: transparent; color: #f1e4cb; }
+.cal-detail-heading h3 { margin-top: 4px; color: #e3d3c0; font: 400 var(--fs-md)/1.5 var(--font-ui); letter-spacing: 0; }
+.cal-detail-heading h3>span { font: inherit; color: inherit; }
+.cal-detail-heading>h3:only-child { margin-top: 10px; color: #fdf9f1; font: 500 22px/1.5 var(--font-serif); }
+/* Phones: the sheet's grab bar joins the eave. */
+.cal-day-sheet:not(.is-popover) .cal-sheet-bar { background: #5f111c; border-bottom: 0; }
+.cal-day-sheet:not(.is-popover) .cal-sheet-grip { background: #f1e4cb66; }
+.cal-day-sheet .cal-sheet-close { color: #f1e4cb; }
+.cal-day-sheet .cal-sheet-close:hover { background: #ffffff1a; color: #fff; }
+/* Festival names in serif, in the sheet and the card alike. */
+.cal-day-sheet .cal-event h4 { font: 500 18px/1.5 var(--font-serif); letter-spacing: 1px; }
+
+/* Computers: the card by the date. White body, thin warm border, short shadow. */
+dialog.cal-day-sheet.is-popover { position: absolute; inset: auto; z-index: 30; width: 300px; max-width: calc(100% - 16px); max-height: 480px; margin: 0; padding: 0 20px 14px;
+  border: 1px solid #5f111c; border-radius: 6px; background: var(--surface); box-shadow: 0 14px 28px -12px #3b0a1266; overflow: auto; transform: none; }
+.cal-day-sheet.is-popover .cal-detail-heading { margin: 0 -20px 22px; padding: 14px 20px 14px; }
+.cal-day-sheet.is-popover .cal-sheet-bar { position: absolute; top: 8px; right: 8px; z-index: 2; width: auto; height: auto; margin: 0; background: none; border: 0; }
+.cal-day-sheet.is-popover .cal-sheet-grip { display: none; }
+.cal-day-sheet.is-popover .cal-sheet-close { position: static; width: 32px; height: 32px; }
+.cal-day-sheet.is-popover .cal-event { display: block; padding: 10px 0; }
+.cal-day-sheet.is-popover .cal-event-heading { grid-template-columns: 26px minmax(0,1fr); gap: 10px; }
+.cal-day-sheet.is-popover .cal-event-icon { width: 26px; height: 30px; color: var(--red); }
+.cal-day-sheet.is-popover .cal-event-icon .icon { width: 24px; height: 24px; }
+.cal-day-sheet.is-popover .cal-reminder { min-height: 36px; margin: 4px 0 0 36px; width: calc(100% - 36px); padding: 0; border: 0; background: none; }
+.cal-day-sheet.is-popover .cal-reminder:hover { background: none; }
+.cal-day-sheet.is-popover .cal-reminder:hover .cal-edit { text-decoration: underline; text-underline-offset: 3px; }
+.cal-day-sheet.is-popover .cal-empty { padding: 4px 0 0; border: 0; background: none; }
+
+/* Phones and tablets: this month's chosen days, by name, under the grid. */
+.cal-month-list { margin: 14px 0 0; }
+.cal-month-list[hidden] { display: none; }
+.cal-month-list-title { display: flex; align-items: baseline; justify-content: space-between; margin: 0 0 4px; color: var(--ink); font: 600 var(--fs-base)/1.5 var(--font-ui); }
+.cal-month-list-title span { color: var(--muted); font-size: var(--fs-sm); font-weight: 400; }
+.cal-month-list ul { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+.cal-month-row { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; grid-template-areas: "date names bell" "date tibetan bell"; align-items: center; column-gap: 10px; width: 100%; min-height: 56px; padding: 8px 2px; border: 0; border-bottom: 1px solid var(--line); background: none; color: var(--ink); text-align: left; cursor: pointer; }
+.cal-month-row:focus-visible { outline: 2px solid var(--wine); outline-offset: -2px; }
+.cal-month-row-date { grid-area: date; display: flex; flex-direction: column; align-items: center; line-height: 1.2; }
+.cal-month-row-date b { font: 500 22px/1.15 var(--font-serif); }
+.cal-month-row-date span { color: var(--muted); font-size: var(--fs-xs); }
+.cal-month-row.is-today .cal-month-row-date b { color: var(--red); }
+.cal-month-row-names { grid-area: names; display: flex; flex-wrap: wrap; gap: 0 10px; font: 500 var(--fs-base)/1.5 var(--font-serif); }
+.cal-month-row-names .is-remind { color: var(--red); }
+.cal-month-row-tibetan { grid-area: tibetan; color: var(--teal-2); font-size: var(--fs-sm); line-height: 1.5; }
+.cal-month-row-bell { grid-area: bell; color: var(--red); }
+.cal-month-row-bell .icon { width: 18px; height: 18px; }
+@media (min-width: 1024px) { .cal-month-list { display: none; } }
