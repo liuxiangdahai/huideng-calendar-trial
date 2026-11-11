@@ -1,4 +1,5 @@
 import {test,expect} from '@playwright/test';
+import {showMoreSettings, openZonePicker} from './more-settings.mjs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import {pathToFileURL} from 'node:url';
@@ -12,6 +13,7 @@ async function open(page, suffix = '') {
   const previewError = await page.locator('#preview-error').textContent();
   if (previewError) throw new Error(previewError);
   await expect(page.locator('.cal-day')).toHaveCount(42);
+  await showMoreSettings(page,{computerOnly:true});
 }
 const credentials = page => page.evaluate(() => JSON.parse(localStorage.getItem('huideng.calendar.subscription')));
 const draft = page => page.evaluate(() => JSON.parse(localStorage.getItem('huideng.calendar.v2')));
@@ -61,7 +63,7 @@ test('new visitors begin empty, all categories retain exact source names, and ch
 test('category and individual reminder settings export real all-day events and persist',async({page}) => {
   await open(page);
   await page.locator('[data-preset="tsok"]').click();
-  await page.locator('#zone-settings').click();
+  await openZonePicker(page);
   await page.locator('#zone-search').fill('Vancouver');
   await page.locator('input[name="timezone"][value="America/Vancouver"]').check();
   await page.locator('#apply-zone').click();
@@ -346,19 +348,22 @@ test('the month grid says its small labels are Tibetan dates before the dates ar
     });
     expect(await page.locator('.cal-key-note').evaluate(n => n.innerText)).toBe(`日期${beside ? '旁' : '下'}的小字是藏历，与农历不同`);
     expect(beside).toBe(viewport.width >= 1024);
-    // The key sits above the weekday row, on one line, in the same lapis as the labels.
+    // The key sits above the weekday row, in the same lapis as the labels: one
+    // line on computers; on phones the note and the dots (会提醒/只显示/未选) may take two.
     const [keyBox, weekdays] = [await key.boundingBox(), await page.locator('.cal-weekdays').boundingBox()];
     expect(keyBox.y + keyBox.height).toBeLessThanOrEqual(weekdays.y + 1);
-    expect(keyBox.height).toBeLessThan(40);
-    // The key shows the same marks as the grid at this width: dots on phones, name strips on desktop.
+    expect(keyBox.height).toBeLessThan(viewport.width >= 1024 ? 40 : 60);
+    // The key shows the same marks as the grid at this width: tint swatches on
+    // phones (the tinted day's colour), name strips on desktop.
     const marks = await page.evaluate(() => {
-      const shown = selector => [...document.querySelectorAll(selector)].some(node => node.offsetParent && getComputedStyle(node).display !== 'none');
-      const strip = node => node && getComputedStyle(node).backgroundColor;
-      return {gridDots: shown('.cal-grid .cal-mobile-events .cal-dot'), keyDots: shown('.cal-key .cal-dot'),
-        gridStrip: strip(document.querySelector('.cal-day:not(.cal-adjacent) .cal-mini-event.is-remind')), keyStrip: strip(document.querySelector('.cal-key .cal-legend-item.is-remind'))};
+      const color = node => node && getComputedStyle(node).backgroundColor;
+      const swatch = document.querySelector('.cal-key .cal-dot.is-remind');
+      return {phone: innerWidth < 1024, keySwatch: swatch && getComputedStyle(swatch).display !== 'none' ? color(swatch) : null,
+        gridTint: color(document.querySelector('.cal-day:not(.cal-adjacent).has-remind')),
+        gridStrip: color(document.querySelector('.cal-day:not(.cal-adjacent) .cal-mini-event.is-remind')), keyStrip: color(document.querySelector('.cal-key .cal-legend-item.is-remind'))};
     });
-    expect(marks.keyDots).toBe(marks.gridDots);
-    if (!marks.gridDots) expect(marks.keyStrip).toBe(marks.gridStrip);
+    if (marks.phone) expect(marks.keySwatch).toBe(marks.gridTint);
+    else { expect(marks.keySwatch).toBeNull(); expect(marks.keyStrip).toBe(marks.gridStrip); }
     // The labels are lapis, the colour family of the 藏历 tag beside the month.
     expect(await page.evaluate(() => {
       const probe = document.createElement('i'); probe.style.color = 'var(--teal-2)'; document.body.append(probe);

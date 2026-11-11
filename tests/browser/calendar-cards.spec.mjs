@@ -134,18 +134,16 @@ test('desktop month shows every original title in the cell and opens complete cl
   expect(indicator.selectedBorder).not.toBe(indicator.todayColor);
 });
 
-test('phone month marks busy days with dots and keeps every name in the label and the day sheet at 390 and 320 pixels', async ({page}) => {
+test('phone month tints busy days and keeps every name in the label and the day sheet at 390 and 320 pixels', async ({page}) => {
   const detail = await openBusyDay(page, 390);
   for (const width of [390, 320]) {
     await page.setViewportSize({width, height: 1000});
     const cell = page.locator(`[data-cal-date="${busy[0]}"]`);
     await expect(cell.locator('.cal-day-events')).toBeHidden();
-    // Phones show up to three dots, then "+"; names are in the sheet and the label.
-    await expect(cell.locator('.cal-mobile-events .cal-dot')).toHaveCount(Math.min(busy[1].length, 3));
-    await expect(cell.locator('.cal-dot-more')).toHaveCount(busy[1].length > 3 ? 1 : 0);
-    const box = await cell.locator('.cal-mobile-events').evaluate(node => ({width: node.getBoundingClientRect().width,
-      cellWidth: node.closest('.cal-day').getBoundingClientRect().width}));
-    expect(box.width).toBeLessThanOrEqual(box.cellWidth);
+    // Phones tint a chosen day like a highlighter (carmine when it reminds);
+    // names are in the list under the grid, the sheet and the label.
+    await expect(cell).toHaveClass(/has-remind|has-display/);
+    expect(await cell.evaluate(node => getComputedStyle(node).backgroundColor)).not.toBe('rgb(255, 255, 255)');
     for (const event of busy[1]) await expect(cell).toHaveAttribute('aria-label', new RegExp(event.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
     await verifyCards(page, detail);
     await verifyMonthHierarchy(page);

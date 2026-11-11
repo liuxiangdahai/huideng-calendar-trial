@@ -54,7 +54,7 @@ function tibetanDetails(date) {
 
 /** Exactly six Monday-first weeks. Missing Tibetan days do not create cells. */
 export function monthCells(month, {start = ENGINE.supported.start, end = ENGINE.supported.end,
-  today, selected, events = []} = {}) {
+  today, selected, events = [], spare = []} = {}) {
   if (typeof month !== 'string' || !/^\d{4}-\d{2}$/.test(month)) throw new RangeError('月份无效。');
   validDate(month + '-01');
   const first = addDays(month + '-01', -weekIndex(month + '-01'));
@@ -64,13 +64,20 @@ export function monthCells(month, {start = ENGINE.supported.start, end = ENGINE.
     if (!byDate.has(event.date)) byDate.set(event.date, []);
     byDate.get(event.date).push(event);
   }
+  // Days in the catalog that are not chosen: shown in grey, never counted.
+  const spareByDate = new Map();
+  for (const event of spare) {
+    if (event.kind === 'daily-date') continue;
+    if (!spareByDate.has(event.date)) spareByDate.set(event.date, []);
+    spareByDate.get(event.date).push(event);
+  }
   return Array.from({length: 42}, (_, index) => {
     const date = addDays(first, index), tibetan = tibetanDetails(date);
     return {date, day: Number(date.slice(8)), inMonth: date.startsWith(month), today: date === today,
       selected: date === selected, disabled: date < start || date > end, tibetan,
       tibetanShort: tibetan ? `${tibetan.monthLeap ? '闰' : ''}${dayPart(tibetan)}${tibetan.dayLeap ? '·重' : ''}` : '',
       repeatNumber: tibetan?.repeatNumber || 0, events: byDate.get(date) || [],
-      count: byDate.get(date)?.length || 0};
+      spare: spareByDate.get(date) || [], count: byDate.get(date)?.length || 0};
   });
 }
 
@@ -153,7 +160,7 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
   const doc = root.ownerDocument, win = doc.defaultView;
   let view = initialView === 'list' ? 'list' : 'month';
   let month = today.slice(0, 7), selected = today, focusDate = today, shown = 5, dailyShown = 30;
-  let state = {data: null, settings: null, events: [], today,
+  let state = {data: null, settings: null, events: [], spare: [], today,
     start: ENGINE.supported.start, end: ENGINE.supported.end};
   let disposed = false;
   root.classList.add('cal-view');
@@ -327,18 +334,21 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     const daily = state.settings?.includeDailyDates === true;
     const header = `<div class="cal-weekdays" role="row">${WEEKDAYS.map(day => `<span role="columnheader" aria-label="星期${day}">${day}</span>`).join('')}</div>`;
     const rows = Array.from({length: 6}, (_, row) => `<div class="cal-week" role="row">${cells.slice(row * 7, row * 7 + 7).map(cell => {
-      const cellEvents = cell.disabled ? [] : cell.events;
-      const aria = `${dateTitle(cell.date)}，星期${WEEKDAYS[weekIndex(cell.date)]}，${cell.tibetan?.fullLabel || '超出藏历换算范围'}${cell.tibetan?.missingLabel ? `，${cell.tibetan.missingLabel}` : ''}，${cell.disabled ? '超出预览范围' : `${cell.count}项已选日程`}${cellEvents.length ? `，${cellEvents.map(event => event.title).join('；')}` : ''}`;
+      const cellEvents = cell.disabled ? [] : cell.events, cellSpare = cell.disabled ? [] : cell.spare;
+      const aria = `${dateTitle(cell.date)}，星期${WEEKDAYS[weekIndex(cell.date)]}，${cell.tibetan?.fullLabel || '超出藏历换算范围'}${cell.tibetan?.missingLabel ? `，${cell.tibetan.missingLabel}` : ''}，${cell.disabled ? '超出预览范围' : `${cell.count}项已选日程`}${cellEvents.length ? `，${cellEvents.map(event => event.title).join('；')}` : ''}${cellSpare.length ? `，未选：${cellSpare.map(event => event.title).join('；')}` : ''}`;
       const markers = [...new Set(cellEvents.map(event => eventPresentation(event, state.data?.catalog).colorClass))];
       // Computers show every chosen day in the cell; the row grows to fit.
       const labels = cellEvents.map(event => {
         const presentation = eventPresentation(event, state.data?.catalog);
         return `<span class="cal-mini-event ${presentation.colorClass}${event.preference?.mode === 'remind' ? ' is-remind' : ''}" title="${escape(event.title)}"${markAttr(event, state.settings?.titleMarks)}>${breakHint(escape(event.title))}</span>`;
-      }).join('');
-      // Phones: no text in the cell, only a dot per chosen day (carmine rings,
-      // gold only shows); tapping the date opens the full day.
-      const mobileSummary = cellEvents.length ? `<span class="cal-mobile-events" aria-hidden="true">${cellEvents.slice(0, 3).map(event => `<i class="cal-dot${event.preference?.mode === 'remind' ? ' is-remind' : ''}"></i>`).join('')}${cellEvents.length > 3 ? '<i class="cal-dot-more">+</i>' : ''}</span>` : '';
-      return `<div role="gridcell" aria-selected="${cell.selected}" class="cal-cell"><button type="button" class="cal-day${cell.inMonth ? '' : ' cal-adjacent'}${cell.selected ? ' cal-selected' : ''}${cell.today ? ' cal-is-today' : ''}" data-cal-date="${cell.date}" data-cal-focus="date-${cell.date}" tabindex="${cell.date === focusDate && !cell.disabled ? 0 : -1}" aria-label="${escape(aria)}"${cell.today ? ' aria-current="date"' : ''}${cell.disabled ? ' disabled' : ''}>
+      }).join('') + cellSpare.map(event => `<span class="cal-mini-event is-spare" title="${escape(event.title)}（未选）">${breakHint(escape(event.title))}</span>`).join('');
+      // Phones: a chosen day is marked like a highlighter on a paper calendar,
+      // the whole date tinted (carmine: reminds, gold: only shows); the list
+      // under the grid names them, and tapping the date opens the full day.
+      // Days not chosen leave the phone grid alone (11-11 feedback).
+      const tint = cellEvents.length ? (cellEvents.some(event => event.preference?.mode === 'remind') ? ' has-remind' : ' has-display') : '';
+      const mobileSummary = '';
+      return `<div role="gridcell" aria-selected="${cell.selected}" class="cal-cell"><button type="button" class="cal-day${cell.inMonth ? '' : ' cal-adjacent'}${cell.selected ? ' cal-selected' : ''}${cell.today ? ' cal-is-today' : ''}${tint}" data-cal-date="${cell.date}" data-cal-focus="date-${cell.date}" tabindex="${cell.date === focusDate && !cell.disabled ? 0 : -1}" aria-label="${escape(aria)}"${cell.today ? ' aria-current="date"' : ''}${cell.disabled ? ' disabled' : ''}>
         <span class="cal-day-date" aria-hidden="true"><span class="cal-gregorian">${cell.day}</span><span class="cal-tibetan${cell.tibetan?.day === 1 ? ' is-month-start' : ''}">${escape(cell.tibetan ? cellLabel(cell.tibetan) : '')}</span></span>
         <span class="cal-marks" aria-hidden="true">${cell.tibetan?.monthLeap ? '<span class="cal-leap">闰月</span>' : ''}${cell.tibetan?.missingBefore?.length ? `<span class="cal-miss">缺${escape(cell.tibetan.missingBefore.map(dayPart).join(''))}</span>` : ''}${cell.repeatNumber ? '<span class="cal-repeat">重日</span>' : ''}${cellEvents.length ? `<span class="cal-category-marks">${markers.slice(0, 3).map(color => `<i class="cal-category-dot ${color}"></i>`).join('')}</span><span class="cal-event-count">${cell.count}</span>` : ''}</span>
         <span class="cal-day-events" aria-hidden="true">${labels}</span>${mobileSummary}</button></div>`;
@@ -355,13 +365,14 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     // The key sits above the grid, where it is read before the dates: what the
     // small labels are, and what the two dot colours mean. Under the grid stay
     // only the hints that matter after looking.
-    const anyEvents = state.events.length > 0;
-    $('[data-cal-key-dots]').innerHTML = anyEvents ? '<span class="cal-legend-item is-remind"><i class="cal-dot is-remind"></i>会提醒</span><span class="cal-legend-item"><i class="cal-dot"></i>只显示</span>' : '';
+    const anyEvents = state.events.length > 0, anySpare = state.spare.length > 0;
+    $('[data-cal-key-dots]').innerHTML = (anyEvents ? '<span class="cal-legend-item is-remind"><i class="cal-dot is-remind"></i>会提醒</span><span class="cal-legend-item"><i class="cal-dot"></i>只显示</span>' : '')
+      + (anySpare ? '<span class="cal-legend-item is-spare"><i class="cal-dot is-spare"></i>未选</span>' : '');
     $('[data-cal-legend]').innerHTML = [
-      anyEvents ? '<span class="cal-legend-tap">点日期看当天详情</span>' : '',
+      anyEvents || anySpare ? '<span class="cal-legend-tap">点日期看当天详情</span>' : '',
       daily ? '<span class="cal-legend-daily">每天的藏历日期也会出现在你的日历里</span>' : ''
     ].join('');
-    $('[data-cal-legend]').hidden = !anyEvents && !daily;
+    $('[data-cal-legend]').hidden = !anyEvents && !anySpare && !daily;
     if (before) [...grid.querySelectorAll('.cal-mini-event,.cal-mobile-event')].filter(node => !before.has(labelKey(node)) && node.offsetParent)
       .slice(0, 16).forEach(node => playMotion(node, 'appear'));
     renderMonthList(cells);
@@ -369,20 +380,27 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     placePopover();
   }
 
-  // Phones and tablets: the dots say that a day is chosen, not what it is.
-  // Under the grid, this month's chosen days are listed by name, so nobody
-  // has to tap dot after dot; a row opens that day (11-10).
+  // Phones and tablets: the tint says that a day is chosen, not what it is.
+  // Under the grid the month's chosen days are listed by name, so nobody has
+  // to tap date after date; a row opens that day (11-10). Before anything is
+  // chosen, the list shows this month's days in grey instead, so the first
+  // visit is not an empty month (11-11).
   function renderMonthList(cells) {
     const node = $('[data-cal-month-list]');
-    const days = cells.filter(cell => cell.inMonth && !cell.disabled && cell.events.length);
-    if (!state.events.length) { node.hidden = true; node.innerHTML = ''; return; }
+    const live = cells.filter(cell => cell.inMonth && !cell.disabled);
+    const chosen = state.events.length > 0;
+    const days = chosen ? live.filter(cell => cell.events.length) : live.filter(cell => cell.spare.length);
+    if (!chosen && !state.spare.length) { node.hidden = true; node.innerHTML = ''; return; }
     node.hidden = false;
-    node.innerHTML = `<h3 class="cal-month-list-title">${escape(monthTitle(month).replace(/^\d+年/, ''))}已选的日子<span>${days.length ? `${days.length} 天` : ''}</span></h3>${days.length
+    const name = escape(monthTitle(month).replace(/^\d+年/, ''));
+    const title = chosen ? `${name}已选的日子<span>${days.length} 天</span>` : `${name}的修行日<span>还没有选</span>`;
+    node.innerHTML = `<h3 class="cal-month-list-title">${title}</h3>${days.length
       ? `<ul>${days.map(cell => {
-          const remind = cell.events.some(event => event.preference?.mode === 'remind');
-          return `<li><button type="button" class="cal-month-row${cell.today ? ' is-today' : ''}" data-cal-pick="${cell.date}" data-cal-focus="month-list-${cell.date}"><span class="cal-month-row-date"><b>${cell.day}</b><span>周${WEEKDAYS[weekIndex(cell.date)]}</span></span><span class="cal-month-row-tibetan">${escape(cell.tibetan?.display || '')}</span><span class="cal-month-row-names">${cell.events.map(event => `<span${event.preference?.mode === 'remind' ? ' class="is-remind"' : ''}>${escape(event.title)}</span>`).join('')}</span>${remind ? `<span class="cal-month-row-bell" aria-label="会提醒">${icon('bell')}</span>` : ''}</button></li>`;
-        }).join('')}</ul>`
-      : '<p class="cal-empty">这个月没有已选的日子。</p>'}`;
+          const items = chosen ? cell.events : cell.spare;
+          const remind = chosen && items.some(event => event.preference?.mode === 'remind');
+          return `<li><button type="button" class="cal-month-row${cell.today ? ' is-today' : ''}${chosen ? '' : ' is-spare'}" data-cal-pick="${cell.date}" data-cal-focus="month-list-${cell.date}"><span class="cal-month-row-date"><b>${cell.day}</b><span>周${WEEKDAYS[weekIndex(cell.date)]}</span></span><span class="cal-month-row-tibetan">${escape(cell.tibetan?.display || '')}</span><span class="cal-month-row-names">${items.map(event => `<span${chosen ? (event.preference?.mode === 'remind' ? ' class="is-remind"' : '') : ' class="is-spare"'}>${escape(event.title)}</span>`).join('')}</span>${remind ? `<span class="cal-month-row-bell" aria-label="会提醒">${icon('bell')}</span>` : ''}</button></li>`;
+        }).join('')}</ul>${chosen ? '' : '<p class="cal-month-list-hint">在“选择内容”里选好，选中的日子会在上面的月历里标出颜色。</p>'}`
+      : `<p class="cal-empty">${chosen ? '这个月没有已选的日子。' : '这个月没有修行日。'}</p>`}`;
   }
 
   function renderDetail() {
@@ -395,6 +413,13 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
       ? '当天暂无已确认的所选日程；部分法会、节日或天象的安排尚待确认。'
       : '当天没有已选日程。可点选其他日期，或继续添加关注的日子。');
     else content = events.map(event => eventMarkup(event, 'day', state)).join('');
+    const spare = state.spare.filter(event => event.date === selected);
+    if (spare.length) {
+      // Nothing chosen on this day yet: the grey days are the answer, not the
+      // plain "nothing chosen" note. A note about unconfirmed dates stays.
+      if (!events.length && !state.settings?.includeDailyDates && !available.hasUnconfirmed) content = '';
+      content += `<section class="cal-spare"><h4>${content ? '这天还有' : '这天有'}<small>未选</small></h4><ul>${spare.map(event => `<li><span class="cal-event-icon">${eventIcon(event, state.data?.catalog)}</span><span>${escape(event.title)}<small>${escape(eventPresentation(event, state.data?.catalog).label)}</small></span></li>`).join('')}</ul><p>在“选择内容”里选上，就会加入你的日历。</p></section>`;
+    }
     $('[data-cal-detail]').innerHTML = `${detailHeading(selected, tibetan)}${content}${(events.length || state.settings?.includeDailyDates) && available.hasUnconfirmed ? `<p class="cal-data-note">${unknownNote()}</p>` : ''}`;
   }
 
@@ -545,6 +570,7 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
       if (state.start > state.end) throw new RangeError('预览日期范围无效。');
       state.events = (state.events || []).map(event => ({...event, preference: event.preference || state.settings?.events?.[idOf(event)]}))
         .filter(event => event.kind !== 'daily-date' && event.date >= state.start && event.date <= state.end && event.preference?.mode !== 'off');
+      state.spare = (state.spare || []).filter(event => event.kind !== 'daily-date' && event.date >= state.start && event.date <= state.end);
       month = clamp(month, state.start.slice(0, 7), state.end.slice(0, 7));
       selected = clamp(selected, state.start, state.end); focusDate = clamp(focusDate, state.start, state.end);
       // A rolling-boundary update can remove the previously focused day from this month.

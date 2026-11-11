@@ -1,4 +1,5 @@
 import {test,expect} from '@playwright/test';
+import {showMoreSettings, openZonePicker} from './more-settings.mjs';
 const route='/calendar-reminders/';
 const fits=async page=>expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 async function dialogFits(page,id){expect(await page.locator(id).evaluate(node=>node.scrollWidth<=node.clientWidth)).toBe(true);}
@@ -56,6 +57,7 @@ test('breakpoints preserve readable selection, complete month grid and reachable
     if(width<1024){await page.locator('#tab-selection').click();await expect(page.locator('#preview-pane')).toBeHidden();}
     else{await expect(page.locator('#preview-pane')).toBeVisible();await expect(page.locator('.mobile-tabs')).toBeHidden();}
     await fits(page);
+    await showMoreSettings(page);
     const masters=page.locator('[data-group-id="masters"]');
     if(!await masters.evaluate(node=>node.open))await masters.locator('summary').click();
     await page.locator('[data-event="jigme-lingpa"]').check();
@@ -79,8 +81,8 @@ test('landscape and keyboard-sized screens keep every form action and Chinese gu
   for(const size of [{width:844,height:390},{width:390,height:400},{width:1440,height:500}]){
     await page.setViewportSize(size);if(size.width<1024)await page.locator('#tab-selection').click();
     // Phones reach the region from inside 详细设置; computers from the top bar.
-    if(size.width<1024){const details=page.locator('#advanced-settings');if(!await details.evaluate(n=>n.open))await details.locator('summary').click();await page.locator('#zone-settings-inline').click();}
-    else await page.locator('#zone-settings').click();
+    if(size.width<1024){const details=page.locator('#advanced-settings');if(!await details.evaluate(n=>n.open))await details.locator(':scope>summary').click();await page.locator('#zone-settings-inline').click();}
+    else await openZonePicker(page);
     await page.locator('#zone-search').fill('Eucla');
     await page.locator('input[value="Australia/Eucla"]').check();await dialogFits(page,'#zone-dialog');await page.locator('#apply-zone').click();
     await page.locator('[data-reminder-group="tsok"]').click();await page.locator('#add-reminder').click();

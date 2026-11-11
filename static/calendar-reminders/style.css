@@ -652,7 +652,6 @@ input[type=time]::-webkit-datetime-edit { padding: 0; }
 .advanced-region .text-button .icon { width: 16px; height: 16px; }
 .advanced-region small { grid-column: 1 / -1; color: var(--muted); font-size: var(--fs-xs); line-height: 1.6; }
 @media (max-width: 1023px) { .region-bar { display: none; } }
-@media (min-width: 1024px) { .advanced-region { display: none; } }
 
 .title-marks-note { margin-top: 2px; color: var(--muted); font-size: var(--fs-xs); line-height: 1.5; }
 .recommend-tag { margin-left: 8px; padding: 0 7px; border-radius: 9px; background: var(--red-tint); color: var(--wine); font: 500 var(--fs-xs)/20px var(--font-ui); letter-spacing: 0; }
@@ -736,3 +735,25 @@ body { background: var(--paper); }
   .masthead-date #today-gregorian { padding-bottom: 0; text-align: left; }
   .today-day { font-size: 34px; letter-spacing: 2px; }
 }
+
+/* ── The page's three steps (11-11) ─────────────────────────────────────────
+   Step 1 holds only the three bundles; 每日藏历 is a separate, optional row.
+   更多设置 sits between steps 2 and 3, folded. Step 3 carries its own button,
+   the same as the bottom bar, so nobody reads "click below" and searches. */
+.daily-date-panel { margin-top: 10px; }
+.daily-date-panel .daily-date-option { border-top: 0; }
+.advanced-settings { margin-top: 22px; border-bottom: 1px solid var(--line-2); }
+.advanced-optional { margin-left: 4px; color: var(--muted); font: 400 var(--fs-sm)/1.5 var(--font-ui); letter-spacing: 0; }
+.step-add-device { margin-bottom: 12px; }
+#step-add-button { width: 100%; min-height: 52px; gap: 8px; font-size: var(--fs-lg); }
+#step-add-button .icon { width: 20px; height: 20px; }
+.region-bar[hidden] { display: none; }
+
+/* The dialog's own steps: a progress line, so they never read as a second 1-2-3. */
+.sub-progress { display: flex; margin: 4px 0 18px; padding: 0; list-style: none; counter-reset: none; }
+.sub-progress li { position: relative; flex: 1; padding: 10px 4px 0; border-top: 3px solid var(--line); color: var(--muted); font-size: var(--fs-sm); text-align: center; }
+.sub-progress li + li { margin-left: 4px; }
+.sub-progress li.is-done { border-top-color: #c9a764; color: var(--ink-2); }
+.sub-progress li[aria-current] { border-top-color: var(--red); color: var(--red); font-weight: 600; }
+#subscription-dialog.is-managing .sub-progress { display: none; }
+@media (min-width: 1024px) { .region-bar[hidden] ~ .workspace { margin-top: 32px; } }

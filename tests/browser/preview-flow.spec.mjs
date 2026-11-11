@@ -1,4 +1,5 @@
 import {test, expect} from '@playwright/test';
+import {showMoreSettings, openZonePicker} from './more-settings.mjs';
 
 const route = '/calendar-reminders/';
 const settingsKey = 'huideng.calendar.v2';
@@ -16,6 +17,7 @@ async function open(page) {
   await expect(page.locator('#app')).toBeVisible();
   await expect(page.locator('#preview-error')).toBeHidden();
   await expect(page.locator('.cal-day')).toHaveCount(42);
+  await showMoreSettings(page);
   await page.locator('[data-preset="guru"]').click();
 }
 
@@ -45,7 +47,9 @@ test('month preview starts on device today and opens the original event reminder
   // One legend line explains the dots (hidden while nothing is chosen).
   await expect(page.locator('.cal-legend')).toHaveCount(1);
   await expect(page.locator('#preview-zone')).toHaveCount(0);
-  await expect(page.locator('#zone-settings')).toBeVisible();
+  // The region lives in 更多设置; the top bar only appears when the zones differ.
+  await expect(page.locator('.region-bar')).toBeHidden();
+  await expect(page.locator('#zone-settings-inline')).toBeVisible();
 
   const marked = page.locator('.cal-day:not(.cal-adjacent):has(.cal-event-count)').first();
   const date = await marked.getAttribute('data-cal-date');

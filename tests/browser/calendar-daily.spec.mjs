@@ -1,4 +1,5 @@
 import {test,expect} from '@playwright/test';
+import {showMoreSettings, openZonePicker} from './more-settings.mjs';
 import fs from 'node:fs/promises';
 import ICAL from 'ical.js';
 
@@ -8,7 +9,7 @@ const subscription=page=>page.evaluate(()=>JSON.parse(localStorage.getItem('huid
 const events=text=>new ICAL.Component(ICAL.parse(text)).getAllSubcomponents('vevent');
 const daily=event=>String(event.getFirstPropertyValue('uid')).startsWith('daily-date-');
 const close=page=>page.locator('[data-close="subscription-dialog"]').first().click();
-async function open(page){await page.goto(route);await expect(page.locator('#app')).toBeVisible();await expect(page.locator('#load-error')).toBeHidden();await expect(page.locator('#preview-error')).toBeHidden();}
+async function open(page){await page.goto(route);await expect(page.locator('#app')).toBeVisible();await expect(page.locator('#load-error')).toBeHidden();await expect(page.locator('#preview-error')).toBeHidden();await showMoreSettings(page,{computerOnly:true});}
 async function downloadText(page){const pending=page.waitForEvent('download');await page.locator('[data-download="display"]').click();return fs.readFile(await (await pending).path(),'utf8');}
 
 test('daily date layer starts off, preserves legacy choices and presets, and clear removes both layers',async({page})=>{
