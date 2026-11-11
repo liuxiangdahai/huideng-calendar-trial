@@ -155,10 +155,10 @@ try{
  for(const value of Object.values(settings.events))value.mode='off';
  managed=await call('PATCH',`/api/subscriptions/${created.id}`,{settings,revision:managed.revision});
  const cancelled=parse(await (await feed()).text());
- assert.ok(cancelled.length>0);
- assert.ok(cancelled.every(e=>e.getFirstPropertyValue('status')==='CANCELLED' && e.getAllSubcomponents('valarm').length===0));
+ // Removed days leave the feed (11-11): calendar apps drop what it no longer lists.
+ assert.equal(cancelled.length,0,'全部取消后订阅里不再有日程');
  await call('DELETE',`/api/subscriptions/${created.id}`);
- assert.ok(parse(await (await feed()).text()).every(e=>e.getFirstPropertyValue('status')==='CANCELLED'));
+ assert.equal(parse(await (await feed()).text()).length,0,'停用后订阅清空');
  console.log(JSON.stringify({status:'passed',scope:SCOPE,requests:timing.length,version:health.version,note:'wallMs is network latency, not Worker CPU'}));
  passed=true;
 }catch(error){failedScenario=scenario;throw error;}

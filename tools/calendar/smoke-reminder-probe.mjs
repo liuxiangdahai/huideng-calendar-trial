@@ -45,11 +45,11 @@ try{
   assert.equal(changed.getFirstSubcomponent('valarm').getFirstPropertyValue('trigger').toSeconds(),(shanghai.getUTCHours()*60+shanghai.getUTCMinutes())*60);
   checks.push({case:'同地址改时间、UID稳定、版本递增',result:'通过'});
   stage='quiet';settings.reminderProbe.silent=['a'];next=await patch(settings);assert.equal(item(next,'a').getAllSubcomponents('valarm').length,0);
-  stage='cancel';settings.reminderProbe.omit=['a'];next=await patch(settings);assert.equal(item(next,'a').getFirstPropertyValue('status'),'CANCELLED');
+  stage='cancel';settings.reminderProbe.omit=['a'];next=await patch(settings);assert.equal(item(next,'a'),undefined,'移除的测试日程不再出现在订阅里');
   checks.push({case:'仅显示与取消不含提醒',result:'通过'});
   stage='stop';await api('DELETE',`/api/subscriptions/${created.id}`);const stopped=await (await feed()).text();
-  assert.ok(!stopped.includes('BEGIN:VALARM'));assert.equal(components(stopped).every(e=>e.getFirstPropertyValue('status')==='CANCELLED'),true);
-  checks.push({case:'停用返回撤销且无提醒',result:'通过'});report.passed=true;
+  assert.ok(!stopped.includes('BEGIN:VALARM'));assert.equal(components(stopped).length,0,'停用后订阅里不再有日程');
+  checks.push({case:'停用后订阅清空且无提醒',result:'通过'});report.passed=true;
 }catch{report.passed=false;report.failedStage=stage;process.exitCode=1;}
 finally{
   if(created)try{await api('DELETE',`/api/subscriptions/${created.id}`);}catch{report.cleanup='待人工检查';process.exitCode=1;}
