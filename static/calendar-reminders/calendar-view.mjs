@@ -99,6 +99,21 @@ export function deviceReminderTimes(event, reminderZone, deviceZone) {
   });
 }
 
+// The day in Tibetan digits (初十 → ༡༠), set in gilt beside the Chinese day.
+const TIBETAN_DIGITS = '༠༡༢༣༤༥༦༧༨༩';
+const tibetanDay = day => String(day).replace(/\d/g, digit => TIBETAN_DIGITS[digit]);
+
+// The day's heading reads like the page header: 藏历 and the month small in
+// lapis, the Tibetan day as the headline, the civil date under it (11-11).
+function detailHeading(date, tibetan) {
+  const civil = `<h3>${escape(dateTitle(date))}<span>星期${WEEKDAYS[weekIndex(date)]}</span></h3>`;
+  if (!tibetan) return `<div class="cal-detail-heading">${civil}</div>`;
+  const year = String(tibetan.fullLabel || '').replace(/^藏历/, '').split('年')[0];
+  const month = `${tibetan.display.split('月')[0]}月`;
+  return `<div class="cal-detail-heading"><p class="cal-detail-era"><b>藏历</b>${escape(year ? `${year}年 ` : '')}${escape(month)}</p>`
+    + `<p class="cal-detail-day"><strong>${escape(dayPart(tibetan))}</strong><span class="cal-detail-tib" lang="bo" aria-hidden="true">${tibetanDay(tibetan.day)}</span>${tibetan.repeatNumber ? `<span class="cal-repeat">重日${tibetan.repeatNumber}</span>` : ''}</p>${civil}</div>`;
+}
+
 function eventMarkup(event, location, state) {
   const id = idOf(event);
   const presentation = eventPresentation(event, state.data?.catalog);
@@ -380,7 +395,7 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
       ? '当天暂无已确认的所选日程；部分法会、节日或天象的安排尚待确认。'
       : '当天没有已选日程。可点选其他日期，或继续添加关注的日子。');
     else content = events.map(event => eventMarkup(event, 'day', state)).join('');
-    $('[data-cal-detail]').innerHTML = `<div class="cal-detail-heading"><h3>${escape(dateTitle(selected))}<span>星期${WEEKDAYS[weekIndex(selected)]}</span></h3><p>${escape(tibetan?.fullLabel || '')}</p></div>${content}${(events.length || state.settings?.includeDailyDates) && available.hasUnconfirmed ? `<p class="cal-data-note">${unknownNote()}</p>` : ''}`;
+    $('[data-cal-detail]').innerHTML = `${detailHeading(selected, tibetan)}${content}${(events.length || state.settings?.includeDailyDates) && available.hasUnconfirmed ? `<p class="cal-data-note">${unknownNote()}</p>` : ''}`;
   }
 
   function renderList() {
