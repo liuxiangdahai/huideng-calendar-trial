@@ -86,7 +86,8 @@ try{
  if(process.argv.includes('--daily'))await series(page,'daily-dates',()=>page.locator('#include-daily-dates').click());
  await page.locator('[data-preset=practice]').click();await page.locator('.sub-upcoming-all').click();await page.locator('#home-calendar [data-cal-month]').waitFor();
  await series(page,'month',i=>page.locator(`#home-calendar [data-cal-action=${i%2?'previous':'next'}]`).click());
- await series(page,'view',i=>page.locator(`#home-calendar [data-cal-view=${i%2?'month':'list'}]`).click());
+ // No 'view' series: the 藏历 page has no 月历/列表 switch (11-11), and on a
+ // phone the subscription preview with its switch is not shown.
  await page.locator('#home-subscribe').click();await page.locator('#preset-options').waitFor();
  await series(page,'open-reminder',()=>page.locator('[data-reminder-event="guru-tsok"]').click(),'click',()=>page.locator('[aria-label="关闭提醒设置"]').click());
  // Separate diagnostic profile; its instrumentation is outside measured samples.

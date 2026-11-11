@@ -49,6 +49,7 @@
 .cal-day.cal-selected.cal-is-today .cal-gregorian { box-shadow: 0 0 0 2px #f9f5ef, 0 0 0 3px var(--gold-2); }
 .cal-day.cal-is-today .cal-tibetan { color: var(--red); }
 .cal-day:focus-visible { position: relative; z-index: 1; outline-offset: -2px; }
+.cal-view.is-pointer .cal-day:focus-visible { outline: none; }
 .cal-day:disabled { opacity: .45; }
 .cal-marks { display: none; flex-wrap: wrap; align-items: center; justify-content: center; gap: 1px 3px; min-height: 15px; max-width: 100%; color: var(--muted); font-size: var(--fs-2xs); line-height: 15px; }
 .cal-marks:has(.cal-leap, .cal-repeat, .cal-miss) { display: flex; gap: 1px 2px; }
@@ -306,6 +307,11 @@ dialog.cal-day-sheet::backdrop { background: #1d1b1859; }
   /* List view has no month to page through: the switch alone, on the right. */
   .cal-control-bar:has([data-cal-navigation][hidden]) { grid-template-columns: 1fr; grid-template-areas: "switch"; }
 }
+/* The 藏历 page has no view switch: the month head and its 藏历 line, each a
+   full row, until the wide symmetric head takes over (11-11). */
+@container calendar (max-width: 619px) {
+  .cal-view.is-reading .cal-control-bar { grid-template-columns: minmax(0,1fr); grid-template-areas: "nav" "context"; }
+}
 
 
 /* ── 11-10: reading the month ─────────────────────────────────────────── */
@@ -489,9 +495,19 @@ dialog.cal-day-sheet.is-popover { position: absolute; inset: auto; z-index: 30; 
    computer; upright phones keep the two-character names and a hint to turn. */
 .cal-turn-hint { display: none; }
 @media (max-width: 767px) and (orientation: portrait) {
-  .cal-view.is-reading .cal-turn-hint { display: flex; align-items: center; gap: 6px; margin: 6px 2px 0; color: var(--muted); font-size: var(--fs-xs); }
-  .cal-view.is-reading .cal-turn-hint::before { content: "⟲"; color: var(--teal); font-size: 15px; }
+  /* The hint shows what turning does: a phone that turns on its side, and
+     the short name becoming the full one, in the 荟供日 colours (11-11). */
+  .cal-view.is-reading .cal-turn-hint { display: grid; grid-template-columns: 40px 1fr; align-items: center; column-gap: 12px; row-gap: 6px; margin: 14px 0 0; padding: 12px 14px; border-radius: var(--r); background: var(--surface-2); }
+  .cal-turn-phone { grid-row: span 2; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line-2); color: var(--teal); }
+  .cal-turn-phone svg { width: 24px; height: 24px; transition: transform .7s cubic-bezier(.5, 0, .2, 1) .25s; }
+  .cal-turn-hint.is-seen .cal-turn-phone svg { transform: rotate(-90deg); }
+  .cal-turn-text { margin: 0; color: var(--muted); font-size: var(--fs-sm); line-height: 1.5; }
+  .cal-turn-text b { margin-right: 6px; color: var(--ink); font: 600 var(--fs-base)/1.5 var(--font-serif); }
+  .cal-turn-demo { display: flex; align-items: center; gap: 8px; margin: 0; }
+  .cal-turn-demo i { padding: 1px 6px; border-radius: 3px; background: var(--red-tint-2); color: var(--red); font: 500 13px/1.5 var(--font-ui); font-style: normal; }
+  .cal-turn-arrow { color: var(--gold); }
 }
+@media (prefers-reduced-motion: reduce) { .cal-turn-phone svg { transition: none; } }
 @media (max-width: 1023px) and (min-width: 600px) and (orientation: landscape) {
   .cal-view.is-reading .cal-abbr { display: none; }
   .cal-view.is-reading .cal-day { align-items: stretch; min-height: 76px; }
@@ -499,21 +515,27 @@ dialog.cal-day-sheet.is-popover { position: absolute; inset: auto; z-index: 30; 
   .cal-view.is-reading .cal-mini-event { font-size: 12px; line-height: 17px; }
 }
 
-/* 缺 and 重 are facts of the Tibetan calendar, not days to keep (11-11): plain
-   lapis text in the top-right corner of the cell, never a chip like a festival.
-   Phones show the single character; the legend and the day card say the rest. */
-.cal-day .cal-marks .cal-miss, .cal-day .cal-marks .cal-repeat { padding: 0; border: 0; border-radius: 0; background: none; color: var(--teal-2); font: 500 11px/1 var(--font-serif); }
-.cal-day .cal-marks small { font-size: inherit; }
+/* 缺 and 重 are facts of the Tibetan calendar, not days to keep (11-11): a
+   small dotted lapis circle with the date, never a chip like a festival.
+   Phones put it in the cell's top-right corner; computers right after the day
+   number, away from the Tibetan date so 缺 二十 is not read as 缺廿一. The
+   legend, a hover title and the day card say the rest. */
+.cal-day-date :is(.cal-miss, .cal-repeat) { display: grid; place-items: center; flex: none; padding: 0; border: 1px dotted #9fb0c8; border-radius: 50%; background: none; color: var(--teal-2); font: 500 10px/1 var(--font-serif); }
+.cal-day-date :is(.cal-miss, .cal-repeat) small { display: none; }
 @media (max-width: 1023px) {
   .cal-day { position: relative; }
-  .cal-day .cal-marks:has(.cal-miss, .cal-repeat) { position: absolute; top: 3px; right: 2px; display: flex; min-height: 0; }
-  .cal-day:has(.cal-marks .cal-miss, .cal-marks .cal-repeat) .cal-gregorian { transform: translateX(-5px); }
-  .cal-day .cal-marks small { display: none; }
-  .cal-day .cal-marks :is(.cal-miss, .cal-repeat) { display: grid; place-items: center; width: 15px; height: 15px; border: 1px dotted #9fb0c8; border-radius: 50%; font-size: 10px; }
+  .cal-day-date :is(.cal-miss, .cal-repeat) { position: absolute; top: 3px; right: 2px; width: 15px; height: 15px; }
+  .cal-day:has(.cal-day-date .cal-miss, .cal-day-date .cal-repeat) .cal-gregorian { transform: translateX(-5px); }
 }
 @media (min-width: 1024px) {
-  .cal-day .cal-marks :is(.cal-miss, .cal-repeat) { font-size: 12px; letter-spacing: 1px; }
-  .cal-day .cal-marks :is(.cal-miss, .cal-repeat)::before { content: "·"; margin-right: 2px; color: var(--muted); }
+  .cal-day-date :is(.cal-miss, .cal-repeat) { width: 20px; height: 20px; margin: 0 auto 0 2px; font-size: 12px; }
+  /* Narrow columns (the 藏历 page at 1024px): no room between the day and
+     the Tibetan date, so the circle sits small on the day's shoulder. */
+  .cal-cell { container-type: inline-size; }
+  @container (max-width: 100px) {
+    .cal-day-date { position: relative; }
+    .cal-day-date :is(.cal-miss, .cal-repeat) { position: absolute; top: -4px; left: 22px; width: 14px; height: 14px; margin: 0; background: var(--surface); font-size: 9px; }
+  }
 }
 .cal-legend-calendar { color: var(--muted); }
 .cal-legend-calendar b { display: inline-grid; place-items: center; width: 16px; height: 16px; margin: 0 1px; border: 1px dotted #9fb0c8; border-radius: 50%; color: var(--teal-2); font: 500 10px/1 var(--font-serif); }

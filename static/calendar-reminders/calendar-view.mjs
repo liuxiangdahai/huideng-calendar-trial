@@ -162,6 +162,13 @@ function markAttr(event, style) {
   const full = markedTitle(event, style), mark = full.slice(0, full.length - String(event.title).length);
   return mark ? ` data-mark="${escape(mark)}"` : '';
 }
+// 缺 and 重 sit with the date as a small dotted circle (phone: the corner;
+// computer: beside the day number), never on the festival line (11-11).
+function skipMark(cell) {
+  const missing = cell.tibetan?.missingBefore?.length ? cell.tibetan.missingBefore.map(dayPart).join('') : '';
+  if (missing) return `<span class="cal-miss" title="藏历这天之前少了${escape(missing)}">缺<small>${escape(missing)}</small></span>`;
+  return cell.repeatNumber ? '<span class="cal-repeat" title="重日：同一个藏历日有两天">重<small>日</small></span>' : '';
+}
 function dailyMarkup(date, marks, compact = false) {
   const event=dailyDateOccurrences(date,date)[0], day=tibetanDetails(date);
   // In the list each day's Tibetan date is one quiet line; the full card
@@ -183,7 +190,10 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
   initialView = 'month', today, reading = false} = {}) {
   validDate(today);
   const doc = root.ownerDocument, win = doc.defaultView;
-  let view = initialView === 'list' ? 'list' : 'month';
+  // The 藏历 page has no 月历/列表 switch (11-11): "接下来" already lists the
+  // days from today, and under the grid the month's own list follows the
+  // month shown. Only the subscription preview offers a list of its own.
+  let view = !reading && initialView === 'list' ? 'list' : 'month';
   let month = today.slice(0, 7), selected = today, focusDate = today, shown = 5, dailyShown = 30;
   let state = {data: null, settings: null, events: [], spare: [], today, reading,
     start: ENGINE.supported.start, end: ENGINE.supported.end};
@@ -197,13 +207,13 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
       <label class="cal-month-picker"><span class="sr-only">选择月份</span><select data-cal-month data-cal-focus="month-picker" aria-label="选择月份"></select>${icon('chevron')}</label>
       <button type="button" class="cal-arrow" data-cal-action="next" data-cal-focus="next" aria-label="下一月">${icon('chevron-right')}</button>
       <button type="button" class="cal-today" data-cal-action="today" data-cal-focus="today">今天</button>
-    </div><p class="cal-month-context" data-cal-context></p><div class="cal-view-switch" role="group" aria-label="${reading ? '查看方式' : '日期预览方式'}">
+    </div><p class="cal-month-context" data-cal-context></p>${reading ? '' : `<div class="cal-view-switch" role="group" aria-label="日期预览方式">
       <button type="button" data-cal-view="month" data-cal-focus="month-view">${icon('calendar')}<span>月历</span></button>
       <button type="button" data-cal-view="list" data-cal-focus="list-view">${icon('list')}<span>列表</span></button>
-    </div></div><section class="cal-month-view" aria-label="${reading ? '藏历月历' : '月历预览'}">
+    </div>`}</div><section class="cal-month-view" aria-label="${reading ? '藏历月历' : '月历预览'}">
     <p class="cal-key"><span class="cal-key-note">日期<span class="cal-key-below">下</span><span class="cal-key-beside">旁</span>的小字是藏历，与农历不同</span><span class="cal-key-dots" data-cal-key-dots></span></p>
     <div class="cal-grid" role="grid" aria-label="月历，日期下方小字为藏历。使用方向键浏览日期，回车查看日程" data-cal-grid></div>
-    <p class="cal-legend" data-cal-legend></p>${reading ? '<p class="cal-turn-hint">把手机横过来，格子里会写出节日全名。</p>' : ''}
+    <p class="cal-legend" data-cal-legend></p>${reading ? `<div class="cal-turn-hint" data-cal-turn><span class="cal-turn-phone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="7" y="3" width="10" height="18" rx="2.2"/><path d="M11 18h2"/></svg></span><p class="cal-turn-text"><b>把手机横过来</b>格子里会写出节日全名</p><p class="cal-turn-demo" aria-hidden="true"><i class="cal-turn-short">莲师</i><span class="cal-turn-arrow">→</span><i class="cal-turn-full">莲师荟供日</i></p></div>` : ''}
     <section class="cal-month-list" aria-label="本月已选的日子" data-cal-month-list></section>
     <section class="cal-day-detail" aria-label="所选日期的日程" data-cal-detail></section>
   </section><dialog class="cal-day-sheet" data-cal-sheet aria-label="当天日程">
@@ -299,6 +309,12 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
   }
   function escape_(event) { if (event.key === 'Escape' && sheet.open && !sheetMode() && !page.querySelector('dialog[open]:not([data-cal-sheet])')) { closeSheet(); } }
   page?.addEventListener('pointerdown', outside, true);
+  // A tapped date already wears the selected frame. WebKit (iPhone, WeChat)
+  // also rings a date that gets focus back from script after the day card
+  // closes, which drew two frames (11-11). Rings are for keyboards: a tap or
+  // click hides them until a key is pressed again.
+  root.addEventListener('pointerdown', () => root.classList.add('is-pointer'), true);
+  page?.addEventListener('keydown', event => { if (!['Shift', 'Control', 'Alt', 'Meta'].includes(event.key)) root.classList.remove('is-pointer'); }, true);
   page?.addEventListener('keydown', escape_);
   let openedFrom = null;
   sheet.addEventListener('close', () => restoreFocus(openedFrom || 'date-' + selected));
@@ -320,6 +336,16 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     if (dy > 70) closeSheet();
   });
 
+  // Daily Tibetan dates are something a subscription adds to a phone
+  // calendar. The 藏历 page already shows every day's date, so it leaves them
+  // out even for people who subscribed to them (11-11).
+  // The phone in the hint turns over once, the first time it is seen.
+  const turn = root.querySelector('[data-cal-turn]');
+  if (turn && 'IntersectionObserver' in window) {
+    const seen = new IntersectionObserver(entries => { if (entries.some(entry => entry.isIntersecting)) { turn.classList.add('is-seen'); seen.disconnect(); } }, {threshold: 0.9});
+    seen.observe(turn);
+  }
+  function showDaily() { return !state.reading && state.settings?.includeDailyDates === true; }
   function activeKey() {
     return root.contains(doc.activeElement) ? doc.activeElement.dataset.calFocus : null;
   }
@@ -359,7 +385,7 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
       [...tibetanYears].map(([year, months]) => `<span class="cal-context-part"><span class="cal-context-year">${escape(year)}年 </span>${escape([...months].join(' · '))}</span>`).join('')}</span>`;
     // Each cell keeps the short Tibetan label even with daily dates on: the
     // key above says what it is, and 藏历 forty-two times was noise (11-10).
-    const daily = state.settings?.includeDailyDates === true;
+    const daily = showDaily();
     const header = `<div class="cal-weekdays" role="row">${WEEKDAYS.map(day => `<span role="columnheader" aria-label="星期${day}">${day}</span>`).join('')}</div>`;
     const rows = Array.from({length: 6}, (_, row) => `<div class="cal-week" role="row">${cells.slice(row * 7, row * 7 + 7).map(cell => {
       const cellEvents = cell.disabled ? [] : cell.events, cellSpare = cell.disabled ? [] : cell.spare;
@@ -383,8 +409,8 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
         : `${chip(ranked[0])}<span class="cal-abbr is-more" aria-hidden="true">等${ranked.length}项</span>`;
       const losar = state.reading && cellEvents.some(event => (event.eventId || event.id) === 'losar') ? ' is-losar' : '';
       return `<div role="gridcell" aria-selected="${cell.selected}" class="cal-cell"><button type="button" class="cal-day${cell.inMonth ? '' : ' cal-adjacent'}${cell.selected ? ' cal-selected' : ''}${cell.today ? ' cal-is-today' : ''}${tint}${losar}" data-cal-date="${cell.date}" data-cal-focus="date-${cell.date}" tabindex="${cell.date === focusDate && !cell.disabled ? 0 : -1}" aria-label="${escape(aria)}"${cell.today ? ' aria-current="date"' : ''}${cell.disabled ? ' disabled' : ''}>
-        <span class="cal-day-date" aria-hidden="true"><span class="cal-gregorian">${cell.day}</span><span class="cal-tibetan${cell.tibetan?.day === 1 ? ' is-month-start' : ''}">${escape(cell.tibetan ? cellLabel(cell.tibetan) : '')}</span></span>
-        <span class="cal-marks" aria-hidden="true">${cell.tibetan?.monthLeap ? '<span class="cal-leap">闰月</span>' : ''}${cell.tibetan?.missingBefore?.length ? `<span class="cal-miss">缺<small>${escape(cell.tibetan.missingBefore.map(dayPart).join(''))}</small></span>` : ''}${cell.repeatNumber ? '<span class="cal-repeat">重<small>日</small></span>' : ''}${cellEvents.length ? `<span class="cal-category-marks">${markers.slice(0, 3).map(color => `<i class="cal-category-dot ${color}"></i>`).join('')}</span><span class="cal-event-count">${cell.count}</span>` : ''}</span>
+        <span class="cal-day-date" aria-hidden="true"><span class="cal-gregorian">${cell.day}</span>${skipMark(cell)}<span class="cal-tibetan${cell.tibetan?.day === 1 ? ' is-month-start' : ''}">${escape(cell.tibetan ? cellLabel(cell.tibetan) : '')}</span></span>
+        <span class="cal-marks" aria-hidden="true">${cell.tibetan?.monthLeap ? '<span class="cal-leap">闰月</span>' : ''}${cellEvents.length ? `<span class="cal-category-marks">${markers.slice(0, 3).map(color => `<i class="cal-category-dot ${color}"></i>`).join('')}</span><span class="cal-event-count">${cell.count}</span>` : ''}</span>
         <span class="cal-day-events" aria-hidden="true">${labels}</span>${mobileSummary}</button></div>`;
     }).join('')}</div>`).join('');
     // When the same month is re-drawn because the selection changed, the
@@ -451,7 +477,7 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     const available = previewAvailability(state.data, state.settings, {start: selected, end: selected});
     let content;
     if (state.reading) content = events.length ? events.map(event => eventMarkup(event, 'day', state)).join('') : empty('这天没有修行日。');
-    else if (state.settings?.includeDailyDates) content = dailyMarkup(selected, state.settings?.titleMarks) + events.map(event => eventMarkup(event, 'day', state)).join('');
+    else if (showDaily()) content = dailyMarkup(selected, state.settings?.titleMarks) + events.map(event => eventMarkup(event, 'day', state)).join('');
     else if (!available.selectedCount) content = empty('还没有选择日程，请在“选择内容”中勾选你关注的日子。');
     else if (!events.length) content = empty(available.hasUnconfirmed
       ? '当天暂无已确认的所选日程；部分法会、节日或天象的安排尚待确认。'
@@ -461,14 +487,14 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     if (spare.length) {
       // Nothing chosen on this day yet: the grey days are the answer, not the
       // plain "nothing chosen" note. A note about unconfirmed dates stays.
-      if (!events.length && !state.settings?.includeDailyDates && !available.hasUnconfirmed) content = '';
+      if (!events.length && !showDaily() && !available.hasUnconfirmed) content = '';
       content += `<section class="cal-spare"><h4>${content ? '这天还有' : '这天有'}<small>未选</small></h4><ul>${spare.map(event => `<li><span class="cal-event-icon">${eventIcon(event, state.data?.catalog)}</span><span>${escape(event.title)}<small>${escape(eventPresentation(event, state.data?.catalog).label)}</small></span></li>`).join('')}</ul><p>在“选择内容”里选上，就会加入你的日历。</p></section>`;
     }
-    $('[data-cal-detail]').innerHTML = `${detailHeading(selected, tibetan)}${content}${(events.length || state.settings?.includeDailyDates) && available.hasUnconfirmed ? `<p class="cal-data-note">${unknownNote()}</p>` : ''}`;
+    $('[data-cal-detail]').innerHTML = `${detailHeading(selected, tibetan)}${content}${(events.length || showDaily()) && available.hasUnconfirmed ? `<p class="cal-data-note">${unknownNote()}</p>` : ''}`;
   }
 
   function renderList() {
-    const daily=state.settings?.includeDailyDates===true;
+    const daily=showDaily();
     const dates = daily ? Array.from({length:dailyShown},(_,index)=>addDays(state.today,index)).filter(date=>date>=state.start && date<=state.end)
       : [...new Set(state.events.filter(event => event.date >= state.today).map(event => event.date))].sort();
     const available = previewAvailability(state.data, state.settings, {start: state.today, end: state.end});
@@ -574,7 +600,7 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
       if(selected!==previousDate) playMotion($('[data-cal-detail]'),'fade');
     } else if (button.dataset.calAction === 'more') {
       const previousCount=$('[data-cal-list]').children.length;
-      if(state.settings?.includeDailyDates) dailyShown += 30; else shown += 5;
+      if(showDaily()) dailyShown += 30; else shown += 5;
       renderList();
       [...$('[data-cal-list]').children].slice(previousCount,previousCount+3).forEach(node=>playMotion(node,'fade'));
       // Keep the current viewport and offer the next newly displayed date to keyboard users.

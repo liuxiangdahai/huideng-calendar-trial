@@ -113,6 +113,16 @@ for (const width of [390, 1366]) test(`cells say where a Tibetan day is skipped 
   await expect(page.locator('[data-cal-date="2026-10-28"] .cal-miss')).toHaveText('缺十七');
   await expect(page.locator('[data-cal-date="2026-11-30"] .cal-miss')).toBeVisible();
   await expect(page.locator('[data-cal-date="2026-11-30"]')).toHaveAttribute('aria-label', /缺日：藏历火马年十月廿一/);
+  // The mark sits with the date (never on the festival line), right after the
+  // day number on computers, away from the Tibetan date.
+  const cell = page.locator('[data-cal-date="2026-11-30"]');
+  await expect(cell.locator('.cal-day-date .cal-miss')).toHaveCount(1);
+  if (width >= 1024) {
+    const [number, mark, tibetan] = await Promise.all(['.cal-gregorian', '.cal-miss', '.cal-tibetan'].map(selector => cell.locator(selector).boundingBox()));
+    expect(mark.x - (number.x + number.width)).toBeLessThan(6);
+    expect(tibetan.x - (mark.x + mark.width)).toBeGreaterThan(8);
+    expect(Math.abs((mark.y + mark.height / 2) - (number.y + number.height / 2))).toBeLessThan(3);
+  }
   await expect(page.locator('[data-cal-date="2026-11-10"] .cal-tibetan')).toHaveText('十月');
   await expect(page.locator('[data-cal-date="2026-11-11"] .cal-tibetan')).toHaveText('初二');
   await page.locator('[data-cal-month]').selectOption('2026-12');
@@ -139,7 +149,7 @@ test('the month head controls never overlap, from phone to wide desktop', async 
     await page.goto(width < 1024 ? '/calendar-reminders/' : '/calendar-reminders/#subscribe');
     await expect(page.locator('.cal-day')).toHaveCount(42);
     const boxes = await page.evaluate(() => ['[data-cal-action="previous"]', '.cal-month-picker', '[data-cal-action="next"]', '.cal-today', '.cal-month-context', '.cal-view-switch']
-      .map(selector => [selector, document.querySelector(selector).getBoundingClientRect().toJSON()]));
+      .filter(selector => document.querySelector(selector)).map(selector => [selector, document.querySelector(selector).getBoundingClientRect().toJSON()]));
     for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) {
       const [[na, a], [nb, b]] = [boxes[i], boxes[j]];
       const overlap = a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom - 1 && b.top < a.bottom - 1;
@@ -172,4 +182,70 @@ test('the 藏历 page shows every day; the subscription preview only the chosen 
   // Back to the 藏历 page with the browser's own back button.
   await page.goBack();
   await expect(page.locator('#home-upcoming-list')).toBeVisible();
+});
+
+test('the 藏历 page leaves out daily dates even for a subscription that has them (11-11)', async ({page}) => {
+  await page.setViewportSize({width: 390, height: 844});
+  await page.goto('/calendar-reminders/#subscribe');
+  await page.locator('[data-preset="tsok"]').click();
+  await page.locator('#include-daily-dates').check({force: true});
+  await page.goto('about:blank'); await page.goto('/calendar-reminders/');
+  const home = page.locator('#home-calendar');
+  await expect(home.locator('.cal-day')).toHaveCount(42);
+  await expect(home.locator('.cal-legend-daily')).toHaveCount(0);
+  await home.locator('[data-cal-date="2026-11-12"]').click();
+  await expect(home.locator('[data-cal-sheet]')).toBeVisible();
+  await expect(home.locator('[data-cal-sheet] .cal-daily-entry')).toHaveCount(0);
+  await page.keyboard.press('Escape');
+  await expect(home.locator('.cal-month-list li').first()).toBeVisible();
+  await expect(home.locator('.cal-daily-entry')).toHaveCount(0);
+});
+
+for (const width of [390, 1366]) test(`the 藏历 page has no 月历/列表 switch; the month list under the grid follows the month at ${width}px`, async ({page}) => {
+  await page.setViewportSize({width, height: 900});
+  await page.goto('/calendar-reminders/');
+  const home = page.locator('#home-calendar');
+  await expect(home.locator('.cal-day')).toHaveCount(42);
+  await expect(home.locator('[data-cal-view]')).toHaveCount(0);
+  await expect(home.locator('.cal-list-view')).toBeHidden();
+  if (width < 1024) {
+    await home.locator('[data-cal-month]').selectOption('2026-12');
+    await expect(home.locator('.cal-month-list-title')).toContainText('12月的修行日');
+  }
+  // The subscription preview keeps its own switch.
+  await page.goto('about:blank'); await page.goto('/calendar-reminders/#subscribe');
+  if (width >= 1024) await expect(page.locator('#calendar-preview [data-cal-view]')).toHaveCount(2);
+});
+
+test('a tapped date keeps one frame after its day card closes (11-11)', async ({browser}) => {
+  const context = await browser.newContext({viewport: {width: 390, height: 844}, isMobile: true, hasTouch: true, baseURL: 'http://127.0.0.1:4173'});
+  const page = await context.newPage();
+  await page.goto('/calendar-reminders/');
+  const cell = page.locator('#home-calendar [data-cal-date="2026-11-19"]');
+  await cell.tap();
+  await expect(page.locator('#home-calendar [data-cal-sheet]')).toBeVisible();
+  await page.locator('#home-calendar [data-cal-action="close-sheet"]').first().tap();
+  await expect(page.locator('#home-calendar [data-cal-sheet]')).toBeHidden();
+  await expect(cell).toHaveClass(/cal-selected/);
+  expect(await cell.evaluate(node => getComputedStyle(node).outlineStyle)).toBe('none');
+  // A key brings the ring back for keyboard users.
+  await page.keyboard.press('ArrowRight');
+  const next = page.locator('#home-calendar [data-cal-date="2026-11-20"]');
+  await expect(next).toBeFocused();
+  expect(await next.evaluate(node => getComputedStyle(node).outlineStyle)).not.toBe('none');
+  await context.close();
+});
+
+test('upright phones show how turning works, with the short name becoming the full one', async ({page}) => {
+  await page.setViewportSize({width: 390, height: 844});
+  await page.goto('/calendar-reminders/');
+  const hint = page.locator('#home-calendar [data-cal-turn]');
+  await hint.scrollIntoViewIfNeeded();
+  await expect(hint).toBeVisible();
+  await expect(hint).toContainText('把手机横过来');
+  await expect(hint.locator('.cal-turn-short')).toHaveText('莲师');
+  await expect(hint.locator('.cal-turn-full')).toHaveText('莲师荟供日');
+  await expect(hint).toHaveClass(/is-seen/);
+  await page.setViewportSize({width: 1366, height: 900});
+  await expect(hint).toBeHidden();
 });

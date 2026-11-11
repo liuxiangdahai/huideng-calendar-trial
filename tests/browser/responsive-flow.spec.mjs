@@ -112,7 +112,7 @@ test('200 percent equivalent desktop reflow and keyboard navigation remain opera
     await page.locator('[data-preset="guru"]').click();
     await page.locator('.sub-upcoming-all').focus();await page.keyboard.press('Enter');
     await expect(page.locator('#home-calendar')).toBeVisible();
-    await page.locator('#home-calendar [data-cal-view="list"]').focus();await page.keyboard.press('Enter');await expect(page.locator('#home-calendar .cal-list-view')).toBeVisible();
+    await page.locator('#home-calendar [data-cal-action="next"]').focus();await page.keyboard.press('Enter');await expect(page.locator('#home-calendar [data-cal-month]')).not.toHaveValue(/2026-10|2026-11/);
     await page.locator('#home-subscribe').focus();await page.keyboard.press('Enter');
     await expect(page.locator('#preset-options')).toBeVisible();
     await page.locator('#subscribe').click();await page.locator('input[name="device"][value="google"]').check();

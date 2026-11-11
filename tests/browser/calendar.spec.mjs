@@ -183,9 +183,9 @@ test('remote disable clears stale credentials while retaining unsaved local choi
   await expect.poll(() => credentials(page)).toBeNull();
   await expect(page.locator('#save-state')).toContainText('已停用');
   expect((await draft(page)).events['dakini-tsok'].mode).toBe('off');
-  await page.locator('#my-subscription').click();
-  await expect(page.locator('#create-subscription')).toBeVisible();
-  await expect(page.locator('#subscription-existing')).toBeHidden();
+  // The old subscription is gone: the bottom button starts a new one.
+  await expect(page.locator('#subscribed-card')).toBeHidden();
+  await expect(page.locator('#subscribe-label')).toHaveText('加入日历');
 });
 
 test('edits made during delayed creation and saving remain an unsaved draft',async({page}) => {
@@ -395,10 +395,14 @@ test('on tablet and desktop the month title pair sits on the grid centre line',a
       const box = document.querySelector(selector).getBoundingClientRect(); return box.left + box.width / 2;
     }));
     for (const value of centre.slice(1)) expect(Math.abs(value - centre[0]), `${width}px`).toBeLessThan(2);
-    // 今天 and the view switch balance the title at the two ends.
-    const [today, grid, views] = await Promise.all(['.cal-today', '.cal-grid', '.cal-view-switch'].map(selector => page.locator(selector).boundingBox()));
+    // 今天 at the start; the preview's view switch, where there is one (the
+    // 藏历 page has none), at the end.
+    const [today, grid] = await Promise.all(['.cal-today', '.cal-grid'].map(selector => page.locator(selector).boundingBox()));
     expect(Math.abs(today.x - grid.x)).toBeLessThan(2);
-    expect(Math.abs(views.x + views.width - grid.x - grid.width)).toBeLessThan(2);
+    if (await page.locator('.cal-view-switch').count()) {
+      const views = await page.locator('.cal-view-switch').boundingBox();
+      expect(Math.abs(views.x + views.width - grid.x - grid.width)).toBeLessThan(2);
+    }
   }
 });
 
@@ -419,4 +423,27 @@ test('every dialog opens under a red eave that spans the window, and a disabled 
     await expect(dialog.locator('.download-fallback summary .icon')).toBeVisible();
     await context.close();
   }
+});
+
+test('with a subscription, the 藏历 page leads back to the choices to change them', async ({page}) => {
+  await open(page); await createSubscription(page); await closeSubscription(page);
+  await page.goto('about:blank'); await page.goto(route);
+  await expect(page.locator('#home-cta-title')).toHaveText('你的日历已在同步');
+  await expect(page.locator('#home-subscribe-label')).toHaveText('修改选择');
+  await page.locator('#home-subscribe').click();
+  await expect(page).toHaveURL(/#subscribe$/);
+  await expect(page.locator('#preset-options')).toBeVisible();
+  await expect(page.locator('#subscribed-card')).toBeVisible();
+  // On the choices page the header leads back to the calendar, as a real step back.
+  await expect(page.locator('#my-subscription')).toHaveText('藏历',{useInnerText:true});
+  await page.locator('#my-subscription').click();
+  await expect(page).not.toHaveURL(/#subscribe$/);
+  await expect(page.locator('#home-calendar')).toBeVisible();
+  await expect(page.locator('#my-subscription')).toHaveText('我的订阅',{useInnerText:true});
+  await page.locator('#my-subscription').click();
+  await expect(page).toHaveURL(/#subscribe$/);
+  await expect(page.locator('#subscription-dialog')).toBeHidden();
+  // The subscription itself opens from the status card or the bottom button.
+  await page.locator('#subscribed-open').click();
+  await expect(page.locator('#subscription-dialog')).toBeVisible();
 });

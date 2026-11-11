@@ -98,13 +98,15 @@ test('reduced motion skips feedback from load and cancels an in-flight effect wh
   await page.locator('[data-group-id="masters"] > summary').click();
   // Safari does not focus buttons on pointer click; use a real keyboard entry
   // so restoring focus after Escape has the same meaning in all engines.
-  await page.locator('#my-subscription').focus();
-  await page.locator('#my-subscription').press('Enter');
-  await expect(page.locator('#subscription-dialog')).toBeVisible();
+  // (The time-zone window: it opens without saving anything.)
+  await showMoreSettings(page);
+  await page.locator('#zone-settings-inline').focus();
+  await page.locator('#zone-settings-inline').press('Enter');
+  await expect(page.locator('#zone-dialog')).toBeVisible();
   expect(await page.evaluate(() => document.getAnimations().length)).toBe(0);
   expect(await page.evaluate(() => window.motionCalls.length)).toBe(0);
   await page.keyboard.press('Escape');
-  await expect(page.locator('#my-subscription')).toBeFocused();
+  await expect(page.locator('#zone-settings-inline')).toBeFocused();
   await page.emulateMedia({reducedMotion: 'no-preference'});
   await expect.poll(() => page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches)).toBe(false);
   // Stretch only the feedback lifetime so the media-change assertion proves

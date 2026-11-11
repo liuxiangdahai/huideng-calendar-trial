@@ -144,7 +144,7 @@ test('remembered Google choice overrides Apple recommendation and desktop opens 
     await expect(page.locator('#iphone-subscribe,#google-subscribe').filter({ visible: true })).toHaveCount(0);
     expect(service.posts).toBe(1);
     expect((await read(page)).feedUrl).toBe(sub.feedUrl);
-    await page.reload(); await page.locator('#my-subscription').click();
+    await page.reload(); await page.locator('#subscribed-open').click();
     await expect(page.locator('input[name="device"][value="other"]')).toBeChecked();
     expect(service.posts).toBe(1);
   } finally { await context.close(); }
@@ -210,7 +210,7 @@ test('Android handoff keeps copy and import available while actual ICS checks fa
     await expect(page.locator('#copy-feed')).toBeEnabled();
     await expect(page.locator('[data-download="remind"]')).toBeEnabled();
     await page.locator('[data-close="subscription-dialog"]').first().click();
-    await page.locator('#my-subscription').click();
+    await page.locator('#subscribed-open').click();
     expect(probes).toBe(2); // Reopening never starts polling or another automatic check.
     mode='hold';await page.locator('#check-connection').click();
     await expect.poll(()=>Boolean(releaseCheck)).toBe(true);
@@ -240,7 +240,7 @@ test('slow preparation survives closing and app changes without duplicate creati
     await page.evaluate(()=>{
       document.querySelector('input[name="device"][value="google"]').click();
       document.querySelector('[data-close="subscription-dialog"]').click();
-      document.querySelector('#my-subscription').click();
+      document.querySelector('#subscribe').click();
       document.querySelector('input[name="device"][value="iphone"]').click();
     });
     expect(service.posts).toBe(1);
@@ -345,7 +345,7 @@ test('expired creation requires an explicit new attempt and preserves that choic
     await expect(page.locator('#create-subscription')).toBeDisabled();
     await expect(page.locator('#restart-creation')).toBeVisible();
     await page.unroute('**/api/subscriptions',expire);
-    await page.reload();await expect(page.locator('#app')).toBeVisible();await page.locator('#my-subscription').click();
+    await page.reload();await expect(page.locator('#app')).toBeVisible();await page.locator('#subscribe').click();
     await expect(page.locator('#subscription-error')).toContainText('七天恢复期限');
     await expect(page.locator('#create-subscription')).toBeDisabled();
     await page.locator('input[name="device"][value="google"]').check();
@@ -367,7 +367,8 @@ test('unsaved and failed settings disable Apple launch until saving the same sub
     await openSelected(page); await page.locator('#subscribe').click(); const original = await ready(page);
     await page.locator('[data-close="subscription-dialog"]').first().click();
     await page.locator('[data-preset="tsok"]').click();
-    await page.locator('#my-subscription').click();
+    // With unsaved changes the status card still opens the subscription without saving.
+    await page.locator('#subscribed-open').click();
     await expect(page.locator('#save-subscription')).toBeVisible();
     await expect(page.locator('#iphone-subscribe')).not.toHaveAttribute('href', /^webcal:/);
     const failSave = route => route.request().method() === 'PATCH'
@@ -430,7 +431,12 @@ test('in-app browser help is explicit and never fabricates an external-browser o
   const context = await deviceContext(browser, { ...devices.iphone, userAgent: devices.iphone.userAgent + ' MicroMessenger/8.0.50' });
   try {
     const page = await context.newPage(); const service=await httpsService(page);
-    await openSelected(page);await page.locator('#my-subscription').click();
+    await page.goto(appPath+'#subscribe');
+    // Arriving at the choices inside WeChat first says how to get to a browser.
+    await expect(page.locator('#wechat-dialog')).toBeVisible();
+    await page.locator('#wechat-dialog [data-close]').last().click();
+    await page.locator('[data-preset="guru"]').click();
+    await page.locator('#subscribe').click();
     const notice=page.locator('#apple-browser-notice');
     await expect(notice).toBeVisible();
     await expect(notice).toContainText('请先在浏览器中打开');
@@ -565,8 +571,8 @@ test('management restore waits for a delayed save and keeps B id, token, draft a
     await expect(page.locator('#iphone-subscribe')).not.toHaveAttribute('href', /^webcal:/);
     await expect(page.locator('#entry-hint')).toHaveText('正在恢复订阅，请稍候。');
     await expect(page.locator('#subscribe-label')).toHaveText('正在恢复订阅…');
-    await expect(page.locator('#subscribe')).toBeDisabled();
-    await expect(page.locator('#my-subscription')).toBeEnabled();
+    // Still tappable: it opens the panel with the progress, and saves nothing.
+    await expect(page.locator('#subscribe')).toBeEnabled();
     held.release(); await expectB(page, b);
     await expect(page.locator('#guide-seen')).not.toBeChecked();
     expect(order.indexOf('GET B')).toBeGreaterThan(order.indexOf('release PATCH A'));
