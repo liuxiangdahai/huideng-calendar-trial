@@ -321,11 +321,9 @@ dialog.cal-day-sheet::backdrop { background: #1d1b1859; }
    headline, the day in Tibetan script in gilt, the civil date), closed by the
    same 香布 valance as under the mountains; the festivals sit on white.
    Phones show it at the top of the sheet; computers as a card by the date. */
-.cal-day-sheet .cal-detail-heading { position: relative; margin: 0 -18px 22px; padding: 4px 18px 14px; border: 0; background: #5f111c; color: #f4ead6; }
+.cal-day-sheet .cal-detail-heading { position: relative; margin: 0 -18px 22px; padding: 4px 18px 14px; border: 0; background: var(--eave); color: #f4ead6; }
 .cal-day-sheet .cal-detail-heading::after { content: ""; position: absolute; left: 0; right: 0; bottom: -13px; height: 13px; pointer-events: none;
-  background: repeating-linear-gradient(90deg, #0000001a 0 1px, transparent 1px 8px), var(--shambu); background-size: auto, 100% 9px; background-repeat: repeat, no-repeat; background-color: #2f3e5a;
-  -webkit-mask: linear-gradient(#000 0 9px, transparent 9px), radial-gradient(circle 4px at 4px 9px, #000 95%, transparent) 0 0/8px 13px repeat-x;
-  mask: linear-gradient(#000 0 9px, transparent 9px), radial-gradient(circle 4px at 4px 9px, #000 95%, transparent) 0 0/8px 13px repeat-x; }
+  background: var(--valance); -webkit-mask: var(--valance-hem); mask: var(--valance-hem); }
 .cal-detail-heading .cal-detail-era { display: flex; align-items: center; gap: 8px; margin: 0; color: #f1e4cb; font: 500 15px/1.5 var(--font-serif); letter-spacing: 2px; }
 .cal-detail-era b { padding: 0 6px 1px; border-radius: 3px; background: #f4ead6; color: var(--teal); font: 600 13px/1.5 var(--font-serif); letter-spacing: 2px; text-indent: 2px; }
 .cal-detail-heading .cal-detail-day { display: flex; align-items: baseline; gap: 12px; margin: 2px 0 0; }
@@ -336,7 +334,7 @@ dialog.cal-day-sheet::backdrop { background: #1d1b1859; }
 .cal-detail-heading h3>span { font: inherit; color: inherit; }
 .cal-detail-heading>h3:only-child { margin-top: 10px; color: #fdf9f1; font: 500 22px/1.5 var(--font-serif); }
 /* Phones: the sheet's grab bar joins the eave. */
-.cal-day-sheet:not(.is-popover) .cal-sheet-bar { background: #5f111c; border-bottom: 0; }
+.cal-day-sheet:not(.is-popover) .cal-sheet-bar { background: var(--eave); border-bottom: 0; }
 .cal-day-sheet:not(.is-popover) .cal-sheet-grip { background: #f1e4cb66; }
 .cal-day-sheet .cal-sheet-close { color: #f1e4cb; }
 .cal-day-sheet .cal-sheet-close:hover { background: #ffffff1a; color: #fff; }
@@ -345,7 +343,7 @@ dialog.cal-day-sheet::backdrop { background: #1d1b1859; }
 
 /* Computers: the card by the date. White body, thin warm border, short shadow. */
 dialog.cal-day-sheet.is-popover { position: absolute; inset: auto; z-index: 30; width: 300px; max-width: calc(100% - 16px); max-height: 480px; margin: 0; padding: 0 20px 14px;
-  border: 1px solid #5f111c; border-radius: 6px; background: var(--surface); box-shadow: 0 14px 28px -12px #3b0a1266; overflow: auto; transform: none; }
+  border: 1px solid var(--eave); border-radius: 6px; background: var(--surface); box-shadow: 0 14px 28px -12px #3b0a1266; overflow: auto; transform: none; }
 .cal-day-sheet.is-popover .cal-detail-heading { margin: 0 -20px 22px; padding: 14px 20px 14px; }
 .cal-day-sheet.is-popover .cal-sheet-bar { position: absolute; top: 8px; right: 8px; z-index: 2; width: auto; height: auto; margin: 0; background: none; border: 0; }
 .cal-day-sheet.is-popover .cal-sheet-grip { display: none; }

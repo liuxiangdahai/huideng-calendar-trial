@@ -314,10 +314,17 @@ test('复制管理链接 inside 我的订阅 shows its note above the open dialo
   const toast = page.locator('#toast');
   await expect(toast).toHaveText('管理链接已复制');
   // The note must be the topmost element where it is drawn, not hidden under the modal.
+  // (Taps pass through it, so hit-testing is switched on just for this check.)
   expect(await toast.evaluate(node => {
+    node.style.pointerEvents = 'auto';
     const box = node.getBoundingClientRect();
-    return node.contains(document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2));
+    const top = node.contains(document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2));
+    node.style.pointerEvents = '';
+    return top;
   })).toBe(true);
+  // It sits at the top of the screen, clear of the dialog's own buttons.
+  const note = await toast.boundingBox(), actions = await page.locator('#subscription-dialog .dialog-actions').boundingBox();
+  expect(note.y + note.height).toBeLessThanOrEqual(actions.y);
   if (test.info().project.name === 'chromium') expect(await page.evaluate(() => navigator.clipboard.readText())).toMatch(/#manage=/);
   // Closing the dialog brings the note back to the page for later messages.
   await closeSubscription(page); await page.locator('[data-preset="tsok"]').click();
@@ -383,5 +390,24 @@ test('on tablet and desktop the month title pair sits on the grid centre line',a
     const [today, grid, views] = await Promise.all(['.cal-today', '.cal-grid', '.cal-view-switch'].map(selector => page.locator(selector).boundingBox()));
     expect(Math.abs(today.x - grid.x)).toBeLessThan(2);
     expect(Math.abs(views.x + views.width - grid.x - grid.width)).toBeLessThan(2);
+  }
+});
+
+test('every dialog opens under a red eave that spans the window, and a disabled step points nowhere',async({browser}) => {
+  for (const viewport of [{width:390,height:844},{width:1366,height:900}]) {
+    const context = await browser.newContext({viewport, locale:'zh-CN'}), page = await context.newPage(); await open(page);
+    await page.locator('[data-preset="tsok"]').click(); await page.locator('#subscribe').click();
+    const dialog = page.locator('#subscription-dialog');
+    await dialog.evaluate(node => Promise.all(node.getAnimations({subtree:true}).map(animation => animation.finished)));
+    const [frame, eave] = await Promise.all([dialog.boundingBox(), dialog.locator('.dialog-head').boundingBox()]);
+    // Edge to edge inside the 1px border, so no white slivers beside the red band.
+    expect(Math.abs(eave.x - frame.x)).toBeLessThanOrEqual(1);
+    expect(Math.abs(eave.x + eave.width - (frame.x + frame.width))).toBeLessThanOrEqual(1);
+    expect(await dialog.locator('.dialog-head').evaluate(node => getComputedStyle(node).backgroundColor)).toBe('rgb(95, 17, 28)');
+    // Whenever the step cannot be pressed yet, it carries no arrow.
+    await page.locator('#create-subscription').evaluate(node => { node.disabled = true; });
+    await expect(page.locator('#create-subscription [data-icon="arrow-right"]')).toBeHidden();
+    await expect(dialog.locator('.download-fallback summary .icon')).toBeVisible();
+    await context.close();
   }
 });
