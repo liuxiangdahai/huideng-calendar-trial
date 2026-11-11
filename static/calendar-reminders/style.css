@@ -33,6 +33,10 @@
   /* Hand-made paper: a faint fibre grain, generated once by the browser. */
   --grain: none;
   --shambu: linear-gradient(#c9a764 0 1px, #a1232b 1px 4px, #d6a64a 4px 6px, #1f3a63 6px 9px);
+  /* The valance itself, hung under the masthead, the day card and every
+     dialog's eave: stripes and pleats, then a scalloped deep-teal hem. */
+  --valance: repeating-linear-gradient(90deg, #0000001a 0 1px, transparent 1px 8px), var(--shambu) 0 0/100% 9px no-repeat, #2f3e5a;
+  --valance-hem: linear-gradient(#000 0 9px, transparent 9px), radial-gradient(circle 4px at 4px 9px, #000 95%, transparent) 0 0/8px 13px repeat-x;
   /* Legacy aliases kept for the shared guide stylesheet and older modules. */
   --card: var(--surface); --red-soft: var(--red-tint); --teal-dark: var(--teal); --teal-soft: var(--teal-tint);
   --control-line: var(--control); --green: var(--teal-2); --radius: var(--r-sm); --panel-radius: var(--r);
@@ -112,11 +116,7 @@ button:disabled { cursor: default; }
 /* 香布 valance: solid stripes, then a scalloped deep-teal hem with faint pleats. */
 .editorial-masthead::after {
   content: ""; position: absolute; left: 0; right: 0; bottom: -13px; height: 13px; pointer-events: none;
-  background: repeating-linear-gradient(90deg, #0000001a 0 1px, transparent 1px 8px), var(--shambu);
-  background-size: auto, 100% 9px; background-repeat: repeat, no-repeat;
-  background-color: #2f3e5a;
-  -webkit-mask: linear-gradient(#000000 0 9px, transparent 9px), radial-gradient(circle 4px at 4px 9px, #000000 95%, transparent) 0 0/8px 13px repeat-x;
-  mask: linear-gradient(#000000 0 9px, transparent 9px), radial-gradient(circle 4px at 4px 9px, #000000 95%, transparent) 0 0/8px 13px repeat-x;
+  background: var(--valance); -webkit-mask: var(--valance-hem); mask: var(--valance-hem);
 }
 .masthead-inner { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 24px; max-width: 1216px; height: 100%; margin: auto; }
 .masthead-eyebrow { display: block; margin-bottom: 6px; color: #e5c287; font: 13px/1.5 var(--font-serif); letter-spacing: 6px; }
@@ -284,19 +284,36 @@ footer a:hover { color: var(--red); }
 /* ── Dialogs: a page with the shambu at its head ──────────────────────── */
 dialog {
   position: fixed; top: calc(var(--viewport-top, 0px) + var(--available-height) * .5); bottom: auto; transform: translateY(-50%);
-  width: min(620px, calc(100% - 32px)); max-height: min(90dvh, calc(var(--available-height) - 24px)); margin: 0 auto; padding: 0 24px;
+  width: min(620px, calc(100% - 32px)); max-height: min(90dvh, calc(var(--available-height) - 24px)); margin: 0 auto; padding: 0 var(--dialog-pad);
   border: 1px solid var(--line-2); border-radius: var(--r); background: var(--surface); color: var(--ink);
   overflow: auto; overscroll-behavior: contain; scroll-padding: 96px 0 90px; box-shadow: var(--shadow-2);
 }
 /* No backdrop blur: re-blurring the page under a scrolling dialog halved the
    frame rate (time-zone list, 11-09). A slightly deeper tint does the job. */
 dialog::backdrop { background: #26232073; }
-.dialog-head { position: sticky; top: 0; z-index: 3; display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 0 0 16px; padding: 22px 0 12px; background: var(--surface); border-bottom: 1px solid var(--line); }
-.dialog-head::before { content: ""; position: absolute; top: 0; left: -24px; right: -24px; height: 6px; background: repeating-linear-gradient(90deg, #00000014 0 1px, transparent 1px 10px), linear-gradient(#73161e 0 2px, #caa25c 2px 4px, #2f3e5a 4px 6px); }
+/* Every window opens under a small eave, like the day card in the calendar:
+   a 边玛 red band with the title, the valance hanging below, the steps on white. */
+dialog { --dialog-pad: 24px; }
+.dialog-head { position: sticky; top: 0; z-index: 3; display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  margin: 0 calc(-1 * var(--dialog-pad)) 28px; padding: 18px var(--dialog-pad) 14px; background: var(--eave); color: #f4ead6; }
+.dialog-head::after { content: ""; position: absolute; left: 0; right: 0; bottom: -13px; height: 13px; pointer-events: none;
+  background: var(--valance); -webkit-mask: var(--valance-hem); mask: var(--valance-hem); }
+.dialog-head .overline { color: #e3cfa9; }
+.dialog-head h2 { color: #fdf9f1; }
+.dialog-head .icon-button { color: #f1e4cb; }
+.dialog-head .icon-button:hover:not(:disabled) { background: #ffffff1a; }
+.dialog-head .icon-button:active:not(:disabled) { background: #ffffff26; }
+.dialog-head :focus-visible { outline-color: #f6cd87; }
 .dialog-head h2 { font: 500 var(--fs-2xl)/1.4 var(--font-serif); letter-spacing: 1px; overflow-wrap: anywhere; }
 .overline { margin-bottom: 2px; font-size: var(--fs-sm); letter-spacing: 2px; color: var(--muted); }
 .dialog-actions { position: sticky; bottom: 0; z-index: 2; display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; margin-top: 22px; padding: 14px 0 18px; background: var(--surface); border-top: 1px solid var(--line); }
 .dialog-actions :is(.primary, .secondary) { min-width: 100px; }
+/* In a dialog the note shows at the top of the screen, on paper, so it never
+   covers the dialog's own buttons, and taps go through it to the window. */
+dialog .toast { inset: calc(var(--viewport-top, 0px) + 10px) auto auto 50%; border: 1px solid #c9a764; background: #fdf9f1; color: var(--ink); box-shadow: 0 8px 24px #26232040; pointer-events: none; }
+dialog .toast-undo { pointer-events: auto; border-color: var(--line-2); color: var(--red); }
+/* A button that cannot be pressed yet does not point anywhere. */
+#create-subscription:disabled [data-icon="arrow-right"] { display: none; }
 fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
 legend { padding: 0 0 10px; font-size: var(--fs-md); color: var(--muted); }
 .field-note { margin: 8px 0 16px; font-size: var(--fs-md); line-height: 1.7; color: var(--muted); }
@@ -343,7 +360,10 @@ input[type=time]::-webkit-datetime-edit { padding: 0; }
 .subscription-entry .url-label { margin-top: 12px; }
 #entry-attempt { padding-left: 12px; border-left: 2px solid var(--control); }
 .management, .download-fallback { margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--line); font-size: var(--fs-md); color: var(--muted); }
-:is(.management, .download-fallback) summary { min-height: 44px; padding: 8px 0; color: var(--ink); }
+:is(.management, .download-fallback) summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; padding: 8px 0; color: var(--ink); list-style: none; cursor: pointer; }
+:is(.management, .download-fallback) summary::-webkit-details-marker { display: none; }
+:is(.management, .download-fallback) summary .icon { width: 16px; height: 16px; color: var(--muted); transition: transform .15s; }
+:is(.management, .download-fallback)[open] summary .icon { transform: rotate(180deg); }
 :is(.management, .download-fallback) p { margin: 10px 0; line-height: 1.8; }
 .management>.danger { margin-left: 8px; }
 .downloads { display: grid; gap: 8px; }
@@ -455,9 +475,8 @@ input[type=time]::-webkit-datetime-edit { padding: 0; }
   #reminder-count, #daily-date-count { font-size: var(--fs-xs); }
   #reminder-count::before, .selection-totals #daily-date-count::before { margin-right: 5px; }
   .action-inner p { max-width: 185px; font-size: var(--fs-xs); }
-  dialog { width: calc(100% - 20px); max-height: calc(var(--available-height) - 20px); padding: 0 18px; }
-  .dialog-head { padding-top: 18px; }
-  .dialog-head::before { left: -18px; right: -18px; }
+  dialog { --dialog-pad: 18px; width: calc(100% - 20px); max-height: calc(var(--available-height) - 20px); }
+  .dialog-head { padding-top: 16px; }
   .dialog-head h2 { font-size: var(--fs-xl); }
   .dialog-actions :is(.primary, .secondary) { min-width: 90px; }
   .reminder-row { gap: 6px; }
