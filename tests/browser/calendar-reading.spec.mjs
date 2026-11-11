@@ -3,12 +3,14 @@ import {test, expect} from '@playwright/test';
 // 11-10: reading the month. Dates fixed by the bundled 藏历 PRO data:
 // 2026-10-28 skips 九月十七, 2026-11-30 skips 十月廿一, 2026-12-11/12 are both
 // 十一月初三, and 2026-11-10 is 十月初一.
+// Computers: the 加入日历 page and its preview of the chosen days. Phones and
+// tablets: the 藏历 page, whose month shows every day (11-11, plan C: the
+// subscription page on phones has no month of its own).
 async function open(page, width, preset = 'practice') {
   await page.setViewportSize({width, height: 900});
-  await page.goto('/calendar-reminders/');
+  await page.goto(width < 1024 ? '/calendar-reminders/' : '/calendar-reminders/#subscribe');
   await expect(page.locator('.cal-day')).toHaveCount(42);
-  await page.locator(`[data-preset="${preset}"]`).click();
-  if (width < 1024) await page.locator('#tab-preview').click();
+  if (width >= 1024) await page.locator(`[data-preset="${preset}"]`).click();
   await page.locator('[data-cal-month]').selectOption('2026-11');
 }
 
@@ -78,32 +80,36 @@ test('a card near the bottom of the grid opens upward and stays over the calenda
   expect(card.y + card.height).toBeLessThanOrEqual(grid.y + grid.height + 1);
 });
 
-for (const width of [390, 820]) test(`phones and tablets list the month's days by name under the grid at ${width}px`, async ({page}) => {
+for (const width of [390, 820]) test(`on phones and tablets every day has a short name in the grid and a full name in the list under it at ${width}px`, async ({page}) => {
   await open(page, width);
+  const tsokDay = page.locator('[data-cal-date="2026-11-19"]');
+  await expect(tsokDay.locator('.cal-abbr')).toHaveText('莲师');
+  // Three or more on one day: the most important name, then 等N项; no symbols.
+  await page.locator('[data-cal-month]').selectOption('2027-02');
+  const losar = page.locator('[data-cal-date="2027-02-07"]');
+  await expect(losar).toHaveClass(/is-losar/);
+  await expect(losar.locator('.cal-abbr')).toHaveText(['新年', '等5项']);
+  await page.locator('[data-cal-month]').selectOption('2026-11');
   const list = page.locator('[data-cal-month-list]');
-  await expect(list).toBeVisible();
-  await expect(list.locator('.cal-month-list-title')).toContainText('11月已选的日子');
-  // Every tinted day has its row, and only those: days not chosen stay out once something is chosen.
-  const chosen = await page.locator('.cal-day:not(.cal-adjacent):is(.has-remind, .has-display)').count();
-  await expect(list.locator('.cal-month-row')).toHaveCount(chosen);
-  await expect(list.locator('.cal-month-list-title')).toContainText(`${chosen} 天`);
-  await expect(list.locator('.is-spare')).toHaveCount(0);
+  await expect(list.locator('.cal-month-list-title')).toContainText('11月的修行日');
+  const marked = await page.locator('.cal-day:not(.cal-adjacent)[class*="has-cat-"]').count();
+  await expect(list.locator('.cal-month-row')).toHaveCount(marked);
   const tsok = list.locator('[data-cal-pick="2026-11-19"]');
   await expect(tsok).toContainText('莲师荟供日');
   await expect(tsok).toContainText('十月初十');
-  await expect(tsok.locator('.cal-month-row-bell')).toHaveCount(1);
-  await expect(list.locator('[data-cal-pick="2026-11-24"] .cal-month-row-bell')).toHaveCount(0);
   await tsok.click();
   const sheet = page.locator('[data-cal-sheet]');
   await expect(sheet).toBeVisible();
   await expect(sheet).toContainText('2026年11月19日');
-  // The tap hint is a computer thing; the list replaces it here.
-  await expect(page.locator('.cal-legend-tap')).toBeHidden();
+  await expect(sheet.locator('.cal-source')).toHaveAttribute('href', /fohuifayu/);
+  await expect(sheet.locator('.cal-reminder')).toHaveCount(0);
 });
 
 for (const width of [390, 1366]) test(`cells say where a Tibetan day is skipped or repeated, and where a month begins, at ${width}px`, async ({page}) => {
   await open(page, width);
+  // 缺 and 重 are marks of the calendar, not chips like a day to keep.
   await expect(page.locator('[data-cal-date="2026-11-30"] .cal-miss')).toHaveText('缺廿一');
+  await expect(page.locator('.cal-legend-calendar')).toContainText('不是节日');
   await expect(page.locator('[data-cal-date="2026-10-28"] .cal-miss')).toHaveText('缺十七');
   await expect(page.locator('[data-cal-date="2026-11-30"] .cal-miss')).toBeVisible();
   await expect(page.locator('[data-cal-date="2026-11-30"]')).toHaveAttribute('aria-label', /缺日：藏历火马年十月廿一/);
@@ -129,9 +135,9 @@ test('with daily dates on, cells keep the short label instead of repeating 藏�
 test('the month head controls never overlap, from phone to wide desktop', async ({page}) => {
   for (const width of [390, 820, 1024, 1180, 1366]) {
     await page.setViewportSize({width, height: 900});
-    await page.goto('/calendar-reminders/');
+    await page.goto('about:blank');
+    await page.goto(width < 1024 ? '/calendar-reminders/' : '/calendar-reminders/#subscribe');
     await expect(page.locator('.cal-day')).toHaveCount(42);
-    if (width < 1024) await page.locator('#tab-preview').click();
     const boxes = await page.evaluate(() => ['[data-cal-action="previous"]', '.cal-month-picker', '[data-cal-action="next"]', '.cal-today', '.cal-month-context', '.cal-view-switch']
       .map(selector => [selector, document.querySelector(selector).getBoundingClientRect().toJSON()]));
     for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) {
@@ -142,41 +148,28 @@ test('the month head controls never overlap, from phone to wide desktop', async 
   }
 });
 
-// 11-11: a first visit is never an empty month. Computers show days not
-// chosen as grey names; phones keep the grid clean and, until something is
-// chosen, list the month's days in grey under it. Once chosen, a day is tinted.
-for (const width of [390, 1366]) test(`days not chosen show in grey until chosen at ${width}px`, async ({page}) => {
-  await page.setViewportSize({width, height: 900});
+// 11-11: the 藏历 page shows every day by kind; the 加入日历 preview shows only
+// what was chosen, and choosing a day there puts it in.
+test('the 藏历 page shows every day; the subscription preview only the chosen ones', async ({page}) => {
+  await page.setViewportSize({width: 1366, height: 900});
   await page.goto('/calendar-reminders/');
-  await expect(page.locator('.cal-day')).toHaveCount(42);
-  if (width < 1024) await page.locator('#tab-preview').click();
   await page.locator('[data-cal-month]').selectOption('2026-11');
   const day = page.locator('[data-cal-date="2026-11-19"]');
-  await expect(day).toHaveAttribute('aria-label', /0项已选日程，未选：莲师荟供日/);
-  if (width < 1024) {
-    await expect(day).not.toHaveClass(/has-remind|has-display/);
-    await expect(page.locator('.cal-key .cal-legend-item.is-spare')).toBeHidden();
-    const list = page.locator('[data-cal-month-list]');
-    await expect(list.locator('.cal-month-list-title')).toContainText('11月的修行日还没有选');
-    await expect(list.locator('[data-cal-pick="2026-11-19"] .is-spare')).toHaveText('莲师荟供日');
-  } else {
-    await expect(page.locator('.cal-key .cal-legend-item.is-spare')).toHaveText('未选');
-    await expect(day.locator('.cal-mini-event.is-spare')).toHaveText('莲师荟供日');
-  }
-  await day.click();
-  const sheet = page.locator('[data-cal-sheet]');
-  await expect(sheet.locator('.cal-spare')).toContainText('这天有未选');
-  await expect(sheet.locator('.cal-spare')).toContainText('莲师荟供日');
-  await expect(sheet.locator('.cal-reminder')).toHaveCount(0);
-  // Choosing it turns the grey day into a chosen one.
+  await expect(day.locator('.cal-mini-event')).toHaveText('莲师荟供日');
+  await expect(page.locator('.cal-key .cal-legend-item')).toHaveText(['荟供日', '节庆', '佛菩萨日', '上师纪念', '法会·其他']);
+  await page.locator('#home-subscribe').click();
+  await expect(page).toHaveURL(/#subscribe$/);
   await page.keyboard.press('Escape');
-  if (width < 1024) await page.locator('#tab-selection').click();
+  // The 藏历 month stays in the page, hidden; read the preview's own grid.
+  const preview = page.locator('#calendar-preview');
+  const chosen = preview.locator('[data-cal-date="2026-11-19"]');
+  await preview.locator('[data-cal-month]').selectOption('2026-11');
+  await expect(chosen).toHaveAttribute('aria-label', /0项已选日程/);
+  await expect(chosen.locator('.cal-mini-event')).toHaveCount(0);
   await page.locator('[data-preset="guru"]').click();
-  if (width < 1024) {
-    await page.locator('#tab-preview').click();
-    await expect(day).toHaveClass(/has-remind/);
-    await expect(page.locator('[data-cal-month-list] .cal-month-list-title')).toContainText('11月已选的日子');
-  }
-  await expect(day).toHaveAttribute('aria-label', /1项已选日程，莲师荟供日/);
-  await expect(day.locator('.is-spare')).toHaveCount(0);
+  await expect(chosen).toHaveAttribute('aria-label', /1项已选日程，莲师荟供日/);
+  await expect(chosen.locator('.cal-mini-event.is-remind')).toHaveText('莲师荟供日');
+  // Back to the 藏历 page with the browser's own back button.
+  await page.goBack();
+  await expect(page.locator('#home-upcoming-list')).toBeVisible();
 });

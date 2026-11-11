@@ -4,7 +4,7 @@ import {icon, fillIcons} from './icons.mjs';
 import {deviceTimeZone,resolveTimeZone,zoneInfo} from './timezones.mjs';
 import {deviceDate,nextLocalMidnight,changedDeviceZone} from './device-time.mjs';
 import {createZonePicker} from './zone-picker.mjs';
-import {createCalendarView} from './calendar-view.mjs';
+import {createCalendarView,rankEvents,READING_CATEGORIES} from './calendar-view.mjs';
 import {createSubscriptionGuide} from './subscription-guide.mjs';
 import {PRESETS,presetIds,applyPreset,matchingPreset} from './presets.mjs';
 import {timeComparison} from './time-comparison.mjs';
@@ -12,7 +12,6 @@ import {eventPresentation,eventIcon,eventDateHint} from './event-presentation.mj
 import {calendarEnvironment,appleSubscriptionUrl,GOOGLE_ADD_URL,OUTLOOK_URL} from './calendar-entry.mjs';
 import {checkSubscriptionConnection} from './connection-check.mjs';
 import {cloneSettings as clone,fetchJSON} from './runtime.mjs';
-import {createMobileTabs} from './mobile-tabs.mjs';
 import {playMotion,playSymbol,installDisclosureMotion} from './motion.mjs';
 import qrcode from './vendor/qrcode/qrcode.mjs';
 
@@ -139,7 +138,8 @@ function renderNextPractice() {
   const run = () => {
     try {
       const events = data.catalog.events.filter(event => ['guru-tsok','dakini-tsok'].includes(event.id));
-      const next = generateOccurrences({catalog:{...data.catalog,events},published:{records:[],coverage:null}},{start:today,end:addDays(today,40)})
+      // From tomorrow: a tsok today is already named by the 今天是 line (11-11).
+      const next = generateOccurrences({catalog:{...data.catalog,events},published:{records:[],coverage:null}},{start:addDays(today,1),end:addDays(today,41)})
         .sort((a,b) => a.date.localeCompare(b.date))[0];
       if (!next) { node.hidden = true; return; }
       const days = Math.round((Date.parse(next.date) - Date.parse(today)) / 864e5), [, month, day] = next.date.split('-').map(Number);
@@ -150,6 +150,101 @@ function renderNextPractice() {
   };
   // Deferred so the first paint and the cold-start task stay unchanged.
   if (typeof requestIdleCallback === 'function') requestIdleCallback(run, {timeout: 1500}); else setTimeout(run, 300);
+}
+// ── Two pages in one (11-11) ────────────────────────────────────────────────
+// 藏历 (home): today, what comes next, the whole calendar, for everyone.
+// 加入日历 (#subscribe): choosing days and adding them to a phone calendar.
+// Management and share links always open the subscription page.
+let page='home', homeView=null, zoneAsked=false;
+function wantedPage() {
+  const hash=location.hash.slice(1);
+  if(hash==='subscribe' || new URLSearchParams(hash).has('manage')) return 'subscribe';
+  return [...new URLSearchParams(location.search).keys()].some(key=>['p','t','d','m'].includes(key)) ? 'subscribe' : 'home';
+}
+function setPage(next,{push=false,scroll=false}={}) {
+  page=next; document.body.dataset.page=next;
+  document.title=next==='home' ? '藏历 · 慧灯小组' : '加入日历 · 藏历 · 慧灯小组';
+  if(push){ try{history.pushState(null,'',`${location.pathname}${location.search}${next==='home'?'':'#subscribe'}`);}catch{} }
+  if(scroll) window.scrollTo({top:0,behavior:'instant'});
+  if(next==='home') renderHome();
+  else if(data && !calendarView) renderPreview();
+  else if(data && !settings.zone && !zoneAsked && !document.querySelector('dialog[open]')) { zoneAsked=true; zonePicker?.open({zone:'',deviceZone:observedZone}); }
+}
+function categoryLabel(event) {
+  const group=eventPresentation(event,data.catalog).groupId;
+  return READING_CATEGORIES.find(([id])=>id===(['tsok','buddha','masters'].includes(group)?group:group==='festivals'?'festival':'practice'));
+}
+function renderTodayFeast(events) {
+  const node=$('#today-feast'), todays=rankEvents(events.filter(event=>event.date===today),data.catalog);
+  if(!todays.length){ node.hidden=true; node.innerHTML=''; return; }
+  const [first]=todays;
+  node.innerHTML=`<span class="today-feast-tag">今天是</span>${eventIcon(first,data.catalog)}<b>${esc(first.title)}</b>${todays.length>1
+    ? `<button type="button" class="today-feast-more" data-feast-more>等 ${todays.length} 项<span aria-hidden="true">›</span></button>`
+    : `<small>${esc(categoryLabel(first)[1])}</small>`}`;
+  node.hidden=false;
+}
+function renderHome() {
+  if(!data) return;
+  const start=addDays(today,-90), end=rangeEnd(today,24);
+  let events=[];
+  try { events=catalogOccurrences(data,settings,{start,end}).filter(event=>event.kind!=='daily-date'); } catch { events=[]; }
+  // The masthead belongs to both pages, so today's day is named on both.
+  renderTodayFeast(events);
+  if(page!=='home') return;
+  // Next days, from tomorrow: one row each, with how long until it comes.
+  const coming=events.filter(event=>event.date>today).sort((a,b)=>a.date.localeCompare(b.date)||0);
+  const byDate=new Map(); for(const event of coming){ if(!byDate.has(event.date)) byDate.set(event.date,[]); byDate.get(event.date).push(event); }
+  const rows=[...byDate].slice(0,5);
+  const inMonth=[...byDate.keys()].filter(date=>date.slice(0,7)===today.slice(0,7)).length;
+  $('#home-upcoming-note').textContent=inMonth ? `本月还有 ${inMonth} 个修行日` : '本月的修行日已过';
+  $('#home-upcoming-list').innerHTML=rows.map(([date,items])=>{
+    const ranked=rankEvents(items,data.catalog), [label]=[categoryLabel(ranked[0])], days=Math.round((Date.parse(date)-Date.parse(today))/864e5);
+    let tibetan=''; try{ tibetan=getTibetanDate(date).display; }catch{}
+    const [,month,day]=date.split('-').map(Number);
+    return `<li><button type="button" class="home-row is-cat-${label[0]}" data-home-date="${date}"><span class="home-row-date"><b>${day}</b><small>${month}月 周${'日一二三四五六'[new Date(date+'T12:00:00Z').getUTCDay()]}</small></span><span class="home-row-name"><strong>${ranked.map(event=>esc(event.title)).join('<i>·</i>')}</strong><small><i class="home-tag">藏历</i>${esc(tibetan)}</small></span><span class="home-row-kind"><i></i>${esc(label[1])}<small>${days===1?'明天':`还有 ${days} 天`}</small></span></button></li>`;
+  }).join('') || '<li class="home-empty">近期没有修行日。</li>';
+  // 每月固定的日子: the monthly days of the calendar, in Tibetan date order.
+  const days=['','初一','初二','初三','初四','初五','初六','初七','初八','初九','初十','十一','十二','十三','十四','十五','十六','十七','十八','十九','二十','廿一','廿二','廿三','廿四','廿五','廿六','廿七','廿八','廿九','三十'];
+  const monthly=data.catalog.events.filter(event=>event.rule?.kind==='tibetan-monthly').sort((a,b)=>a.rule.day-b.rule.day);
+  $('#home-monthly-list').innerHTML=monthly.map(event=>`<li class="is-cat-${categoryLabel(event)[0]}"><b>${days[event.rule.day]||''}</b><span>${esc(event.title.replace(/加持日$|日$/,''))}</span></li>`).join('');
+  $('#home-monthly').hidden=!monthly.length;
+  if(!homeView){
+    homeView=createCalendarView($('#home-calendar'),{today,reading:true,initialView:'month',onViewChange:()=>{}});
+  }
+  homeView.update({data,settings,events,spare:[],today,start,end,deviceZone:observedZone});
+  $('#home-subscribe-label').textContent=subscription ? '我的订阅' : '加入日历';
+}
+function openHomeDate(date) {
+  const cell=$('#home-calendar').querySelector(`[data-cal-date="${date}"]`);
+  if(cell){ cell.click(); return; }
+  const picker=$('#home-calendar [data-cal-month]');
+  if(picker){ picker.value=date.slice(0,7); picker.dispatchEvent(new Event('change',{bubbles:true})); }
+  requestAnimationFrame(()=>$('#home-calendar').querySelector(`[data-cal-date="${date}"]`)?.click());
+}
+// Each page draws only its own calendar: the 藏历 page reads every day, this
+// preview shows the chosen ones. Created on first use, so a page never holds
+// two month grids at once.
+function ensurePreview() {
+  if (calendarView || page!=='subscribe') return calendarView;
+  calendarView=createCalendarView($('#calendar-preview'),{initialView:ui.view==='list'?'list':'month',today,
+    onViewChange:view=>{ui.view=view;persistUI();},
+    onEditEvent:(id,trigger)=>{const item=data.catalog.events.find(event=>event.id===id);if(item)openReminders([id],item.title,trigger);}});
+  return calendarView;
+}
+// Plan C (11-11): right under step 1, what this choice will put in the
+// calendar next, written the way the calendar app will show it.
+function renderSubscribeUpcoming() {
+  const node=$('#sub-upcoming'), dates=[...new Set(upcoming.map(event=>event.date))];
+  node.hidden=!dates.length;
+  if(!dates.length) return;
+  $('#sub-upcoming-list').innerHTML=dates.slice(0,3).map(date=>{
+    const items=rankEvents(upcoming.filter(event=>event.date===date),data.catalog), [,month,day]=date.split('-').map(Number);
+    let tibetan=''; try{ tibetan=getTibetanDate(date).display; }catch{}
+    const remind=items.find(event=>event.preference?.mode==='remind');
+    return `<li><span class="sub-up-date"><b>${day}</b><small>${month}月 周${'日一二三四五六'[new Date(date+'T12:00:00Z').getUTCDay()]}</small></span><span class="sub-up-name"><strong>${items.map(event=>esc(event.title)).join('<i>·</i>')}</strong><small><i class="home-tag">藏历</i>${esc(tibetan)}</small></span><span class="sub-up-alarm${remind?' is-remind':''}">${remind?icon('bell'):''}<small>${esc(remind?reminderLabel(remind.preference.reminders):'只显示')}</small></span></li>`;
+  }).join('');
+  const later=dates.length-3;
+  $('#sub-upcoming-more').textContent=later>0 ? `以及之后的 ${later} 个日子，每年自动更新。` : '之后的日子会自动更新。';
 }
 function renderRegion(now=new Date()) {
   const info=settings.zone ? zoneInfo(settings.zone,now) : null;
@@ -219,10 +314,13 @@ function renderPreview() {
   } catch (error) {
     upcoming = []; $('#preview-error').textContent = error.message; $('#preview-error').hidden = false;
   }
-  calendarView?.update({data,settings,events,spare,today,start,end,deviceZone:observedZone});
+  // The 藏历 page shows every day; this preview shows only what was chosen.
+  ensurePreview()?.update({data,settings,events,spare:[],today,start,end,deviceZone:observedZone});
+  renderSubscribeUpcoming();
   $('#reminder-settings').disabled=!countSelected();
   renderTimeChoices(); renderQuickAdd();
   renderRegion(); renderSaveState();
+  renderHome();
 }
 // Step 2: one reminder time for every day that reminds. Detailed per-item
 // times stay possible; the step then says so instead of overwriting silently.
@@ -810,8 +908,7 @@ function attachEvents() {
       pref.mode='off';
     }
     settings.includeDailyDates=false;stopped=false;refresh();
-    if($('.workspace').dataset.activeTab==='preview' && matchMedia('(max-width:1023px)').matches) $('[data-cal-view="month"]').focus({preventScroll:true});
-    else $('#preset-options button').focus({preventScroll:true});
+    $('#preset-options button').focus({preventScroll:true});
     notify(subscription?'已清空选择；保存修改后更新日历。':'已清空选择。',()=>restoreSnapshot(before,'已恢复之前的选择。'));
   });
   const openZone=()=>zonePicker.open({zone:settings.zone,deviceZone:observedZone});
@@ -825,7 +922,7 @@ function attachEvents() {
   });
   window.addEventListener('focus',checkDeviceTime);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkDeviceTime();});
-  window.addEventListener('hashchange',() => { void restoreManagementLink(); });
+  window.addEventListener('hashchange',() => { if(wantedPage()!==page) setPage(wantedPage()); void restoreManagementLink(); });
   // Tapping a symbol anywhere it stands for a day (list, day cards, the
   // masthead knot) plays its own motion — a small reward for curiosity.
   document.addEventListener('click',event=>{
@@ -889,9 +986,13 @@ function attachEvents() {
   $('#reminder-dialog').addEventListener('close',()=>{
     if(reminderReturnSelector && !document.querySelector('dialog[open]')) $(reminderReturnSelector)?.focus({preventScroll:true});
   });
-  createMobileTabs();
-  $('.skip').addEventListener('click',event=>{event.preventDefault();$('#tab-selection').click();$('#preset-options button')?.focus();});
-  $('#my-subscription').addEventListener('click',()=>openSubscription());
+  $('.skip').addEventListener('click',event=>{event.preventDefault();if(page!=='subscribe')setPage('subscribe',{push:true});$('#preset-options button')?.focus();});
+  $('#my-subscription').addEventListener('click',()=>{ if(!subscription && page==='home') setPage('subscribe',{push:true,scroll:true}); else openSubscription(); });
+  $('#home-subscribe').addEventListener('click',()=>{ if(subscription) openSubscription(); else setPage('subscribe',{push:true,scroll:true}); });
+  $('#home-upcoming-list').addEventListener('click',event=>{ const row=event.target.closest('[data-home-date]'); if(row) openHomeDate(row.dataset.homeDate); });
+  $('#today-feast').addEventListener('click',event=>{ if(event.target.closest('[data-feast-more]')) openHomeDate(today); });
+  window.addEventListener('popstate',()=>setPage(wantedPage()));
+  for(const link of document.querySelectorAll('[data-go-home]')) link.addEventListener('click',event=>{event.preventDefault();setPage('home',{push:true,scroll:true});});
   // The panel grows out of the button that opened it, so the step reads as
   // one continuous action rather than a page jump.
   $('#step-add-button').addEventListener('click',()=>$('#subscribe').click());
@@ -962,7 +1063,8 @@ async function restoreManagementLink() {
   managementRestoring=false;
   // Remove the management capability before making any request. A fragment-only
   // navigation must work as well as opening the link in a new browser tab.
-  try { history.replaceState(null,'',location.pathname+location.search); } catch {}
+  try { history.replaceState(null,'',location.pathname+location.search+'#subscribe'); } catch {}
+  if(page!=='subscribe') setPage('subscribe');
   openSubscription();
   const dot = manage.indexOf('.');
   if (dot <= 0 || !/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(manage)) {
@@ -1015,19 +1117,17 @@ async function init() {
   const storedCreation=readStored(creationKey);
   if(!subscription && storedCreation?.apiBaseUrl===apiBaseUrl && /^[A-Za-z0-9_-]{43}$/.test(storedCreation.key) &&
       storedCreation.settings && typeof storedCreation.settings==='object' && !Array.isArray(storedCreation.settings)) pendingCreation=storedCreation;
+  const firstPage=wantedPage();
   const sharedNotice=applySharedSettings();
   zonePicker=createZonePicker($('#zone-dialog'),{onApply:zone=>{
     settings.zone=zone;stopped=false;ui.lastDeviceZone=observedZone;persistUI();refresh(false);
     notify(subscription?'提醒地区已调整；点击保存修改后同步。':'提醒地区已调整。');
   }});
-  calendarView=createCalendarView($('#calendar-preview'),{initialView:ui.view==='list'?'list':'month',today,
-    onViewChange:view=>{ui.view=view;persistUI();},
-    onEditEvent:(id,trigger)=>{const item=data.catalog.events.find(event=>event.id===id);if(item)openReminders([id],item.title,trigger);}});
   guide=createSubscriptionGuide($('#device-guide'),{notificationRoot:$('#notification-guide'),initialState:ui.guide,
     onStateChange:state=>{ui.guide=state;persistUI();}});
   const savedApp=['iphone','google','outlook','other'].includes(ui.app) ? ui.app : ui.guide?.app;
   if(['iphone','google','outlook','other'].includes(savedApp)) $(`input[name="device"][value="${savedApp}"]`).checked=true;
-  attachEvents(); $('#app').hidden = false; renderGroups(); renderPresets();renderPreview(); persist();persistUI();checkDeviceTime();
+  attachEvents(); page=firstPage; document.body.dataset.page=firstPage; if(firstPage==='subscribe') document.title='加入日历 · 藏历 · 慧灯小组'; $('#app').hidden = false; renderGroups(); renderPresets();renderPreview(); persist();persistUI();checkDeviceTime();
   if(pendingCreation?.blocked) showSubscriptionError(pendingCreation.blocked);
   if(sharedNotice) notify(sharedNotice);
   // Reuse the browser's completed layout. Writing a root variable between two
@@ -1072,7 +1172,7 @@ async function init() {
     try { await loadSubscription(); }
     catch (error) { notify(error.message); }
   }
-  if(!settings.zone&&!document.querySelector('dialog[open]'))zonePicker.open({zone:'',deviceZone:observedZone});
+  if(page==='subscribe'&&!settings.zone&&!document.querySelector('dialog[open]')){zoneAsked=true;zonePicker.open({zone:'',deviceZone:observedZone});}
 }
 init().catch(error => {
   $('#load-error').textContent = error.message || '页面暂时无法加载，请刷新重试。';

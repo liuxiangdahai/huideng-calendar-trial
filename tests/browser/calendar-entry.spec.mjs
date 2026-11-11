@@ -55,7 +55,7 @@ async function httpsService(page, { failFirst = false, holdFirst = false, loseFi
 }
 
 async function openSelected(page) {
-  await page.goto(appPath);
+  await page.goto(appPath+'#subscribe');
   await expect(page.locator('#app')).toBeVisible();
   await page.locator('[data-preset="guru"]').click();
 }
@@ -246,7 +246,7 @@ test('slow preparation survives closing and app changes without duplicate creati
     expect(service.posts).toBe(1);
     service.release(); await ready(page);
     await expect(page.locator('#iphone-subscribe')).toBeVisible();
-    await expect(page).toHaveURL(origin + appPath);
+    await expect(page).toHaveURL(origin + appPath + '#subscribe');
     await expect(page.locator('#guide-seen')).not.toBeChecked();
     expect(service.posts).toBe(1);
   } finally { service?.release(); await context.close(); }
@@ -527,7 +527,7 @@ async function switchToManagementB(page, b) {
   await page.evaluate(({ id, token }) => { location.hash = `manage=${id}.${token}`; }, { id: b.id, token: b.manageToken });
   // Hash removal proves the restore handler ran; it must not leak the capability
   // into API URLs or retain it in a shareable address bar.
-  await expect(page).toHaveURL(origin + appPath);
+  await expect(page).toHaveURL(origin + appPath + '#subscribe');
 }
 
 async function expectB(page, b) {

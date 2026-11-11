@@ -19,7 +19,7 @@ async function openBusyDay(page, width) {
   expect(busy, '已确认资料中应有一个在当前滚动窗口内的五项日程日期').toBeTruthy();
   await page.setViewportSize({width, height: 1000});
   await page.addInitScript(value => localStorage.setItem('huideng.calendar.v2', JSON.stringify(value)), settings);
-  await page.goto('/calendar-reminders/');
+  await page.goto('/calendar-reminders/#subscribe');
   await expect(page.locator('#app')).toBeVisible();
   await expect(page.locator('#preview-error')).toBeHidden();
   if (width < 1024) await page.locator('#tab-preview').click();
@@ -134,28 +134,27 @@ test('desktop month shows every original title in the cell and opens complete cl
   expect(indicator.selectedBorder).not.toBe(indicator.todayColor);
 });
 
-test('phone month tints busy days and keeps every name in the label and the day sheet at 390 and 320 pixels', async ({page}) => {
-  const detail = await openBusyDay(page, 390);
+// Phones (11-11, plan C): the month lives on the 藏历 page. A busy day shows
+// its most important name and 等N项; the label and the day sheet name them all.
+test('phone 藏历 month names busy days and keeps every name in the label and the day sheet at 390 and 320 pixels', async ({page}) => {
+  await page.setViewportSize({width: 390, height: 1000});
+  await page.goto('/calendar-reminders/');
+  await expect(page.locator('.cal-day')).toHaveCount(42);
+  await page.locator('[data-cal-month]').selectOption(busy[0].slice(0, 7));
+  const cell = page.locator(`[data-cal-date="${busy[0]}"]`);
   for (const width of [390, 320]) {
     await page.setViewportSize({width, height: 1000});
-    const cell = page.locator(`[data-cal-date="${busy[0]}"]`);
     await expect(cell.locator('.cal-day-events')).toBeHidden();
-    // Phones tint a chosen day like a highlighter (carmine when it reminds);
-    // names are in the list under the grid, the sheet and the label.
-    await expect(cell).toHaveClass(/has-remind|has-display/);
-    expect(await cell.evaluate(node => getComputedStyle(node).backgroundColor)).not.toBe('rgb(255, 255, 255)');
+    await expect(cell.locator('.cal-abbr').last()).toHaveText(`等${busy[1].length}项`);
+    const box = await cell.evaluate(node => [...node.querySelectorAll('.cal-abbr')].every(chip => chip.getBoundingClientRect().right <= node.getBoundingClientRect().right + 1));
+    expect(box).toBe(true);
     for (const event of busy[1]) await expect(cell).toHaveAttribute('aria-label', new RegExp(event.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
-    await verifyCards(page, detail);
     await verifyMonthHierarchy(page);
-    expect(await detail.locator('.cal-event h4').evaluateAll(nodes => nodes.every(node => {
-      const style = getComputedStyle(node);
-      return style.whiteSpace !== 'nowrap' && style.overflowWrap === 'anywhere';
-    }))).toBe(true);
-    if (width === 390) await page.screenshot({path: '.calendar-preview/cards-final-mobile.png', fullPage: true});
   }
-  await detail.locator('[data-cal-event]').first().click();
-  await expect(page.locator('#reminder-dialog')).toBeVisible();
-  await page.locator('[data-close="reminder-dialog"]').first().click();
-  await expect(page.locator(`[data-cal-date="${busy[0]}"]`)).toHaveClass(/cal-selected/);
-  await enableOneAndVerifyConversion(page, detail);
+  await cell.click();
+  const detail = page.locator('[data-cal-detail]');
+  await expect(detail.locator('.cal-event h4')).toHaveCount(busy[1].length);
+  for (const event of busy[1]) await expect(detail).toContainText(event.title);
+  await expect(detail.locator('.cal-reminder')).toHaveCount(0);
+  if (true) await page.screenshot({path: '.calendar-preview/cards-final-mobile.png', fullPage: true});
 });

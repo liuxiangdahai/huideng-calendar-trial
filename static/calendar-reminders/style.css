@@ -256,7 +256,6 @@ main { max-width: 1280px; min-height: calc(100svh - var(--header-space)); margin
 .preview-footer .icon { width: 16px; height: 16px; margin-top: 2px; }
 .empty { padding: 28px 8px; text-align: center; font-size: var(--fs-md); line-height: 1.8; color: var(--muted); }
 .empty .icon { width: 28px; height: 28px; margin: 0 auto 10px; }
-.mobile-tabs { display: none; }
 
 /* ── Action bar ───────────────────────────────────────────────────────── */
 .action-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; padding: 12px 32px max(12px, env(safe-area-inset-bottom)); border-top: 1px solid var(--line-2); background: #faf8f4f2; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: 0 -6px 20px #4635170d; }
@@ -400,11 +399,9 @@ input[type=time]::-webkit-datetime-edit { padding: 0; }
   .editorial-masthead { height: 124px; }
   .masthead-inner { padding-inline: 24px; }
   .workspace { display: block; }
-  .workspace[data-active-tab=selection] .preview-column, .workspace[data-active-tab=preview] .selection-column { display: none; }
+  /* Phones and tablets: one page, no tabs (11-11). The month is on the 藏历 page. */
+  .workspace .preview-column { display: none; }
   .region-bar { margin-bottom: 4px; }
-  .mobile-tabs { position: sticky; top: 0; z-index: 8; isolation: isolate; display: flex; gap: 28px; margin-bottom: 14px; border-bottom: 1px solid var(--line-2); background: var(--paper); box-shadow: 0 8px 12px -10px #46351726; }
-  .mobile-tabs button { min-height: 46px; padding: 8px 2px; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px; background: transparent; color: var(--muted); font: var(--fs-base)/1.4 var(--font-serif); letter-spacing: 2px; transition: none; }
-  .mobile-tabs button[aria-selected=true] { border-bottom-color: var(--wine); color: var(--wine); font-weight: 600; }
   .selection-heading, .preview-heading { display: none; }
   .preview-panel { padding: 14px 14px 0; }
   .action-bar { padding-inline: 24px; }
@@ -757,3 +754,118 @@ body { background: var(--paper); }
 .sub-progress li[aria-current] { border-top-color: var(--red); color: var(--red); font-weight: 600; }
 #subscription-dialog.is-managing .sub-progress { display: none; }
 @media (min-width: 1024px) { .region-bar[hidden] ~ .workspace { margin-top: 32px; } }
+
+/* ── Two pages (11-11): 藏历 is the home page; 加入日历 lives at #subscribe. ── */
+body:not([data-page="subscribe"]) [data-page-part="subscribe"] { display: none !important; }
+body[data-page="subscribe"] [data-page-part="home"] { display: none !important; }
+
+/* Today's day, under the date in the masthead: a gold 今天是 tag, then the name. */
+.editorial-masthead:has(.today-feast:not([hidden])) { height: auto; min-height: 156px; }
+.editorial-masthead:has(.today-feast:not([hidden])) .masthead-inner { padding-block: 18px 22px; }
+.today-feast { display: flex; align-items: center; gap: 10px; width: max-content; max-width: 100%; margin: 8px 0 0; padding: 6px 14px 6px 8px; border: 1px solid #d9b56a66; border-radius: 4px; background: #0b16297a; color: #f4ead6; }
+.today-feast[hidden] { display: none; }
+.today-feast-tag { flex: none; padding: 1px 8px; border-radius: 3px; background: #d9b56a; color: #3b0a12; font: 500 13px/1.5 var(--font-ui); letter-spacing: 1px; }
+.today-feast .icon { flex: none; width: 24px; height: 24px; color: #d9b56a; }
+.today-feast b { min-width: 0; overflow: hidden; color: #fdf3dc; font: 500 19px/1.4 var(--font-serif); letter-spacing: 2px; text-overflow: ellipsis; white-space: nowrap; }
+.today-feast small { flex: none; color: #d9c49a; font-size: 12px; letter-spacing: 1px; }
+.today-feast-more { flex: none; min-height: 30px; padding: 2px 10px; border: 0; border-radius: 14px; background: #ffffff1f; color: #f1e4cb; font: 400 14px/1.5 var(--font-ui); white-space: nowrap; cursor: pointer; }
+.today-feast-more:hover { background: #ffffff33; }
+.today-feast-more span { margin-left: 4px; }
+.today-feast-more:focus-visible { outline: 2px solid #f6cd87; outline-offset: 2px; }
+@media (max-width: 767px) {
+  .today-feast { gap: 8px; padding: 6px 12px 6px 8px; }
+  .today-feast .icon { width: 22px; height: 22px; }
+  .today-feast b { font-size: 17px; letter-spacing: 1px; }
+  .today-feast small { display: none; }
+  .today-feast-more { margin-left: auto; }
+  /* The next tsok line reads as plain text under the framed 今天是 line. */
+  /* The next tsok line is plain text on phones, no frame (11-11). */
+  .editorial-masthead .masthead-next { margin-top: 4px; padding-top: 0; border-top: 0; border-radius: 0; }
+}
+
+/* 藏历 home: what comes next on the left, the month on the right. */
+.home { display: grid; gap: 28px; margin: 28px 0 40px; }
+.home-side { display: grid; gap: 24px; align-content: start; }
+.home-heading { display: flex; align-items: baseline; gap: 10px; padding-bottom: 8px; border-bottom: 2px solid var(--ink); }
+.home-heading h2 { margin: 0; font: 500 24px/1.3 var(--font-serif); letter-spacing: 2px; }
+.home-heading small { color: var(--teal); font: 400 15px/1.5 var(--font-serif); }
+.home-list { margin: 0; padding: 0; list-style: none; }
+.home-row { display: grid; grid-template-columns: 58px minmax(0,1fr) auto; align-items: center; gap: 12px; width: 100%; min-height: 72px; padding: 10px 4px; border: 0; border-bottom: 1px solid var(--line); background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.home-row:hover { background: var(--surface-2); }
+.home-row:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+.home-row-date { display: grid; justify-items: center; line-height: 1.1; }
+.home-row-date b { color: var(--ink); font: 400 30px/1 var(--font-serif); }
+.home-row-date small { margin-top: 4px; color: var(--muted); font-size: 12px; white-space: nowrap; }
+.home-row-name { min-width: 0; }
+.home-row-name strong { display: block; color: var(--ink); font: 500 19px/1.4 var(--font-serif); letter-spacing: 1px; }
+.home-row-name strong i { margin: 0 6px; color: var(--muted); font-style: normal; }
+.home-row-name small { color: var(--teal); font: 400 14px/1.6 var(--font-serif); }
+.home-tag { margin-right: 6px; padding: 0 5px; border-radius: 3px; background: var(--teal); color: #f4ead6; font: 500 11px/1.6 var(--font-serif); font-style: normal; letter-spacing: 1px; }
+.home-row-kind { display: grid; justify-items: end; color: var(--kind); font-size: 13px; white-space: nowrap; }
+.home-row-kind i { width: 18px; height: 4px; margin-bottom: 4px; border-radius: 2px; background: var(--kind); }
+.home-row-kind small { color: var(--muted); font-size: 12px; }
+.home-empty { padding: 16px 4px; color: var(--muted); }
+.is-cat-tsok { --kind: var(--red); --kind-tint: var(--red-tint); }
+.is-cat-festival { --kind: var(--red-2); --kind-tint: var(--red-tint); }
+.is-cat-buddha { --kind: #8a6420; --kind-tint: #f6efe0; }
+.is-cat-masters { --kind: var(--teal); --kind-tint: var(--teal-tint); }
+.is-cat-practice { --kind: #5d5a54; --kind-tint: #efede9; }
+.home-cta { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 16px 18px; border-radius: 10px; background: var(--eave); color: #f4ead6; }
+.home-cta h2 { margin: 0; font: 500 18px/1.5 var(--font-serif); letter-spacing: 1px; }
+.home-cta p { margin: 0; color: #e3cfa9; font-size: 13px; }
+.home-cta button { display: inline-flex; flex: none; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 0 22px; border: 0; border-radius: 8px; background: #f4ead6; color: var(--eave); font: 600 17px/1 var(--font-ui); letter-spacing: 2px; cursor: pointer; }
+.home-cta button:hover { background: #fff6e4; }
+.home-cta button:focus-visible { outline: 2px solid #f6cd87; outline-offset: 2px; }
+.home-cta .icon { width: 20px; height: 20px; }
+.home-monthly { padding: 16px 20px; border: 1px solid var(--line-2); border-radius: 10px; background: var(--surface); }
+.home-monthly h2 { margin: 0 0 6px; font: 500 18px/1.5 var(--font-serif); letter-spacing: 1px; }
+.home-monthly h2 small { margin-left: 8px; color: var(--muted); font: 400 13px var(--font-ui); letter-spacing: 0; }
+.home-monthly ul { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 0 18px; margin: 0; padding: 0; list-style: none; }
+.home-monthly li { display: flex; align-items: baseline; gap: 12px; padding: 8px 0; border-bottom: 1px dashed var(--line-2); }
+.home-monthly b { min-width: 34px; color: var(--teal); font: 500 16px var(--font-serif); }
+.home-monthly span { font: 400 16px/1.5 var(--font-serif); }
+.home-monthly .is-cat-tsok span { color: var(--red); }
+@media (min-width: 1024px) {
+  .home { grid-template-columns: 400px minmax(0,1fr); gap: 40px; margin-top: 32px; }
+  .home-main { min-width: 0; }
+}
+@media (max-width: 1023px) {
+  .home-side { display: contents; }
+  .home-upcoming { order: 1; } .home-cta { order: 2; } .home-main { order: 3; } .home-monthly { order: 4; }
+  .home { gap: 24px; margin-top: 22px; }
+}
+@media (max-width: 639px) {
+  .home-cta { flex-direction: column; align-items: stretch; }
+  .home-cta button { width: 100%; }
+}
+@media (max-width: 370px) {
+  .home-monthly ul { grid-template-columns: 1fr; }
+  .home-row { grid-template-columns: 48px minmax(0,1fr) auto; gap: 10px; }
+}
+
+/* 加入日历, plan C: what comes next, under step 1. */
+.sub-upcoming { margin-top: 14px; padding: 14px 16px 10px; border: 1px solid #d8c59c; border-radius: 10px; background: #fffdf8; }
+.sub-upcoming h4 { display: inline-block; margin: 0 0 4px; padding: 2px 10px; border-radius: 12px; background: var(--gold-tint); color: #6b4f1d; font: 500 13px/1.6 var(--font-ui); }
+.sub-upcoming ol { margin: 0; padding: 0; list-style: none; }
+.sub-upcoming li { display: grid; grid-template-columns: 56px minmax(0,1fr) auto; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.sub-up-date { display: grid; justify-items: center; line-height: 1.1; }
+.sub-up-date b { font: 400 26px/1 var(--font-serif); }
+.sub-up-date small { margin-top: 4px; color: var(--muted); font-size: 12px; white-space: nowrap; }
+.sub-up-name { min-width: 0; }
+.sub-up-name strong { display: block; color: var(--red); font: 500 18px/1.4 var(--font-serif); letter-spacing: 1px; }
+.sub-up-name strong i { margin: 0 6px; color: var(--muted); font-style: normal; }
+.sub-up-name small { color: var(--teal); font: 400 13px/1.6 var(--font-serif); }
+.sub-up-alarm { display: grid; justify-items: end; color: var(--muted); text-align: right; }
+.sub-up-alarm.is-remind { color: var(--red); }
+.sub-up-alarm .icon { width: 18px; height: 18px; }
+.sub-up-alarm small { font-size: 12px; color: var(--muted); max-width: 7em; }
+.sub-upcoming-more { margin: 8px 0 0; color: var(--muted); font-size: 13px; }
+.sub-home-link { display: none; }
+@media (max-width: 1023px) {
+  .sub-home-link { display: flex; justify-content: space-between; align-items: center; margin: 24px 0 0; padding: 16px 4px; border-top: 1px solid var(--line-2); border-bottom: 1px solid var(--line-2); color: var(--ink-2); font-size: var(--fs-base); text-decoration: none; }
+  .sub-home-link .icon { width: 16px; height: 16px; }
+}
+@media (max-width: 1023px) { body[data-page="subscribe"] .workspace { margin-top: 26px; } }
+@media (min-width: 1024px) { .home-upcoming { order: 1; } .home-monthly { order: 2; } .home-cta { order: 3; } }
+.sub-upcoming-all { display: inline-flex; align-items: center; gap: 2px; min-height: 40px; margin-top: 2px; color: var(--teal); font-size: var(--fs-sm); text-decoration: none; }
+.sub-upcoming-all .icon { width: 14px; height: 14px; }

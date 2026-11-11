@@ -415,3 +415,106 @@ dialog.cal-day-sheet.is-popover { position: absolute; inset: auto; z-index: 30; 
   .cal-key-dots .cal-legend-item.is-spare { display: none; }
   .cal-month-list-hint { margin: 10px 2px 0; color: var(--muted); font-size: var(--fs-sm); line-height: 1.6; }
 }
+
+/* Reading mode (藏历 home, 11-11): category colours instead of remind/display. */
+.cal-view.is-reading .cal-mini-event { border-left-color: var(--kind, var(--gold-2)); background: var(--kind-tint, #f7efdf); color: var(--kind, #5b4a2d); }
+.cal-view.is-reading .event-category-tsok { --kind: var(--red); --kind-tint: var(--red-tint); }
+.cal-view.is-reading .event-category-buddha { --kind: #8a6420; --kind-tint: #f6efe0; }
+.cal-view.is-reading .event-category-masters { --kind: var(--teal); --kind-tint: var(--teal-tint); }
+.cal-view.is-reading :is(.event-category-practice, .event-category-festivals, .event-category-nature, .event-category-eclipse, .event-category-other) { --kind: #5d5a54; --kind-tint: #efede9; }
+.cal-view.is-reading .event-category-festivals { --kind: var(--red-2); --kind-tint: var(--red-tint); }
+.cal-view.is-reading .cal-key-dots .cal-legend-item { color: var(--muted); }
+.cal-view.is-reading .cal-key-dots .cal-dot { display: inline-block; width: 14px; height: 4px; border-radius: 2px; background: var(--kind); box-shadow: none; }
+/* Names in ink; the kind is a short colour bar before each name, so a name
+   never shares the lapis of the Tibetan date under it (11-11). */
+.cal-view.is-reading .cal-month-row-names span { display: inline-flex; align-items: center; gap: 6px; color: var(--ink); }
+.cal-view.is-reading .cal-month-row-names span::before { content: ""; flex: none; width: 4px; height: 16px; border-radius: 2px; background: var(--kind); }
+.cal-view.is-reading .cal-month-row-tibetan::before { content: "藏历"; margin-right: 6px; padding: 0 5px; border-radius: 3px; background: var(--teal); color: #f4ead6; font: 500 11px/1.6 var(--font-serif); letter-spacing: 1px; vertical-align: 1px; }
+.cal-view.is-reading .cal-source { margin-left: 10px; color: var(--teal); font-size: var(--fs-sm); }
+.cal-view.is-reading .cal-event { display: block; }
+@media (min-width: 1024px) {
+  .cal-view.is-reading .cal-key-dots .cal-legend-item { padding: 0; border: 0; background: none; color: var(--muted); }
+}
+@media (max-width: 1023px) {
+  .cal-view.is-reading .cal-day:is(.has-cat-tsok, .has-cat-festival, .has-cat-buddha, .has-cat-masters, .has-cat-practice) { background: var(--kind-tint); }
+  .cal-view.is-reading .cal-day:is(.has-cat-tsok, .has-cat-festival, .has-cat-buddha, .has-cat-masters, .has-cat-practice)::after { content: ""; position: absolute; left: 22%; right: 22%; bottom: 6px; height: 3px; border-radius: 2px; background: var(--kind); }
+  .cal-view.is-reading .cal-day.cal-adjacent[class*="has-cat-"] { opacity: .55; }
+  .cal-view.is-reading .cal-day.cal-selected[class*="has-cat-"] { box-shadow: inset 0 0 0 2px var(--wine); }
+}
+.cal-view.is-reading .has-cat-tsok { --kind: var(--red); --kind-tint: var(--red-tint-2); }
+.cal-view.is-reading .has-cat-buddha { --kind: #8a6420; --kind-tint: #f3e6c8; }
+.cal-view.is-reading .has-cat-masters { --kind: var(--teal); --kind-tint: #dfe6f1; }
+.cal-view.is-reading .has-cat-practice { --kind: #77736b; --kind-tint: #ebe8e3; }
+.cal-view.is-reading .has-cat-festival { --kind: var(--red-2); --kind-tint: var(--red-tint-2); }
+
+/* Phone grid (11-11): each day says its name in two characters, coloured by
+   kind; with more days than fit, the second chip says 等N项. No dots, bars or
+   symbols to decode. */
+.cal-abbr { display: none; }
+@media (max-width: 1023px) {
+  .cal-view.is-reading .cal-day[class*="has-cat-"] { background: var(--surface); }
+  .cal-view.is-reading .cal-day::after { display: none; }
+  .cal-view.is-reading .cal-abbr { display: block; margin-top: 2px; padding: 0 2px; border-radius: 3px; background: var(--kind-tint); color: var(--kind); font: 500 12px/1.5 var(--font-ui); white-space: nowrap; }
+  .cal-view.is-reading .cal-abbr.is-cat-buddha { color: #6b4a10; }
+  .cal-view.is-reading .cal-abbr.is-more { background: none; color: var(--muted); font-weight: 400; }
+  .cal-view.is-reading .cal-key-dots .cal-dot { width: 14px; height: 10px; border-radius: 2px; background: var(--kind); }
+}
+@media (max-width: 480px) {
+  .cal-view.is-reading .cal-key-dots { gap: 4px 10px; }
+  .cal-view.is-reading .cal-key-dots .cal-legend-item { white-space: nowrap; font-size: 13px; }
+}
+}
+@media (max-width: 370px) { .cal-view.is-reading .cal-key-dots { gap: 4px 7px; } .cal-view.is-reading .cal-key-dots .cal-legend-item { font-size: 12px; } }
+
+/* 藏历新年 (Losar, 11-11): the one day of the year that gets its own dress — a
+   gilt double frame, the 香布 valance hung along the top edge, which sways once
+   when the month is shown. Calm with reduced motion. */
+.cal-view .cal-day.is-losar { position: relative; overflow: hidden; box-shadow: inset 0 0 0 1.5px #c9a764, inset 0 0 0 4px var(--surface), inset 0 0 0 5px #c9a76499; }
+.cal-view .cal-day.is-losar::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 9px; pointer-events: none; transform-origin: top center;
+  background: var(--valance); -webkit-mask: var(--valance-hem); mask: var(--valance-hem); -webkit-mask-size: auto, 6px 9px; mask-size: auto, 6px 9px; animation: losar-sway 1.8s ease-in-out 2; }
+.cal-view .cal-day.is-losar .cal-gregorian { position: relative; z-index: 1; }
+.cal-view.is-reading .cal-day.is-losar .cal-abbr { background: var(--eave); color: #f6e6c4; }
+@keyframes losar-sway { 0%, 100% { transform: skewX(0deg); } 30% { transform: skewX(-6deg); } 65% { transform: skewX(5deg); } }
+@media (prefers-reduced-motion: reduce) { .cal-view .cal-day.is-losar::before { animation: none; } }
+/* 藏历节庆 (Losar and other festivals) read in the tsok red family, not grey. */
+.cal-view.is-reading .has-cat-festival { --kind: var(--red-2); --kind-tint: var(--red-tint); }
+.cal-view.is-reading .cal-abbr.is-cat-festival { --kind: var(--red-2); --kind-tint: var(--red-tint); }
+/* A month across two Tibetan years (火马年 十二月 · 火羊年 一月) wraps instead
+   of running under the view switch (11-11). */
+.cal-month-context { white-space: normal; }
+.cal-context-text { display: flex; flex-wrap: wrap; column-gap: 8px; }
+.cal-view.is-reading .cal-key-dots { flex-wrap: wrap; }
+.cal-view.is-reading .cal-day.is-losar .cal-abbr.is-more { background: none; color: var(--eave); }
+/* Phones turned sideways (11-11): wide enough for the full names, as on a
+   computer; upright phones keep the two-character names and a hint to turn. */
+.cal-turn-hint { display: none; }
+@media (max-width: 767px) and (orientation: portrait) {
+  .cal-view.is-reading .cal-turn-hint { display: flex; align-items: center; gap: 6px; margin: 6px 2px 0; color: var(--muted); font-size: var(--fs-xs); }
+  .cal-view.is-reading .cal-turn-hint::before { content: "⟲"; color: var(--teal); font-size: 15px; }
+}
+@media (max-width: 1023px) and (min-width: 600px) and (orientation: landscape) {
+  .cal-view.is-reading .cal-abbr { display: none; }
+  .cal-view.is-reading .cal-day { align-items: stretch; min-height: 76px; }
+  .cal-view.is-reading .cal-day-events { display: block; margin-top: 3px; }
+  .cal-view.is-reading .cal-mini-event { font-size: 12px; line-height: 17px; }
+}
+
+/* 缺 and 重 are facts of the Tibetan calendar, not days to keep (11-11): plain
+   lapis text in the top-right corner of the cell, never a chip like a festival.
+   Phones show the single character; the legend and the day card say the rest. */
+.cal-day .cal-marks .cal-miss, .cal-day .cal-marks .cal-repeat { padding: 0; border: 0; border-radius: 0; background: none; color: var(--teal-2); font: 500 11px/1 var(--font-serif); }
+.cal-day .cal-marks small { font-size: inherit; }
+@media (max-width: 1023px) {
+  .cal-day { position: relative; }
+  .cal-day .cal-marks:has(.cal-miss, .cal-repeat) { position: absolute; top: 3px; right: 2px; display: flex; min-height: 0; }
+  .cal-day:has(.cal-marks .cal-miss, .cal-marks .cal-repeat) .cal-gregorian { transform: translateX(-5px); }
+  .cal-day .cal-marks small { display: none; }
+  .cal-day .cal-marks :is(.cal-miss, .cal-repeat) { display: grid; place-items: center; width: 15px; height: 15px; border: 1px dotted #9fb0c8; border-radius: 50%; font-size: 10px; }
+}
+@media (min-width: 1024px) {
+  .cal-day .cal-marks :is(.cal-miss, .cal-repeat) { font-size: 12px; letter-spacing: 1px; }
+  .cal-day .cal-marks :is(.cal-miss, .cal-repeat)::before { content: "·"; margin-right: 2px; color: var(--muted); }
+}
+.cal-legend-calendar { color: var(--muted); }
+.cal-legend-calendar b { display: inline-grid; place-items: center; width: 16px; height: 16px; margin: 0 1px; border: 1px dotted #9fb0c8; border-radius: 50%; color: var(--teal-2); font: 500 10px/1 var(--font-serif); }
+.cal-detail-note { margin: 4px 0 0; color: #e3d3c0; font-size: var(--fs-sm); }

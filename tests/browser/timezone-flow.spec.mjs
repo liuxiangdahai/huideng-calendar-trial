@@ -2,7 +2,7 @@ import {test,expect} from '@playwright/test';
 import {showMoreSettings, openZonePicker} from './more-settings.mjs';
 const read=page=>page.evaluate(()=>JSON.parse(localStorage.getItem('huideng.calendar.v2')));
 const credentials=page=>page.evaluate(()=>JSON.parse(localStorage.getItem('huideng.calendar.subscription')));
-async function open(page){await page.goto('/calendar-reminders/');await expect(page.locator('#app')).toBeVisible();await showMoreSettings(page,{computerOnly:true});await page.locator('[data-preset="guru"]').click();}
+async function open(page){await page.goto('/calendar-reminders/#subscribe');await expect(page.locator('#app')).toBeVisible();await showMoreSettings(page,{computerOnly:true});await page.locator('[data-preset="guru"]').click();}
 async function zone(page,value){await openZonePicker(page);await page.locator('#zone-search').fill(value);await page.locator(`input[name="timezone"][value="${value}"]`).check();await page.locator('#apply-zone').click();}
 async function create(page){await page.locator('#subscribe').click();await page.locator('input[name="device"][value="iphone"]').check();await expect(page.locator('#feed-url')).not.toHaveValue('');await page.locator('[data-close="subscription-dialog"]').first().click();}
 
@@ -35,7 +35,7 @@ async function traveler(browser,browserName){
   if(cdp){await cdp.send('Emulation.setTimezoneOverride',{timezoneId:''});await cdp.send('Emulation.setTimezoneOverride',{timezoneId});return page;}
   const storageState=await context.storageState();await context.close();
   context=await browser.newContext({baseURL:'http://127.0.0.1:4173',timezoneId,storageState});page=await context.newPage();
-  await page.goto('/calendar-reminders/');await expect(page.locator('#app')).toBeVisible();return page;
+  await page.goto('/calendar-reminders/#subscribe');await expect(page.locator('#app')).toBeVisible();return page;
  },async close(){await context.close();}};
 }
 

@@ -6,7 +6,7 @@ async function dialogFits(page,id){expect(await page.locator(id).evaluate(node=>
 
 test('presets and independent daily dates fit phone first screen and preview starts directly with calendar controls',async({page})=>{
   await page.setViewportSize({width:390,height:844});
-  await page.goto(route);await expect(page.locator('#app')).toBeVisible();
+  await page.goto(route+'#subscribe');await expect(page.locator('#app')).toBeVisible();
   await expect(page.locator('.action-buttons #clear-selection')).toBeVisible();
   await expect(page.locator('#selection-pane #preset-options')).toBeVisible();
   const layout=await page.evaluate(()=>({
@@ -25,37 +25,38 @@ test('presets and independent daily dates fit phone first screen and preview sta
   await page.locator('[data-preset="practice"]').click();
   await expect(page.locator('#selection-count')).toHaveText('已选 54 项');
   await expect(page.locator('#reminder-count')).toHaveText('2 项提醒');
-  await page.locator('#tab-preview').click();
-  await expect(page.locator('#preset-options')).toBeHidden();
-  await expect(page.locator('[data-cal-month]')).toBeVisible();
-  expect((await page.locator('.cal-control-bar').boundingBox()).y).toBeLessThan(300);
+  // Plan C (11-11): what comes next is right under step 1, no tab to switch.
+  await expect(page.locator('#sub-upcoming')).toBeVisible();
+  await expect(page.locator('#sub-upcoming-title')).toHaveText('接下来会出现在你日历里');
+  await expect(page.locator('#sub-upcoming-list li')).toHaveCount(3);
+  await expect(page.locator('#sub-upcoming-list')).toContainText('莲师荟供日');
+  await expect(page.locator('#preview-pane')).toBeHidden();
   await page.screenshot({path:'.calendar-preview/modern-mobile-preview.png',fullPage:true});
-  await page.locator('.skip').focus();await page.keyboard.press('Enter');
-  await expect(page.locator('[data-preset="guru"]')).toBeFocused();await expect(page.locator('#preset-options')).toBeVisible();
   const reminder=page.locator('[data-reminder-event="guru-tsok"]');
   await reminder.click();await page.locator('#reminder-form button[type="submit"]').click();
   await expect(reminder).toBeFocused();
-  await page.locator('#tab-preview').click();await page.locator('[data-cal-view="list"]').click();
-  const card=page.locator('.cal-list-view [data-cal-event]').first(),key=await card.getAttribute('data-cal-focus');
-  await card.click();await page.locator('#reminder-form button[type="submit"]').click();
-  await expect(page.locator(`[data-cal-focus="${key}"]`)).toBeFocused();
-  await page.locator('#tab-selection').click();await page.evaluate(()=>scrollTo(0,0));
+  await page.evaluate(()=>scrollTo(0,0));
   await page.screenshot({path:'.calendar-preview/modern-mobile-selection.png',fullPage:true});
   const categoryIcon=await page.locator('[data-reminder-group="tsok"] svg').innerHTML();
   expect(categoryIcon).not.toBe(await page.locator('[data-reminder-event="guru-tsok"] svg').innerHTML());
-  await page.locator('#tab-preview').click();await page.locator('#clear-selection').click();
+  await page.locator('#clear-selection').click();
   await expect(page.locator('#selection-count')).toHaveText('已选 0 项');
   await expect(page.locator('#clear-selection')).toBeDisabled();
-  await expect(page.locator('[data-cal-view="month"]')).toBeFocused();
-  await expect(page.locator('#preview-pane')).toBeVisible();
+  await expect(page.locator('#preset-options button').first()).toBeFocused();
+  // The whole month is one link away, on the 藏历 page, and back is one tap.
+  await page.locator('.sub-upcoming-all, .sub-home-link').last().click();
+  await expect(page.locator('#home-calendar [data-cal-month]')).toBeVisible();
+  await expect(page.locator('#home-calendar .cal-day')).toHaveCount(42);
+  await page.goBack();
+  await expect(page.locator('#preset-options')).toBeVisible();
 });
 
 test('breakpoints preserve readable selection, complete month grid and reachable bottom content',async({page})=>{
-  await page.goto(route);await expect(page.locator('#app')).toBeVisible();
+  await page.goto(route+'#subscribe');await expect(page.locator('#app')).toBeVisible();
   for(const width of [320,390,545,585,768,1024,1440]){
     await page.setViewportSize({width,height:844});
-    if(width<1024){await page.locator('#tab-selection').click();await expect(page.locator('#preview-pane')).toBeHidden();}
-    else{await expect(page.locator('#preview-pane')).toBeVisible();await expect(page.locator('.mobile-tabs')).toBeHidden();}
+    if(width<1024)await expect(page.locator('#preview-pane')).toBeHidden();
+    else await expect(page.locator('#preview-pane')).toBeVisible();
     await fits(page);
     await showMoreSettings(page);
     const masters=page.locator('[data-group-id="masters"]');
@@ -65,7 +66,6 @@ test('breakpoints preserve readable selection, complete month grid and reachable
     await expect(page.locator('#reminder-title')).toContainText('持明无畏洲');
     await dialogFits(page,'#reminder-dialog');
     await page.locator('[data-close="reminder-dialog"]').first().click();
-    if(width<1024)await page.locator('#tab-preview').click();
     await expect(page.locator('.cal-day')).toHaveCount(42);await fits(page);
     // Align explicitly: "if needed" only checks the viewport, not the fixed action bar.
     await page.locator('footer').evaluate(node=>node.scrollIntoView({block:'end'}));
@@ -76,10 +76,10 @@ test('breakpoints preserve readable selection, complete month grid and reachable
 });
 
 test('landscape and keyboard-sized screens keep every form action and Chinese guide reachable',async({page})=>{
-  await page.goto(route);await expect(page.locator('#app')).toBeVisible();
+  await page.goto(route+'#subscribe');await expect(page.locator('#app')).toBeVisible();
   await page.locator('[data-preset="guru"]').click();
   for(const size of [{width:844,height:390},{width:390,height:400},{width:1440,height:500}]){
-    await page.setViewportSize(size);if(size.width<1024)await page.locator('#tab-selection').click();
+    await page.setViewportSize(size);
     // Phones reach the region from inside 详细设置; computers from the top bar.
     if(size.width<1024){const details=page.locator('#advanced-settings');if(!await details.evaluate(n=>n.open))await details.locator(':scope>summary').click();await page.locator('#zone-settings-inline').click();}
     else await openZonePicker(page);
@@ -108,10 +108,13 @@ test('landscape and keyboard-sized screens keep every form action and Chinese gu
 test('200 percent equivalent desktop reflow and keyboard navigation remain operable',async({browser})=>{
   const context=await browser.newContext({viewport:{width:720,height:450},deviceScaleFactor:2,baseURL:'http://127.0.0.1:4173'});
   try{
-    const page=await context.newPage();await page.goto(route);await expect(page.locator('#app')).toBeVisible();
+    const page=await context.newPage();await page.goto(route+'#subscribe');await expect(page.locator('#app')).toBeVisible();
     await page.locator('[data-preset="guru"]').click();
-    await page.locator('#tab-preview').focus();await page.keyboard.press('Enter');
-    await page.locator('[data-cal-view="list"]').focus();await page.keyboard.press('Enter');await expect(page.locator('.cal-list-view')).toBeVisible();
+    await page.locator('.sub-upcoming-all').focus();await page.keyboard.press('Enter');
+    await expect(page.locator('#home-calendar')).toBeVisible();
+    await page.locator('#home-calendar [data-cal-view="list"]').focus();await page.keyboard.press('Enter');await expect(page.locator('#home-calendar .cal-list-view')).toBeVisible();
+    await page.locator('#home-subscribe').focus();await page.keyboard.press('Enter');
+    await expect(page.locator('#preset-options')).toBeVisible();
     await page.locator('#subscribe').click();await page.locator('input[name="device"][value="google"]').check();
     await page.locator('[data-guide-expand]>summary').focus();await page.keyboard.press('Enter');await expect(page.locator('.guide-notification-body')).toBeVisible();
     await dialogFits(page,'#subscription-dialog');await page.keyboard.press('Escape');await expect(page.locator('#subscription-dialog')).toBeHidden();await fits(page);
