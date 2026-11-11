@@ -5,7 +5,7 @@ import {tmpdir} from 'node:os';
 import {join, dirname, basename} from 'node:path';
 import ICAL from 'ical.js';
 import {SQLiteD1} from '../../service/calendar/sqlite-d1.mjs';
-import {createCalendarService, digest} from '../../service/calendar/service.mjs';
+import {createCalendarService, digest, clientFamily} from '../../service/calendar/service.mjs';
 import {validateSettings, exportICS, selectOccurrences, defaults, addDays, rangeEnd, resolveAlarmInstants} from '../../static/calendar-reminders/core.mjs';
 import {dailyDateOccurrences} from '../../static/calendar-reminders/engine.mjs';
 
@@ -90,7 +90,7 @@ test('daily layer v2 input is opt-in and rejects non-boolean API values before p
   assert.equal((await f.db.prepare('SELECT count(*) AS total FROM subscriptions').first()).total, 1);
 });
 
-test('daily layer enable, disable, re-enable and subscription stop preserve URL and UID with monotonic versions', async t => {
+test('daily dates are live: enable, disable, re-enable and stop keep URL and UID, never touch the ledger, and only raise versions', async t => {
   const f = fixture(t), created = await f.create();
   const initial = f.entries(await (await f.fetch(created.feedUrl)).text());
   assert.equal(initial.length, 1);
@@ -117,7 +117,7 @@ test('daily layer enable, disable, re-enable and subscription stop preserve URL 
     const civil = event.getFirstPropertyValue('dtstart');
     assert.equal(civil.isDate, true);
     assert.equal(event.getFirstPropertyValue('uid'), `daily-date-${civil.toString()}@calendar.huidengvan.org`);
-    assert.equal(event.getFirstPropertyValue('sequence'), 0);
+    assert.ok(event.getFirstPropertyValue('sequence') >= 1000, 'live daily versions start above every ledger version');
     assert.equal(event.getAllSubcomponents('valarm').length, 0);
     assert.doesNotMatch(event.getFirstPropertyValue('description'), /佛慧法语|fohuifayu/);
   }
@@ -125,6 +125,9 @@ test('daily layer enable, disable, re-enable and subscription stop preserve URL 
   const repeated = enabled.find(event => event.getFirstPropertyValue('uid') === trackedUid);
   assert.match(repeated.getFirstPropertyValue('summary'), /重日2/);
   assert.equal(enabled.find(event => event.getFirstPropertyValue('uid') === festivalUid).getFirstPropertyValue('sequence'), 0);
+  const dailyRows = async () => (await f.db.prepare(`SELECT count(*) AS total FROM calendar_entries WHERE uid LIKE 'daily-date-%'`).first()).total;
+  assert.equal(await dailyRows(), 0, 'daily dates are not stored per subscriber');
+  const firstSequence = repeated.getFirstPropertyValue('sequence');
   const snapshotCalls = {...f.calls};
   const renderVersion = (await f.db.prepare('SELECT render_version FROM subscriptions').first()).render_version;
   assert.equal((await f.fetch(created.feedUrl, {headers: {'If-None-Match': first.headers.get('ETag')}})).status, 304);
@@ -133,28 +136,24 @@ test('daily layer enable, disable, re-enable and subscription stop preserve URL 
 
   const removed = await change(false), removedEvents = f.entries(await removed.text());
   assert.notEqual(removed.headers.get('ETag'), first.headers.get('ETag'));
-  const cancelled = removedEvents.filter(event => event.getFirstPropertyValue('uid').startsWith('daily-date-'));
-  assert.equal(cancelled.length, daily.length);
-  for (const event of cancelled) {
-    assert.equal(event.getFirstPropertyValue('status'), 'CANCELLED');
-    assert.equal(event.getFirstPropertyValue('sequence'), 1);
-    assert.equal(event.getAllSubcomponents('valarm').length, 0);
-  }
+  // Turning daily dates off leaves them out of the feed entirely (11-10 device test).
+  assert.equal(removedEvents.filter(event => event.getFirstPropertyValue('uid').startsWith('daily-date-')).length, 0);
+  assert.equal(removedEvents.length, 1);
   assert.equal(removedEvents.find(event => event.getFirstPropertyValue('uid') === festivalUid).getFirstPropertyValue('sequence'), 0);
   const restored = f.entries(await (await change(true)).text());
   for (const event of restored.filter(event => event.getFirstPropertyValue('uid').startsWith('daily-date-'))) {
     assert.equal(event.getFirstPropertyValue('status'), 'CONFIRMED');
-    assert.equal(event.getFirstPropertyValue('sequence'), 2);
+    assert.ok(event.getFirstPropertyValue('sequence') > firstSequence);
     assert.equal(event.getAllSubcomponents('valarm').length, 0);
   }
-  assert.equal(restored.find(event => event.getFirstPropertyValue('uid') === trackedUid).getFirstPropertyValue('sequence'), 2);
+  assert.equal(await dailyRows(), 0);
   f.tick(1000);
   assert.equal((await f.api(`/api/subscriptions/${created.id}`, 'DELETE', undefined, created.manageToken)).status, 200);
   const stoppedText = await (await f.fetch(created.feedUrl)).text(), stopped = f.entries(stoppedText);
   assert.doesNotMatch(stoppedText, /BEGIN:VALARM/);
-  assert.equal(stopped.length, enabled.length);
-  assert.ok(stopped.every(event => event.getFirstPropertyValue('status') === 'CANCELLED'));
-  assert.equal(stopped.find(event => event.getFirstPropertyValue('uid') === trackedUid).getFirstPropertyValue('sequence'), 3);
+  assert.equal(stopped.length, 0, 'a stopped subscription lists nothing; calendar apps drop what the feed no longer lists');
+  assert.equal((await f.db.prepare('SELECT count(*) AS count FROM calendar_entries WHERE cancelled_at IS NOT NULL').first()).count, 1,
+    'the ledger keeps the cancelled festival so a return continues its SEQUENCE');
   assert.equal((await f.db.prepare('SELECT settings_json FROM subscriptions').first()).settings_json, '{}');
 });
 
@@ -184,7 +183,7 @@ test('legacy PATCH omission preserves current daily choice while explicit false 
   assert.equal(last.revision, 3);
 });
 
-test('timezone edits leave overlapping daily dates, titles and versions unchanged and never introduce alarms', async t => {
+test('timezone edits leave overlapping daily dates and titles unchanged, never lower versions and never introduce alarms', async t => {
   const f = fixture(t), settings = {...makeSettings('off'), includeDailyDates: true};
   const created = await f.create(settings);
   const first = f.entries(await (await f.fetch(created.feedUrl)).text());
@@ -202,8 +201,10 @@ test('timezone edits leave overlapping daily dates, titles and versions unchange
     const previous = byUid.get(event.getFirstPropertyValue('uid'));
     if (!previous) continue;
     overlaps++;
-    for (const field of ['summary', 'description', 'sequence', 'dtstamp'])
+    for (const field of ['summary', 'description'])
       assert.equal(String(event.getFirstPropertyValue(field)), String(previous.getFirstPropertyValue(field)), field);
+    // A settings save may raise a live daily version; it must never lower it.
+    assert.ok(event.getFirstPropertyValue('sequence') >= previous.getFirstPropertyValue('sequence'));
     assert.equal(event.getFirstPropertyValue('dtstart').toString(), previous.getFirstPropertyValue('dtstart').toString());
   }
   assert.ok(overlaps > 800);
@@ -234,6 +235,25 @@ test('persisted pre-extension v2 settings need no migration and omitted PATCH pr
   assert.ok(f.entries(await (await f.fetch(created.feedUrl)).text()).some(event => event.getFirstPropertyValue('uid').startsWith('daily-date-')));
 });
 
+test('daily rows stored before 11-10 are removed once and live versions stay above them', async t => {
+  const f = fixture(t), created = await f.create({...makeSettings('off'), includeDailyDates: true});
+  await f.fetch(created.feedUrl);
+  // Model a subscriber from before the change: daily dates in the ledger with versions up to 7.
+  const sample = 'daily-date-2026-10-20';
+  await f.db.prepare(`INSERT INTO calendar_entries (subscription_id, uid, content_hash, event_json, sequence, created_at, modified_at, cancelled_at)
+    VALUES (?, ?, 'h', '{}', 7, '2026-10-01T00:00:00.000Z', '2026-10-01T00:00:00.000Z', NULL),
+           (?, 'daily-date-2026-10-21', 'h', '{}', 3, '2026-10-01T00:00:00.000Z', '2026-10-01T00:00:00.000Z', '2026-10-02T00:00:00.000Z')`)
+    .bind(created.id, sample, created.id).run();
+  await f.db.prepare('DELETE FROM feed_snapshots').run();
+  f.tick(1000);
+  const events = f.entries(await (await f.fetch(created.feedUrl)).text());
+  const legacy = events.find(event => event.getFirstPropertyValue('uid') === `${sample}@calendar.huidengvan.org`);
+  assert.equal(legacy.getFirstPropertyValue('status'), 'CONFIRMED');
+  assert.ok(legacy.getFirstPropertyValue('sequence') > 7);
+  assert.equal(events.filter(event => event.getFirstPropertyValue('uid') === legacy.getFirstPropertyValue('uid')).length, 1, 'no duplicate after the move');
+  assert.equal((await f.db.prepare(`SELECT count(*) AS total FROM calendar_entries WHERE uid LIKE 'daily-date-%'`).first()).total, 0);
+});
+
 test('a daily date label correction retains the civil UID and publishes a higher sequence and fresh ETag', async t => {
   const f = fixture(t);
   // The injected selector simulates a future PRO correction on one real date.
@@ -242,13 +262,15 @@ test('a daily date label correction retains the civil UID and publishes a higher
   const created = await f.create(makeSettings('display'));
   const first = await f.fetch(created.feedUrl), before = f.entries(await first.text())[0];
   f.tick(1000);
+  // A real correction arrives as a new data import, which advances updatedOn.
+  f.data.updatedOn = '2026-10-21';
   Object.assign(f.data.occurrences[0], {title: '藏历二月十一（历法校订）', tibetan: '二月十一',
     description: '藏历日期校订。日期换算：藏历 PRO。'});
   const updated = await f.fetch(created.feedUrl), after = f.entries(await updated.text())[0];
   assert.equal(before.getFirstPropertyValue('uid'), `daily-date-${date}@calendar.huidengvan.org`);
   assert.equal(after.getFirstPropertyValue('uid'), before.getFirstPropertyValue('uid'));
   assert.equal(after.getFirstPropertyValue('dtstart').toString(), date);
-  assert.equal(after.getFirstPropertyValue('sequence'), before.getFirstPropertyValue('sequence') + 1);
+  assert.ok(after.getFirstPropertyValue('sequence') > before.getFirstPropertyValue('sequence'));
   assert.match(after.getFirstPropertyValue('summary'), /校订/);
   assert.match(after.getFirstPropertyValue('description'), /日期校订/);
   assert.notEqual(after.getFirstPropertyValue('last-modified').toString(), before.getFirstPropertyValue('last-modified').toString());
@@ -624,7 +646,7 @@ test('display entries stay alarm-free and ignore timezone-rule changes', async t
   assert.equal((await f.fetch(created.feedUrl, {headers: {'If-None-Match': first.headers.get('ETag')}})).status, 304);
 });
 
-test('date corrections use the same UID and deselection creates alarm-free cancellation tombstones', async t => {
+test('date corrections use the same UID; deselection drops the event from the feed and keeps a ledger tombstone', async t => {
   const f = fixture(t), created = await f.create();
   const initial = f.entries(await (await f.fetch(created.feedUrl)).text())[0];
   f.data.occurrences[0].date = '2027-03-21'; f.tick(60000);
@@ -634,10 +656,10 @@ test('date corrections use the same UID and deselection creates alarm-free cance
   assert.equal(corrected.getFirstPropertyValue('dtstart').toString(), '2027-03-21');
   await f.api(`/api/subscriptions/${created.id}`, 'PATCH',
     {settings: makeSettings('off'), revision: 1}, created.manageToken);
-  const [cancelled] = f.entries(await (await f.fetch(created.feedUrl)).text());
-  assert.equal(cancelled.getFirstPropertyValue('status'), 'CANCELLED');
-  assert.equal(cancelled.getFirstPropertyValue('sequence'), 2);
-  assert.equal(cancelled.getAllSubcomponents('valarm').length, 0);
+  assert.equal(f.entries(await (await f.fetch(created.feedUrl)).text()).length, 0, 'a deselected day leaves the feed');
+  const tombstone = await f.db.prepare('SELECT * FROM calendar_entries').first();
+  assert.ok(tombstone.cancelled_at);
+  assert.equal(tombstone.sequence, 2);
   f.tick(91 * 86400000);
   await f.service.scheduled(null, f.env);
   assert.equal(f.entries(await (await f.fetch(created.feedUrl)).text()).length, 0);
@@ -650,31 +672,30 @@ test('date corrections use the same UID and deselection creates alarm-free cance
   assert.equal(restored.getFirstPropertyValue('sequence'), 3);
 });
 
-test('source removals cancel events and an advancing rolling window publishes new dates automatically', async t => {
+test('source removals drop events from the feed and an advancing rolling window publishes new dates automatically', async t => {
   const f = fixture(t), created = await f.create();
   await f.fetch(created.feedUrl);
   f.data.occurrences.length = 0;
-  const [cancelled] = f.entries(await (await f.fetch(created.feedUrl)).text());
-  assert.equal(cancelled.getFirstPropertyValue('status'), 'CANCELLED');
+  assert.equal(f.entries(await (await f.fetch(created.feedUrl)).text()).length, 0);
   f.data.occurrences.push({id: 'test', eventId: 'test', uid: 'test-2028-month-1', date: '2028-10-25',
     title: '莲师荟供日', tibetan: '九月初十', source: 'https://www.fohuifayu.com/index.php/calendar'});
-  assert.equal(f.entries(await (await f.fetch(created.feedUrl)).text()).length, 1);
+  assert.equal(f.entries(await (await f.fetch(created.feedUrl)).text()).length, 0, 'not yet inside the rolling window');
   f.tick(10 * 86400000);
   const all = f.entries(await (await f.fetch(created.feedUrl)).text());
-  assert.equal(all.length, 2);
+  assert.equal(all.length, 1);
   assert.equal(all.filter(event => event.getFirstPropertyValue('status') === 'CONFIRMED').length, 1);
 });
 
-test('disable erases preferences, cancels published events, and purges event content after retention', async t => {
+test('disable erases preferences, empties the feed, and purges event content after retention', async t => {
   const f = fixture(t), created = await f.create();
   await f.fetch(created.feedUrl);
   const removed = await f.api(`/api/subscriptions/${created.id}`, 'DELETE', undefined, created.manageToken);
   assert.equal(removed.status, 200);
   const stored = await f.db.prepare('SELECT * FROM subscriptions').first();
   assert.equal(stored.settings_json, '{}');
-  const [cancelled] = f.entries(await (await f.fetch(created.feedUrl)).text());
-  assert.equal(cancelled.getFirstPropertyValue('status'), 'CANCELLED');
-  assert.equal(cancelled.getAllSubcomponents('valarm').length, 0);
+  const stoppedText = await (await f.fetch(created.feedUrl)).text();
+  assert.equal(f.entries(stoppedText).length, 0);
+  assert.doesNotMatch(stoppedText, /BEGIN:VALARM/);
   assert.equal((await f.api(`/api/subscriptions/${created.id}`, 'PATCH',
     {settings: makeSettings(), revision: 2}, created.manageToken)).status, 410);
   f.tick(91 * 86400000);
@@ -876,10 +897,10 @@ test('editing and disabling atomically remove cached private settings before the
   assert.equal((await f.db.prepare('SELECT settings_revision FROM feed_snapshots').first()).settings_revision, 2);
   assert.equal((await f.api(`/api/subscriptions/${created.id}`, 'DELETE', undefined, created.manageToken)).status, 200);
   assert.equal((await f.db.prepare('SELECT count(*) AS count FROM feed_snapshots').first()).count, 0);
-  const cancelled = await f.fetch(created.feedUrl);
-  const text = await cancelled.text();
+  const stopped = await f.fetch(created.feedUrl);
+  const text = await stopped.text();
   assert.doesNotMatch(text, /BEGIN:VALARM/);
-  assert.match(text, /STATUS:CANCELLED/);
+  assert.doesNotMatch(text, /BEGIN:VEVENT/);
   assert.equal((await f.db.prepare('SELECT settings_revision FROM feed_snapshots').first()).settings_revision, 3);
 });
 
@@ -935,9 +956,11 @@ test('disable racing a refresh cannot resurrect cached reminders or overwrite ca
   };
   const response = await f.fetch(created.feedUrl), text = await response.text();
   assert.equal(response.status, 200);
-  assert.match(text, /STATUS:CANCELLED/);
+  assert.doesNotMatch(text, /BEGIN:VEVENT/);
   assert.doesNotMatch(text, /BEGIN:VALARM/);
-  assert.equal(f.entries(text)[0].getFirstPropertyValue('sequence'), 1);
+  const row = await f.db.prepare('SELECT * FROM calendar_entries').first();
+  assert.ok(row.cancelled_at, 'the cancellation is kept in the ledger');
+  assert.equal(row.sequence, 1);
   assert.equal((await f.db.prepare('SELECT settings_revision FROM feed_snapshots').first()).settings_revision, 2);
 });
 
@@ -1009,4 +1032,36 @@ test('health is read-only, validates configuration and migrations, and exposes o
   f.db.prepare = prepare;
   await f.db.exec('DROP TABLE feed_snapshots');
   assert.equal((await f.fetch('/healthz')).status, 503);
+});
+
+test('feed fetches are recorded per calendar app at most once an hour, never blocking the feed', async t => {
+  const f = fixture(t), created = await f.create();
+  const google = 'Google-Calendar-Importer', iphone = 'iOS/18.1 (22B83) dataaccessd/1.0';
+  const rows = async () => (await f.db.prepare('SELECT client, user_agent, first_seen_at, last_seen_at FROM feed_fetches ORDER BY client').all()).results;
+  assert.equal((await f.fetch(created.feedUrl, {headers: {'User-Agent': google}})).status, 200);
+  assert.equal((await f.fetch(created.feedUrl, {headers: {'User-Agent': iphone}})).status, 200);
+  let seen = await rows();
+  assert.deepEqual(seen.map(row => row.client), ['apple', 'google']);
+  const first = seen.find(row => row.client === 'google').last_seen_at;
+  f.tick(20 * 60000);
+  await f.fetch(created.feedUrl, {headers: {'User-Agent': google}});
+  assert.equal((await rows()).find(row => row.client === 'google').last_seen_at, first, 'within the hour: no write');
+  f.tick(61 * 60000);
+  await f.fetch(created.feedUrl, {headers: {'User-Agent': google}});
+  seen = await rows();
+  assert.notEqual(seen.find(row => row.client === 'google').last_seen_at, first);
+  assert.equal(seen.find(row => row.client === 'google').first_seen_at, first);
+  // A broken log never breaks the feed.
+  await f.db.prepare('DROP TABLE feed_fetches').run();
+  assert.equal((await f.fetch(created.feedUrl, {headers: {'User-Agent': google}})).status, 200);
+});
+
+test('calendar apps are told apart by User-Agent', () => {
+  assert.equal(clientFamily('Google-Calendar-Importer'), 'google');
+  assert.equal(clientFamily('iOS/18.1 (22B83) dataaccessd/1.0'), 'apple');
+  assert.equal(clientFamily('macOS/15.1 (24B83) CalendarAgent/1000'), 'apple');
+  assert.equal(clientFamily('Mozilla/5.0 (Linux; Android 14; 23078RKD5C Build/UKQ1) MIUI/V816'), 'xiaomi');
+  assert.equal(clientFamily('Microsoft Office/16.0 (Windows NT 10.0; Microsoft Outlook 16.0)'), 'outlook');
+  assert.equal(clientFamily('okhttp/4.12.0'), 'android');
+  assert.equal(clientFamily(''), 'other');
 });

@@ -200,14 +200,54 @@ function publicEvent(event, zone, alarmInstants, titleMarks = DEFAULT_TITLE_MARK
     alarmInstants: remind ? alarmInstants : []
   };
 }
+// 每日藏历 is the same for everyone, so it is computed fresh for each feed and
+// never written to a subscriber's ledger (11-10). That removes ~820 rows per
+// subscriber with daily dates, the daily slide (one insert + one cancel each
+// day) and the release-day rewrite of those rows.
+//
+// SEQUENCE must never go backwards for a UID a calendar has already seen. The
+// ledger used small numbers (0..~10), so live entries start far above them.
+// They rise with every settings save (revision; title marks can change the
+// text) and with every data import (updatedOn; a 藏历 PRO correction can change
+// it). Both only ever increase, so their sum does too.
+export const DAILY_UID_PREFIX = 'daily-date-';
+export const DAILY_SEQUENCE_BASE = 1000;
+const DATA_DAY_ORIGIN = Date.UTC(2026, 0, 1);
+const isDailyUid = uid => typeof uid === 'string' && uid.startsWith(DAILY_UID_PREFIX);
+function dataDay(updatedOn) {
+  const time = Date.parse(`${updatedOn}T00:00:00Z`);
+  return /^\d{4}-\d{2}-\d{2}$/.test(updatedOn || '') && Number.isFinite(time) ? Math.max(0, Math.floor((time - DATA_DAY_ORIGIN) / 86400000)) : 0;
+}
+export function liveDailyVersion(record, data) {
+  const day = dataDay(data?.updatedOn);
+  const dataTime = day ? new Date(DATA_DAY_ORIGIN + day * 86400000).toISOString() : '';
+  return {sequence: DAILY_SEQUENCE_BASE + record.revision + day,
+    modified: dataTime > record.updated_at ? dataTime : record.updated_at};
+}
+
 function publishedEvent(entry) {
   return {
     ...JSON.parse(entry.event_json),
     sequence: entry.sequence, createdAt: entry.created_at,
     lastModified: entry.modified_at, dtstamp: entry.modified_at,
-    status: entry.cancelled_at ? 'CANCELLED' : 'CONFIRMED'
+    status: 'CONFIRMED'
   };
 }
+
+// The calendar app a feed request comes from, by its User-Agent. Only the
+// family and the raw string are kept, to see whether Google, Apple or Xiaomi
+// actually came back after a change (11-11).
+export function clientFamily(userAgent = '') {
+  const agent = String(userAgent).toLowerCase();
+  if (agent.includes('google')) return 'google';
+  if (/xiaomi|miui|hyperos|redmi/.test(agent)) return 'xiaomi';
+  if (/microsoft|outlook|office/.test(agent)) return 'outlook';
+  if (/iphone|ipad|ios\/|mac ?os|darwin|dataaccessd|calendaragent|cfnetwork/.test(agent)) return 'apple';
+  if (/android|okhttp|dalvik/.test(agent)) return 'android';
+  if (/mozilla|chrome|safari|firefox/.test(agent)) return 'browser';
+  return 'other';
+}
+const FETCH_LOG_INTERVAL_MS = 3600000;
 
 /**
  * The D1 binding is the only mutable dependency. Both production and SQLite tests
@@ -412,7 +452,7 @@ export function createCalendarService({getData, validateSettings, selectOccurren
         snapshot.renderer_version === release.rendererVersion && snapshot.local_day === localDay &&
         Date.parse(snapshot.generated_at) <= time.getTime() &&
         time.getTime() - Date.parse(snapshot.generated_at) < SNAPSHOT_TTL_MS && Date.parse(snapshot.expires_at) > time.getTime()) {
-      return {ics: snapshot.ics, etag: snapshot.etag, modified: snapshot.last_modified};
+      return {id: record.id, ics: snapshot.ics, etag: snapshot.etag, modified: snapshot.last_modified};
     }
     data ??= await getData();
     // Catalog retirement can remove a previously valid choice. New API input is
@@ -424,10 +464,16 @@ export function createCalendarService({getData, validateSettings, selectOccurren
     const selection = record.disabled ? [] : selectCalendarOccurrences(data, settings, rollingWindow(time, settings.zone), selectOccurrences);
     const prior = (await env.DB.prepare('SELECT * FROM calendar_entries WHERE subscription_id = ?')
       .bind(record.id).all()).results;
-    const previous = new Map(prior.map(entry => [entry.uid, entry])), next = new Map(), changes = [];
+    const previous = new Map(prior.map(entry => [entry.uid, entry])), next = new Map(), changes = [], live = [];
+    const dailyVersion = liveDailyVersion(record, data);
     for (const occurrence of selection) {
       if (!occurrence.uid || next.has(occurrence.uid)) throw new Error('Duplicate or missing occurrence UID');
       const event = publicEvent(occurrence, settings.zone, resolveAlarmInstants(occurrence, settings.zone), settings.titleMarks);
+      if (isDailyUid(event.uid)) {
+        live.push({...event, sequence: dailyVersion.sequence, createdAt: record.created_at,
+          lastModified: dailyVersion.modified, dtstamp: dailyVersion.modified, status: 'CONFIRMED'});
+        continue;
+      }
       const content = canonical(event), old = previous.get(event.uid);
       // The ledger stores the exact canonical text it hashed. Identical text has
       // the identical hash, so only new or changed events pay for SHA-256.
@@ -441,8 +487,11 @@ export function createCalendarService({getData, validateSettings, selectOccurren
       next.set(event.uid, entry);
       if (changed) changes.push(entry);
     }
+    // Daily rows left from before 11-10 are removed once, below; they are never
+    // cancelled here, so turning daily dates off simply leaves them out.
+    const legacyDaily = prior.some(entry => isDailyUid(entry.uid));
     for (const old of prior) {
-      if (next.has(old.uid)) continue;
+      if (next.has(old.uid) || isDailyUid(old.uid)) continue;
       const entry = old.cancelled_at ? old : {...old, sequence: old.sequence + 1,
         modified_at: timestamp, cancelled_at: timestamp};
       if (time.getTime() - Date.parse(entry.cancelled_at) < RETENTION_MS) {
@@ -451,9 +500,14 @@ export function createCalendarService({getData, validateSettings, selectOccurren
       }
     }
     const entries = [...next.values()];
-    const events = entries.map(publishedEvent).sort((a, b) =>
+    // A removed day leaves the feed instead of staying as STATUS:CANCELLED:
+    // Google and Xiaomi kept cancelled days for over a day, iPhone strikes them
+    // through (11-11). Calendar apps drop what a subscription no longer lists.
+    // The ledger row stays, so a day that comes back continues its SEQUENCE.
+    const events = [...entries.filter(entry => !entry.cancelled_at).map(publishedEvent), ...live].sort((a, b) =>
       a.date.localeCompare(b.date) || a.uid.localeCompare(b.uid));
-    const modified = entries.reduce((latest, entry) => entry.modified_at > latest ? entry.modified_at : latest, record.updated_at);
+    const modified = entries.reduce((latest, entry) => entry.modified_at > latest ? entry.modified_at : latest,
+      live.length && dailyVersion.modified > record.updated_at ? dailyVersion.modified : record.updated_at);
     const ics = exportICS(events, {zone: settings.zone, name: '慧灯藏历',
       generatedAt: new Date(modified), sourceVersion: data.sourceVersion || data.updatedOn || '',
       usePublishedAlarmInstants: true, titleMarks: settings.titleMarks});
@@ -470,6 +524,9 @@ export function createCalendarService({getData, validateSettings, selectOccurren
         event_json = excluded.event_json, sequence = excluded.sequence,
         modified_at = excluded.modified_at, cancelled_at = excluded.cancelled_at`,
     [JSON.stringify(changes), ...sqlGuard(record)]));
+    if (legacyDaily) statements.push(bound(env.DB, `DELETE FROM calendar_entries
+      WHERE subscription_id = ? AND uid >= ? AND uid < ? AND ${GUARD}`,
+    [record.id, DAILY_UID_PREFIX, DAILY_UID_PREFIX.slice(0, -1) + '.', ...sqlGuard(record)]));
     // Preserve UID/sequence after removal; re-selecting the same occurrence must
     // not look like an old, out-of-order revision to a calendar client.
     statements.push(bound(env.DB, `UPDATE calendar_entries SET event_json = '{}', content_hash = ''
@@ -498,10 +555,23 @@ export function createCalendarService({getData, validateSettings, selectOccurren
       if (attempt >= 2) throw new HttpError(503, '订阅正在更新，请稍后重试。');
       return materialize(env, feedToken, attempt + 1);
     }
-    return {ics, etag, modified};
+    return {id: record.id, ics, etag, modified};
+  }
+  // At most one write per subscription, app family and hour: enough to answer
+  // "when did Google last fetch?", far below the free D1 write allowance.
+  async function recordFetch(env, id, userAgent) {
+    const time = now(), timestamp = time.toISOString(), agent = String(userAgent || '').slice(0, 200);
+    try {
+      await env.DB.prepare(`INSERT INTO feed_fetches (subscription_id, client, user_agent, first_seen_at, last_seen_at)
+        VALUES (?, ?, ?, ?, ?)
+        ON CONFLICT(subscription_id, client) DO UPDATE SET last_seen_at = excluded.last_seen_at, user_agent = excluded.user_agent
+        WHERE feed_fetches.last_seen_at <= ?`)
+        .bind(id, clientFamily(agent), agent, timestamp, timestamp, new Date(time.getTime() - FETCH_LOG_INTERVAL_MS).toISOString()).run();
+    } catch { /* The record is diagnostic; a feed is never refused for it. */ }
   }
   async function feed(request, env, feedToken) {
-    const {ics, etag, modified} = await materialize(env, feedToken);
+    const {id, ics, etag, modified} = await materialize(env, feedToken);
+    await recordFetch(env, id, request.headers.get('User-Agent'));
     const headers = {
       'Content-Type': 'text/calendar; charset=utf-8', 'ETag': etag,
       'Last-Modified': new Date(modified).toUTCString(),

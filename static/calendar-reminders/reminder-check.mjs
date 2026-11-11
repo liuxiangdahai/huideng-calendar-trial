@@ -101,13 +101,16 @@ async function checkFeed(){
       allDay:e.getFirstPropertyValue('dtstart').isDate,alarms:e.getAllSubcomponents('valarm').map(a=>({
         type:a.getFirstProperty('trigger').type,value:a.getFirstPropertyValue('trigger').toString(),
         seconds:a.getFirstProperty('trigger').type==='duration'?a.getFirstPropertyValue('trigger').toSeconds():null}))}));
-    if(items.length!==6 || items.some(e=>!/^reminder-probe-[a-f]@/.test(e.uid)))throw new Error('测试日程不完整，请重新检查。');
+    // Removed or stopped tests leave the file (11-11); the rest must all be there.
     const expired=Date.now()>=Date.parse(probeExpiry(s.settings.reminderProbe));
-    for(const expected of probeSchedule(s.settings)){
+    const schedule=probeSchedule(s.settings), live=schedule.filter(expected=>!(s.disabled||expired||expected.omitted));
+    if(items.length!==live.length || items.some(e=>!/^reminder-probe-[a-f]@/.test(e.uid)))throw new Error('测试日程不完整，请重新检查。');
+    for(const expected of schedule){
       const actual=items.find(e=>e.uid===`reminder-probe-${expected.id}@calendar.huidengvan.org`);
       const cancelled=s.disabled||expired||expected.omitted;
-      const count=cancelled||expected.quiet?0:expected.instants.length;
-      if(actual.alarms.length!==count || (actual.status==='CANCELLED')!==Boolean(cancelled))throw new Error(`测试 ${expected.id.toUpperCase()} 的文件提醒与保存设置不一致，请保留记录并反馈。`);
+      if(cancelled){if(actual)throw new Error(`测试 ${expected.id.toUpperCase()} 已撤销，却仍在文件里，请保留记录并反馈。`);continue;}
+      const count=expected.quiet?0:expected.instants.length;
+      if(!actual || actual.alarms.length!==count || actual.status==='CANCELLED')throw new Error(`测试 ${expected.id.toUpperCase()} 的文件提醒与保存设置不一致，请保留记录并反馈。`);
       if(!cancelled && !expected.quiet && expected.variant==='absolute-legacy' && actual.alarms.some((a,i)=>new Date(a.value).toISOString()!==expected.instants[i]))throw new Error('文件提醒时间与保存设置不一致，请反馈。');
       if(!cancelled && !expected.quiet && expected.variant==='relative'){
         const wanted=expected.reminders.map(r=>{const [h,m]=r.time.split(':').map(Number);return (h*60+m-r.daysBefore*1440)*60;}).sort((a,b)=>a-b);
