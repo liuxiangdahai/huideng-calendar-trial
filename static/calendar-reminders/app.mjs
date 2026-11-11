@@ -123,8 +123,10 @@ function safeHTTP(value) {
 function renderToday() {
   const now=new Date(); today=deviceDate(now);
   $('#today-gregorian').textContent = new Intl.DateTimeFormat('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'short'}).format(now);
-  try { const tibetan=getTibetanDate(today); $('#today-tibetan').textContent = `藏历${tibetan.yearName}年 ${tibetan.display}`; }
-  catch { $('#today-tibetan').textContent = ''; }
+  // 历页: the Tibetan date is the page's headline, the civil date its footnote.
+  // 藏历 and the year sit right above it, large enough to be read as one with the date.
+  try { const tibetan=getTibetanDate(today); $('#today-tibetan').innerHTML = `<strong class="today-day">${esc(tibetan.display)}</strong>`; $('#today-year').textContent = `${tibetan.yearName}年`; }
+  catch { $('#today-tibetan').textContent = ''; $('#today-year').textContent = ''; }
   renderNextPractice();
 }
 // Read-only orientation for every visitor: the next guru or dakini tsok day,
@@ -256,14 +258,29 @@ function nextReminderText() {
   const [, month, day]=next.date.split('-').map(Number);
   return next.preference?.mode==='remind' ? `下一次提醒：${month}月${day}日 ${next.title} · ${reminderLabel(next.preference.reminders)}` : `下一个修行日：${month}月${day}日 ${next.title}（仅显示）`;
 }
+// How soon a saved change shows up is decided by each calendar app, not by us:
+// Apple refreshes within minutes to hours, Google about once a day, and some
+// Android calendars are as slow or copy the calendar only once (11-10 tests).
+const UPDATE_PACE = '苹果日历通常较快，Google 日历和部分安卓手机可能要等一天';
 function renderSubscribedCard() {
-  const card=$('#subscribed-card'), show=Boolean(subscription) && !stopped && !conflict && !dirty();
-  card.hidden=!show; if(!show)return;
+  // The card stays in place for anyone with a subscription. It used to vanish
+  // while there were unsaved changes and pop back when the choice matched the
+  // saved one again, which pushed the choices down just as they were tapped.
+  const card=$('#subscribed-card'), show=Boolean(subscription) && !stopped && !conflict, changed=show && dirty();
+  card.hidden=!show; if(!show){card.style.minHeight='';return;}
+  card.classList.toggle('is-dirty',changed);
+  // Whichever message is taller sets the height for both, so switching between
+  // them never moves what is below. A new window width starts over.
+  if(renderSubscribedCard.width!==innerWidth){renderSubscribedCard.width=innerWidth;card.style.minHeight='';}
+  queueMicrotask(()=>{if(!card.hidden)card.style.minHeight=`${Math.max(parseFloat(card.style.minHeight)||0,card.offsetHeight)}px`;});
+  $('#subscribed-title').textContent=changed ? '有改动还没保存' : '你的日历已在同步';
   // A web page cannot open the phone's settings, so give the one path that
   // works on every phone: search the Settings app for the calendar.
-  $('#subscribed-hint').textContent=phoneLike()
-    ? '到时没有响铃？打开手机“设置”，搜索“日历”，确认已允许通知。改了设置后，手机日历通常几小时内更新。'
-    : '没有收到提醒？在日历应用的设置里确认已允许通知。改了设置后，日历通常几小时内更新。';
+  const pace=`保存后，${UPDATE_PACE}。`;
+  $('#subscribed-hint').textContent=changed ? pace : (phoneLike()
+    ? '到时没有响铃？打开手机“设置”，搜索“日历”，确认已允许通知。'
+    : '没有收到提醒？在日历应用的设置里确认已允许通知。')+`改了设置并${pace}`;
+  if(changed){$('#subscribed-next').textContent=`点${phoneLike()?'底部':'右下角'}“保存修改”，日历才会跟着更新。`;return;}
   const next=upcoming.find(event=>event.preference?.mode==='remind') || upcoming.find(event=>event.kind!=='daily-date');
   if(!next){$('#subscribed-next').textContent='目前没有即将到来的修行日。';return;}
   const [, month, day]=next.date.split('-').map(Number);
@@ -464,7 +481,7 @@ function renderSubscription() {
   $('#entry-title').lastChild.textContent=managing ? '订阅地址' : '添加到日历';
   if(managing){
     $('#manage-title').lastChild.textContent=stopped ? '这份订阅已停用' : conflict ? '设置已在其他设备修改' : dirty() ? '有改动尚未保存' : '已加入日历，正在同步';
-    $('#manage-next').textContent=dirty() ? '保存后，日历会在几小时内更新；订阅地址不变' : nextReminderText();
+    $('#manage-next').textContent=dirty() ? `保存后订阅地址不变。${UPDATE_PACE}` : nextReminderText();
   }
   $('#subscription-new').hidden = Boolean(subscription);
   $('#subscription-existing').hidden = !subscription;
@@ -620,7 +637,7 @@ async function performSaveSubscription(create) {
     if (changedDuringSave) {
       settings = latestDraft; refresh(); renderSubscription();
       notify('已保存上次提交的设置；后续修改仍待保存。');
-    } else notify(phoneLike()?'已保存。手机日历通常几小时内自动更新。':'已保存。日历通常几小时内自动更新。');
+    } else notify(`已保存。${UPDATE_PACE}`);
   } catch (error) { showSubscriptionError(error); }
   finally {
     requestPending = false; renderSubscription();
