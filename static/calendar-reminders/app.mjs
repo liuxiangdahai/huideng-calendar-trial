@@ -212,7 +212,10 @@ function renderHome() {
     homeView=createCalendarView($('#home-calendar'),{today,reading:true,initialView:'month',onViewChange:()=>{}});
   }
   homeView.update({data,settings,events,spare:[],today,start,end,deviceZone:observedZone});
-  $('#home-subscribe-label').textContent=subscription ? '我的订阅' : '加入日历';
+  // Already added: the card offers changing the choices instead.
+  $('#home-subscribe-label').textContent=subscription ? '修改选择' : '加入日历';
+  $('#home-cta-title').textContent=subscription ? '你的日历已在同步' : '到日子想收到提醒？';
+  $('#home-cta-text').textContent=subscription ? '想改选的日子或提醒时间，点这里；保存后日历会自动更新。' : '把荟供日等加入手机日历，到时自动提醒。';
 }
 function openHomeDate(date) {
   const cell=$('#home-calendar').querySelector(`[data-cal-date="${date}"]`);
@@ -987,8 +990,11 @@ function attachEvents() {
     if(reminderReturnSelector && !document.querySelector('dialog[open]')) $(reminderReturnSelector)?.focus({preventScroll:true});
   });
   $('.skip').addEventListener('click',event=>{event.preventDefault();if(page!=='subscribe')setPage('subscribe',{push:true});$('#preset-options button')?.focus();});
-  $('#my-subscription').addEventListener('click',()=>{ if(!subscription && page==='home') setPage('subscribe',{push:true,scroll:true}); else openSubscription(); });
-  $('#home-subscribe').addEventListener('click',()=>{ if(subscription) openSubscription(); else setPage('subscribe',{push:true,scroll:true}); });
+  // From the 藏历 page both lead to the 加入日历 page, where the choices are
+  // changed; there 我的订阅 opens the subscription itself (11-11 feedback:
+  // with a subscription, the 藏历 page had no way back to the choices).
+  $('#my-subscription').addEventListener('click',()=>{ if(page==='home') setPage('subscribe',{push:true,scroll:true}); else openSubscription(); });
+  $('#home-subscribe').addEventListener('click',()=>setPage('subscribe',{push:true,scroll:true}));
   $('#home-upcoming-list').addEventListener('click',event=>{ const row=event.target.closest('[data-home-date]'); if(row) openHomeDate(row.dataset.homeDate); });
   $('#today-feast').addEventListener('click',event=>{ if(event.target.closest('[data-feast-more]')) openHomeDate(today); });
   window.addEventListener('popstate',()=>setPage(wantedPage()));

@@ -420,3 +420,21 @@ test('every dialog opens under a red eave that spans the window, and a disabled 
     await context.close();
   }
 });
+
+test('with a subscription, the 藏历 page leads back to the choices to change them', async ({page}) => {
+  await open(page); await createSubscription(page); await closeSubscription(page);
+  await page.goto('about:blank'); await page.goto(route);
+  await expect(page.locator('#home-cta-title')).toHaveText('你的日历已在同步');
+  await expect(page.locator('#home-subscribe-label')).toHaveText('修改选择');
+  await page.locator('#home-subscribe').click();
+  await expect(page).toHaveURL(/#subscribe$/);
+  await expect(page.locator('#preset-options')).toBeVisible();
+  await expect(page.locator('#subscribed-card')).toBeVisible();
+  await page.goBack();
+  await page.locator('#my-subscription').click();
+  await expect(page).toHaveURL(/#subscribe$/);
+  await expect(page.locator('#subscription-dialog')).toBeHidden();
+  // On the 加入日历 page, 我的订阅 opens the subscription itself.
+  await page.locator('#my-subscription').click();
+  await expect(page.locator('#subscription-dialog')).toBeVisible();
+});
