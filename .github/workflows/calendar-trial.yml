@@ -22,6 +22,18 @@ jobs:
   checks:
     if: inputs.operation != 'recover-trial-20261108'
     runs-on: ubuntu-latest
+    # The browsers and their system libraries come baked into Playwright's own
+    # image, so checks never wait on Ubuntu's package mirrors. On 2026-11-11
+    # the runners could not resolve azure.archive.ubuntu.com and
+    # `playwright install --with-deps` hung for over an hour, holding the
+    # release. Keep the tag equal to @playwright/test in package-lock.json;
+    # the first step below fails fast if they drift apart.
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
+      options: --ipc=host
+    env:
+      HOME: /root
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -29,10 +41,21 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
+      # Compared with a copy taken before the checks rather than with git, so
+      # the step does not depend on git being present in the image.
+      - name: Keep the committed generated date data
+        run: |
+          mkdir -p /tmp/committed
+          cp -r static/calendar-reminders/calendar-data.json static/calendar-reminders/feeds /tmp/committed/
       - run: npm run check:calendar
       - name: Require committed generated date data
-        run: git diff --exit-code HEAD -- static/calendar-reminders/calendar-data.json static/calendar-reminders/feeds
-      - run: npx playwright install --with-deps chromium firefox webkit
+        run: |
+          diff -r /tmp/committed/feeds static/calendar-reminders/feeds
+          cmp /tmp/committed/calendar-data.json static/calendar-reminders/calendar-data.json
+      - name: Playwright image matches the locked test runner
+        run: |
+          locked=$(node -p "require('./node_modules/@playwright/test/package.json').version")
+          test "$locked" = "1.64.1" || { echo "::error::@playwright/test is $locked; update the container tag to v$locked-noble"; exit 1; }
       - run: npm run test:browser:all
       - uses: actions/upload-artifact@v4
         if: failure()
