@@ -35,9 +35,10 @@ try {
   const updated = await call('PATCH',`/api/subscriptions/${subscription.id}`,{settings,revision:managed.revision});
   assert.equal(updated.feedUrl,subscription.feedUrl);
   const after = events(await (await fetch(subscription.feedUrl)).text());
-  const cancelled = after.filter(e=>e.getFirstPropertyValue('status')==='CANCELLED');
-  assert.ok(cancelled.length>0);
-  assert.ok(cancelled.every(e=>ids.has(e.getFirstPropertyValue('uid')) && e.getAllSubcomponents('valarm').length===0));
+  // Removed days leave the feed instead of staying as STATUS:CANCELLED (11-11).
+  assert.ok(after.every(e=>e.getFirstPropertyValue('status')==='CONFIRMED'));
+  assert.ok(after.length>0 && after.length<initial.length);
+  assert.ok(after.every(e=>ids.has(e.getFirstPropertyValue('uid'))));
   settings.zone='America/Vancouver';
   for (const preference of Object.values(settings.events)) {
     preference.mode='remind';
@@ -52,7 +53,7 @@ try {
   assert.ok(full.every(e=>e.getFirstPropertyValue('status')==='CONFIRMED' && e.getAllSubcomponents('valarm').length===2));
   await call('DELETE',`/api/subscriptions/${subscription.id}`);
   const stopped = events(await (await fetch(subscription.feedUrl)).text());
-  assert.ok(stopped.every(e=>e.getFirstPropertyValue('status')==='CANCELLED'));
+  assert.equal(stopped.length,0);
   console.log(`本地联调通过：两个荟供日 ${initial.length} 条，全目录双提醒 ${full.length} 条；地址、缓存、修改与撤销已验证。`);
 } finally {
   if (subscription) await call('DELETE',`/api/subscriptions/${subscription.id}`).catch(()=>{});
