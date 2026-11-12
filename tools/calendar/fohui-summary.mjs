@@ -10,9 +10,9 @@ try{
   if(r.policy?.allowed===false)text+='本次 robots 规则仍禁止该路径；按2026年11月9日项目负责人明确的公开读取决定执行。这不是站方授权。\n\n';
   try{
     const p=JSON.parse(await fs.readFile('artifacts/source-maintenance/publication.json','utf8'));
-    if(p.prUrl)text+=`候选资料：[查看 PR](${p.prUrl})。\n\n`;
+    if(p.compareUrl)text+=`候选资料：[查看差异](${p.compareUrl})；待核对的修订可从此处创建 PR。\n\n`;
     if(p.release)text+=`已交给[既有发布流程](${p.release.url})；应以该流程和两站版本核验结果判定是否上线。\n\n`;
-    if(p.failure)text+='自动提交或发布交接未完成，需检查本次运行和候选 PR。\n\n';
+    if(p.failure)text+='自动提交或发布交接未完成，需检查本次运行和候选分支。\n\n';
   }catch(error){if(error.code!=='ENOENT')throw error;}
 }catch(error){text+='没有完整检查报告，请查看失败步骤；不得推断资料已更新。\n';}
 if(process.env.GITHUB_STEP_SUMMARY)await fs.appendFile(process.env.GITHUB_STEP_SUMMARY,text);

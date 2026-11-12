@@ -1,4 +1,4 @@
-// GitHub-only handoff: a data PR is checked by the existing release workflow.
+// GitHub-only handoff: a data branch is checked by the existing release workflow.
 // Only a future extension may fast-forward main, then dispatch that same workflow.
 import fs from 'node:fs/promises';
 import {execFileSync} from 'node:child_process';
@@ -48,8 +48,10 @@ export async function publish({command=run,dispatch=dispatchAndWait,context=proc
   try{
     run('git',['fetch','origin','refs/heads/main:refs/remotes/origin/main']);
     if(run('git',['rev-parse','origin/main'])!==base){receipt.status='base-changed';await save();throw new Error('主分支已有新修改，本次不覆盖，请重新运行资料检查。');}
-    const open=JSON.parse(run('gh',['pr','list','--repo',REPO,'--head',policy.branch,'--base','main','--state','open','--json','number,url']));
-    if(open.length){receipt.status='existing-review';receipt.prUrl=open[0].url;await save();console.log('相同资料已有待核对 PR：'+open[0].url);return receipt;}
+    receipt.compareUrl=`https://github.com/${REPO}/compare/main...${policy.branch}`;
+    if(run('git',['ls-remote','--heads','origin',`refs/heads/${policy.branch}`])){
+      receipt.status='existing-review';await save();console.log('相同资料已有候选分支，需核对：'+receipt.compareUrl);return receipt;
+    }
     run('git',['switch','-c',policy.branch]);
     run('git',['config','user.name','github-actions[bot]']);
     run('git',['config','user.email','41898282+github-actions[bot]@users.noreply.github.com']);
@@ -58,12 +60,6 @@ export async function publish({command=run,dispatch=dispatchAndWait,context=proc
     const commit=run('git',['rev-parse','HEAD']);receipt.commit=commit;
     // No force push: an existing or concurrently modified branch must be reviewed.
     run('git',['push','origin',`HEAD:refs/heads/${policy.branch}`]);
-    const body=`佛慧法语已确认资料从 ${report.before.end} 更新至 ${report.after.end}。新增 ${report.newDays} 天，修订 ${report.editedDays} 天。\n\n`+
-      `来源：https://www.fohuifayu.com/index.php/calendar/\n\n完整差异与来源摘要见本次资料任务的 source-maintenance 报告；原始网页不进入产品或提交。稳定记录编号与既有订阅设置保持。\n\n`+
-      (policy.automatic?'本次仅为未来新增的已知日期。现有三浏览器检查通过且主分支未变化后，自动提交并触发唯一验收→试用发布流程。':'本次涉及既有日期或记录修订，只提供已检查候选，等待维护者核对记录身份。')+
-      `\n\n来源任务：https://github.com/${REPO}/actions/runs/${context.GITHUB_RUN_ID}\n`;
-    await write('artifacts/source-maintenance/pr-body.md',body);
-    receipt.prUrl=run('gh',['pr','create','--repo',REPO,'--base','main','--head',policy.branch,'--title',`更新佛慧法语历书资料（${report.checkedAt.slice(0,10)}）`,'--body-file','artifacts/source-maintenance/pr-body.md']);
     receipt.status='checking';await save();
     receipt.checks=await dispatch(policy.branch,commit);
     if(!policy.automatic){receipt.status='review-required';await save();return receipt;}
@@ -77,7 +73,7 @@ export async function publish({command=run,dispatch=dispatchAndWait,context=proc
     console.log(`资料已检查，发布由既有流程继续：${receipt.release.url}`);
     return receipt;
   }catch(error){
-    receipt.failure='自动提交或检查未完成；查看本次 Actions 与 PR，线上资料不得据此标为已更新。';await save();
+    receipt.failure='自动提交或检查未完成；查看本次 Actions 与候选分支，线上资料不得据此标为已更新。';await save();
     // Do not print subprocess stderr, environment or authenticated remotes.
     throw new Error(`${receipt.failure}${error.message.startsWith('资料检查')?error.message:''}`);
   }

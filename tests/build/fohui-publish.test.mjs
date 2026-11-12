@@ -18,8 +18,6 @@ function harness({facts=report,concurrent=false,checkFails=false,mainRejects=fal
         if(args[0]==='push'&&args[2].endsWith(':refs/heads/main')&&mainRejects)throw new Error('branch protection');
         return '';
       }
-      if(args[1]==='list')return '[]';
-      if(args[1]==='create')return 'https://github.com/liuxiangdahai/huideng-calendar-trial/pull/123';
       throw new Error('unexpected command');
     },
     dispatch:async(ref,sha,opts)=>{calls.push(['dispatch',ref,sha,opts]);if(checkFails)throw new Error('资料检查未通过');return {url:'https://github.com/liuxiangdahai/huideng-calendar-trial/actions/runs/123',sha};}
@@ -34,6 +32,8 @@ test('automatic publication checks the candidate SHA, fast-forwards main, then e
   const release=h.calls.findIndex(c=>c[0]==='dispatch'&&c[1]==='main');
   assert.ok(verify>=0&&verify<push&&push<release);assert.equal(h.calls[verify][2],commit);
   assert.equal(receipt.status,'release-requested');assert.ok(!h.calls.flat().some(c=>typeof c==='string'&&c.includes('--force')));
+  assert.match(receipt.compareUrl,/\/compare\/main\.\.\.automation\/fohui-/);
+  assert.ok(!h.calls.some(c=>c[0]==='gh'&&c[1]==='pr'),'no PR creation or review permissions needed');
 });
 
 test('failed checks or branch protection leave the candidate and never dispatch production',async()=>{

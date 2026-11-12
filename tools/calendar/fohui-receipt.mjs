@@ -12,7 +12,7 @@ const receipt={schemaVersion:1,checkedAt:report.checkedAt,status:report.status,s
   candidateEnd:report.after?.end||null,newDays:report.newDays??null,editedDays:report.editedDays??null,
   issues:report.changes?.filter(c=>c.blocking).map(c=>({kind:c.kind,date:c.date||c.from||null}))||[],
   failureCode:report.code||null,robotsAllowed:report.policy?.allowed??null,
-  publicationStatus:publication?.status||null,publicationFailure:publication?.failure||null,
+  publicationStatus:publication?.status||null,publicationFailure:publication?.failure||null,compareUrl:publication?.compareUrl||null,
   run:`https://github.com/${repo}/actions/runs/${process.env.GITHUB_RUN_ID}`,
   releaseRun:publication?.release?.url||null};
 const route=`repos/${repo}/contents/docs/evidence/source-maintenance/latest-check.json`;
