@@ -547,5 +547,5 @@ dialog.cal-day-sheet.is-popover { position: absolute; inset: auto; z-index: 30; 
 .cal-legend-calendar { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); }
 .cal-legend-calendar b { width: 20px; height: 20px; margin: 0; font-size: 12px; }
 .cal-legend-why { color: var(--muted); }
-.cal-legend>.cal-legend-tap { margin-left: auto; color: var(--teal-2); }
+.cal-view .cal-legend>span.cal-legend-tap { margin-left: auto; color: var(--teal-2); }
 @media (max-width: 1023px) { .cal-legend { gap: 6px 16px; } }

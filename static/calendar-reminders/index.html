@@ -161,19 +161,25 @@
       <p class="wechat-note">第一次加入或想修改，都请在浏览器里打开：你的订阅记在浏览器里。找不到这一项，可以复制网址，粘贴到手机浏览器里打开。</p>
       <div class="dialog-actions"><button id="wechat-copy" type="button" class="secondary"><span data-icon="copy" aria-hidden="true"></span>复制网址</button><button type="button" class="primary" data-close="wechat-dialog">知道了</button></div>
     </dialog>
-  <dialog id="share-dialog" aria-labelledby="share-title">
-      <div class="dialog-head"><div><p class="overline">分享设置</p><h2 id="share-title">发给师兄，或用手机扫码</h2></div><button type="button" class="icon-button" data-close="share-dialog" aria-label="关闭分享"><span data-icon="close" aria-hidden="true"></span></button></div>
-      <p id="share-summary" class="field-note"></p>
-      <div class="share-body"><div id="share-qr" class="share-qr" role="img" aria-label="分享链接二维码"></div>
-        <div><p class="field-note">对方打开后，第 1、2 步已按这套设置选好，只需点底部按钮加入日历。每个人得到的是自己的订阅，互不影响。</p>
-        <button id="share-copy" type="button" class="secondary"><span data-icon="copy" aria-hidden="true"></span>复制分享链接</button></div></div>
+  <!-- 分享 (11-12): what they will get, on butter paper; the code in a 嘎乌
+       frame for a phone camera; one action card to send the link. -->
+  <dialog id="share-dialog" class="share-dialog" aria-labelledby="share-title">
+      <div class="dialog-head"><div><p class="overline">分享给师兄</p><h2 id="share-title">发给师兄，或用手机扫码</h2></div><button type="button" class="icon-button" data-close="share-dialog" aria-label="关闭分享"><span data-icon="close" aria-hidden="true"></span></button></div>
+      <div class="share-what"><small>对方打开后，会按这套设置选好</small><p id="share-summary"></p></div>
+      <div class="share-body">
+        <figure class="share-code"><div id="share-qr" class="share-qr" role="img" aria-label="分享链接二维码"></div><figcaption>用手机相机扫一扫</figcaption></figure>
+        <div class="share-side">
+          <button id="share-copy" type="button" class="manage-action"><span class="manage-action-icon" data-icon="copy" aria-hidden="true"></span><span><strong>复制分享链接</strong><small>发到微信群或私聊</small></span><span data-icon="chevron-right" aria-hidden="true"></span></button>
+          <p class="share-then">对方只需点底部的“加入日历”。每个人得到的是自己的订阅，以后各改各的，互不影响。</p>
+        </div>
+      </div>
       <p id="share-custom-note" class="notice" hidden>你逐项细调过的提醒不会带过去，分享的是方案、提醒时间和每日藏历。</p>
       <div class="dialog-actions"><button type="button" class="secondary" data-close="share-dialog">完成</button></div>
     </dialog>
     <dialog id="zone-dialog" aria-labelledby="zone-title">
     <form id="zone-form">
       <div class="dialog-head"><div><p class="overline">地区与时间</p><h2 id="zone-title">选择提醒时区</h2></div><button type="button" class="icon-button" data-close="zone-dialog" aria-label="关闭时区选择"><span data-icon="close" aria-hidden="true"></span></button></div>
-      <p class="field-note">只调整提醒使用的地区，不改变各项提醒时间或全天日期。顶部的今天始终跟随设备。</p>
+      <p class="field-note zone-why">提醒按这个地区的时间响起。只在你长期住在别处、而手机时间不对时才需要改。</p>
       <div class="search-box"><span data-icon="search" aria-hidden="true"></span><input id="zone-search" type="search" placeholder="搜索国家、城市或时区" aria-label="搜索国家、城市或时区" autocomplete="off"></div>
       <p id="zone-result-status" class="field-note" role="status"></p>
       <div id="zone-options" class="zone-options"></div>

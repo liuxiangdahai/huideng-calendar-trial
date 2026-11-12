@@ -431,8 +431,9 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
     $('[data-cal-legend]').innerHTML = [
       // 缺 and 重 each get their own short line, only in months that have
       // them; "not a festival" is said once, quietly (11-12).
-      cells.some(cell => cell.inMonth && cell.tibetan?.missingBefore?.length) ? '<span class="cal-legend-calendar"><b>缺</b>这天之前，藏历少了一天</span>' : '',
-      cells.some(cell => cell.inMonth && cell.repeatNumber) ? '<span class="cal-legend-calendar"><b>重</b>同一个藏历日有两天</span>' : '',
+      // Whenever either mark is in the month, both are explained together,
+      // so the pair is learned at once (11-12).
+      ...(cells.some(cell => cell.inMonth && (cell.tibetan?.missingBefore?.length || cell.repeatNumber)) ? ['<span class="cal-legend-calendar"><b>缺</b>这天之前，藏历少了一天</span>', '<span class="cal-legend-calendar"><b>重</b>同一个藏历日有两天</span>'] : []),
       cells.some(cell => cell.inMonth && (cell.tibetan?.missingBefore?.length || cell.repeatNumber)) ? '<span class="cal-legend-why">都是藏历本身的安排，不是节日</span>' : '',
       anyEvents || anySpare ? '<span class="cal-legend-tap">点日期看当天详情</span>' : '',
       daily ? '<span class="cal-legend-daily">每天的藏历日期也会出现在你的日历里</span>' : ''
