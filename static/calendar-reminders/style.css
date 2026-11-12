@@ -1292,3 +1292,11 @@ body[data-page="subscribe"] [data-page-part="home"] { display: none !important; 
 }
 @media (max-height: 560px) { #zone-dialog :is(.zone-why, #zone-result-status) { display: none; } }
 .category-heading .text-button { min-height: 46px; }
+.daily-calendar-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 14px; }
+.daily-calendar-actions>* { flex: 1 1 220px; justify-content: center; min-height: 48px; white-space: nowrap; }
+.daily-calendar-actions>a#daily-calendar-apple { border-color: var(--eave); color: var(--eave); background: var(--surface); font-weight: 600; }
+#daily-calendar-copy { background: var(--surface); }
+.daily-calendar-how { margin: 0 0 12px !important; padding-top: 10px; border-top: 1px solid #e2cfa6; color: var(--ink-2) !important; font-size: var(--fs-sm); line-height: 1.8; }
+.daily-calendar-how b { color: var(--wine); font-weight: 600; }
+.daily-calendar-actions>[hidden] { display: none; }
+#time-choice-note { margin-left: auto; padding-left: 12px; white-space: nowrap; }

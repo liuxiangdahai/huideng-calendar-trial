@@ -365,7 +365,10 @@ function renderTimeChoices() {
     button.disabled=!prefs.length;
     button.setAttribute('aria-pressed',String(button.dataset.timeChoice===current));
   }
+  // A time is always chosen for you (当天 08:00); say so, so nobody thinks
+  // this step must be answered (11-12).
   $('#time-choice-note').textContent=!prefs.length ? '先在上一步选择会提醒的日子' : !current ? '已逐项设置不同时间' :
+    current==='0|08:00' ? '已默认选好，可不改' :
     [...document.querySelectorAll('[data-time-choice]')].some(b=>b.dataset.timeChoice===current) ? '' : `当前：${reminderLabel(prefs[0].reminders)}`;
 }
 // Step 3 names the device it recognised. A browser that reports a computer but
@@ -976,7 +979,12 @@ function attachEvents() {
   advanced.addEventListener('toggle',()=>{ui.advancedOpen=advanced.open;persistUI();syncAdvanced();});
   const dailyUrl=new URL('./daily-dates.ics',location.href);
   if(dailyUrl.protocol==='https:') $('#daily-calendar-apple').href=dailyUrl.href.replace(/^https:/,'webcal:');
-  $('#daily-calendar-apple').hidden=!calendarDevice.apple || dailyUrl.protocol!=='https:';
+  // One clear path per device (11-12): on Apple, one tap and the Calendar app
+  // asks to subscribe, nothing to copy; elsewhere, copy and paste where the
+  // calendar app adds a subscription. Copy stays as a quiet extra on Apple.
+  const dailyApple=calendarDevice.apple && dailyUrl.protocol==='https:' && !calendarDevice.inAppBrowser;
+  $('#daily-calendar-apple').hidden=!dailyApple;
+  $('#daily-calendar-how').innerHTML=dailyApple ? '<b>用 Apple 日历：</b>点“加入 Apple 日历”，日历会自动弹出“订阅”，确认即可。<br><b>用其他日历：</b>复制链接，粘贴到日历应用的“添加订阅日历”。' : '<b>怎么加：</b>复制链接，打开日历应用的“添加订阅日历”（或“通过网址添加”），粘贴即可。';
   // The offline single-file page has no shared file to subscribe to.
   $('.daily-calendar').hidden=!/^https?:$/.test(dailyUrl.protocol);
   $('#daily-calendar-copy').addEventListener('click',()=>void copy(dailyUrl.href,'每日藏历订阅地址'));
