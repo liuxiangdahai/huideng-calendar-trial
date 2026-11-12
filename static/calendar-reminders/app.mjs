@@ -919,6 +919,7 @@ function attachEvents() {
     for(const pref of remindPrefs()) pref.reminders=[{daysBefore:Number(daysBefore),time}];
     stopped=false;refresh();
     button.focus({preventScroll:true});playMotion(button,'check');playSymbol(button.querySelector('svg'));
+    button.classList.remove('play'); void button.offsetWidth; button.classList.add('play');
     notify(subscription?'提醒时间已改；保存修改后同步到日历。':`所有提醒改为${reminderLabel([{daysBefore:Number(daysBefore),time}])}。`);
   });
   $('#share-settings').addEventListener('click',openShare);

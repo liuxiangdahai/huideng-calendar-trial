@@ -75,3 +75,7 @@
 @keyframes sub-unroll { from { clip-path: inset(0 0 100% 0); transform: translateY(-8px); } to { clip-path: inset(0 0 -40px 0); transform: none; } }
 @keyframes sub-glow { 0%, 100% { box-shadow: 0 0 0 1px var(--gilt), 0 0 0 4px #5f111c, 0 0 0 5.5px var(--gold-2), 0 0 0 0 #e8c98300; } 40% { box-shadow: 0 0 0 1px var(--gilt), 0 0 0 4px #5f111c, 0 0 0 5.5px var(--gold-2), 0 0 20px 8px #e8c98399; } }
 @keyframes sub-settle { to { color: #c9a76429; } }
+@media (prefers-reduced-motion: no-preference) {
+  .play::after { animation: paint-red .42s cubic-bezier(.6,.05,.3,1); }
+}
+@keyframes paint-red { from { transform: scaleX(1); } to { transform: scaleX(0); } }

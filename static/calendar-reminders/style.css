@@ -1070,3 +1070,62 @@ body[data-page="subscribe"] [data-page-part="home"] { display: none !important; 
   .step-add .sub-up-alarm .icon { width: 15px; height: 15px; }
 }
 @media (min-width: 1024px) and (max-width: 1279px) { .sub-body strong { font-size: 18px; } }
+
+/* ===== One selection language: 涂红 (11-12) =====
+   Every choice on this page is chosen the same way as 我的订阅 and the
+   eave: it is painted eave red, framed in a gilt line. Plans keep their 边玛
+   crown on top; emblems turn ivory with a red symbol. Step numbers sit in
+   the same 嘎乌 arch as the 我的订阅 card, with a gilt rule after the title. */
+.preset-card[aria-pressed=true], .daily-date-option:has(input:checked) { isolation: isolate; border-color: var(--eave); background: var(--eave); color: #fdf9f1; box-shadow: inset 0 0 0 1px var(--gilt), 0 12px 22px -18px #5f111cb3; }
+.preset-card[aria-pressed=true] .preset-copy strong small, .daily-date-option:has(input:checked) .daily-date-title-row small { color: #e9d3aa; }
+.preset-card[aria-pressed=true] .preset-copy>span, .daily-date-option:has(input:checked) #daily-date-note { color: #f1e4cb; }
+.preset-card[aria-pressed=true] .preset-copy em { color: #f4dcae; }
+.preset-card[aria-pressed=true] .preset-copy em .icon { color: var(--gold-2); }
+.preset-card[aria-pressed=true] .preset-days span { background: #fdf9f11a; color: #fdf9f1; box-shadow: inset 0 0 0 1px #b9975a80; }
+.daily-date-option:has(input:checked) .daily-date-title-row strong { color: #fdf9f1; }
+.preset-card[aria-pressed=true] .preset-medal, .daily-date-option:has(input:checked) .preset-medal { background: radial-gradient(circle, #fdf9f1 62%, transparent 63%); box-shadow: 0 0 0 1px var(--gilt); color: var(--red); }
+.daily-date-option:has(input:checked) .preset-medal { color: var(--teal); }
+.preset-card[aria-pressed=true] .medal-seat, .daily-date-option:has(input:checked) .preset-medal .medal-seat { color: var(--gold-2); }
+.preset-card[aria-pressed=true] .seat-front, .daily-date-option:has(input:checked) .seat-front { fill: var(--eave); }
+.preset-card[aria-pressed=true] .preset-check { background: #fdf9f1; border-color: #fdf9f1; color: var(--eave); box-shadow: 0 0 0 2px var(--eave), 0 0 0 3px var(--gold-2); }
+.daily-date-option .event-label input:checked { background: #fdf9f1; border-color: #fdf9f1; box-shadow: 0 0 0 2px var(--eave), 0 0 0 3px var(--gold-2); }
+.daily-date-option .event-label input:checked::after { border-color: var(--eave); }
+.daily-date-option:has(input:checked) .daily-date-help { border-top-color: #b9975a55; }
+.daily-date-option:has(input:checked) .daily-date-help summary { color: #e9d3aa; }
+.daily-date-option:has(input:checked) .daily-date-examples { color: #f1e4cb; }
+.daily-date-option:has(input:checked) .daily-date-examples p:first-child { color: #fdf9f1; }
+.daily-date-help { border-top-style: solid; border-top-color: var(--line); }
+/* Times: the same medallion as the plans; chosen, painted red like them. */
+.time-choices button { position: relative; isolation: isolate; overflow: hidden; padding: 14px 4px 12px; background: var(--surface); }
+.time-choices button>[data-icon] { display: grid; place-items: center; width: 38px; height: 38px; margin-bottom: 6px; border-radius: 50%; background: radial-gradient(circle, #fff 56%, var(--gold-tint) 57%); box-shadow: inset 0 0 0 1px #a5803f44; color: var(--gold); }
+.time-choices button>[data-icon] .icon { width: 22px; height: 22px; margin: 0; color: inherit; }
+.time-choices button[aria-pressed=true]>[data-icon] { background: radial-gradient(circle, #fdf9f1 62%, transparent 63%); box-shadow: 0 0 0 1px var(--gilt); color: var(--red); }
+/* The paint: chosen, the red sweeps in from the left like a brush stroke;
+   a white sheet over it draws back (the red is the card's own colour, so
+   it is there at once for anyone who skips the motion). */
+.preset-card::after, .daily-date-option::after, .time-choices button::after { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--surface); transform: scaleX(0); transform-origin: 100% 50%; pointer-events: none; }
+/* Step numbers in a 嘎乌 arch; a gilt rule runs on after the title. */
+.quick-heading h3:has(.step-no) { flex: 1; gap: 12px; font-size: 20px; }
+.quick-heading h3:has(.step-no)::after { content: ""; flex: 1; min-width: 24px; height: 1px; margin-left: 4px; background: linear-gradient(90deg, var(--gold-2), transparent); }
+.step-no { width: 26px; height: 30px; padding-top: 3px; border-radius: 13px 13px 3px 3px / 10px 10px 3px 3px; background: var(--eave); color: #f4ead6; font: 600 15px/1 var(--font-serif); box-shadow: 0 0 0 1px var(--gilt), 0 0 0 3px var(--paper), 0 0 0 4px #c9a76488; }
+@media (min-width: 1024px) { .quick-heading h3:has(.step-no) { font-size: var(--fs-lg); } }
+/* 11-12 (later): the red card alone says "chosen" — no 边玛 crown on the
+   choices. Chosen emblems are dark inside (wine, gilt symbol). The 边玛 band
+   crowns the "最近会出现的日子" card under the computer's month instead. */
+.preset-card::before, .daily-date-option::before { display: none; }
+.preset-card[aria-pressed=true], .daily-date-option:has(input:checked) { padding-top: 16px; }
+.daily-date-option:has(input:checked) { padding-top: 14px; }
+.preset-card[aria-pressed=true] .preset-medal, .daily-date-option:has(input:checked) .preset-medal, .time-choices button[aria-pressed=true]>[data-icon] { background: radial-gradient(circle, #3f0a12 62%, transparent 63%); box-shadow: 0 0 0 1px var(--gilt); color: var(--gold-2); }
+.preset-card[aria-pressed=true] .seat-front, .daily-date-option:has(input:checked) .seat-front { fill: var(--eave); }
+.quick-heading h3 { white-space: normal; }
+.quick-heading h3:has(.step-no)::after { min-width: 0; }
+@media (min-width: 1024px) {
+  .step-add .sub-upcoming { padding-top: 26px; }
+  .step-add .sub-upcoming::before { display: block; content: ""; position: absolute; inset: -1px -1px auto; height: 12px; border-radius: 10px 10px 0 0;
+    background: radial-gradient(circle 4px at 50% 50%, #e8c983 0 2.8px, #8a6a2a 3.3px, transparent 4.2px) 20px 50% / 58px 100% repeat-x,
+      repeating-linear-gradient(90deg, #4a0d16 0 1px, #6a1420 1px 3px, #5a1019 3px 4px), #5f111c;
+    border-bottom: 1.5px solid var(--gilt); }
+}
+/* Chosen emblems take the card's own eave red inside, a fine gilt ring and a
+   pale-gold symbol, like the first chosen reminder times (11-12). */
+.preset-card[aria-pressed=true] .preset-medal, .daily-date-option:has(input:checked) .preset-medal, .time-choices button[aria-pressed=true]>[data-icon] { background: var(--eave); box-shadow: inset 0 0 0 1px #b9975a99; color: #f1d9a6; }
