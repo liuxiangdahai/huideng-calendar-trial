@@ -55,3 +55,20 @@
 }
 @keyframes cal-sheet-up { from { translate: 0 100%; } to { translate: 0 0; } }
 @keyframes cal-card-in { from { opacity: 0; translate: 0 4px; } to { opacity: 1; translate: 0 0; } }
+
+/* 加入日历页 (11-12) */
+@media (prefers-reduced-motion: no-preference) {
+  /* The live dot breathes while the calendar is in sync. */
+  .sub-tag i { animation: sub-live 2.6s ease-out infinite; }
+  .subscribed-card.is-dirty .sub-tag i { animation: none; }
+  /* Two gilt rings go out from the emblem the moment it is chosen. */
+  .play .medal-wave { animation: medal-wave 1s ease-out; }
+  .play .medal-wave+.medal-wave { animation-delay: .25s; }
+  .time-choices button { transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease; }
+}
+@keyframes sub-live { 0% { box-shadow: 0 0 0 0 #7fd19a80; } 70%, 100% { box-shadow: 0 0 0 7px #7fd19a00; } }
+@keyframes medal-wave { 0% { opacity: .9; transform: scale(1); } 100% { opacity: 0; transform: scale(1.5); } }
+@media (prefers-reduced-motion: no-preference) {
+  .play::after { animation: paint-red .42s cubic-bezier(.6,.05,.3,1); }
+}
+@keyframes paint-red { from { transform: scaleX(1); } to { transform: scaleX(0); } }

@@ -169,9 +169,11 @@ test('restored open categories do not replay expansion and daily dates retain th
   expect(await page.evaluate(() => window.motionCalls.filter(call => /event-list|group-tools/.test(call.classes)))).toEqual([]);
   await page.locator('#include-daily-dates').check();
   await expect(page.locator('#daily-date-count')).toBeVisible();
-  expect(await palette()).toEqual(initialPalette);
+  // Chosen, it wears the 边玛 band like a chosen plan (11-12); unchosen, it is
+  // back to the shared paper.
+  await expect.poll(() => page.locator('.daily-date-option').evaluate(node => getComputedStyle(node, '::before').transform)).toMatch(/^(none|matrix\(1, 0, 0, 1, 0, 0\))$/);
   await page.locator('#include-daily-dates').uncheck();
-  expect(await palette()).toEqual(initialPalette);
+  await expect.poll(palette).toEqual(initialPalette);
   await expect(page.locator('#event-guru-tsok')).toBeChecked();
   expect(audit).toEqual({errors: [], writes: []});
 });

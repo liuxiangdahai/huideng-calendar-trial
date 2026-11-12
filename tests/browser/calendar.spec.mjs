@@ -31,7 +31,7 @@ async function createSubscription(page) {
   await page.locator('input[name="device"][value="iphone"]').check();
   expect((await response).status()).toBe(201);
   await expect(page.locator('#feed-url')).toHaveValue(/^http:\/\/127\.0\.0\.1:4173\/calendar\/.+\.ics$/);
-  await expect(page.locator('#subscription-status')).toContainText('等待日历同步');
+  await expect(page.locator('#subscription-status')).toContainText('日历会自己更新');
   return credentials(page);
 }
 async function closeSubscription(page) { await page.locator('[data-close="subscription-dialog"]').first().click(); }
@@ -111,7 +111,7 @@ test('real subscription keeps its URL, cancels removed events and allows saving 
   await page.locator('[data-event="dakini-tsok"]').uncheck();
   await expect(page.locator('#subscribe')).toContainText('保存修改');
   await page.locator('#subscribe').click();
-  await expect(page.locator('#subscription-status')).toContainText('设置已保存');
+  await expect(page.locator('#subscription-status')).toContainText('已保存');
   await expect.poll(async() => (await credentials(page)).revision).toBe(2);
   expect((await credentials(page)).feedUrl).toBe(first.feedUrl);
   const updated = components(await (await request.get(first.feedUrl)).text());
@@ -160,7 +160,7 @@ test('management fragment restores a subscription on another device without leak
     expect(requested.some(url => url.includes(sub.manageToken))).toBe(false);
     const feed = await (await request.get(sub.feedUrl)).text();
     expect(feed).not.toContain(sub.manageToken);
-    await expect(second.locator('#subscription-status')).toContainText('等待日历同步');
+    await expect(second.locator('#subscription-status')).toContainText('日历会自己更新');
   } finally { await other.close(); }
 });
 
@@ -206,7 +206,7 @@ test('edits made during delayed creation and saving remain an unsaved draft',asy
   await page.locator('[data-event="dakini-tsok"]').uncheck();
   release();
   await expect.poll(async() => (await credentials(page))?.revision).toBe(1);
-  await expect(page.locator('#save-state')).toHaveText('有改动，保存后同步到日历');
+  await expect(page.locator('#save-state')).toHaveText('有改动，记得保存修改');
   expect((await draft(page)).events['dakini-tsok'].mode).toBe('off');
   expect((await credentials(page)).savedSettings.events['dakini-tsok'].mode).toBe('remind');
   await page.unroute('**/api/subscriptions',delayed);
@@ -219,18 +219,20 @@ test('edits made during delayed creation and saving remain an unsaved draft',asy
   release();
   await expect.poll(async() => (await credentials(page))?.revision).toBe(2);
   await expect(page.locator('#selection-count')).toHaveText('已选 0 项');
-  await expect(page.locator('#save-state')).toHaveText('有改动，保存后同步到日历');
+  await expect(page.locator('#save-state')).toHaveText('有改动，记得保存修改');
   expect((await credentials(page)).savedSettings.events['guru-tsok'].mode).toBe('remind');
 });
 
 test('mobile selection, preview, long names and dialogs fit 390 and 320 pixel widths',async({page}) => {
   await page.setViewportSize({width:390,height:844}); await open(page);
   await expect(page.locator('#selection-pane')).toBeVisible();
-  await expect(page.locator('#preview-pane')).toBeHidden();
+  // Phones keep step 3 (what the calendar will hold) but not the month preview.
+  await expect(page.locator('#preview-pane .preview-panel')).toBeHidden();
+  await expect(page.locator('.step-add')).toBeAttached();
   await page.screenshot({path:'.calendar-preview/mobile.png',fullPage:true});
   // One page, no tabs: the month is one link away, on the 藏历 page.
   await expect(page.locator('[role="tablist"]')).toHaveCount(0);
-  await expect(page.locator('.sub-home-link')).toBeVisible();
+  await expect(page.locator('#my-subscription .to-home')).toBeVisible();
   // Phones open in the simple three steps; categories live under 详细设置.
   await expect(page.locator('#advanced-settings')).not.toHaveAttribute('open','');
   await page.locator('#advanced-settings>summary').click();

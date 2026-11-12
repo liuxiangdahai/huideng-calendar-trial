@@ -113,8 +113,10 @@ test('desktop month shows every original title in the cell and opens complete cl
   expect(truncation).toEqual({overflow: 'hidden', ellipsis: 'ellipsis', title: busy[1][0].title, text: busy[1][0].title});
   await verifyCards(page, detail);
   await verifyMonthHierarchy(page);
-  await page.screenshot({path: '.calendar-preview/cards-final-desktop.png', fullPage: true});
   await enableOneAndVerifyConversion(page, detail);
+  // A full-page capture briefly resizes the window, which closes the card on
+  // a computer; take it once the card's checks are done.
+  await page.screenshot({path: '.calendar-preview/cards-final-desktop.png', fullPage: true});
   // Today remains identifiable after keyboard-selecting another date.
   await page.locator('[data-cal-action="today"]').click();
   const todayCell = page.locator('.cal-day[aria-current="date"]');

@@ -7,16 +7,17 @@ async function dialogFits(page,id){expect(await page.locator(id).evaluate(node=>
 test('presets and independent daily dates fit phone first screen and preview starts directly with calendar controls',async({page})=>{
   await page.setViewportSize({width:390,height:844});
   await page.goto(route+'#subscribe');await expect(page.locator('#app')).toBeVisible();
-  await expect(page.locator('.action-buttons #clear-selection')).toBeVisible();
+  // One action in the bar; clearing everything sits in 更多设置 (11-12).
+  await expect(page.locator('.action-buttons #clear-selection')).toHaveCount(0);
+  await expect(page.locator('#advanced-settings #clear-selection')).toHaveCount(1);
   await expect(page.locator('#selection-pane #preset-options')).toBeVisible();
   const layout=await page.evaluate(()=>({
-    daily:document.querySelector('.daily-date-option').getBoundingClientRect().bottom,
+    second:document.querySelectorAll('.preset-card')[1].getBoundingClientRect().bottom,
     bar:document.querySelector('.action-bar').getBoundingClientRect().top
   }));
-  // The new, explicitly requested independent date layer precedes categories.
-  // Keep its complete controls in the first screen, without shrinking type or
-  // touch targets to force the first category into the same viewport.
-  expect(layout.daily).toBeLessThan(layout.bar);
+  // The plan cards grew their emblems and days (11-12): the first screen shows
+  // the first two whole, the rest a short scroll away, never shrunk to fit.
+  expect(layout.second).toBeLessThan(layout.bar);
   await expect(page.locator('#advanced-settings')).not.toHaveAttribute('open','');
   await page.locator('#advanced-settings>summary').click();
   await page.locator('.group-card>summary').first().scrollIntoViewIfNeeded();
@@ -25,12 +26,12 @@ test('presets and independent daily dates fit phone first screen and preview sta
   await page.locator('[data-preset="practice"]').click();
   await expect(page.locator('#selection-count')).toHaveText('已选 54 项');
   await expect(page.locator('#reminder-count')).toHaveText('2 项提醒');
-  // Plan C (11-11): what comes next is right under step 1, no tab to switch.
+  // Step 3 (11-12): what the calendar will hold, as a desk-calendar page.
   await expect(page.locator('#sub-upcoming')).toBeVisible();
-  await expect(page.locator('#sub-upcoming-title')).toHaveText('接下来会出现在你日历里');
+  await expect(page.locator('#add-title')).toContainText('你的日历里会是这样');
   await expect(page.locator('#sub-upcoming-list li')).toHaveCount(3);
   await expect(page.locator('#sub-upcoming-list')).toContainText('莲师荟供日');
-  await expect(page.locator('#preview-pane')).toBeHidden();
+  await expect(page.locator('#preview-pane .preview-panel')).toBeHidden();
   await page.screenshot({path:'.calendar-preview/modern-mobile-preview.png',fullPage:true});
   const reminder=page.locator('[data-reminder-event="guru-tsok"]');
   await reminder.click();await page.locator('#reminder-form button[type="submit"]').click();
@@ -43,8 +44,8 @@ test('presets and independent daily dates fit phone first screen and preview sta
   await expect(page.locator('#selection-count')).toHaveText('已选 0 项');
   await expect(page.locator('#clear-selection')).toBeDisabled();
   await expect(page.locator('#preset-options button').first()).toBeFocused();
-  // The whole month is one link away, on the 藏历 page, and back is one tap.
-  await page.locator('.sub-upcoming-all, .sub-home-link').last().click();
+  // The whole month is one tap away, on the 藏历 page, and back is one tap.
+  await page.locator('#my-subscription').click();
   await expect(page.locator('#home-calendar [data-cal-month]')).toBeVisible();
   await expect(page.locator('#home-calendar .cal-day')).toHaveCount(42);
   await page.goBack();
@@ -55,8 +56,8 @@ test('breakpoints preserve readable selection, complete month grid and reachable
   await page.goto(route+'#subscribe');await expect(page.locator('#app')).toBeVisible();
   for(const width of [320,390,545,585,768,1024,1440]){
     await page.setViewportSize({width,height:844});
-    if(width<1024)await expect(page.locator('#preview-pane')).toBeHidden();
-    else await expect(page.locator('#preview-pane')).toBeVisible();
+    if(width<1024)await expect(page.locator('#preview-pane .preview-panel')).toBeHidden();
+    else await expect(page.locator('#preview-pane .preview-panel')).toBeVisible();
     await fits(page);
     await showMoreSettings(page);
     const masters=page.locator('[data-group-id="masters"]');
