@@ -81,6 +81,10 @@ const SYMBOL_MOTION = {
   knot: [['path', null, [{strokeDasharray: '1', strokeDashoffset: 1}, {strokeDasharray: '1', strokeDashoffset: 0}], {duration: 900, stagger: 120}]],
   eclipse: [['.s-shadow', '50% 50%', [{transform: 'translateX(-6px)', opacity: 0}, {transform: 'translateX(0)', opacity: 1}], {duration: 700}],
     ['.s-rays', '50% 50%', [{transform: 'rotate(-30deg)', opacity: .3}, {transform: 'rotate(0)', opacity: 1}], {duration: 700}]],
+  // The three reminder times (11-12): the sun comes up, turns, the moon rocks.
+  sunrise: [[null, '50% 80%', [{transform: 'translateY(4px)', opacity: .4}, {transform: 'translateY(-1px)', opacity: 1, offset: .7}, {transform: 'translateY(0)'}], {duration: 620}]],
+  sun: [[null, '50% 50%', [{transform: 'rotate(-45deg) scale(.8)'}, {transform: 'rotate(4deg) scale(1.05)', offset: .7}, {transform: 'rotate(0) scale(1)'}], {duration: 700}]],
+  moon: [[null, '50% 50%', swing([0, -16, 9, -3, 0]), {duration: 760}]],
   calendar: [[null, '50% 30%', [{transform: 'perspective(60px) rotateX(0)'}, {transform: 'perspective(60px) rotateX(-55deg)', offset: .4}, {transform: 'perspective(60px) rotateX(0)'}], {duration: 560}]]
 };
 export function playSymbol(svg) {

@@ -34,7 +34,7 @@ const creationKey = 'huideng.calendar.creation';
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 const defaultReminders = () => [{daysBefore:0,time:'08:00'}];
 const readStored = key => { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } };
-let data, settings, subscription = null, apiBaseUrl = '', upcoming = [];
+let data, settings, subscription = null, apiBaseUrl = '', upcoming = [], pendingWelcome = false;
 let calendarView,zonePicker,guide,ui={},observedZone='',today='',dayTimer;
 let reminderTarget = [], reminderDraft, reminderReturnSelector, requestPending = false, conflict = false, stopped = false;
 let openGroups = new Set(['tsok']), lastActive = new Map();
@@ -268,7 +268,8 @@ function renderSubscribeUpcoming() {
     const items=rankEvents(upcoming.filter(event=>event.date===date),data.catalog), [,month,day]=date.split('-').map(Number);
     let tibetan=''; try{ tibetan=getTibetanDate(date).display; }catch{}
     const remind=items.find(event=>event.preference?.mode==='remind');
-    return `<li><span class="sub-up-date"><b>${day}</b><small>${month}月 周${'日一二三四五六'[new Date(date+'T12:00:00Z').getUTCDay()]}</small></span><span class="sub-up-name"><strong>${items.map(event=>esc(event.title)).join('<i>·</i>')}</strong><small><i class="home-tag">藏历</i>${esc(tibetan)}</small></span><span class="sub-up-alarm${remind?' is-remind':''}">${remind?icon('bell'):''}<small>${esc(remind?reminderLabel(remind.preference.reminders):'只显示')}</small></span></li>`;
+    const cat=items[0].kind==='daily-date' ? 'daily' : (categoryLabel(items[0])?.[0]||'practice');
+    return `<li class="is-cat-${cat}"><span class="sub-up-date"><b>${day}</b><small>${month}月 周${'日一二三四五六'[new Date(date+'T12:00:00Z').getUTCDay()]}</small></span><span class="sub-up-name"><strong>${items.map(event=>esc(event.title)).join('<i>·</i>')}</strong><small><i class="home-tag">藏历</i>${esc(tibetan)}</small></span><span class="sub-up-alarm${remind?' is-remind':''}">${remind?icon('bell'):''}<small>${esc(remind?reminderLabel(remind.preference.reminders):'只显示')}</small></span></li>`;
   }).join('');
   const later=dates.length-3;
   $('#sub-upcoming-more').textContent=later>0 ? `以及之后的 ${later} 个日子，每年自动更新。` : '之后的日子会自动更新。';
@@ -302,7 +303,10 @@ function renderPresets() {
   $('#daily-calendar-note').hidden=!settings.includeDailyDates;
   $('#category-source').textContent=plan ? `下面已按“${plan.title}”勾选；在这里改动后，就变成自选`
     : countSelected() ? '自选：已在下面逐项调整，上方方案不再选中' : '';
-  $('#preset-options').innerHTML=PRESETS.map(preset=>`<button class="preset-card" type="button" data-preset="${preset.id}" aria-pressed="${current===preset.id}"${preset.id==='practice'?' aria-describedby="preset-scope-note"':''}><span class="preset-icon">${icon(preset.icon)}</span><span class="preset-copy"><strong>${preset.title}<small>${presetIds(data.catalog,preset.id).length} 项</small></strong><span>${preset.description}</span><em>${icon('bell')}${preset.reminder}</em></span><span class="preset-check" aria-hidden="true">${current===preset.id?icon('check'):''}</span></button>`).join('');
+  // Each plan (11-12): its emblem seated on a lotus, the actual Tibetan days,
+  // and when chosen a 边玛 band along its top. The one just tapped plays its
+  // emblem once (bell rings, lotus opens) and sends out two gilt rings.
+  $('#preset-options').innerHTML=PRESETS.map(preset=>`<button class="preset-card" type="button" data-preset="${preset.id}" aria-pressed="${current===preset.id}"${preset.id==='practice'?' aria-describedby="preset-scope-note"':''}><span class="preset-medal" aria-hidden="true">${icon('lotus-seat').replace('class="icon"','class="icon medal-seat"')}<span class="medal-icon">${icon(preset.icon)}</span><span class="medal-wave"></span><span class="medal-wave"></span></span><span class="preset-copy"><strong>${preset.title}<small>${presetIds(data.catalog,preset.id).length} 项</small></strong>${preset.days.length?`<span class="preset-days">${preset.days.map(day=>`<span>${day}</span>`).join('')}</span>`:''}${preset.note?`<span>${preset.note}${preset.days.length===1?preset.days[0]:''}</span>`:''}<em>${icon('bell')}${preset.reminder}</em></span><span class="preset-check" aria-hidden="true">${current===preset.id?icon('check'):''}</span></button>`).join('');
   $('#clear-selection').disabled=!hasSelectedContent();
   $('#include-daily-dates').checked=settings.includeDailyDates===true;
 }
@@ -371,16 +375,21 @@ const phoneLike=()=>calendarDevice.mobile || matchMedia('(pointer:coarse) and (m
 const deviceLabel=()=>'加入日历';
 function renderQuickAdd() {
   const phone=phoneLike();
-  $('#add-title-text').textContent='加入日历';
-  $('#step-add-device').textContent=subscription
-    ? (phone ? '已经加入过。以后改了选择，点“保存修改”，手机日历会自动更新，不用重新添加。' : '已经加入过。以后改了选择，点“保存修改”，日历会自动更新，不用重新添加。')
-    : calendarDevice.appleMobile ? '点下面的按钮，iPhone 会问是否订阅这个日历，点“订阅”即可。'
-    : phone ? '点下面的按钮，按提示把它加到手机自带的日历里。'
-    : calendarDevice.mac ? '可以直接加入 Mac 日历，也可以选 Google 或 Outlook。'
-    : '可以直接加入 Google 或 Outlook 日历；要加到手机上，用下方扫码。';
-  $('#step-add-note').textContent=subscription ? '' : '只需添加一次。已经加过的不用再加；如果日历里同一天出现两遍，删掉其中一个日历即可。';
-  $('#step-add-note').hidden=Boolean(subscription);
+  // Step 3 is what the calendar will hold (11-12). Before adding, one line
+  // says what the bottom button will do on this device; after, nothing more.
+  $('#add-title-text').textContent=subscription ? '你的日历里会是这样' : '加入后，你的日历里会是这样';
+  $('#step-add-device').textContent=subscription ? ''
+    : calendarDevice.appleMobile ? '点最下面的“加入日历”，iPhone 会问是否订阅这个日历，点“订阅”即可。'
+    : phone ? '点最下面的“加入日历”，按提示把它加到手机自带的日历里。'
+    : calendarDevice.mac ? '点最下面的“加入日历”：可以直接加入 Mac 日历，也可以选 Google 或 Outlook。'
+    : '点最下面的“加入日历”：可以直接加入 Google 或 Outlook 日历；要加到手机上，可以扫码。';
+  $('#step-add-device').hidden=Boolean(subscription);
+  $('#unsubscribed-hint').hidden=Boolean(subscription) || stopped || conflict;
   $('#share-settings').lastChild.textContent=phone ? '把这套设置分享给师兄' : '用手机扫码继续 · 分享给师兄';
+  // Not ringing is a question about the subscription, so it is answered in
+  // its window rather than on the page (11-12). A web page cannot open the
+  // phone's settings, so give the one path that works on every phone.
+  $('#manage-help').textContent=(phone ? '到时没有响铃？打开手机“设置”，搜索“日历”，确认已允许通知。' : '没有收到提醒？在日历应用的设置里确认已允许通知。')+`改了选择并保存后，${UPDATE_PACE}。`;
   renderSubscribedCard();
 }
 function nextReminderText() {
@@ -407,20 +416,40 @@ function renderSubscribedCard() {
   // them never moves what is below. A new window width starts over.
   if(renderSubscribedCard.width!==innerWidth){renderSubscribedCard.width=innerWidth;card.style.minHeight='';}
   queueMicrotask(()=>{if(!card.hidden)card.style.minHeight=`${Math.max(parseFloat(card.style.minHeight)||0,card.offsetHeight)}px`;});
-  $('#subscribed-title').textContent=changed ? '有改动还没保存' : '你的日历已在同步';
-  // A web page cannot open the phone's settings, so give the one path that
-  // works on every phone: search the Settings app for the calendar.
-  const pace=`保存后，${UPDATE_PACE}。`;
-  $('#subscribed-hint').textContent=changed ? pace : (phoneLike()
-    ? '到时没有响铃？打开手机“设置”，搜索“日历”，确认已允许通知。'
-    : '没有收到提醒？在日历应用的设置里确认已允许通知。')+`改了设置并${pace}`;
-  if(changed){$('#subscribed-next').textContent='点“保存修改”，日历才会跟着更新。';return;}
   const next=upcoming.find(event=>event.preference?.mode==='remind') || upcoming.find(event=>event.kind!=='daily-date');
-  if(!next){$('#subscribed-next').textContent='目前没有即将到来的修行日。';return;}
-  const [, month, day]=next.date.split('-').map(Number);
-  $('#subscribed-next').textContent=next.preference?.mode==='remind'
-    ? `下一次提醒：${month}月${day}日 ${next.title} · ${reminderLabel(next.preference.reminders)}`
-    : `下一个修行日：${month}月${day}日 ${next.title}（仅显示）`;
+  // The gau box holds the next day; with none ahead it stays empty-handed.
+  $('#subscribed-gau').hidden=!next;
+  if(next){
+    const [, month, day]=next.date.split('-').map(Number);
+    $('#subscribed-day').textContent=day;
+    $('#subscribed-date').textContent=`${month}月 周${'日一二三四五六'[new Date(next.date+'T12:00:00Z').getUTCDay()]}`;
+  }
+  const added=card.classList.contains('is-new');
+  $('#subscribed-title').textContent=changed ? '有改动还没保存' : added ? '刚刚加好 · 正在同步' : '我的订阅 · 已在同步';
+  if(changed){
+    // Short enough to keep the card's height: the choices below must not move.
+    $('#subscribed-next').textContent='点“保存修改”后同步';
+    $('#subscribed-when').textContent='日历一般几个小时内跟着更新';
+    return;
+  }
+  if(!next){ $('#subscribed-next').textContent='目前没有即将到来的修行日'; $('#subscribed-when').textContent='新的日子会自动加入日历'; return; }
+  const days=Math.round((Date.parse(next.date)-Date.parse(today))/864e5);
+  const left=days<=0 ? '就是今天' : days===1 ? '就在明天' : `还有 ${days} 天`;
+  const remind=next.preference?.mode==='remind';
+  $('#subscribed-next').textContent=`${remind?'下次提醒':'下一个修行日'} ${next.title}`;
+  $('#subscribed-when').textContent=remind ? `${reminderLabel(next.preference.reminders)} · ${left}` : `只显示，不响铃 · ${left}`;
+}
+// Right after the first add (11-12): back at the top, the card unrolls from
+// under the masthead like a thangka and its knot draws itself in gilt; a few
+// seconds later it settles into the everyday card. Once only.
+const reducedMotion=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+function welcomeSubscription() {
+  const card=$('#subscribed-card');
+  if(card.hidden) return;
+  card.classList.add('is-new'); renderSubscribedCard();
+  card.scrollIntoView({block:'center',behavior:reducedMotion()?'auto':'smooth'});
+  playSymbol(card.querySelector('.sub-knot svg'));
+  setTimeout(()=>{ card.classList.remove('is-new'); renderSubscribedCard(); },3600);
 }
 // The bottom bar always says what happens next, in the person's own terms.
 // The bar speaks only when it has something to say: what to do first, or
@@ -488,9 +517,6 @@ function renderSaveState() {
   renderSaveState.wasDisabled=ctaDisabled;
   $('#subscribe').disabled = ctaDisabled;
   // Step 3 carries the same button as the bottom bar, same words, same state.
-  $('#step-add-label').textContent=$('#subscribe-label').textContent;
-  $('#step-add-button').disabled=ctaDisabled;
-  $('#step-add-button').setAttribute('aria-busy',String(requestPending||managementRestoring));
   // With a saved subscription and nothing to save, the bottom button becomes
   // a quiet "我的订阅": the thumb-reachable way back to the manage panel.
   $('#subscribe').classList.toggle('is-quiet', Boolean(subscription) && !changed && !requestPending && !managementRestoring && !conflict && !stopped);
@@ -724,6 +750,8 @@ function acceptRemote(result, force = false) {
   if(result.id && result.id!==subscription?.id) guide?.resetConfirmations();
   if(subscription && (result.id && result.id!==subscription.id || result.revision!==subscription.revision || feedUrl!==subscription.feedUrl)) {resetConnection();lastWriteKind='';}
   if (force || !dirty()) {settings = clone(remote);}
+  // A brand-new subscription gets its welcome when the window closes.
+  if(!subscription?.id && result.id) pendingWelcome=true;
   subscription = {...subscription,id:result.id || subscription?.id,manageToken:result.manageToken || subscription?.manageToken,
     feedUrl,revision:result.revision,savedSettings:remote};
   conflict = false; stopped = false; refresh(); renderSubscription();
@@ -858,7 +886,7 @@ function attachEvents() {
   $('#include-daily-dates').addEventListener('change',event=>{
     settings.includeDailyDates=event.target.checked;stopped=false;refresh(false);
     playMotion(event.target,'check');
-    if(event.target.checked) playSymbol($('.daily-date-icon svg'));
+    if(event.target.checked){ playSymbol($('.daily-date-icon .medal-icon svg')); const card=$('.daily-date-option'); card.classList.remove('play'); void card.offsetWidth; card.classList.add('play'); }
   });
   $('#preset-options').addEventListener('click',event=>{
     const button=event.target.closest('[data-preset]');if(!button)return;
@@ -882,18 +910,20 @@ function attachEvents() {
     const chosen=$('#preset-options').querySelector(`[data-preset="${button.dataset.preset}"]`);
     chosen?.focus({preventScroll:true});
     playMotion(chosen?.querySelector('.preset-check'),'check');
-    playSymbol(chosen?.querySelector('.preset-icon svg'));
+    playSymbol(chosen?.querySelector('.medal-icon svg'));
+    chosen?.classList.add('play');
   });
   $('#time-choices').addEventListener('click',event=>{
     const button=event.target.closest('[data-time-choice]');if(!button||button.disabled)return;
     const [daysBefore,time]=button.dataset.timeChoice.split('|');
     for(const pref of remindPrefs()) pref.reminders=[{daysBefore:Number(daysBefore),time}];
     stopped=false;refresh();
-    button.focus({preventScroll:true});playMotion(button,'check');
+    button.focus({preventScroll:true});playMotion(button,'check');playSymbol(button.querySelector('svg'));
     notify(subscription?'提醒时间已改；保存修改后同步到日历。':`所有提醒改为${reminderLabel([{daysBefore:Number(daysBefore),time}])}。`);
   });
   $('#share-settings').addEventListener('click',openShare);
   $('#subscribed-open').addEventListener('click',()=>openSubscription());
+  $('#subscription-dialog').addEventListener('close',()=>{ if(!pendingWelcome) return; pendingWelcome=false; if(page==='subscribe') welcomeSubscription(); });
   $('#manage-share').addEventListener('click',()=>openShare());
   $('#manage-add').addEventListener('click',()=>{
     const dialog=$('#subscription-dialog'), show=!dialog.classList.contains('show-add');
@@ -1032,7 +1062,6 @@ function attachEvents() {
   for(const link of document.querySelectorAll('[data-go-home]')) link.addEventListener('click',event=>{event.preventDefault();goHome();});
   // The panel grows out of the button that opened it, so the step reads as
   // one continuous action rather than a page jump.
-  $('#step-add-button').addEventListener('click',()=>$('#subscribe').click());
   $('#subscribe').addEventListener('click',event => {
     const dialog=$('#subscription-dialog'), wasOpen=dialog.open;
     openSubscription({prepare:true});

@@ -1,8 +1,10 @@
 import {cloneSettings} from './runtime.mjs';
 export const PRESETS = [
-  {id:'guru',title:'莲师荟供日',description:'藏历每月初十',reminder:'到日子提醒',icon:'ritual-bell'},
-  {id:'tsok',title:'两个荟供日',description:'莲师初十 · 空行母廿五',reminder:'到日子提醒',icon:'bell-vajra'},
-  {id:'practice',title:'全部修行日',description:'各类修行日与已收录日月食',reminder:'荟供日提醒，其余只显示',icon:'lotus'}
+  // days: the actual Tibetan days, shown on the card (11-12); note: what the
+  // days alone do not say.
+  {id:'guru',title:'莲师荟供日',description:'藏历每月初十',reminder:'到日子提醒',icon:'ritual-bell',days:['初十'],note:'藏历每月'},
+  {id:'tsok',title:'两个荟供日',description:'莲师初十 · 空行母廿五',reminder:'到日子提醒',icon:'bell-vajra',days:['初十 莲师','廿五 空行母'],note:''},
+  {id:'practice',title:'全部修行日',description:'各类修行日与已收录日月食',reminder:'荟供日提醒，其余只显示',icon:'lotus',days:[],note:'各类修行日与已收录日月食'}
 ];
 const tsokIds = new Set(['guru-tsok','dakini-tsok']);
 const presetMode = (presetId,eventId) => presetId==='practice' && !tsokIds.has(eventId) ? 'display' : 'remind';

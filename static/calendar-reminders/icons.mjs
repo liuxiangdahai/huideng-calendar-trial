@@ -47,14 +47,21 @@ const paths = {
   list: '<path d="M9 6h12M9 12h12M9 18h12M3 6h1m-1 6h1m-1 6h1"/>',
   download: '<path d="M12 3v12m-4-4 4 4 4-4M4 16v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/>',
   phone: '<rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 5h4m-3 14h2"/>',
+  // 莲花座: the seat under each choice's emblem (11-12). Its own wide box.
+  'lotus-seat': '<path d="M-2 12C-1 8 2 6 4 5.5C6 6 9 8 10 12M12 12C13 8 16 6 18 5.5C20 6 23 8 24 12M26 12C27 8 30 6 32 5.5C34 6 37 8 38 12M40 12C41 8 44 6 46 5.5C48 6 51 8 52 12M54 12C55 8 58 6 60 5.5C62 6 65 8 66 12"/><path class="seat-front" d="M4 12C5 6 9 3 11 2C13 3 17 6 18 12M18 12C19 6 23 3 25 2C27 3 31 6 32 12M32 12C33 6 37 3 39 2C41 3 45 6 46 12M46 12C47 6 51 3 53 2C55 3 59 6 60 12"/><path d="M3 12.5h58M8 16h48"/>',
+  // 日出 · 太阳 · 月亮: the three reminder times (11-12).
+  sunrise: '<path d="M3.5 18h17M7 18a5 5 0 0 1 10 0M12 7v2.4M5.3 10.6l1.6 1.6M18.7 10.6l-1.6 1.6M2.8 14.6h2.1M19.1 14.6h2.1M9.5 21h5"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7"/>',
+  moon: '<path d="M19.5 14.6A7.6 7.6 0 0 1 9.4 4.5a7.6 7.6 0 1 0 10.1 10.1Z"/><path d="M17 3.2v3.2M15.4 4.8h3.2"/>',
   copy: '<rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/>'
 };
-const RITUAL = new Set(['ritual-bell','vajra','bell-vajra','lotus','wheel','parasol','banner','nyida','vase','knot']);
+const RITUAL = new Set(['lotus-seat','ritual-bell','vajra','bell-vajra','lotus','wheel','parasol','banner','nyida','vase','knot']);
 export function icon(name) {
   const known = name in paths ? name : 'calendar';
   // Ritual symbols carry finer detail, so they use a slightly finer line.
   const width = RITUAL.has(known) ? 1.4 : 1.6;
-  return `<svg class="icon" data-icon-name="${known}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${width}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${paths[known]}</svg>`;
+  const box = known === 'lotus-seat' ? '0 0 64 18' : '0 0 24 24';
+  return `<svg class="icon" data-icon-name="${known}" viewBox="${box}" fill="none" stroke="currentColor" stroke-width="${width}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${paths[known]}</svg>`;
 }
 export function fillIcons(root = document) {
   root.querySelectorAll('[data-icon]').forEach(node => { node.innerHTML = icon(node.dataset.icon); });

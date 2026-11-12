@@ -40,7 +40,8 @@
             <h2 id="home-monthly-title">每月固定的日子<small>藏历</small></h2><ul id="home-monthly-list"></ul>
           </section>
         </div>
-        <section class="home-main" aria-labelledby="home-calendar-title">
+        <section class="home-main desk-page" aria-labelledby="home-calendar-title">
+          <span class="desk-rings" aria-hidden="true"><i></i><i></i></span>
           <h2 id="home-calendar-title" class="sr-only">藏历月历</h2>
           <div id="home-calendar"></div>
         </section>
@@ -49,28 +50,29 @@
       <div class="workspace" data-page-part="subscribe">
         <section id="selection-pane" class="selection-column" aria-labelledby="selection-title">
           <div class="section-heading selection-heading"><h2 id="selection-title">选择内容</h2></div>
+          <!-- 我的订阅 (11-12): the next day sits in a 嘎乌 (gau) amulet box, a
+               faint endless knot behind; the whole card opens the subscription.
+               The valance is the masthead's alone, so the card has none. -->
           <section id="subscribed-card" class="subscribed-card" aria-live="polite" hidden>
-            <p class="subscribed-title"><span data-icon="calendar-check" aria-hidden="true"></span><span id="subscribed-title">你的日历已在同步</span></p>
-            <p id="subscribed-next"></p><p id="subscribed-hint" class="subscribed-hint"></p>
-            <button id="subscribed-open" type="button" class="text-button">查看我的订阅<span data-icon="chevron-right" aria-hidden="true"></span></button>
+            <button id="subscribed-open" type="button" class="sub-ticket" aria-describedby="subscribed-next subscribed-when">
+              <span class="sub-knot" data-icon="knot" aria-hidden="true"></span>
+              <span id="subscribed-gau" class="sub-gau" aria-hidden="true"><b id="subscribed-day"></b><small id="subscribed-date"></small></span>
+              <span class="sub-body"><span class="sub-tag"><i aria-hidden="true"></i><span id="subscribed-title">我的订阅 · 已在同步</span></span><strong id="subscribed-next"></strong><span class="sub-when"><span data-icon="bell" aria-hidden="true"></span><span id="subscribed-when"></span></span></span>
+              <span class="sub-open">订阅链接 · 加到另一台设备 · 停用<span data-icon="chevron-right" aria-hidden="true"></span></span>
+            </button>
           </section>
+          <p id="unsubscribed-hint" class="unsubscribed-hint" hidden><b>还没加入日历</b>：选好日子和时间，最后点“加入日历”。</p>
           <section class="quick-section" aria-labelledby="quick-title">
             <div class="quick-heading"><h3 id="quick-title"><span class="step-no">1</span>选择要提醒的日子</h3></div>
             <div class="quick-panel">
               <div id="preset-options" class="preset-options"></div>
               <p id="preset-scope-note" class="preset-scope-note">全部修行日不含节气及其他纪念日。</p>
             </div>
-            <section id="sub-upcoming" class="sub-upcoming" aria-labelledby="sub-upcoming-title" hidden>
-              <h4 id="sub-upcoming-title">接下来会出现在你日历里</h4>
-              <ol id="sub-upcoming-list"></ol>
-              <p id="sub-upcoming-more" class="sub-upcoming-more"></p>
-              <a class="sub-upcoming-all" href="#calendar" data-go-home>在藏历里看全部日子<span data-icon="chevron-right" aria-hidden="true"></span></a>
-            </section>
             <div class="quick-panel daily-date-panel">
               <section class="daily-date-option" aria-labelledby="daily-date-title">
                 <label class="event-label" for="include-daily-dates">
-                  <span class="daily-date-icon" data-icon="calendar" aria-hidden="true"></span>
-                  <span class="daily-date-copy"><span class="daily-date-title-row"><strong id="daily-date-title">加入每日藏历</strong><small>仅显示</small></span><span id="daily-date-note">每天一条全天日期，不设置提醒。</span></span>
+                  <span class="daily-date-icon preset-medal" aria-hidden="true"><span data-icon="lotus-seat" class="medal-seat"></span><span data-icon="calendar" class="medal-icon"></span></span>
+                  <span class="daily-date-copy"><span class="daily-date-title-row"><strong id="daily-date-title">另加每日藏历</strong><small>可选</small></span><span id="daily-date-note">每天一条全天的藏历日期，不响铃。</span></span>
                   <input id="include-daily-dates" type="checkbox" aria-labelledby="daily-date-title" aria-describedby="daily-date-note">
                 </label>
                 <details class="daily-date-help"><summary>显示示例<span data-icon="chevron" aria-hidden="true"></span></summary><div class="daily-date-examples"><p>藏历十月初一<br>藏历九月初九（重日1）<br>藏历九月初九（重日2）<br>藏历闰二月初一</p><p id="daily-date-app-note">可以单独订阅，也可与修行日一起加入。每天会多一条全天日程，不会替换日历应用自带的日期标签。请检查应用的默认通知，避免它自行添加提醒。</p></div></details>
@@ -80,15 +82,15 @@
           <section class="quick-section step-time" aria-labelledby="time-title">
             <div class="quick-heading"><h3 id="time-title"><span class="step-no">2</span>几点提醒</h3><span id="time-choice-note"></span></div>
             <div id="time-choices" class="time-choices" role="group" aria-labelledby="time-title">
-              <button type="button" data-time-choice="0|07:00" aria-pressed="false"><strong>早上 7 点</strong><small>当天</small></button>
-              <button type="button" data-time-choice="0|08:00" aria-pressed="false"><strong>早上 8 点</strong><small>当天</small></button>
-              <button type="button" data-time-choice="1|20:00" aria-pressed="false"><strong>晚上 8 点</strong><small>前一天</small></button>
+              <button type="button" data-time-choice="0|07:00" aria-pressed="false"><span data-icon="sunrise" aria-hidden="true"></span><strong>早上 7 点</strong><small>当天</small></button>
+              <button type="button" data-time-choice="0|08:00" aria-pressed="false"><span data-icon="sun" aria-hidden="true"></span><strong>早上 8 点</strong><small>当天</small></button>
+              <button type="button" data-time-choice="1|20:00" aria-pressed="false"><span data-icon="moon" aria-hidden="true"></span><strong>晚上 8 点</strong><small>前一天</small></button>
             </div>
           </section>
           <details id="advanced-settings" class="advanced-settings">
             <summary><span data-icon="sliders" aria-hidden="true"></span><span><strong>更多设置<span class="advanced-optional">（可不改）</span></strong><small id="advanced-summary">分类、逐项提醒、地区、每日藏历单独订阅</small></span><span data-icon="chevron" aria-hidden="true"></span></summary>
           <div class="advanced-region"><span class="advanced-region-label"><span data-icon="globe" aria-hidden="true"></span>提醒地区</span><button id="zone-settings-inline" class="text-button" type="button" aria-haspopup="dialog"><span id="zone-summary-inline">选择时区</span><span data-icon="chevron-right" aria-hidden="true"></span></button><small>提醒按手机当地时间响起；人在外地时才需要改</small></div>
-          <div class="category-heading"><h3>按分类调整</h3><button id="reminder-settings" type="button" class="text-button"><span data-icon="bell-settings" aria-hidden="true"></span>批量提醒</button></div><p id="category-source" class="category-source" role="status"></p>
+          <div class="category-heading"><h3>按分类调整</h3><button id="reminder-settings" type="button" class="text-button"><span data-icon="bell-settings" aria-hidden="true"></span>批量提醒</button><button id="clear-selection" class="text-button" type="button" aria-label="清空全部选择">全部清空</button></div><p id="category-source" class="category-source" role="status"></p>
           <div id="groups"></div>
           <fieldset class="title-marks">
             <legend>日历里怎样区分</legend>
@@ -102,25 +104,35 @@
             <div class="feed-actions"><a id="daily-calendar-apple" class="secondary" href="#daily-calendar-title"><span data-icon="calendar-plus" aria-hidden="true"></span>加入 Apple 日历</a><button id="daily-calendar-copy" type="button" class="secondary"><span data-icon="copy" aria-hidden="true"></span>复制订阅地址</button></div>
           </section>
           </details>
-          <section class="quick-section step-add" aria-labelledby="add-title">
-            <div class="quick-heading"><h3 id="add-title"><span class="step-no">3</span><span id="add-title-text">加入日历</span></h3></div>
-            <p id="step-add-device" class="step-add-device"></p>
-            <button id="step-add-button" type="button" class="primary full"><span data-icon="calendar-plus" aria-hidden="true"></span><span id="step-add-label">加入日历</span></button>
-            <p id="step-add-note" class="step-add-note">只需添加一次。已经加过的不用再加；如果日历里同一天出现两遍，删掉其中一个日历即可。</p>
-            <button id="share-settings" type="button" class="text-button"><span data-icon="copy" aria-hidden="true"></span>把这套设置分享给师兄</button>
-          </section>
         </section>
-        <a class="sub-home-link" href="#calendar" data-go-home>查看整月藏历<span data-icon="chevron-right" aria-hidden="true"></span></a>
         <aside id="preview-pane" class="preview-column" aria-labelledby="preview-title">
-          <section class="preview-panel">
-            <div class="section-heading preview-heading"><h2 id="preview-title">日期预览</h2></div>
+          <!-- The right column is the live preview itself (11-12): no title, no
+               step number; a desk-calendar head (red band, two rings) like the
+               藏历 page's month. -->
+          <section class="preview-panel desk-page">
+            <span class="desk-rings" aria-hidden="true"><i></i><i></i></span>
+            <h2 id="preview-title" class="sr-only">日期预览</h2>
             <div id="calendar-preview"></div>
           </section>
           <p id="preview-error" class="notice error" role="alert" hidden></p>
+          <!-- Step 3 (11-12): on phones it follows step 2; on computers it sits
+               under the month in the right column, so both columns end level. -->
+          <section class="quick-section step-add" aria-labelledby="add-title">
+            <div class="quick-heading"><h3 id="add-title"><span class="step-no">3</span><span id="add-title-text">你的日历里会是这样</span></h3></div>
+            <section id="sub-upcoming" class="sub-upcoming" aria-labelledby="add-title" hidden>
+              <span class="sub-rings desk-rings" aria-hidden="true"><i></i><i></i></span>
+              <p class="sub-upcoming-caption">最近会出现的日子</p>
+              <ol id="sub-upcoming-list"></ol>
+              <p id="sub-upcoming-more" class="sub-upcoming-more"></p>
+              <a class="sub-upcoming-all" href="#calendar" data-go-home>在藏历里看全部日子<span data-icon="chevron-right" aria-hidden="true"></span></a>
+            </section>
+            <p id="step-add-device" class="step-add-device"></p>
+            <button id="share-settings" type="button" class="text-button"><span data-icon="copy" aria-hidden="true"></span>把这套设置分享给师兄</button>
+          </section>
         </aside>
       </div>
   <footer><a href="https://www.huidengvan.org/">慧灯小组</a><span>历法：<a href="https://zangli.pro/" target="_blank" rel="noopener noreferrer">藏历 PRO</a><span class="footer-dot">·</span>节日：<a href="https://www.fohuifayu.com/index.php/calendar" target="_blank" rel="noopener noreferrer">佛慧法语</a></span></footer>
-      <div class="action-bar" data-page-part="subscribe"><div class="action-inner"><div class="action-summary"><div class="selection-totals"><strong id="selection-count">已选 0 项</strong><span id="reminder-count">0 项提醒</span><span id="daily-date-count" hidden>含每日藏历</span></div><p id="save-state">第 1 步：选择要提醒的日子</p></div><div class="action-buttons"><button id="clear-selection" class="text-button" type="button" aria-label="清空全部选择">清空选择</button><button id="subscribe" type="button" class="primary"><span id="subscribe-label">加入日历</span><span data-icon="arrow-right" aria-hidden="true"></span></button></div></div></div>
+      <div class="action-bar" data-page-part="subscribe"><div class="action-inner"><div class="action-summary"><div class="selection-totals"><strong id="selection-count">已选 0 项</strong><span id="reminder-count">0 项提醒</span><span id="daily-date-count" hidden>含每日藏历</span></div><p id="save-state">第 1 步：选择要提醒的日子</p></div><div class="action-buttons"><button id="subscribe" type="button" class="primary"><span id="subscribe-label">加入日历</span><span data-icon="arrow-right" aria-hidden="true"></span></button></div></div></div>
     </div>
   </main>
 
@@ -144,7 +156,7 @@
         <li><span class="wechat-pic" aria-hidden="true"><span class="wechat-bar"><i></i><b class="wechat-dots"><i></i><i></i><i></i></b></span></span><div><small>第一步</small><strong>点右上角 ···</strong></div></li>
         <li><span class="wechat-pic" aria-hidden="true"><span class="wechat-bar"><i></i></span><span class="wechat-sheet"><b data-icon="copy"></b><b class="is-on" data-icon="globe"></b><b></b></span></span><div><small>第二步</small><strong>选“在浏览器打开”</strong></div></li>
       </ol>
-      <p class="wechat-note">在浏览器里加过的，打开后点“我的订阅”就能看到。找不到这一项，可以复制网址，粘贴到手机浏览器里打开。</p>
+      <p class="wechat-note">第一次加入或想修改，都请在浏览器里打开：你的订阅记在浏览器里。找不到这一项，可以复制网址，粘贴到手机浏览器里打开。</p>
       <div class="dialog-actions"><button id="wechat-copy" type="button" class="secondary"><span data-icon="copy" aria-hidden="true"></span>复制网址</button><button type="button" class="primary" data-close="wechat-dialog">知道了</button></div>
     </dialog>
   <dialog id="share-dialog" aria-labelledby="share-title">
@@ -174,6 +186,7 @@
     <section id="manage-panel" class="manage-panel" aria-labelledby="manage-title" hidden>
       <p id="manage-title" class="manage-title"><span data-icon="calendar-check" aria-hidden="true"></span>已加入日历，正在同步</p>
       <p id="manage-next" class="manage-next"></p>
+      <p id="manage-help" class="manage-help"></p>
       <div class="manage-actions"><button id="manage-share" type="button" class="secondary"><span data-icon="copy" aria-hidden="true"></span>分享给师兄</button><button id="manage-add" type="button" class="secondary" aria-expanded="false" aria-controls="device-guide"><span data-icon="calendar-plus" aria-hidden="true"></span>加到另一台设备或日历</button></div>
     </section>
     <fieldset class="device-options"><legend>选择你使用的日历应用</legend><label><input type="radio" name="device" value="iphone"><span data-icon="phone" aria-hidden="true"></span><span>Apple 日历<small>iPhone、iPad、Mac</small></span></label><label><input type="radio" name="device" value="google"><span data-icon="calendar" aria-hidden="true"></span><span>Google 日历<small>通过电脑添加订阅</small></span></label><label><input type="radio" name="device" value="outlook"><span data-icon="calendar" aria-hidden="true"></span><span>Outlook<small>网页版、经典桌面版</small></span></label><label><input type="radio" name="device" value="other"><span data-icon="phone" aria-hidden="true"></span><span>其他日历<small>华为、OPPO、小米等</small></span></label></fieldset>

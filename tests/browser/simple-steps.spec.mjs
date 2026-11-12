@@ -26,11 +26,13 @@ test('phones start in three simple steps; computers show the detailed settings',
   await expect(page.locator('.region-bar')).toBeHidden();
   await page.locator('#advanced-settings>summary').click();
   await expect(page.locator('#zone-settings-inline')).toBeVisible();
-  // Step 3 carries the real button, named like the bottom bar.
+  // One action, in the bottom bar (11-12): step 3 shows what the calendar
+  // will hold and says where to tap; it has no button of its own.
   await page.locator('[data-preset="tsok"]').click();
-  await expect(page.locator('#step-add-button')).toBeEnabled();
-  await expect(page.locator('#step-add-label')).toHaveText(await page.locator('#subscribe-label').textContent());
-  await page.locator('#step-add-button').click();
+  await expect(page.locator('#step-add-button')).toHaveCount(0);
+  await expect(page.locator('#step-add-device')).toContainText('加入日历');
+  await expect(page.locator('#sub-upcoming')).toBeVisible();
+  await page.locator('#subscribe').click();
   await expect(page.locator('#subscription-dialog')).toBeVisible();
   // The dialog's own steps are a progress line, not a second 1-2-3. A browser
   // that already names its calendar app starts at 添加.
@@ -85,7 +87,10 @@ test('after subscribing, the page opens on a sync status with the next reminder;
   await expect(page.locator('#copy-feed')).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(page.locator('#subscribed-card')).toBeVisible();
-  await expect(page.locator('#subscribed-next')).toContainText('下一次提醒');
+  await expect(page.locator('#subscribed-next')).toContainText('下次提醒');
+  // Right after adding, the card welcomes once, then reads as every day.
+  await expect(page.locator('#subscribed-title')).toHaveText('刚刚加好 · 正在同步');
+  await expect(page.locator('#subscribed-title')).toHaveText('我的订阅 · 已在同步');
   const feedUrl=await page.evaluate(()=>JSON.parse(localStorage.getItem('huideng.calendar.subscription')).feedUrl);
   const text=await (await request.get(feedUrl)).text();
   const titles=new ICAL.Component(ICAL.parse(text)).getAllSubcomponents('vevent').map(e=>e.getFirstPropertyValue('summary'));
@@ -98,7 +103,9 @@ test('after subscribing, the page opens on a sync status with the next reminder;
   // The card keeps its place and says what to do; it must not vanish and pop back.
   await expect(page.locator('#subscribed-card')).toBeVisible();
   await expect(page.locator('#subscribed-title')).toHaveText('有改动还没保存');
-  await expect(page.locator('#subscribed-hint')).toContainText('几个小时内跟着更新');
+  await expect(page.locator('#subscribed-when')).toContainText('几个小时内跟着更新');
+  // How slow some calendars are, and what to do when nothing rings, is in the window.
+  await expect(page.locator('#manage-help')).toContainText('个别要等到第二天');
   await page.locator('#subscribe').click();
   await expect(page.locator('#subscribe-label')).toHaveText('我的订阅');
   const after=await (await request.get(feedUrl)).text();
@@ -147,10 +154,10 @@ for (const viewport of [{width:390,height:844},{width:1366,height:900}]) test(`w
     await page.locator('input[name="device"][value="other"]').check();
     await expect(page.locator('#copy-feed')).toBeVisible();
     await page.keyboard.press('Escape');
-    await expect(page.locator('#subscribed-title')).toHaveText('你的日历已在同步');
+    await expect(page.locator('#subscribed-title')).toHaveText('我的订阅 · 已在同步');
     const top=()=>page.locator('#preset-options').evaluate(node=>Math.round(node.getBoundingClientRect().top+scrollY));
     const start=await top();
-    for (const [preset,title] of [['practice','有改动还没保存'],['tsok','你的日历已在同步'],['guru','有改动还没保存'],['tsok','你的日历已在同步']]) {
+    for (const [preset,title] of [['practice','有改动还没保存'],['tsok','我的订阅 · 已在同步'],['guru','有改动还没保存'],['tsok','我的订阅 · 已在同步']]) {
       await page.locator(`[data-preset="${preset}"]`).click();
       await expect(page.locator('#subscribed-title')).toHaveText(title);
       expect(await top(),`${viewport.width}px after ${preset}`).toBe(start);

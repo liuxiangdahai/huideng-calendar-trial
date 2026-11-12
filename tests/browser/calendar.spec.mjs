@@ -226,11 +226,13 @@ test('edits made during delayed creation and saving remain an unsaved draft',asy
 test('mobile selection, preview, long names and dialogs fit 390 and 320 pixel widths',async({page}) => {
   await page.setViewportSize({width:390,height:844}); await open(page);
   await expect(page.locator('#selection-pane')).toBeVisible();
-  await expect(page.locator('#preview-pane')).toBeHidden();
+  // Phones keep step 3 (what the calendar will hold) but not the month preview.
+  await expect(page.locator('#preview-pane .preview-panel')).toBeHidden();
+  await expect(page.locator('.step-add')).toBeAttached();
   await page.screenshot({path:'.calendar-preview/mobile.png',fullPage:true});
   // One page, no tabs: the month is one link away, on the 藏历 page.
   await expect(page.locator('[role="tablist"]')).toHaveCount(0);
-  await expect(page.locator('.sub-home-link')).toBeVisible();
+  await expect(page.locator('#my-subscription .to-home')).toBeVisible();
   // Phones open in the simple three steps; categories live under 详细设置.
   await expect(page.locator('#advanced-settings')).not.toHaveAttribute('open','');
   await page.locator('#advanced-settings>summary').click();
