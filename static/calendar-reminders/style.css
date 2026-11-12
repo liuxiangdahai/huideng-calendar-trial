@@ -1291,3 +1291,4 @@ body[data-page="subscribe"] [data-page-part="home"] { display: none !important; 
   #zone-dialog:is(:has(#zone-search:focus), .is-typing) .zone-options { min-height: 120px; max-height: max(120px, calc(var(--available-height) - 250px)); }
 }
 @media (max-height: 560px) { #zone-dialog :is(.zone-why, #zone-result-status) { display: none; } }
+.category-heading .text-button { min-height: 46px; }
