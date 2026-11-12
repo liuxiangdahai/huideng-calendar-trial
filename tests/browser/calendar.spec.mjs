@@ -184,7 +184,9 @@ test('remote disable clears stale credentials while retaining unsaved local choi
   await expect(page.locator('#save-state')).toContainText('已停用');
   expect((await draft(page)).events['dakini-tsok'].mode).toBe('off');
   // The old subscription is gone: the bottom button starts a new one.
-  await expect(page.locator('#subscribed-card')).toBeHidden();
+  // Stopped elsewhere: the card says so plainly (11-12).
+  await expect(page.locator('#subscribed-card')).toHaveClass(/is-state/);
+  await expect(page.locator('#subscribed-title')).toHaveText('这份订阅已停用');
   await expect(page.locator('#subscribe-label')).toHaveText('加入日历');
 });
 
@@ -441,7 +443,7 @@ test('with a subscription, the 藏历 page leads back to the choices to change t
   await page.locator('#my-subscription').click();
   await expect(page).not.toHaveURL(/#subscribe$/);
   await expect(page.locator('#home-calendar')).toBeVisible();
-  await expect(page.locator('#my-subscription')).toHaveText('我的订阅',{useInnerText:true});
+  await expect(page.locator('#my-subscription')).toHaveText('订阅设置',{useInnerText:true});
   await page.locator('#my-subscription').click();
   await expect(page).toHaveURL(/#subscribe$/);
   await expect(page.locator('#subscription-dialog')).toBeHidden();

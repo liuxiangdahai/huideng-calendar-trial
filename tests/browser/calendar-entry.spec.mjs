@@ -82,7 +82,7 @@ for (const [name, device] of Object.entries(devices).filter(([name]) => name !==
       const sub = await ready(page);
       const entry = page.locator('#iphone-subscribe');
       await expect(entry).toBeVisible();
-      await expect(entry).toHaveText('打开 Apple 日历订阅');
+      await expect(entry).toHaveText('加入 Apple 日历');
       await expect(entry).toHaveAttribute('href', sub.feedUrl.replace(/^https:/, 'webcal:'));
       expect(await entry.getAttribute('href')).not.toContain(sub.manageToken);
       await expect(page.locator('#copy-feed')).toBeVisible();
@@ -105,6 +105,8 @@ for (const [name, device] of Object.entries(devices).filter(([name]) => name !==
       expect(service.posts).toBe(1);
       expect((await read(page)).feedUrl).toBe(sub.feedUrl);
       if (name === 'mac') {
+        // In 我的订阅 the add steps and checks sit behind 加到另一台设备 (11-12).
+        await page.locator('#manage-add').click();
         await page.locator('[data-guide-expand] > summary').click();
         await expect(page.locator('.guide-notification-body')).toContainText('Mac');
         await expect(page.locator('.guide-notification-body')).not.toContainText('请拿起手机');
@@ -194,7 +196,7 @@ test('Android handoff keeps copy and import available while actual ICS checks fa
     await page.locator('input[name="device"][value="other"]').check();
     await expect(page.locator('#iphone-subscribe')).toBeHidden();
     await expect(page.locator('#google-subscribe')).toBeHidden();
-    await expect(page.locator('#copy-feed')).toHaveText('复制订阅地址');
+    await expect(page.locator('#copy-feed')).toHaveText('复制订阅链接');
     await expect(page.locator('.download-fallback')).toContainText('文件不会持续更新');
     await page.locator('.download-fallback > summary').click();
     await expect(page.locator('[data-download="remind"]')).toBeVisible();
@@ -212,7 +214,9 @@ test('Android handoff keeps copy and import available while actual ICS checks fa
     await page.locator('[data-close="subscription-dialog"]').first().click();
     await page.locator('#subscribed-open').click();
     expect(probes).toBe(2); // Reopening never starts polling or another automatic check.
-    mode='hold';await page.locator('#check-connection').click();
+    // In 我的订阅 the check lives in the 到时没有响铃？ fold (11-12).
+    await page.locator('#manage-trouble > summary').click();
+    mode='hold';await page.locator('#manage-check').click();
     await expect.poll(()=>Boolean(releaseCheck)).toBe(true);
     await page.locator('[data-close="subscription-dialog"]').first().click();
     await page.locator('[data-preset="tsok"]').click();await page.locator('#subscribe').click();
@@ -220,6 +224,7 @@ test('Android handoff keeps copy and import available while actual ICS checks fa
     releaseCheck();
     await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
     await expect(page.locator('#connection-result')).not.toContainText('失败');
+    await expect(page.locator('#manage-check-result')).not.toContainText('取不到');
     expect((await read(page)).feedUrl).toBe(sub.feedUrl);
     expect(probes).toBe(3);
     expect(service.posts).toBe(1);

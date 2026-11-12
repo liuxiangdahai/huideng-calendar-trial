@@ -53,6 +53,7 @@ const paths = {
   sunrise: '<path d="M3.5 18h17M7 18a5 5 0 0 1 10 0M12 7v2.4M5.3 10.6l1.6 1.6M18.7 10.6l-1.6 1.6M2.8 14.6h2.1M19.1 14.6h2.1M9.5 21h5"/>',
   sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7"/>',
   moon: '<path d="M19.5 14.6A7.6 7.6 0 0 1 9.4 4.5a7.6 7.6 0 1 0 10.1 10.1Z"/><path d="M17 3.2v3.2M15.4 4.8h3.2"/>',
+  share: '<circle cx="18" cy="5.5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="18.5" r="2.5"/><path d="m8.2 10.8 7.6-4.1M8.2 13.2l7.6 4.1"/>',
   copy: '<rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/>'
 };
 const RITUAL = new Set(['lotus-seat','ritual-bell','vajra','bell-vajra','lotus','wheel','parasol','banner','nyida','vase','knot']);

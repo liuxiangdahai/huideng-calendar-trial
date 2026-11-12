@@ -237,7 +237,9 @@ function renderHome() {
   homeView.update({data,settings,events,spare:[],today,start,end,deviceZone:observedZone});
   // Already added: the card offers changing the choices instead.
   $('#home-subscribe-label').textContent=subscription ? '修改选择' : '加入日历';
-  $('#my-subscription-label').textContent=subscription ? '我的订阅' : '加入日历';
+  // 订阅设置 is the page of choices; 我的订阅 is only the subscription itself
+  // (the card at the top of that page and the window it opens) (11-12).
+  $('#my-subscription-label').textContent=subscription ? '订阅设置' : '加入日历';
   $('#home-cta-title').textContent=subscription ? '你的日历已在同步' : '到日子想收到提醒？';
   $('#home-cta-text').textContent=subscription ? '想改选的日子或提醒时间，点这里；保存后日历会自动更新。' : '把荟供日等加入手机日历，到时自动提醒。';
 }
@@ -389,7 +391,7 @@ function renderQuickAdd() {
   // Not ringing is a question about the subscription, so it is answered in
   // its window rather than on the page (11-12). A web page cannot open the
   // phone's settings, so give the one path that works on every phone.
-  $('#manage-help').textContent=(phone ? '到时没有响铃？打开手机“设置”，搜索“日历”，确认已允许通知。' : '没有收到提醒？在日历应用的设置里确认已允许通知。')+`改了选择并保存后，${UPDATE_PACE}。`;
+  $('#manage-help').textContent=(calendarDevice.appleMobile ? '先看手机“设置”里“日历”是否允许通知；再看日历列表里这份订阅的“移除提醒”是否关着。' : phone ? '打开手机“设置”，搜索“日历”，确认已允许通知。' : '在日历应用的设置里确认已允许通知。')+`改了选择并保存后，${UPDATE_PACE}。`;
   renderSubscribedCard();
 }
 function nextReminderText() {
@@ -409,9 +411,23 @@ function renderSubscribedCard() {
   // The card stays in place for anyone with a subscription. It used to vanish
   // while there were unsaved changes and pop back when the choice matched the
   // saved one again, which pushed the choices down just as they were tapped.
-  const card=$('#subscribed-card'), show=Boolean(subscription) && !stopped && !conflict, changed=show && dirty();
+  // Stopped or changed on another device: the same card says so plainly on
+  // pale paper, so these states are never just a grey line (11-12).
+  const card=$('#subscribed-card'), state=stopped ? 'stopped' : subscription && conflict ? 'conflict' : '';
+  const show=Boolean(subscription) || Boolean(state), changed=show && !state && dirty();
   card.hidden=!show; if(!show){card.style.minHeight='';return;}
   card.classList.toggle('is-dirty',changed);
+  if(card.classList.contains('is-state')!==Boolean(state)) card.style.minHeight='';
+  card.classList.toggle('is-state',Boolean(state));
+  $('#subscribed-open').disabled=state==='stopped';
+  $('.sub-open').hidden=state==='stopped';
+  if(state){
+    $('#subscribed-gau').hidden=true;
+    $('#subscribed-title').textContent=state==='stopped' ? '这份订阅已停用' : '设置已在其他设备修改';
+    $('#subscribed-next').textContent=state==='stopped' ? '请在手机日历里移除它' : '先载入另一台设备保存的设置';
+    $('#subscribed-when').textContent=state==='stopped' ? '想重新开始：选好日子，点“加入日历”' : '点这里，再点“重新载入已保存设置”';
+    return;
+  }
   // Whichever message is taller sets the height for both, so switching between
   // them never moves what is below. A new window width starts over.
   if(renderSubscribedCard.width!==innerWidth){renderSubscribedCard.width=innerWidth;card.style.minHeight='';}
@@ -424,7 +440,7 @@ function renderSubscribedCard() {
     $('#subscribed-day').textContent=day;
     $('#subscribed-date').textContent=`${month}月 周${'日一二三四五六'[new Date(next.date+'T12:00:00Z').getUTCDay()]}`;
   }
-  $('#subscribed-title').textContent=changed ? '有改动还没保存' : '我的订阅 · 日历会自己更新';
+  $('#subscribed-title').textContent=changed ? '有改动还没保存' : '我的订阅 · 已保存';
   if(changed){
     // Short enough to keep the card's height: the choices below must not move.
     $('#subscribed-next').textContent='点“保存修改”后生效';
@@ -605,6 +621,9 @@ function renderConnection() {
   $('#check-connection').hidden=!subscription;
   $('#check-connection').disabled=checking||busy;
   $('#check-connection').textContent=checking ? '正在检查…' : connection.state==='error' ? '重试检查' : '检查连接';
+  $('#manage-check').disabled=checking||busy||!subscription;
+  $('#manage-check').textContent=checking ? '正在检查…' : connection.state==='error' ? '再检查一次' : '检查一下链接能不能用';
+  $('#manage-check-result').textContent=connection.state==='ok' ? '链接正常，日历能取到内容。' : connection.state==='error' ? `链接暂时取不到内容。${connection.message||'请稍后再试，或换个网络。'}` : '';
 }
 async function checkConnection() {
   if(!subscription || requestPending || managementRestoring || connectionController) return;
@@ -641,11 +660,8 @@ function renderSubscription() {
   $('#subscription-title').textContent=managing ? '我的订阅' : '加入日历';
   renderProgress();
   $('#subscription-dialog .overline').textContent=managing ? '已加入日历' : '我的订阅';
-  $('#entry-title').lastChild.textContent=managing ? '订阅地址' : '添加到日历';
-  if(managing){
-    $('#manage-title').lastChild.textContent=stopped ? '这份订阅已停用' : conflict ? '设置已在其他设备修改' : dirty() ? '有改动尚未保存' : '已加入日历，正在同步';
-    $('#manage-next').textContent=dirty() ? '保存后，日历会自己更新' : nextReminderText();
-  }
+  $('#entry-title').lastChild.textContent=managing ? '加到另一台设备' : '添加到日历';
+  if(managing) renderManageHead();
   $('#subscription-new').hidden = Boolean(subscription);
   $('#subscription-existing').hidden = !subscription;
   $('#subscription-management').hidden = !subscription;
@@ -663,6 +679,19 @@ function renderSubscription() {
     return count ? `<button class="secondary" type="button" data-download="${mode}">${icon('download')}下载${mode === 'remind' ? '提醒' : '仅显示'}日历 · ${count} 项日程</button>` : '';
   }).join('') || '<p>近期没有可下载的已选日程。</p>';
   deviceGuide(); renderSaveState(); renderConnection();
+  if(managing) renderManageHead();
+}
+// The window's head: the same 嘎乌 box and next day as the page's card, or,
+// when something needs doing, just that (11-12).
+function renderManageHead() {
+  const state=stopped ? '这份订阅已停用' : conflict ? '设置已在其他设备修改' : dirty() ? '有改动还没保存' : '';
+  $('#manage-gau').hidden=Boolean(state)||$('#subscribed-gau').hidden;
+  $('#manage-day').textContent=$('#subscribed-day').textContent;
+  $('#manage-date').textContent=$('#subscribed-date').textContent;
+  $('#manage-title').textContent=state || $('#subscribed-next').textContent || '已保存，日历会自己更新';
+  $('#manage-next').textContent=stopped ? '请在手机日历里移除这份订阅。' : conflict ? '请重新载入已保存的设置，再调整。' : dirty() ? '点下方“保存修改”后，日历会自己更新。' : `${$('#subscribed-when').textContent} · 日历会自己更新`;
+  $('#manage-copy').disabled=$('#copy-feed').disabled;
+  $('#subscription-dialog').classList.toggle('has-state',Boolean(state));
 }
 function openSubscription({prepare=false}={}) {
   if(!entryError) $('#subscription-error').hidden = true;
@@ -910,6 +939,8 @@ function attachEvents() {
   $('#share-settings').addEventListener('click',openShare);
   $('#subscribed-open').addEventListener('click',()=>openSubscription());
   $('#manage-share').addEventListener('click',()=>openShare());
+  $('#manage-copy').addEventListener('click',()=>$('#copy-feed').click());
+  $('#manage-check').addEventListener('click',()=>void checkConnection());
   $('#manage-add').addEventListener('click',()=>{
     const dialog=$('#subscription-dialog'), show=!dialog.classList.contains('show-add');
     dialog.classList.toggle('show-add',show);$('#manage-add').setAttribute('aria-expanded',String(show));

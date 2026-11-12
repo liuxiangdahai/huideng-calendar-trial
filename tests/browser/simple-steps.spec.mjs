@@ -90,7 +90,7 @@ test('after subscribing, the page opens on a sync status with the next reminder;
   await expect(page.locator('#subscribed-next')).toContainText('下次提醒');
   // After adding, the page stays put and says it simply (11-12): no replay.
   await expect(page.locator('#save-state')).toHaveText('已保存，日历会自己更新');
-  await expect(page.locator('#subscribed-title')).toHaveText('我的订阅 · 日历会自己更新');
+  await expect(page.locator('#subscribed-title')).toHaveText('我的订阅 · 已保存');
   const feedUrl=await page.evaluate(()=>JSON.parse(localStorage.getItem('huideng.calendar.subscription')).feedUrl);
   const text=await (await request.get(feedUrl)).text();
   const titles=new ICAL.Component(ICAL.parse(text)).getAllSubcomponents('vevent').map(e=>e.getFirstPropertyValue('summary'));
@@ -154,10 +154,10 @@ for (const viewport of [{width:390,height:844},{width:1366,height:900}]) test(`w
     await page.locator('input[name="device"][value="other"]').check();
     await expect(page.locator('#copy-feed')).toBeVisible();
     await page.keyboard.press('Escape');
-    await expect(page.locator('#subscribed-title')).toHaveText('我的订阅 · 日历会自己更新');
+    await expect(page.locator('#subscribed-title')).toHaveText('我的订阅 · 已保存');
     const top=()=>page.locator('#preset-options').evaluate(node=>Math.round(node.getBoundingClientRect().top+scrollY));
     const start=await top();
-    for (const [preset,title] of [['practice','有改动还没保存'],['tsok','我的订阅 · 日历会自己更新'],['guru','有改动还没保存'],['tsok','我的订阅 · 日历会自己更新']]) {
+    for (const [preset,title] of [['practice','有改动还没保存'],['tsok','我的订阅 · 已保存'],['guru','有改动还没保存'],['tsok','我的订阅 · 已保存']]) {
       await page.locator(`[data-preset="${preset}"]`).click();
       await expect(page.locator('#subscribed-title')).toHaveText(title);
       expect(await top(),`${viewport.width}px after ${preset}`).toBe(start);

@@ -540,3 +540,12 @@ dialog.cal-day-sheet.is-popover { position: absolute; inset: auto; z-index: 30; 
 .cal-legend-calendar { color: var(--muted); }
 .cal-legend-calendar b { display: inline-grid; place-items: center; width: 16px; height: 16px; margin: 0 1px; border: 1px dotted #9fb0c8; border-radius: 50%; color: var(--teal-2); font: 500 10px/1 var(--font-serif); }
 .cal-detail-note { margin: 4px 0 0; color: #e3d3c0; font-size: var(--fs-sm); }
+
+/* The note under the month (11-12): one item per line-run, room between
+   them; the tap hint goes to the far end on its own. */
+.cal-legend { gap: 6px 20px; margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--line-2); font-size: var(--fs-sm); }
+.cal-legend-calendar { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); }
+.cal-legend-calendar b { width: 20px; height: 20px; margin: 0; font-size: 12px; }
+.cal-legend-why { color: var(--muted); }
+.cal-legend>.cal-legend-tap { margin-left: auto; color: var(--teal-2); }
+@media (max-width: 1023px) { .cal-legend { gap: 6px 16px; } }

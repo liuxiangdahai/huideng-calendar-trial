@@ -109,7 +109,8 @@ for (const width of [390, 1366]) test(`cells say where a Tibetan day is skipped 
   await open(page, width);
   // 缺 and 重 are marks of the calendar, not chips like a day to keep.
   await expect(page.locator('[data-cal-date="2026-11-30"] .cal-miss')).toHaveText('缺廿一');
-  await expect(page.locator('.cal-legend-calendar')).toContainText('不是节日');
+  await expect(page.locator('.cal-legend').first()).toContainText('不是节日');
+  await expect(page.locator('.cal-legend-calendar').first()).toContainText('少了一天');
   await expect(page.locator('[data-cal-date="2026-10-28"] .cal-miss')).toHaveText('缺十七');
   await expect(page.locator('[data-cal-date="2026-11-30"] .cal-miss')).toBeVisible();
   await expect(page.locator('[data-cal-date="2026-11-30"]')).toHaveAttribute('aria-label', /缺日：藏历火马年十月廿一/);

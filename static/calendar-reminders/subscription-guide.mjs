@@ -49,7 +49,7 @@ function openingHelp(device) {
     ${device.inAppBrowser ? `<p class="guide-handoff">当前可能在${escape(device.inAppBrowser)}的内置浏览器中，日历跳转可能被拦截。</p>${steps([
       ['sliders', '点按当前页面右上角的“…”菜单。'],
       ['globe', '若有“在浏览器打开”或“在 Safari 中打开”，选择这个入口。'],
-      ['calendar-plus', '在浏览器中返回本页的订阅入口，再点按“打开 Apple 日历订阅”。']
+      ['calendar-plus', '在浏览器中返回本页的订阅入口，再点按“加入 Apple 日历”。']
     ])}<p>若没有外部浏览器入口，可复制当前网页地址，在 Safari 或系统浏览器中打开。</p><p>微信与 Safari 保存的本机设置不互通。若已准备好订阅，可在下方“管理这份订阅”中复制管理链接，只在自己的 Safari 中打开，继续管理同一份订阅；请勿转发管理链接。也可复制上方的 HTTPS 订阅地址，在日历中手动添加。</p>` : '<p>若浏览器询问是否打开“日历”，请选择允许。若没有弹出窗口，可在 Safari 或系统浏览器中打开本页后重试。</p>'}
     <p>也可以复制上方的订阅地址，按“查看添加步骤”中的手动方法添加。复制地址本身不会完成订阅。</p>
     <p class="guide-note">若已在系统窗口取消，可再次点按打开按钮；如果已经添加，请先到日历中检查，避免重复添加。</p>
@@ -73,8 +73,8 @@ function addition(app, context, device) {
   if (app === 'iphone') {
     const direct = device.appleMobile || device.mac;
     const directSteps = direct
-      ? device.inAppBrowser ? [['globe', '先按上方提示，在 Safari 或系统浏览器中打开本页。'], ['calendar-plus', '在浏览器中点按“打开 Apple 日历订阅”。'], ['calendar-check', '在系统打开的日历窗口中确认添加。']]
-      : [['calendar-plus', '点按上方“打开 Apple 日历订阅”。'], ['calendar-check', '在系统打开的日历窗口中确认添加。']]
+      ? device.inAppBrowser ? [['globe', '先按上方提示，在 Safari 或系统浏览器中打开本页。'], ['calendar-plus', '在浏览器中点按“加入 Apple 日历”。'], ['bell', '看到“移除提醒”时请保持关闭，到日子才会响。'], ['calendar-check', '在系统打开的日历窗口中确认添加。']]
+      : [['calendar-plus', '点按上方“加入 Apple 日历”。'], ['bell', '在 iPhone 弹出的订阅页面里，看到“移除提醒”时请保持关闭，到日子才会响。'], ['calendar-check', '确认添加。']]
       : [['copy', '复制上方的订阅地址。'], ['phone', '将地址发送给自己的 iPhone、iPad 或 Mac。']];
     return addSteps(app, `${location(device.mac ? '在电脑上操作 · Mac' : device.appleMobile ? '在手机上操作 · iPhone / iPad' : '当前设备用于准备，下一步转到 Apple 设备', device.mac ? 'calendar' : 'phone')}
       <p>${prepare}</p>${steps(directSteps)}
@@ -84,6 +84,7 @@ function addition(app, context, device) {
         ['calendar-plus', '在“添加日历”菜单中选择“添加订阅日历”。'],
         ['copy', '粘贴订阅地址。'],
         ['search', '点按“查找”；较早版本可能显示“订阅”。'],
+        ['bell', '看到“移除提醒”时请保持关闭，到日子才会响。'],
         ['calendar-check', '按屏幕提示确认添加。']
       ])}<p class="guide-links">${link(HELP.apple, 'Apple 中文订阅帮助')}</p></details>
       <details class="guide-help" data-guide-help="apple-manual-mac"><summary>在 Mac 上手动添加</summary>${location('在电脑上操作 · Mac', 'calendar')}${steps([
@@ -98,7 +99,7 @@ function addition(app, context, device) {
   if (app === 'google') return `${device.mobile ? '<p class="guide-handoff">手机应用无法通过网址添加订阅。请把订阅地址发给自己，下一步转到电脑。</p>' : ''}${addSteps(app, `${location('在电脑上操作 · Google 日历网页', 'calendar')}
     <p>${prepare}</p>${steps([
       ['copy', '复制上方的订阅地址。'],
-      ['calendar', '在电脑浏览器中点按“打开 Google 日历添加页面”。'],
+      ['calendar', '在电脑浏览器中点按“加入 Google 日历”。'],
       ['copy', '粘贴订阅地址。'],
       ['calendar-check', '点按“添加日历”。']
     ])}<p class="guide-note">若打开后没有出现添加页面，在 ${link('https://calendar.google.com/', 'Google 日历网页')}左侧找到“其他日历”，点按旁边的加号，再选择“通过网址添加”。请确认当前登录的是手机使用的 Google 账号。</p><p class="guide-links">${link(HELP.googleAdd, 'Google 中文订阅帮助')}</p>`)}
@@ -106,7 +107,7 @@ function addition(app, context, device) {
   if (app === 'outlook') return `${device.mobile ? '<p class="guide-handoff">请先在电脑网页版或经典桌面版添加订阅，再在需要使用的设备中检查日程。</p>' : ''}${addSteps(app, `${location('在电脑上操作 · Outlook 网页版', 'calendar')}
     <p>${prepare}</p>${steps([
       ['copy', '复制上方的订阅地址。'],
-      ['calendar', '打开 Outlook 网页日历；工作或学校账号请使用所在组织的 Outlook 网页。'],
+      ['calendar', '点按“加入 Outlook”打开网页日历；工作或学校账号请使用所在组织的 Outlook 网页。'],
       ['calendar-plus', '在日历侧栏选择“添加日历”。'],
       ['globe', '选择“从 Web 订阅”。'],
       ['copy', '粘贴订阅地址，并按页面要求填写日历名称。'],
