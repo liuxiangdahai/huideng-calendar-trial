@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-11-12T11:50:46.136Z",
+  "status": "unchanged",
+  "sourceRange": [
+    "2026-01-01",
+    "2027-05-06"
+  ],
+  "candidateEnd": null,
+  "newDays": 0,
+  "editedDays": 0,
+  "issues": [],
+  "failureCode": null,
+  "robotsAllowed": false,
+  "publicationStatus": null,
+  "publicationFailure": null,
+  "compareUrl": null,
+  "run": "https://github.com/liuxiangdahai/huideng-calendar-trial/actions/runs/43212611208",
+  "releaseRun": null
+}
