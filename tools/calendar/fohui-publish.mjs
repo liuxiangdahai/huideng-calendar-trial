@@ -46,7 +46,7 @@ export async function publish({command=run,dispatch=dispatchAndWait,context=proc
   const receipt={checkedAt:new Date().toISOString(),base,automatic:policy.automatic,status:'pending'};
   const save=()=>write('artifacts/source-maintenance/publication.json',JSON.stringify(receipt,null,2)+'\n');
   try{
-    run('git',['fetch','origin','main']);
+    run('git',['fetch','origin','refs/heads/main:refs/remotes/origin/main']);
     if(run('git',['rev-parse','origin/main'])!==base){receipt.status='base-changed';await save();throw new Error('主分支已有新修改，本次不覆盖，请重新运行资料检查。');}
     const open=JSON.parse(run('gh',['pr','list','--repo',REPO,'--head',policy.branch,'--base','main','--state','open','--json','number,url']));
     if(open.length){receipt.status='existing-review';receipt.prUrl=open[0].url;await save();console.log('相同资料已有待核对 PR：'+open[0].url);return receipt;}
