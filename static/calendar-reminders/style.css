@@ -1129,3 +1129,166 @@ body[data-page="subscribe"] [data-page-part="home"] { display: none !important; 
 /* Chosen emblems take the card's own eave red inside, a fine gilt ring and a
    pale-gold symbol, like the first chosen reminder times (11-12). */
 .preset-card[aria-pressed=true] .preset-medal, .daily-date-option:has(input:checked) .preset-medal, .time-choices button[aria-pressed=true]>[data-icon] { background: var(--eave); box-shadow: inset 0 0 0 1px #b9975a99; color: #f1d9a6; }
+
+/* Synced, nothing to save (11-12): the bar becomes a thin status line with a
+   small 我的订阅 link; the big button returns when there is something to do. */
+.action-buttons>#subscribe.is-quiet, .action-buttons>#subscribe.is-quiet:hover:not(:disabled) { min-height: 44px; width: auto; padding: 0 4px 0 12px; border: 0; background: none; box-shadow: none; color: var(--wine); font: 600 var(--fs-md)/1.4 var(--font-serif); }
+.action-buttons>#subscribe.is-quiet .icon { width: 18px; height: 18px; }
+.action-bar:has(#subscribe.is-quiet) .action-inner { display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; }
+.action-bar:has(#subscribe.is-quiet) .action-summary { display: grid; justify-items: start; text-align: left; }
+.action-bar:has(#subscribe.is-quiet) .action-summary { flex: 1; min-width: 0; }
+.action-bar:has(#subscribe.is-quiet) .action-buttons { display: block; flex: none; }
+
+/* ===== 我的订阅 window (11-12) =====
+   Head: the page card's 嘎乌 box and next day on butter paper. Then three
+   everyday actions as cards, help and management folded below. Technical
+   pieces (the address field, connection panel, file import) stay out of
+   sight until 加到另一台设备 opens the add steps. */
+.manage-panel { margin: 4px 0 6px; padding: 0; border: 0; background: none; }
+.manage-head { display: grid; grid-template-columns: 70px minmax(0,1fr); gap: 16px; align-items: center; padding: 18px 16px 16px; border: 1px solid #e2cfa6; border-radius: 10px; background: #fbf5ea; }
+.manage-gau { height: 84px; padding-top: 8px; box-shadow: 0 0 0 1px var(--gilt), 0 0 0 4px #fbf5ea, 0 0 0 5px var(--gold-2); }
+.manage-gau::before { box-shadow: 0 0 0 2px #fbf5ea; }
+.manage-gau b { font-size: 30px; }
+.manage-gau[hidden] { display: none; }
+.manage-head:has(.manage-gau[hidden]) { grid-template-columns: minmax(0,1fr); }
+.manage-title { display: block; margin: 0; color: var(--wine); font: 600 var(--fs-lg)/1.45 var(--font-serif); }
+.manage-next { margin: 4px 0 0; color: var(--ink-2); font-size: var(--fs-md); line-height: 1.6; }
+#subscription-dialog.has-state .manage-head { border-color: #e6c18a; background: #fdf3e2; }
+.manage-actions { display: grid; gap: 10px; margin: 14px 0 0; }
+.manage-action { display: grid; grid-template-columns: 44px minmax(0,1fr) 20px; gap: 14px; align-items: center; width: 100%; min-height: 64px; padding: 10px 12px 10px 10px; border: 1px solid var(--line-2); border-radius: 10px; background: var(--surface); color: var(--ink); text-align: left; cursor: pointer; transition: border-color 160ms ease, background-color 160ms ease; }
+.manage-action:hover:not(:disabled):not([aria-expanded=true]) { border-color: var(--control); background: var(--surface-2); }
+.manage-action:disabled { opacity: .55; cursor: default; }
+.manage-action-icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: radial-gradient(circle, #fff 56%, var(--red-tint) 57%); box-shadow: inset 0 0 0 1px #a1232b33; color: var(--wine); }
+.manage-action-icon .icon { width: 22px; height: 22px; }
+.manage-action strong { display: block; font: 600 var(--fs-base)/1.4 var(--font-serif); }
+.manage-action small { display: block; margin-top: 2px; color: var(--muted); font-size: var(--fs-sm); line-height: 1.45; }
+.manage-action>.icon:last-child, .manage-action>[data-icon]:last-child .icon { width: 18px; height: 18px; color: var(--gold); }
+.manage-action[aria-expanded=true] { border-color: var(--eave); background: var(--eave); color: #fdf9f1; box-shadow: inset 0 0 0 1px var(--gilt); }
+.manage-action[aria-expanded=true] small { color: #e9d3aa; }
+.manage-action[aria-expanded=true] .manage-action-icon { background: var(--eave); box-shadow: inset 0 0 0 1px #b9975a99; color: #f1d9a6; }
+.manage-action[aria-expanded=true]>[data-icon]:last-child { transform: rotate(90deg); }
+.manage-fold, #subscription-dialog .management { margin-top: 14px; padding: 0 2px; border-top: 1px solid var(--line); }
+.manage-fold summary, #subscription-dialog .management summary { display: flex; align-items: center; gap: 10px; min-height: 52px; color: var(--ink); font: 600 var(--fs-base)/1.4 var(--font-serif); list-style: none; cursor: pointer; }
+.manage-fold summary::-webkit-details-marker { display: none; }
+.manage-fold summary .icon, #subscription-dialog .management summary .icon { margin-left: auto; width: 16px; height: 16px; color: var(--muted); transition: transform .15s; }
+.manage-fold[open] summary .icon { transform: rotate(180deg); }
+#subscription-dialog .management summary small { color: var(--muted); font: 400 var(--fs-sm)/1.4 var(--font-ui); }
+.manage-help { margin: 0 0 8px; color: var(--ink-2); font-size: var(--fs-md); line-height: 1.7; }
+.manage-check-result { margin: 4px 0 12px; color: var(--muted); font-size: var(--fs-sm); }
+.manage-check-result:empty { display: none; }
+#subscription-dialog .management .danger { color: var(--red); }
+/* Out of sight while managing; 加到另一台设备 brings the add steps back. */
+#subscription-dialog.is-managing #connection-status, #subscription-dialog.is-managing:not(.show-add) :is(.subscription-entry>#entry-title, .entry-actions, #copy-progress, .url-label, #subscription-status, .download-fallback, #notification-guide) { display: none; }
+#subscription-dialog.is-managing #subscription-summary { margin: 0 0 12px; font-size: var(--fs-sm); }
+#subscription-dialog.is-managing .subscription-entry { margin: 0; padding: 0; border: 0; }
+#subscription-dialog.is-managing.show-add .subscription-entry { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
+@media (max-width: 480px) {
+  .manage-head { grid-template-columns: 60px minmax(0,1fr); gap: 14px; padding: 16px 14px 14px; }
+  .manage-gau { height: 76px; }
+  .manage-gau b { font-size: 26px; }
+}
+
+/* ===== One language for every choice and panel (11-12) =====
+   Chosen = eave red with a gilt line and pale-gold symbol, wherever a
+   choice is made: calendar apps, show/remind, title marks, time zones.
+   Emblems sit in the same round medallion; side panels are butter paper
+   with a gilt edge; notices use a gilt rule, errors a red one. */
+:is(.mode-choice, .device-options) label:has(input:checked), .title-marks label:has(input:checked) { border-color: var(--eave); background: var(--eave); color: #fdf9f1; box-shadow: inset 0 0 0 1px var(--gilt); }
+.device-options label:has(input:checked) small, .title-marks label:has(input:checked) small { color: #e9d3aa; }
+:is(.mode-choice, .device-options) label:has(input:checked)>[data-icon], :is(.mode-choice, .device-options) label:has(input:checked)>.icon { color: #f1d9a6; }
+:is(.mode-choice, .device-options) label:hover:not(:has(input:checked)), .title-marks label:hover:not(:has(input:checked)) { border-color: var(--control); background: var(--surface-2); }
+.device-options label { border-radius: 10px; }
+.device-options label>[data-icon] { display: grid; place-items: center; flex: none; width: 36px; height: 36px; border-radius: 50%; background: radial-gradient(circle, #fff 56%, var(--red-tint) 57%); box-shadow: inset 0 0 0 1px #a1232b33; }
+.device-options label:has(input:checked)>[data-icon] { background: var(--eave); box-shadow: inset 0 0 0 1px #b9975a99; }
+.device-options label>[data-icon] .icon { width: 20px; height: 20px; }
+.device-options legend, #entry-title { font: 600 var(--fs-lg)/1.5 var(--font-serif); color: var(--ink); }
+.title-marks label { border-radius: 10px; border-color: var(--line-2); }
+.title-marks input { accent-color: var(--gold-2); }
+.title-marks legend, .category-heading h3 { color: var(--ink); letter-spacing: 1px; }
+.category-heading h3::before { width: 6px; height: 6px; background: var(--gold-2); }
+.zone-option:has(input:checked) { background: var(--eave); color: #fdf9f1; }
+.zone-option:has(input:checked) small { color: #e9d3aa; }
+.zone-option input { accent-color: var(--gold-2); }
+/* Categories: emblem in a medallion, count as a small gilt-edged tag. */
+.group-icon { width: 42px; height: 42px; border-radius: 50%; background: radial-gradient(circle, #fff 56%, var(--red-tint) 57%); box-shadow: inset 0 0 0 1px #a1232b33; }
+.group-icon .icon { width: 22px; height: 22px; }
+.group-count.has-selected { padding: 1px 10px; border-radius: 4px; background: #fbf5ea; box-shadow: inset 0 0 0 1px #e2cfa6; color: var(--wine); font-weight: 600; }
+.group-card[open]>summary { box-shadow: inset 3px 0 var(--eave); }
+.group-card[open] .group-icon { background: var(--eave); box-shadow: inset 0 0 0 1px #b9975a99; color: #f1d9a6; }
+.advanced-region { border-radius: 10px; border-color: #e2cfa6; background: #fbf5ea; }
+/* 每日藏历 as its own calendar: folded right under the every-day card. */
+.daily-calendar { margin-top: 8px; padding: 0 14px; border: 1px solid #e2cfa6; border-radius: 10px; background: #fbf5ea; }
+.daily-calendar>summary { display: flex; align-items: center; gap: 8px; min-height: 48px; color: var(--wine); font: 600 var(--fs-md)/1.4 var(--font-serif); list-style: none; cursor: pointer; }
+.daily-calendar>summary::-webkit-details-marker { display: none; }
+.daily-calendar>summary .recommend-tag { margin-left: 0; background: var(--eave); color: #f1d9a6; }
+.daily-calendar>summary .icon { margin-left: auto; width: 16px; height: 16px; color: var(--muted); transition: transform .15s; }
+.daily-calendar[open]>summary .icon { transform: rotate(180deg); }
+.daily-calendar p { margin: 0 0 10px; color: var(--ink-2); font-size: var(--fs-sm); }
+.daily-calendar .feed-actions { margin: 0 0 14px; }
+/* Share: the code on butter paper in a gilt frame. */
+.share-qr { padding: 10px; border-radius: 10px; background: #fbf5ea; box-shadow: inset 0 0 0 1px #e2cfa6; }
+/* Notices and errors. */
+.notice { border: 1px solid #e2cfa6; border-left: 3px solid var(--gold-2); border-radius: 8px; background: #fbf5ea; }
+.notice.error { border-color: #e6bcbc; border-left-color: var(--red); background: #fbf1ee; color: var(--red-2); }
+/* Unusual states of the subscription (stopped, changed elsewhere): the
+   card at the top turns paper-pale with a clear line, never just grey text. */
+.subscribed-card.is-state .sub-ticket { background: #fbf5ea; color: var(--ink); box-shadow: inset 0 0 0 1px #e2cfa6; }
+.subscribed-card.is-state .sub-tag { color: var(--red); }
+.subscribed-card.is-state .sub-tag i { background: var(--red); animation: none; }
+.subscribed-card.is-state .sub-when, .subscribed-card.is-state .sub-open { color: var(--ink-2); }
+.subscribed-card.is-state .sub-open { border-top-color: #e2cfa6; }
+.subscribed-card.is-state .sub-knot { color: #c9a76433; }
+.sub-open[hidden] { display: none; }
+.sub-ticket:has(.sub-open[hidden]) { padding-bottom: 18px; }
+.sub-ticket:disabled { cursor: default; opacity: 1; }
+.subscribed-card.is-state .sub-when .icon { display: none; }
+.sub-body strong, .sub-tag { min-width: 0; overflow-wrap: anywhere; white-space: normal; }
+.subscribed-card.is-state .sub-when { gap: 0; }
+
+/* 分享 window (11-12) */
+.share-what { margin: 0 0 16px; padding: 12px 16px; border: 1px solid #e2cfa6; border-radius: 10px; background: #fbf5ea; }
+.share-what small { display: block; color: var(--muted); font-size: var(--fs-sm); }
+#share-summary { margin: 2px 0 0; color: var(--wine); font: 600 var(--fs-lg)/1.5 var(--font-serif); }
+.share-body { grid-template-columns: 196px minmax(0,1fr); gap: 22px; align-items: center; }
+.share-code { position: relative; display: grid; justify-items: center; gap: 8px; margin: 10px 0 0; }
+.share-code .share-qr { width: 180px; padding: 12px; border: 0; border-radius: 60px 60px 8px 8px / 26px 26px 8px 8px; background: #fff; box-shadow: 0 0 0 1px var(--gilt), 0 0 0 5px #fbf5ea, 0 0 0 6px var(--gold-2); }
+.share-code::before { content: ""; position: absolute; top: -10px; left: 50%; z-index: 1; width: 12px; height: 12px; margin-left: -6px; border-radius: 50% 50% 50% 0; background: var(--gold-2); box-shadow: 0 0 0 2px var(--surface); transform: rotate(-45deg); }
+.share-code figcaption { color: var(--muted); font-size: var(--fs-sm); }
+.share-side { display: grid; gap: 12px; }
+.share-then { margin: 0; color: var(--ink-2); font-size: var(--fs-md); line-height: 1.7; }
+@media (max-width: 560px) { .share-body { grid-template-columns: 1fr; justify-items: stretch; } .share-code { justify-self: center; } }
+
+/* 时区 window (11-12): search, then the zones as rows; the chosen one is
+   painted like every other choice, with a gilt check. */
+.zone-why { margin-bottom: 12px; }
+.search-box { min-height: 48px; border-color: var(--line-2); border-radius: 10px; background: var(--surface); }
+.search-box:focus-within { border-color: var(--gold-2); box-shadow: 0 0 0 3px #c9a76433; }
+.search-box .icon { color: var(--gold); }
+.zone-options { border-radius: 10px; }
+.zone-option { position: relative; min-height: 64px; }
+.zone-option input { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.zone-check { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border: 1.5px solid var(--line-2); border-radius: 50%; }
+.zone-option:has(input:checked) .zone-check { border-color: #fdf9f1; background: #fdf9f1; box-shadow: 0 0 0 2px var(--eave), 0 0 0 3px var(--gold-2); }
+.zone-option:has(input:checked) .zone-check::after { content: ""; width: 10px; height: 6px; margin-top: -3px; border: solid var(--eave); border-width: 0 0 2px 2px; transform: rotate(-45deg); }
+.zone-option:has(input:checked) em { color: #f1d9a6; }
+.zone-option:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: -3px; }
+#zone-result-status { color: var(--muted); font-size: var(--fs-sm); }
+.search-box input:focus, .search-box input:focus-visible { outline: none; }
+#share-copy { background: var(--surface); }
+/* 提醒设置 window: the two modes as cards with a medallion; fields on paper. */
+.mode-choice label { min-height: 56px; border-radius: 10px; font-family: var(--font-serif); font-weight: 600; }
+.mode-choice label>[data-icon] { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: radial-gradient(circle, #fff 56%, var(--red-tint) 57%); box-shadow: inset 0 0 0 1px #a1232b33; color: var(--wine); }
+.mode-choice label>[data-icon] .icon { width: 18px; height: 18px; }
+.mode-choice label:has(input:checked)>[data-icon] { background: var(--eave); box-shadow: inset 0 0 0 1px #b9975a99; color: #f1d9a6; }
+#reminder-fields:not(:empty) { margin: 4px 0 12px; padding: 4px 14px; border: 1px solid #e2cfa6; border-radius: 10px; background: #fbf5ea; }
+.reminder-row :is(select, input[type=time]) { border-radius: 8px; background: var(--surface); }
+/* Typing a place on a phone (11-12): the keyboard takes half the screen, so
+   the window drops its explanation and the list keeps the room it needs. */
+/* Touch only: with a mouse, blurring the box on a click would move the list
+   under the pointer. Once typed in, it stays compact until the window closes. */
+@media (pointer: coarse) {
+  #zone-dialog:is(:has(#zone-search:focus), .is-typing) :is(.zone-why, #zone-result-status, .dialog-head .overline) { display: none; }
+  #zone-dialog:is(:has(#zone-search:focus), .is-typing) .zone-options { min-height: 120px; max-height: max(120px, calc(var(--available-height) - 250px)); }
+}
+@media (max-height: 560px) { #zone-dialog :is(.zone-why, #zone-result-status) { display: none; } }
+.category-heading .text-button { min-height: 46px; }
