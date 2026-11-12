@@ -88,9 +88,13 @@ test('after subscribing, the page opens on a sync status with the next reminder;
   await page.keyboard.press('Escape');
   await expect(page.locator('#subscribed-card')).toBeVisible();
   await expect(page.locator('#subscribed-next')).toContainText('下次提醒');
-  // Right after adding, the card welcomes once, then reads as every day.
-  await expect(page.locator('#subscribed-title')).toHaveText('刚刚加好 · 正在同步');
+  // Right after adding the page stays put: the bar says it where the eye is.
+  await expect(page.locator('#save-state')).toHaveText('已加入日历，正在同步');
+  // The card welcomes once when it comes into view, then reads as every day.
+  await page.locator('#subscribed-card').scrollIntoViewIfNeeded();
+  await expect(page.locator('#subscribed-title')).toHaveText('已加入日历 · 正在同步');
   await expect(page.locator('#subscribed-title')).toHaveText('我的订阅 · 已在同步');
+  await expect(page.locator('#save-state')).toHaveText('已同步到日历，改动会自动更新',{timeout:10000});
   const feedUrl=await page.evaluate(()=>JSON.parse(localStorage.getItem('huideng.calendar.subscription')).feedUrl);
   const text=await (await request.get(feedUrl)).text();
   const titles=new ICAL.Component(ICAL.parse(text)).getAllSubcomponents('vevent').map(e=>e.getFirstPropertyValue('summary'));

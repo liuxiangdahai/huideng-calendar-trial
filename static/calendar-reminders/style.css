@@ -1129,3 +1129,8 @@ body[data-page="subscribe"] [data-page-part="home"] { display: none !important; 
 /* Chosen emblems take the card's own eave red inside, a fine gilt ring and a
    pale-gold symbol, like the first chosen reminder times (11-12). */
 .preset-card[aria-pressed=true] .preset-medal, .daily-date-option:has(input:checked) .preset-medal, .time-choices button[aria-pressed=true]>[data-icon] { background: var(--eave); box-shadow: inset 0 0 0 1px #b9975a99; color: #f1d9a6; }
+/* Just added (11-12): said where the eye is, and said large on the card. */
+#save-state.is-fresh { display: inline-flex; align-items: center; gap: 6px; color: var(--wine); font: 600 var(--fs-md)/1.5 var(--font-serif); }
+#save-state.is-fresh::before { content: "✓"; display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--eave); color: #f1d9a6; font: 600 12px/1 var(--font-ui); box-shadow: 0 0 0 1px var(--gilt); }
+.subscribed-card.is-new .sub-tag { color: #f4dcae; font: 600 17px/1.5 var(--font-serif); letter-spacing: 1px; }
+.subscribed-card.is-new .sub-tag i { width: 10px; height: 10px; }

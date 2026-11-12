@@ -34,7 +34,7 @@ const creationKey = 'huideng.calendar.creation';
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 const defaultReminders = () => [{daysBefore:0,time:'08:00'}];
 const readStored = key => { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } };
-let data, settings, subscription = null, apiBaseUrl = '', upcoming = [], pendingWelcome = false;
+let data, settings, subscription = null, apiBaseUrl = '', upcoming = [], pendingWelcome = false, justAddedUntil = 0;
 let calendarView,zonePicker,guide,ui={},observedZone='',today='',dayTimer;
 let reminderTarget = [], reminderDraft, reminderReturnSelector, requestPending = false, conflict = false, stopped = false;
 let openGroups = new Set(['tsok']), lastActive = new Map();
@@ -425,7 +425,7 @@ function renderSubscribedCard() {
     $('#subscribed-date').textContent=`${month}月 周${'日一二三四五六'[new Date(next.date+'T12:00:00Z').getUTCDay()]}`;
   }
   const added=card.classList.contains('is-new');
-  $('#subscribed-title').textContent=changed ? '有改动还没保存' : added ? '刚刚加好 · 正在同步' : '我的订阅 · 已在同步';
+  $('#subscribed-title').textContent=changed ? '有改动还没保存' : added ? '已加入日历 · 正在同步' : '我的订阅 · 已在同步';
   if(changed){
     // Short enough to keep the card's height: the choices below must not move.
     $('#subscribed-next').textContent='点“保存修改”后同步';
@@ -439,17 +439,25 @@ function renderSubscribedCard() {
   $('#subscribed-next').textContent=`${remind?'下次提醒':'下一个修行日'} ${next.title}`;
   $('#subscribed-when').textContent=remind ? `${reminderLabel(next.preference.reminders)} · ${left}` : `只显示，不响铃 · ${left}`;
 }
-// Right after the first add (11-12): back at the top, the card unrolls from
-// under the masthead like a thangka and its knot draws itself in gilt; a few
-// seconds later it settles into the everyday card. Once only.
-const reducedMotion=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+// Right after the first add (11-12). The page does not jump: the bottom bar,
+// where the eye already is, says 已加入日历 with a gilt check for a few
+// seconds. The card at the top welcomes once, the moment it is in view (now,
+// or when the person scrolls back up): it unrolls from under the masthead,
+// its knot draws in gilt and it reads 已加入日历 · 正在同步 in large type.
 function welcomeSubscription() {
   const card=$('#subscribed-card');
   if(card.hidden) return;
-  card.classList.add('is-new'); renderSubscribedCard();
-  card.scrollIntoView({block:'center',behavior:reducedMotion()?'auto':'smooth'});
-  playSymbol(card.querySelector('.sub-knot svg'));
-  setTimeout(()=>{ card.classList.remove('is-new'); renderSubscribedCard(); },3600);
+  justAddedUntil=Date.now()+8000; renderSaveState();
+  setTimeout(renderSaveState,8100);
+  const play=()=>{
+    card.classList.add('is-new'); renderSubscribedCard();
+    playSymbol(card.querySelector('.sub-knot svg'));
+    setTimeout(()=>{ card.classList.remove('is-new'); renderSubscribedCard(); },4200);
+  };
+  if(!('IntersectionObserver' in window)) return play();
+  const seen=new IntersectionObserver(entries=>{ if(entries.some(entry=>entry.isIntersecting)){ seen.disconnect(); play(); } },{threshold:.6});
+  seen.observe(card);
+  setTimeout(()=>seen.disconnect(),10*60*1000);
 }
 // The bottom bar always says what happens next, in the person's own terms.
 // The bar speaks only when it has something to say: what to do first, or
@@ -505,7 +513,10 @@ function renderSaveState() {
   $('#reminder-count').textContent = dailyOnly ? '仅显示' : `${Object.values(settings.events).filter(pref=>pref.mode==='remind').length} 项提醒`;
   $('#daily-date-count').hidden=!settings.includeDailyDates || !count;
   $('#subscribe').setAttribute('aria-busy',String(requestPending||managementRestoring));
-  $('#save-state').textContent = stopped ? '已停用，请在手机移除订阅日历' : conflict ? '设置已在其他设备修改' : changed ? '有改动，保存后同步到日历' : subscription ? '已同步到日历，改动会自动更新' : nextStepText();
+  // Right after adding, the bar (where the eye already is) says so plainly.
+  const fresh = subscription && !changed && !stopped && !conflict && justAddedUntil > Date.now();
+  $('#save-state').textContent = stopped ? '已停用，请在手机移除订阅日历' : conflict ? '设置已在其他设备修改' : changed ? '有改动，保存后同步到日历' : fresh ? '已加入日历，正在同步' : subscription ? '已同步到日历，改动会自动更新' : nextStepText();
+  $('#save-state').classList.toggle('is-fresh', Boolean(fresh));
   $('#subscribe-label').textContent = managementRestoring ? '正在恢复订阅…' : requestPending ? '正在保存…' : subscription ? (changed ? '保存修改' : '我的订阅') : deviceLabel();
   for(const input of document.querySelectorAll('input[name="title-marks"]')) input.checked=input.value===(settings.titleMarks||'none');
   // While saving or restoring, the button shows it and opens the panel with
