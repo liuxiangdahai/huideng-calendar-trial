@@ -1292,3 +1292,62 @@ body[data-page="subscribe"] [data-page-part="home"] { display: none !important; 
 }
 @media (max-height: 560px) { #zone-dialog :is(.zone-why, #zone-result-status) { display: none; } }
 .category-heading .text-button { min-height: 46px; }
+.daily-calendar-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 14px; }
+.daily-calendar-actions>* { flex: 1 1 220px; justify-content: center; min-height: 48px; white-space: nowrap; }
+.daily-calendar-actions>a#daily-calendar-apple { border-color: var(--eave); color: var(--eave); background: var(--surface); font-weight: 600; }
+#daily-calendar-copy { background: var(--surface); }
+.daily-calendar-how { margin: 0 0 12px !important; padding-top: 10px; border-top: 1px solid #e2cfa6; color: var(--ink-2) !important; font-size: var(--fs-sm); line-height: 1.8; }
+.daily-calendar-how b { color: var(--wine); font-weight: 600; }
+.daily-calendar-actions>[hidden] { display: none; }
+#time-choice-note { margin-left: auto; padding-left: 12px; white-space: nowrap; }
+
+/* ── 更多设置 · one ledger (11-12) ───────────────────────────────────────
+   Secondary settings stay quiet: one kind of row, a gold hairline between
+   rows, the current value on the right. Painted eave red still means
+   "chosen": a category's emblem turns dark only when something in it is
+   picked. The closed summary names what is set; anything changed from the
+   default is in red. */
+.advanced-settings>summary small em { font-style: normal; color: var(--red); }
+#groups .group-card { border-bottom-color: #eadcc0; }
+#groups .group-card:first-child { border-top-color: #eadcc0; }
+#groups .group-icon, #groups .group-card[open] .group-icon { width: 38px; height: 38px; background: #fbf5ea; box-shadow: inset 0 0 0 1px #e2cfa6; color: var(--wine); }
+#groups .group-card.has-selected .group-icon { background: var(--eave); box-shadow: 0 0 0 2px #fbf5ea, 0 0 0 3px #d9bf8c; color: #ecd6a6; }
+#groups .group-count.has-selected { padding: 0; border-radius: 0; background: none; box-shadow: none; color: var(--wine); font-weight: 600; }
+#groups .group-count { font-size: var(--fs-sm); }
+.advanced-other { margin: 26px 0 8px; }
+.advanced-other-title { display: flex; align-items: center; gap: 8px; margin: 0 0 6px; font: 600 var(--fs-base)/1.5 var(--font-serif); letter-spacing: 1px; color: var(--ink); }
+.advanced-other-title::before { content: ""; flex: none; width: 6px; height: 6px; background: var(--gold-2); transform: rotate(45deg); }
+.ledger-row { position: relative; display: flex; align-items: center; gap: 12px; min-height: 58px; margin: 0; padding: 4px 6px 4px 8px; border: 0; border-bottom: 1px solid #eadcc0; border-radius: 0; background: none; }
+.advanced-other>.ledger-row:first-of-type { border-top: 1px solid #eadcc0; }
+.ledger-row>[data-icon] { display: grid; place-items: center; flex: none; width: 22px; color: var(--wine); }
+.ledger-row>[data-icon] .icon { width: 20px; height: 20px; }
+.ledger-name { flex: 1; min-width: 0; font-size: var(--fs-base); color: var(--ink); }
+.ledger-value { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0; border: 0; background: none; color: var(--ink-2); font: inherit; font-size: var(--fs-md); text-align: right; cursor: pointer; }
+.ledger-value .icon { flex: none; width: 16px; height: 16px; color: var(--control); transition: transform .2s; }
+/* The whole row answers a tap, not only the words on the right. */
+.advanced-region .ledger-value::after { content: ""; position: absolute; inset: 0; }
+@media (hover: hover) { .ledger-row:hover { background: var(--surface-2); } }
+.title-marks-row>summary { list-style: none; cursor: pointer; }
+.title-marks-row>summary::-webkit-details-marker { display: none; }
+.title-marks-row[open]>summary { border-bottom-color: transparent; }
+.title-marks-row[open]>summary .ledger-value .icon { transform: rotate(180deg); }
+.title-marks-row[open] { border-bottom: 1px solid #eadcc0; }
+.title-marks-row .title-marks { margin: 0 0 8px; padding: 0 6px 0 8px; border: 0; }
+.title-marks-row .title-marks label { gap: 14px; }
+.title-marks-row .title-marks label, .title-marks-row .title-marks label:has(input:checked), .title-marks-row .title-marks label:hover:not(:has(input:checked)) { align-items: flex-start; min-height: 0; margin: 0; padding: 10px 0; border: 0; border-radius: 0; background: none; box-shadow: none; color: var(--ink); }
+.title-marks-row .title-marks input { appearance: none; -webkit-appearance: none; flex: none; width: 20px; height: 20px; margin: 2px 0 0; border: 1.5px solid var(--control); border-radius: 50%; background: var(--surface); cursor: pointer; }
+.title-marks-row .title-marks input:checked { border-color: var(--eave); background: var(--eave) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ecd6a6' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 12.5 4 4L18 8'/%3E%3C/svg%3E") center/14px no-repeat; }
+.title-marks-row .title-marks input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.title-marks-row .title-marks strong { font-weight: 600; }
+.title-marks-row .title-marks label:has(input:checked) strong { color: var(--wine); }
+.title-marks-row .title-marks label small, .title-marks-row .title-marks label:has(input:checked) small { color: var(--muted); font-size: var(--fs-sm); line-height: 1.6; }
+
+/* Computers (11-12): the month stays in view beside a long left column; the
+   next-days card waits at the column's foot. */
+@media (min-width: 1024px) {
+  .workspace>.preview-column { align-self: stretch; display: flex; flex-direction: column; }
+  .preview-stick { flex: 1 0 auto; }
+  .preview-stick>.desk-page { position: sticky; top: var(--stick-top, 16px); z-index: 1; }
+  .preview-column.can-stick { position: static; }
+}
+@media (min-width: 1024px) and (max-height: 600px) { .preview-stick>.desk-page { position: relative; } }
