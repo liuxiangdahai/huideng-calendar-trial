@@ -5,8 +5,8 @@ import {parseMonthPage, assertCompleteMonth, diffSource, mergeSource} from '../.
 import {getTibetanDate} from '../../static/calendar-reminders/engine.mjs';
 
 const read = file => JSON.parse(readFileSync(file, 'utf8'));
-const existing = read('data/calendar/fohui-dates.json'), catalog = read('data/calendar/catalog.json');
-const ledger = read('data/calendar/published-record-ids.json');
+const {source:existing,ledger} = read('tests/fixtures/fohui-baseline.json');
+const catalog = read('data/calendar/catalog.json');
 const esc = value => value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const page = days => `<table>${days.map(day => `<td class="cal_dayshasevents today"><a class="cal_daylink"> ${Number(day.date.slice(8))}</a>` +
   `<a class="eventfull ev" title="${esc('藏历：' + day.tibetan)}" data-content="${esc(day.labels.join('<br>'))}">x</a></td>`).join('')}</table>`;
@@ -81,4 +81,41 @@ test('an explicitly confirmed withdrawal keeps its ID reserved', () => {
   const merged = mergeSource({existing, incoming, snapshots: [], ledger, changes, retrievedOn: '2026-11-08', acceptRemovals: true});
   assert.ok(!merged.ledger.records.some(r => r.recordId === record.recordId));
   assert.equal(merged.ledger.withdrawn[0].recordId, record.recordId);
+});
+
+test('a restored occurrence reuses its reserved ID and repeated import adds nothing', () => {
+  const record = ledger.records.find(r => r.date.startsWith('2027-03'));
+  const incoming = month(2027,3);
+  incoming.find(d=>d.date===record.date).labels = incoming.find(d=>d.date===record.date).labels.filter(l=>l!==record.sourceLabel);
+  const removed=diffSource({existing,incoming,catalog,ledger});
+  const previous=mergeSource({existing,incoming,snapshots:[],ledger,changes:removed,retrievedOn:'2026-11-09',acceptRemovals:true});
+  const restored=diffSource({existing:previous.source,incoming:month(2027,3),catalog,ledger:previous.ledger});
+  assert.equal(restored[0].kind,'restored'); assert.equal(restored[0].recordId,record.recordId);
+  const merged=mergeSource({existing:previous.source,incoming:month(2027,3),snapshots:[],ledger:previous.ledger,changes:restored,retrievedOn:'2026-11-10'});
+  assert.equal(merged.ledger.records.length,ledger.records.length); assert.equal(merged.ledger.withdrawn.length,0);
+  assert.deepEqual(diffSource({existing:merged.source,incoming:month(2027,3),catalog,ledger:merged.ledger}),[]);
+});
+
+test('ambiguous moves and missing IDs cannot silently allocate a different identity', () => {
+  const incoming=month(2027,3), record=ledger.records.find(r=>r.sourceLabel==='春分');
+  incoming.find(d=>d.date===record.date).labels=[];
+  for(const date of ['2027-03-20','2027-03-22'])incoming.find(d=>d.date===date).labels.push('春分');
+  assert.ok(diffSource({existing,incoming,catalog,ledger}).some(c=>c.kind==='ambiguous-move'&&c.blocking));
+  incoming.find(d=>d.date==='2027-03-22').labels=[];
+  assert.ok(diffSource({existing,incoming,catalog,ledger:{...ledger,records:[]}}).some(c=>c.kind==='missing-record-id'&&c.blocking));
+});
+
+test('a fixed observance disappearing is a reviewable withdrawal, not an unconfirmed move', () => {
+  const incoming=month(2027,3), day=incoming.find(d=>d.labels.includes('莲师荟供日'));
+  day.labels=day.labels.filter(l=>l!=='莲师荟供日');
+  assert.ok(diffSource({existing,incoming,catalog,ledger}).some(c=>c.kind==='removed'&&c.blocking));
+});
+
+test('invalid month dates, duplicate days, and duplicate source labels fail closed', () => {
+  assert.throws(()=>parseMonthPage('',2027,13),/年月/);
+  assert.throws(()=>assertCompleteMonth([{date:'2027-02-29'}],2027,2,{allowTrailing:true}),/无效日期/);
+  assert.throws(()=>assertCompleteMonth([{date:'2027-04-01'}],2027,3,{allowTrailing:true}),/其他月份/);
+  assert.throws(()=>diffSource({existing,incoming:[...month(2027,3),month(2027,3)[0]],catalog,ledger}),/重复公历/);
+  const incoming=month(2027,3);incoming[0].labels=['春分','春分'];
+  assert.throws(()=>parse(incoming,2027,3),/重复/);
 });

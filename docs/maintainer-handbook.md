@@ -12,13 +12,14 @@
 
 数据库里每份订阅的订阅地址都等于“钥匙”：拿到地址就能读到对方的日历。**导出或备份数据库时，文件绝不能提交进公开仓库，也不能不加密地放到任何公开位置。**
 
-## 2. 更新佛慧法语的法会日期（每年一次，最迟在资料到期前）
+## 2. 检查佛慧法语自动维护结果
 
-- 资料到期日看`data/calendar/fohui-dates.json`的`end`（当前到 2027-05-06）。过期后，荟供日等按规则推算的日子照常出现，但**法会起止日会从师兄的手机日历里消失**。
-- 佛慧法语不允许程序自动抓取，所以由人在浏览器里打开新月份页面，另存为 HTML，再运行：
-  `node tools/calendar/fohui-diff.mjs <保存页面的文件夹> --retrieved-on 保存当天日期(YYYY-MM-DD)`（先看差异），确认无误后加`--apply`合并。
-- 合并后照第 3 节发布。
-- 细节：`docs/calendar-source-update-proposal.md`。
+- 在仓库 Actions 中打开 **Fohui calendar source maintenance**，查看最近结果；长期记录在`docs/evidence/source-maintenance/latest-check.json`。
+- 每月一次，11、12月各加一次。原历无变化时只记录检查结果；完整、已知的未来新增日期通过校验和现有发布检查后更新到原订阅。
+- 若出现待核对PR，检查的是原文对应、稳定编号和资料完整性，不另改佛慧法语的安排；新名称或删除不能静默忽略。失败报告在每次运行的`source-maintenance`附件中。
+- 确认范围看`data/calendar/fohui-dates.json`的`end`（2026-11-09实查仍为2027-05-06）。范围以外，固定荟供等按既定规则生成；法会、天象没有新记录时仍为待确认。
+- 手动检查：Actions → Run workflow → `check`；需要更新和发布时选择`maintain`。备用：保存月份HTML后运行`node tools/calendar/fohui-diff.mjs <文件夹> --retrieved-on YYYY-MM-DD`，核对后加`--apply`，再按第3节发布。
+- 来源的robots限制、项目负责人的公开读取决定、故障处理与重新启用说明见`docs/calendar-source-update-proposal.md`。
 
 ## 3. 发布
 

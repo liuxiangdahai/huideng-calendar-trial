@@ -3,11 +3,12 @@
 //   node tools/calendar/fohui-diff.mjs <folder> --retrieved-on YYYY-MM-DD            # report only
 //   node tools/calendar/fohui-diff.mjs <folder> --retrieved-on YYYY-MM-DD --apply    # merge + record changes
 //   add --accept-removals only after confirming on 佛慧法语 that an occurrence was withdrawn.
-// Save pages from a normal browser (fohui-YYYY-M.html). This tool never fetches the site:
-// the source's robots rules do not permit automated crawling.
+// Offline fallback for saved pages (fohui-YYYY-M.html). The separately authorized
+// scheduled collector is fohui-maintain.mjs; this command itself never fetches.
 import fs from 'node:fs';
 import path from 'node:path';
 import {parseMonthPage, assertCompleteMonth, monthFile, diffSource, mergeSource} from './fohui-source.mjs';
+import {factsDigest} from './fohui-maintenance-core.mjs';
 
 const args = process.argv.slice(2);
 const folder = path.resolve(args.find(a => !a.startsWith('--') && !/^\d{4}-\d{2}-\d{2}$/.test(a)) || '');
@@ -32,6 +33,10 @@ const report = {retrievedOn, months: snapshots.map(s => s.url), range: [incoming
 console.log(JSON.stringify(report, null, 2));
 if (!flag('--apply')) process.exit(changes.some(c => c.blocking) ? 2 : 0);
 const merged = mergeSource({existing, incoming, snapshots, ledger, changes, retrievedOn, acceptRemovals: flag('--accept-removals')});
+if (factsDigest(merged.source.days) === factsDigest(existing.days)) {
+  console.error('原历事实没有变化，未改写资料日期、记录或发布版本。');
+  process.exit(0);
+}
 fs.writeFileSync('data/calendar/fohui-dates.json', JSON.stringify(merged.source, null, 2) + '\n');
 fs.writeFileSync('data/calendar/published-record-ids.json', JSON.stringify(merged.ledger, null, 2) + '\n');
 const logFile = 'data/calendar/fohui-changes.json';

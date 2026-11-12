@@ -1,0 +1,325 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-11-09T02:27:50.741Z",
+  "status": "unchanged",
+  "automaticEligible": false,
+  "before": {
+    "start": "2026-01-01",
+    "end": "2027-05-06",
+    "days": 491,
+    "factsSha256": "dc48d245fef62e5334b86b3b0ab350316ab3f5e764a6e6e8270db09b7004490e"
+  },
+  "candidateRange": [
+    "2026-01-01",
+    "2027-05-06"
+  ],
+  "newDays": 0,
+  "editedDays": 0,
+  "policy": {
+    "allowed": false,
+    "publicReadAuthorized": true,
+    "checkedAt": "2026-11-09T02:27:51.773Z",
+    "url": "https://www.fohuifayu.com/robots.txt",
+    "sha256": "eff9ff6649abe2d1d91ff209c128bb72c5580782a2f6553f01805921b84de55a",
+    "delayMs": 5000,
+    "path": "/index.php/calendar/monthcalendar/2026/1/-"
+  },
+  "observations": [
+    {
+      "month": "2026-01",
+      "days": 31,
+      "state": "complete",
+      "sha256": "741dbba43479a86f7b72bf9153a59ad091dbb4ad021ccd7834ee9750149be0ae",
+      "cached": false
+    },
+    {
+      "month": "2026-02",
+      "days": 28,
+      "state": "complete",
+      "sha256": "a56a4f184a9c28eaa37883bdf26620284dfc1ca3e40096674e92fe57d10bc5ad",
+      "cached": false
+    },
+    {
+      "month": "2026-03",
+      "days": 31,
+      "state": "complete",
+      "sha256": "ac50c4672f459bb983464a608677fdc3e90179872b97c3be4d25b87a422f5770",
+      "cached": false
+    },
+    {
+      "month": "2026-04",
+      "days": 30,
+      "state": "complete",
+      "sha256": "cc1bc07a3572637b176895f61c03a3cf11d8ad56331b3a8becfe3fe62402cd9a",
+      "cached": false
+    },
+    {
+      "month": "2026-05",
+      "days": 31,
+      "state": "complete",
+      "sha256": "8e6d57079de25aceb1e1f91adcd3489bd5cf080e0eaf4213e2f469c97067410b",
+      "cached": false
+    },
+    {
+      "month": "2026-06",
+      "days": 30,
+      "state": "complete",
+      "sha256": "8557f5dbd6a8bd0f7d2385cfa03475b09a76aaa7413a323754ae0d6d6356f441",
+      "cached": false
+    },
+    {
+      "month": "2026-07",
+      "days": 31,
+      "state": "complete",
+      "sha256": "30a370bfe78a2412250ce74fb16ad22253034350016f9e49382552e6d96afcfd",
+      "cached": false
+    },
+    {
+      "month": "2026-08",
+      "days": 31,
+      "state": "complete",
+      "sha256": "0ededf796b8ee8082622c9384df3210f900139bf7e1df8fb56a7266dcb902a94",
+      "cached": false
+    },
+    {
+      "month": "2026-09",
+      "days": 30,
+      "state": "complete",
+      "sha256": "87de71a7bec83cab65b2df3f806df4bc6ecc3e7d8f32f3cf17d63c40ee5365fa",
+      "cached": false
+    },
+    {
+      "month": "2026-10",
+      "days": 31,
+      "state": "complete",
+      "sha256": "2662d08d5b85d6534b0daefebe18f36b8cbd1cc570967bbccdaeae624c39a57e",
+      "cached": false
+    },
+    {
+      "month": "2026-11",
+      "days": 30,
+      "state": "complete",
+      "sha256": "8ed1a8066340e854772e8d9d19657fa0a42a6aeda6484e5f463c8b62e3d83009",
+      "cached": false
+    },
+    {
+      "month": "2026-12",
+      "days": 31,
+      "state": "complete",
+      "sha256": "0acd5b66330c4597750603804627b5b66f51963e4457948eb053801ec0089f85",
+      "cached": false
+    },
+    {
+      "month": "2027-01",
+      "days": 31,
+      "state": "complete",
+      "sha256": "1679a54b5eae81d42332d6fe6307807f0b77ae002c318323788cb5f853a357f8",
+      "cached": false
+    },
+    {
+      "month": "2027-02",
+      "days": 28,
+      "state": "complete",
+      "sha256": "6b664afb99f6a354e4ab8c24ebf586cb5c0be6234630ecca4c3acd593f3dac7c",
+      "cached": false
+    },
+    {
+      "month": "2027-03",
+      "days": 31,
+      "state": "complete",
+      "sha256": "eebe0d286918c86c0aac427bf59801c82fd855aefdc99fdaa29f8ea684938281",
+      "cached": false
+    },
+    {
+      "month": "2027-04",
+      "days": 30,
+      "state": "complete",
+      "sha256": "fe047fdaec7c7e7a4d587f1993c872d5997357a48b58553c6a008af7126ee672",
+      "cached": false
+    },
+    {
+      "month": "2027-05",
+      "days": 6,
+      "state": "partial",
+      "sha256": "906e003ba13c880763162bace741601cc3222236c6119242aa65d2af0e3819fb",
+      "cached": false
+    },
+    {
+      "month": "2027-06",
+      "days": 0,
+      "state": "unpublished",
+      "sha256": "e2570ed8f0a52dde8c32fd2e53c0b9c77ac1d9bc665ca3c49a40680f2682ebc1",
+      "cached": false
+    },
+    {
+      "month": "2027-07",
+      "days": 0,
+      "state": "unpublished",
+      "sha256": "5333159216d021c72df0beb6d6e869d42bd47b68bb9a8bea1166dd86e8659882",
+      "cached": false
+    },
+    {
+      "month": "2027-08",
+      "days": 0,
+      "state": "unpublished",
+      "sha256": "8d3828ec52dd62b6385bbdce5d378699ff240475e7e63160f515289720b50827",
+      "cached": false
+    },
+    {
+      "month": "2027-09",
+      "days": 0,
+      "state": "unpublished",
+      "sha256": "1f9c94b8188a363f918f52ad950277ed728a759f1099b788cccb955285560ea0",
+      "cached": false
+    },
+    {
+      "month": "2027-10",
+      "days": 0,
+      "state": "unpublished",
+      "sha256": "ee5d99e0dcc5cae467c6ac49c40484abcf11771f086f5e4bc7dc59b9cc56a092",
+      "cached": false
+    },
+    {
+      "month": "2027-11",
+      "days": 0,
+      "state": "unpublished",
+      "sha256": "93b47dd4083424c72a6f96df57ab7ec647dcc12d047d6c1d0fb7b6873ed2e02b",
+      "cached": false
+    },
+    {
+      "month": "2027-12",
+      "days": 0,
+      "state": "unpublished",
+      "sha256": "c4bea3a9eb476bc106dca3c3faf8e26ab3cea951213aa832973fc004db19c62f",
+      "cached": false
+    }
+  ],
+  "requests": [
+    {
+      "url": "https://www.fohuifayu.com/robots.txt",
+      "attempt": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/1/-",
+      "attempt": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/2/-",
+      "attempt": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/3/-",
+      "attempt": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/4/-",
+      "attempt": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/5/-",
+      "attempt": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/6/-",
+      "attempt": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/7/-",
+      "attempt": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/8/-",
+      "attempt": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/9/-",
+      "attempt": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/10/-",
+      "attempt": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/11/-",
+      "attempt": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2026/12/-",
+      "attempt": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/1/-",
+      "attempt": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/2/-",
+      "attempt": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-",
+      "attempt": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-",
+      "attempt": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/5/-",
+      "attempt": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/6/-",
+      "attempt": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/7/-",
+      "attempt": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/8/-",
+      "attempt": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/9/-",
+      "attempt": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/10/-",
+      "attempt": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/11/-",
+      "attempt": 1,
+      "status": 200
+    },
+    {
+      "url": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/12/-",
+      "attempt": 1,
+      "status": 200
+    }
+  ],
+  "changes": []
+}

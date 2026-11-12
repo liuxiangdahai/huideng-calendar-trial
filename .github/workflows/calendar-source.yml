@@ -1,0 +1,72 @@
+name: Fohui calendar source maintenance
+on:
+  schedule:
+    # Monthly, with one extra check in November and December. UTC 19:23 = 03:23 Beijing.
+    - cron: '23 19 1 * *'
+    - cron: '23 19 15 11,12 *'
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: '只核对来源，或核对并交给现有发布流程'
+        type: choice
+        default: check
+        options: [check, maintain]
+permissions:
+  contents: read
+concurrency:
+  group: fohui-source-maintenance
+  cancel-in-progress: false
+jobs:
+  source:
+    if: github.repository == 'liuxiangdahai/huideng-calendar-trial'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Validate collection and maintenance before accessing the source
+        run: node --test tests/build/fohui-*.test.mjs
+      - name: Reuse verified conditional-request cache
+        uses: actions/cache@v4
+        with:
+          path: artifacts/source-maintenance/cache.json
+          key: fohui-source-v1-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: fohui-source-v1-
+      - name: Collect and stage complete candidate facts
+        id: source
+        run: node tools/calendar/fohui-maintain.mjs --apply
+      - name: Verify candidate dates, engine and subscription behavior
+        if: steps.source.outputs.candidate == 'true'
+        run: npm run check:calendar
+      - name: Open a checked data PR and publish only an unambiguous future extension
+        if: steps.source.outputs.candidate == 'true' && github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || inputs.operation == 'maintain')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node tools/calendar/fohui-publish.mjs
+      - name: Record human-readable result
+        if: always()
+        run: node tools/calendar/fohui-summary.mjs
+      - name: Preserve the monthly maintenance receipt without changing calendar data
+        if: always() && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node tools/calendar/fohui-receipt.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: source-maintenance
+          path: |
+            artifacts/source-maintenance/report.json
+            artifacts/source-maintenance/observations.json
+            artifacts/source-maintenance/candidate.json
+            artifacts/source-maintenance/publication.json
+            artifacts/source-maintenance/robots.txt
+          retention-days: 30
