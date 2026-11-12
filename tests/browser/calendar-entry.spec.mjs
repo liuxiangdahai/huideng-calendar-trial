@@ -64,7 +64,7 @@ async function ready(page, local = false) {
   await expect(page.locator('#subscription-existing')).toBeVisible();
   await expect(page.locator('#copy-feed')).toBeEnabled();
   await expect(page.locator('#feed-url')).toHaveValue(local ? /^http:\/\/127\.0\.0\.1:4173\/calendar\/.+\.ics$/ : /^https:\/\/calendar\.example\/calendar\/.+\.ics$/);
-  await expect(page.locator('#subscription-status')).toContainText('设置已保存');
+  await expect(page.locator('#subscription-status')).toContainText('已保存');
   return read(page);
 }
 
@@ -216,7 +216,7 @@ test('Android handoff keeps copy and import available while actual ICS checks fa
     await expect.poll(()=>Boolean(releaseCheck)).toBe(true);
     await page.locator('[data-close="subscription-dialog"]').first().click();
     await page.locator('[data-preset="tsok"]').click();await page.locator('#subscribe').click();
-    await expect(page.locator('#connection-title')).toHaveText('设置已保存，等待日历同步');
+    await expect(page.locator('#connection-title')).toHaveText('已保存，日历会自己更新');
     releaseCheck();
     await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
     await expect(page.locator('#connection-result')).not.toContainText('失败');

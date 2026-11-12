@@ -88,13 +88,9 @@ test('after subscribing, the page opens on a sync status with the next reminder;
   await page.keyboard.press('Escape');
   await expect(page.locator('#subscribed-card')).toBeVisible();
   await expect(page.locator('#subscribed-next')).toContainText('下次提醒');
-  // Right after adding the page stays put: the bar says it where the eye is.
-  await expect(page.locator('#save-state')).toHaveText('已加入日历，正在同步');
-  // The card welcomes once when it comes into view, then reads as every day.
-  await page.locator('#subscribed-card').scrollIntoViewIfNeeded();
-  await expect(page.locator('#subscribed-title')).toHaveText('已加入日历 · 正在同步');
-  await expect(page.locator('#subscribed-title')).toHaveText('我的订阅 · 已在同步');
-  await expect(page.locator('#save-state')).toHaveText('已同步到日历，改动会自动更新',{timeout:10000});
+  // After adding, the page stays put and says it simply (11-12): no replay.
+  await expect(page.locator('#save-state')).toHaveText('已保存，日历会自己更新');
+  await expect(page.locator('#subscribed-title')).toHaveText('我的订阅 · 日历会自己更新');
   const feedUrl=await page.evaluate(()=>JSON.parse(localStorage.getItem('huideng.calendar.subscription')).feedUrl);
   const text=await (await request.get(feedUrl)).text();
   const titles=new ICAL.Component(ICAL.parse(text)).getAllSubcomponents('vevent').map(e=>e.getFirstPropertyValue('summary'));
@@ -107,7 +103,7 @@ test('after subscribing, the page opens on a sync status with the next reminder;
   // The card keeps its place and says what to do; it must not vanish and pop back.
   await expect(page.locator('#subscribed-card')).toBeVisible();
   await expect(page.locator('#subscribed-title')).toHaveText('有改动还没保存');
-  await expect(page.locator('#subscribed-when')).toContainText('几个小时内跟着更新');
+  await expect(page.locator('#subscribed-when')).toContainText('日历会自己更新');
   // How slow some calendars are, and what to do when nothing rings, is in the window.
   await expect(page.locator('#manage-help')).toContainText('个别要等到第二天');
   await page.locator('#subscribe').click();
@@ -158,10 +154,10 @@ for (const viewport of [{width:390,height:844},{width:1366,height:900}]) test(`w
     await page.locator('input[name="device"][value="other"]').check();
     await expect(page.locator('#copy-feed')).toBeVisible();
     await page.keyboard.press('Escape');
-    await expect(page.locator('#subscribed-title')).toHaveText('我的订阅 · 已在同步');
+    await expect(page.locator('#subscribed-title')).toHaveText('我的订阅 · 日历会自己更新');
     const top=()=>page.locator('#preset-options').evaluate(node=>Math.round(node.getBoundingClientRect().top+scrollY));
     const start=await top();
-    for (const [preset,title] of [['practice','有改动还没保存'],['tsok','我的订阅 · 已在同步'],['guru','有改动还没保存'],['tsok','我的订阅 · 已在同步']]) {
+    for (const [preset,title] of [['practice','有改动还没保存'],['tsok','我的订阅 · 日历会自己更新'],['guru','有改动还没保存'],['tsok','我的订阅 · 日历会自己更新']]) {
       await page.locator(`[data-preset="${preset}"]`).click();
       await expect(page.locator('#subscribed-title')).toHaveText(title);
       expect(await top(),`${viewport.width}px after ${preset}`).toBe(start);

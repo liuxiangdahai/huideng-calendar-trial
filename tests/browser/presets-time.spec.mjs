@@ -42,8 +42,8 @@ test('presets replace choices without undo and clearing preserves local timezone
 test('preset saves retain feed URL, remind only on tsok days and clocks remain UI only',async({page,request})=>{
   await open(page);await page.locator('[data-preset="guru"]').click();await page.locator('#subscribe').click();await page.locator('input[name="device"][value="iphone"]').check();await expect(page.locator('#feed-url')).not.toHaveValue('');const original=await creds(page);await page.locator('[data-close="subscription-dialog"]').first().click();
   await expect(page.locator('#time-comparison')).toContainText('设备与提醒时间');await expect(page.locator('#zone-summary')).toContainText('北京时间 · UTC+08:00');
-  await page.locator('[data-preset="practice"]').click();await expect(page.locator('#save-state')).toContainText('保存后');expect((await creds(page)).revision).toBe(original.revision);
-  await page.locator('#clear-selection').click();await expect(page.locator('#selection-count')).toHaveText('已选 0 项');await expect(page.locator('#save-state')).toContainText('保存后');
+  await page.locator('[data-preset="practice"]').click();await expect(page.locator('#save-state')).toContainText('保存修改');expect((await creds(page)).revision).toBe(original.revision);
+  await page.locator('#clear-selection').click();await expect(page.locator('#selection-count')).toHaveText('已选 0 项');await expect(page.locator('#save-state')).toContainText('保存修改');
   expect((await creds(page)).revision).toBe(original.revision);expect((await creds(page)).feedUrl).toBe(original.feedUrl);
   const remote=await (await request.get(`/api/subscriptions/${original.id}`,{headers:{Authorization:`Bearer ${original.manageToken}`}})).json();
   expect(remote.revision).toBe(original.revision);expect(remote.settings).toEqual(original.savedSettings);

@@ -34,7 +34,7 @@ const creationKey = 'huideng.calendar.creation';
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 const defaultReminders = () => [{daysBefore:0,time:'08:00'}];
 const readStored = key => { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } };
-let data, settings, subscription = null, apiBaseUrl = '', upcoming = [], pendingWelcome = false, justAddedUntil = 0;
+let data, settings, subscription = null, apiBaseUrl = '', upcoming = [];
 let calendarView,zonePicker,guide,ui={},observedZone='',today='',dayTimer;
 let reminderTarget = [], reminderDraft, reminderReturnSelector, requestPending = false, conflict = false, stopped = false;
 let openGroups = new Set(['tsok']), lastActive = new Map();
@@ -424,12 +424,11 @@ function renderSubscribedCard() {
     $('#subscribed-day').textContent=day;
     $('#subscribed-date').textContent=`${month}月 周${'日一二三四五六'[new Date(next.date+'T12:00:00Z').getUTCDay()]}`;
   }
-  const added=card.classList.contains('is-new');
-  $('#subscribed-title').textContent=changed ? '有改动还没保存' : added ? '已加入日历 · 正在同步' : '我的订阅 · 已在同步';
+  $('#subscribed-title').textContent=changed ? '有改动还没保存' : '我的订阅 · 日历会自己更新';
   if(changed){
     // Short enough to keep the card's height: the choices below must not move.
-    $('#subscribed-next').textContent='点“保存修改”后同步';
-    $('#subscribed-when').textContent='日历一般几个小时内跟着更新';
+    $('#subscribed-next').textContent='点“保存修改”后生效';
+    $('#subscribed-when').textContent='保存后，日历会自己更新';
     return;
   }
   if(!next){ $('#subscribed-next').textContent='目前没有即将到来的修行日'; $('#subscribed-when').textContent='新的日子会自动加入日历'; return; }
@@ -438,26 +437,6 @@ function renderSubscribedCard() {
   const remind=next.preference?.mode==='remind';
   $('#subscribed-next').textContent=`${remind?'下次提醒':'下一个修行日'} ${next.title}`;
   $('#subscribed-when').textContent=remind ? `${reminderLabel(next.preference.reminders)} · ${left}` : `只显示，不响铃 · ${left}`;
-}
-// Right after the first add (11-12). The page does not jump: the bottom bar,
-// where the eye already is, says 已加入日历 with a gilt check for a few
-// seconds. The card at the top welcomes once, the moment it is in view (now,
-// or when the person scrolls back up): it unrolls from under the masthead,
-// its knot draws in gilt and it reads 已加入日历 · 正在同步 in large type.
-function welcomeSubscription() {
-  const card=$('#subscribed-card');
-  if(card.hidden) return;
-  justAddedUntil=Date.now()+8000; renderSaveState();
-  setTimeout(renderSaveState,8100);
-  const play=()=>{
-    card.classList.add('is-new'); renderSubscribedCard();
-    playSymbol(card.querySelector('.sub-knot svg'));
-    setTimeout(()=>{ card.classList.remove('is-new'); renderSubscribedCard(); },4200);
-  };
-  if(!('IntersectionObserver' in window)) return play();
-  const seen=new IntersectionObserver(entries=>{ if(entries.some(entry=>entry.isIntersecting)){ seen.disconnect(); play(); } },{threshold:.6});
-  seen.observe(card);
-  setTimeout(()=>seen.disconnect(),10*60*1000);
 }
 // The bottom bar always says what happens next, in the person's own terms.
 // The bar speaks only when it has something to say: what to do first, or
@@ -513,10 +492,7 @@ function renderSaveState() {
   $('#reminder-count').textContent = dailyOnly ? '仅显示' : `${Object.values(settings.events).filter(pref=>pref.mode==='remind').length} 项提醒`;
   $('#daily-date-count').hidden=!settings.includeDailyDates || !count;
   $('#subscribe').setAttribute('aria-busy',String(requestPending||managementRestoring));
-  // Right after adding, the bar (where the eye already is) says so plainly.
-  const fresh = subscription && !changed && !stopped && !conflict && justAddedUntil > Date.now();
-  $('#save-state').textContent = stopped ? '已停用，请在手机移除订阅日历' : conflict ? '设置已在其他设备修改' : changed ? '有改动，保存后同步到日历' : fresh ? '已加入日历，正在同步' : subscription ? '已同步到日历，改动会自动更新' : nextStepText();
-  $('#save-state').classList.toggle('is-fresh', Boolean(fresh));
+  $('#save-state').textContent = stopped ? '已停用，请在手机移除订阅日历' : conflict ? '设置已在其他设备修改' : changed ? '有改动，记得保存修改' : subscription ? '已保存，日历会自己更新' : nextStepText();
   $('#subscribe-label').textContent = managementRestoring ? '正在恢复订阅…' : requestPending ? '正在保存…' : subscription ? (changed ? '保存修改' : '我的订阅') : deviceLabel();
   for(const input of document.querySelectorAll('input[name="title-marks"]')) input.checked=input.value===(settings.titleMarks||'none');
   // While saving or restoring, the button shows it and opens the panel with
@@ -607,7 +583,7 @@ function resetConnection() {
 function renderConnection() {
   const busy=requestPending||managementRestoring;
   const title=busy ? (managementRestoring ? '正在恢复订阅' : subscription ? '正在保存设置' : '正在准备订阅') : stopped ? '已停用' :
-    !subscription ? '尚未准备' : lastWriteKind==='saved' ? '设置已保存，等待日历同步' : '地址已生成';
+    !subscription ? '尚未准备' : lastWriteKind==='saved' ? '已保存，日历会自己更新' : '地址已生成';
   $('#connection-title').textContent=title;
   const checking=connection.state==='checking';
   const connectionPanel=$('#connection-status');
@@ -668,7 +644,7 @@ function renderSubscription() {
   $('#entry-title').lastChild.textContent=managing ? '订阅地址' : '添加到日历';
   if(managing){
     $('#manage-title').lastChild.textContent=stopped ? '这份订阅已停用' : conflict ? '设置已在其他设备修改' : dirty() ? '有改动尚未保存' : '已加入日历，正在同步';
-    $('#manage-next').textContent=dirty() ? `保存后订阅地址不变。${UPDATE_PACE}` : nextReminderText();
+    $('#manage-next').textContent=dirty() ? '保存后，日历会自己更新' : nextReminderText();
   }
   $('#subscription-new').hidden = Boolean(subscription);
   $('#subscription-existing').hidden = !subscription;
@@ -679,7 +655,7 @@ function renderSubscription() {
   $('#reload-subscription').hidden = !conflict;
   if (subscription) {
     $('#feed-url').value = subscription.feedUrl;
-    $('#subscription-status').textContent = dirty() ? '当前修改尚未保存；日历仍使用上次保存的设置。' : '设置已保存，等待日历同步。订阅地址保持不变。';
+    $('#subscription-status').textContent = dirty() ? '当前修改尚未保存；日历仍使用上次保存的设置。' : '已保存，日历会自己更新';
   }
   const downloadable=downloadOccurrences();
   $('#downloads').innerHTML = ['remind','display'].map(mode => {
@@ -761,8 +737,6 @@ function acceptRemote(result, force = false) {
   if(result.id && result.id!==subscription?.id) guide?.resetConfirmations();
   if(subscription && (result.id && result.id!==subscription.id || result.revision!==subscription.revision || feedUrl!==subscription.feedUrl)) {resetConnection();lastWriteKind='';}
   if (force || !dirty()) {settings = clone(remote);}
-  // A brand-new subscription gets its welcome when the window closes.
-  if(!subscription?.id && result.id) pendingWelcome=true;
   subscription = {...subscription,id:result.id || subscription?.id,manageToken:result.manageToken || subscription?.manageToken,
     feedUrl,revision:result.revision,savedSettings:remote};
   conflict = false; stopped = false; refresh(); renderSubscription();
@@ -826,7 +800,7 @@ async function performSaveSubscription(create) {
     if (changedDuringSave) {
       settings = latestDraft; refresh(); renderSubscription();
       notify('已保存上次提交的设置；后续修改仍待保存。');
-    } else notify(`已保存。${UPDATE_PACE}`);
+    } else notify('已保存，日历会自己更新');
   } catch (error) { showSubscriptionError(error); }
   finally {
     requestPending = false; renderSubscription();
@@ -907,7 +881,7 @@ function attachEvents() {
       for(const [id,pref] of Object.entries(settings.events)){ if(pref.mode!=='off')lastActive.set(id,clone(pref)); pref.mode='off'; }
       stopped=false;refresh();
       $('#preset-options').querySelector(`[data-preset="${button.dataset.preset}"]`)?.focus({preventScroll:true});
-      notify(subscription?'已取消这个方案；保存修改后更新日历。':'已取消这个方案。',()=>restoreSnapshot(before,'已恢复之前的选择。'));
+      notify(subscription?'已取消这个方案，记得保存修改':'已取消这个方案。',()=>restoreSnapshot(before,'已恢复之前的选择。'));
       return;
     }
     const next=applyPreset(settings,data.catalog,button.dataset.preset);
@@ -931,11 +905,10 @@ function attachEvents() {
     stopped=false;refresh();
     button.focus({preventScroll:true});playMotion(button,'check');playSymbol(button.querySelector('svg'));
     button.classList.remove('play'); void button.offsetWidth; button.classList.add('play');
-    notify(subscription?'提醒时间已改；保存修改后同步到日历。':`所有提醒改为${reminderLabel([{daysBefore:Number(daysBefore),time}])}。`);
+    notify(subscription?'提醒时间已改，记得保存修改':`所有提醒改为${reminderLabel([{daysBefore:Number(daysBefore),time}])}。`);
   });
   $('#share-settings').addEventListener('click',openShare);
   $('#subscribed-open').addEventListener('click',()=>openSubscription());
-  $('#subscription-dialog').addEventListener('close',()=>{ if(!pendingWelcome) return; pendingWelcome=false; if(page==='subscribe') welcomeSubscription(); });
   $('#manage-share').addEventListener('click',()=>openShare());
   $('#manage-add').addEventListener('click',()=>{
     const dialog=$('#subscription-dialog'), show=!dialog.classList.contains('show-add');
@@ -945,7 +918,7 @@ function attachEvents() {
   for(const input of document.querySelectorAll('input[name="title-marks"]')) input.addEventListener('change',()=>{
     if(input.value==='none') delete settings.titleMarks; else settings.titleMarks=input.value;
     stopped=false;refresh(false);
-    notify(subscription?'标记样式已改；保存修改后，日历下次同步时更新。':'标记样式已改。');
+    notify(subscription?'标记样式已改，记得保存修改':'标记样式已改。');
   });
   // Inside WeChat the 藏历 page reads as anywhere else; the way to a browser is
   // shown only when someone wants to add days (11-11). Any browser will do;
@@ -985,7 +958,7 @@ function attachEvents() {
     }
     settings.includeDailyDates=false;stopped=false;refresh();
     $('#preset-options button').focus({preventScroll:true});
-    notify(subscription?'已清空选择；保存修改后更新日历。':'已清空选择。',()=>restoreSnapshot(before,'已恢复之前的选择。'));
+    notify(subscription?'已清空选择，记得保存修改':'已清空选择。',()=>restoreSnapshot(before,'已恢复之前的选择。'));
   });
   const openZone=()=>zonePicker.open({zone:settings.zone,deviceZone:observedZone});
   $('#zone-settings').addEventListener('click',openZone);
@@ -994,7 +967,7 @@ function attachEvents() {
   $('#use-device-zone').addEventListener('click',()=>{
     if(!resolveTimeZone(observedZone)){openZone();return;}
     settings.zone=observedZone;ui.lastDeviceZone=observedZone;persistUI();refresh(false);
-    notify(subscription?'提醒时区已调整；点击保存修改后同步。':'已采用设备时区。');
+    notify(subscription?'提醒时区已调整，记得保存修改':'已采用设备时区。');
   });
   window.addEventListener('focus',checkDeviceTime);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkDeviceTime();});
@@ -1199,7 +1172,7 @@ async function init() {
   const sharedNotice=applySharedSettings();
   zonePicker=createZonePicker($('#zone-dialog'),{onApply:zone=>{
     settings.zone=zone;stopped=false;ui.lastDeviceZone=observedZone;persistUI();refresh(false);
-    notify(subscription?'提醒地区已调整；点击保存修改后同步。':'提醒地区已调整。');
+    notify(subscription?'提醒地区已调整，记得保存修改':'提醒地区已调整。');
   }});
   guide=createSubscriptionGuide($('#device-guide'),{notificationRoot:$('#notification-guide'),initialState:ui.guide,
     onStateChange:state=>{ui.guide=state;persistUI();}});

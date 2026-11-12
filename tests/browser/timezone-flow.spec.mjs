@@ -51,7 +51,7 @@ test('travel requires explicit choice and saving keeps the same anonymous feed',
   page=await device.change('Asia/Kathmandu');
   await page.evaluate(()=>window.dispatchEvent(new Event('focus')));
   await page.locator('#use-device-zone').click();
-  await expect(page.locator('#save-state')).toHaveText('有改动，保存后同步到日历');
+  await expect(page.locator('#save-state')).toHaveText('有改动，记得保存修改');
   expect((await credentials(page)).savedSettings.zone).toBe('Asia/Shanghai');
   await page.locator('#subscribe').click();
   await expect.poll(async()=>(await credentials(page)).revision).toBe(sub.revision+1);
