@@ -1,0 +1,496 @@
+{
+  "note": "Frozen regression fixture from the 2026-10-20 source snapshot. Never publish as live data.",
+  "source": {
+    "schemaVersion": 1,
+    "sourceName": "佛慧法语藏历",
+    "retrievedOn": "2026-10-20",
+    "start": "2027-03-01",
+    "end": "2027-05-06",
+    "snapshots": [
+      {
+        "url": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-",
+        "sha256": "ec906349821636468547465d18c261fcea2f5f9ee6b437f2e309a655c7493ef8",
+        "days": 31
+      },
+      {
+        "url": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-",
+        "sha256": "df23204e2410521378a391f323d889fa3a11b2e21c6fa155ffaeefe2428a55b9",
+        "days": 30
+      },
+      {
+        "url": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/5/-",
+        "sha256": "b55c68bd94d93d61777ef304f51c01baa3f3215de3e62946d6cdfcc969584b4b",
+        "days": 6
+      }
+    ],
+    "days": [
+      {
+        "date": "2027-03-01",
+        "tibetan": "一月廿四",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+      },
+      {
+        "date": "2027-03-02",
+        "tibetan": "一月廿五",
+        "labels": [
+          "空行母荟供日"
+        ],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+      },
+      {
+        "date": "2027-03-03",
+        "tibetan": "一月廿六",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+      },
+      {
+        "date": "2027-03-04",
+        "tibetan": "一月廿七",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+      },
+      {
+        "date": "2027-03-05",
+        "tibetan": "一月廿八",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+      },
+      {
+        "date": "2027-03-06",
+        "tibetan": "一月廿八",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+      },
+      {
+        "date": "2027-03-07",
+        "tibetan": "一月廿九",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+      },
+      {
+        "date": "2027-03-08",
+        "tibetan": "一月三十",
+        "labels": [
+          "释迦牟尼佛加持日"
+        ],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+      },
+      {
+        "date": "2027-03-09",
+        "tibetan": "二月初一",
+        "labels": [
+          "禅定胜王佛加持日"
+        ],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+      },
+      {
+        "date": "2027-03-10",
+        "tibetan": "二月初二",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+      },
+      {
+        "date": "2027-03-11",
+        "tibetan": "二月初三",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+      },
+      {
+        "date": "2027-03-12",
+        "tibetan": "二月初四",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+      },
+      {
+        "date": "2027-03-13",
+        "tibetan": "二月初五",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+      },
+      {
+        "date": "2027-03-14",
+        "tibetan": "二月初六",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+      },
+      {
+        "date": "2027-03-15",
+        "tibetan": "二月初七",
+        "labels": [
+          "长寿法会开始",
+          "药师佛加持日"
+        ],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+      },
+      {
+        "date": "2027-03-16",
+        "tibetan": "二月初九",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+      },
+      {
+        "date": "2027-03-17",
+        "tibetan": "二月初十",
+        "labels": [
+          "莲师荟供日"
+        ],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+      },
+      {
+        "date": "2027-03-18",
+        "tibetan": "二月十一",
+        "labels": [
+          "长寿法会结束"
+        ],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+      },
+      {
+        "date": "2027-03-19",
+        "tibetan": "二月十二",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+      },
+      {
+        "date": "2027-03-20",
+        "tibetan": "二月十三",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+      },
+      {
+        "date": "2027-03-21",
+        "tibetan": "二月十四",
+        "labels": [
+          "春分"
+        ],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+      },
+      {
+        "date": "2027-03-22",
+        "tibetan": "二月十五",
+        "labels": [
+          "阿弥陀佛加持日"
+        ],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+      },
+      {
+        "date": "2027-03-23",
+        "tibetan": "二月十六",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+      },
+      {
+        "date": "2027-03-24",
+        "tibetan": "二月十七",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+      },
+      {
+        "date": "2027-03-25",
+        "tibetan": "二月十八",
+        "labels": [
+          "观音菩萨加持日"
+        ],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+      },
+      {
+        "date": "2027-03-26",
+        "tibetan": "二月十九",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+      },
+      {
+        "date": "2027-03-27",
+        "tibetan": "二月二十",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+      },
+      {
+        "date": "2027-03-28",
+        "tibetan": "二月廿一",
+        "labels": [
+          "地藏菩萨加持日"
+        ],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+      },
+      {
+        "date": "2027-03-29",
+        "tibetan": "二月廿二",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+      },
+      {
+        "date": "2027-03-30",
+        "tibetan": "二月廿三",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+      },
+      {
+        "date": "2027-03-31",
+        "tibetan": "二月廿四",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/3/-"
+      },
+      {
+        "date": "2027-04-01",
+        "tibetan": "二月廿五",
+        "labels": [
+          "空行母荟供日"
+        ],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+      },
+      {
+        "date": "2027-04-02",
+        "tibetan": "二月廿六",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+      },
+      {
+        "date": "2027-04-03",
+        "tibetan": "二月廿七",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+      },
+      {
+        "date": "2027-04-04",
+        "tibetan": "二月廿八",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+      },
+      {
+        "date": "2027-04-05",
+        "tibetan": "二月廿九",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+      },
+      {
+        "date": "2027-04-06",
+        "tibetan": "二月三十",
+        "labels": [
+          "释迦牟尼佛加持日"
+        ],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+      },
+      {
+        "date": "2027-04-07",
+        "tibetan": "闰二月初一",
+        "labels": [
+          "禅定胜王佛加持日"
+        ],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+      },
+      {
+        "date": "2027-04-08",
+        "tibetan": "闰二月初二",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+      },
+      {
+        "date": "2027-04-09",
+        "tibetan": "闰二月初三",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+      },
+      {
+        "date": "2027-04-10",
+        "tibetan": "闰二月初四",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+      },
+      {
+        "date": "2027-04-11",
+        "tibetan": "闰二月初五",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+      },
+      {
+        "date": "2027-04-12",
+        "tibetan": "闰二月初六",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+      },
+      {
+        "date": "2027-04-13",
+        "tibetan": "闰二月初七",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+      },
+      {
+        "date": "2027-04-14",
+        "tibetan": "闰二月初八",
+        "labels": [
+          "药师佛加持日"
+        ],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+      },
+      {
+        "date": "2027-04-15",
+        "tibetan": "闰二月初九",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+      },
+      {
+        "date": "2027-04-16",
+        "tibetan": "闰二月初十",
+        "labels": [
+          "莲师荟供日"
+        ],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+      },
+      {
+        "date": "2027-04-17",
+        "tibetan": "闰二月十一",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+      },
+      {
+        "date": "2027-04-18",
+        "tibetan": "闰二月十三",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+      },
+      {
+        "date": "2027-04-19",
+        "tibetan": "闰二月十四",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+      },
+      {
+        "date": "2027-04-20",
+        "tibetan": "闰二月十五",
+        "labels": [
+          "阿弥陀佛加持日"
+        ],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+      },
+      {
+        "date": "2027-04-21",
+        "tibetan": "闰二月十六",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+      },
+      {
+        "date": "2027-04-22",
+        "tibetan": "闰二月十七",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+      },
+      {
+        "date": "2027-04-23",
+        "tibetan": "闰二月十八",
+        "labels": [
+          "观音菩萨加持日"
+        ],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+      },
+      {
+        "date": "2027-04-24",
+        "tibetan": "闰二月十九",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+      },
+      {
+        "date": "2027-04-25",
+        "tibetan": "闰二月二十",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+      },
+      {
+        "date": "2027-04-26",
+        "tibetan": "闰二月廿一",
+        "labels": [
+          "地藏菩萨加持日"
+        ],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+      },
+      {
+        "date": "2027-04-27",
+        "tibetan": "闰二月廿一",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+      },
+      {
+        "date": "2027-04-28",
+        "tibetan": "闰二月廿二",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+      },
+      {
+        "date": "2027-04-29",
+        "tibetan": "闰二月廿三",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+      },
+      {
+        "date": "2027-04-30",
+        "tibetan": "闰二月廿四",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/4/-"
+      },
+      {
+        "date": "2027-05-01",
+        "tibetan": "闰二月廿五",
+        "labels": [
+          "空行母荟供日"
+        ],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/5/-"
+      },
+      {
+        "date": "2027-05-02",
+        "tibetan": "闰二月廿六",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/5/-"
+      },
+      {
+        "date": "2027-05-03",
+        "tibetan": "闰二月廿七",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/5/-"
+      },
+      {
+        "date": "2027-05-04",
+        "tibetan": "闰二月廿八",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/5/-"
+      },
+      {
+        "date": "2027-05-05",
+        "tibetan": "闰二月廿九",
+        "labels": [],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/5/-"
+      },
+      {
+        "date": "2027-05-06",
+        "tibetan": "闰二月三十",
+        "labels": [
+          "释迦牟尼佛加持日"
+        ],
+        "source": "https://www.fohuifayu.com/index.php/calendar/monthcalendar/2027/5/-"
+      }
+    ]
+  },
+  "ledger": {
+    "schemaVersion": 1,
+    "note": "Published-only occurrences keep these IDs permanently. When the source corrects a date or title, edit that record without changing recordId. Allocate a new unused ID only for a genuinely new occurrence.",
+    "records": [
+      {
+        "recordId": "fohui-00031",
+        "eventId": "longevity-assembly-start",
+        "date": "2027-03-15",
+        "sourceLabel": "长寿法会开始"
+      },
+      {
+        "recordId": "fohui-00032",
+        "eventId": "longevity-assembly-end",
+        "date": "2027-03-18",
+        "sourceLabel": "长寿法会结束"
+      },
+      {
+        "recordId": "fohui-00033",
+        "eventId": "spring-equinox",
+        "date": "2027-03-21",
+        "sourceLabel": "春分"
+      }
+    ]
+  }
+}

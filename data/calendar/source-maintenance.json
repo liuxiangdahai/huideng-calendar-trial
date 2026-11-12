@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "publicReadAuthorized": true,
+  "decisionDate": "2026-11-09",
+  "decision": "项目负责人已明确授权低频读取佛慧法语公开月份页。此决定不是站方授权；每次保留 robots 规则与读取结果，遇拒绝访问、验证或结构异常即停止。",
+  "minimumIntervalMs": 5000,
+  "maxExtensionDays": 400,
+  "automaticPublication": "known-future-extension-only"
+}
