@@ -365,10 +365,7 @@ function renderTimeChoices() {
     button.disabled=!prefs.length;
     button.setAttribute('aria-pressed',String(button.dataset.timeChoice===current));
   }
-  // A time is always chosen for you (当天 08:00); say so, so nobody thinks
-  // this step must be answered (11-12).
   $('#time-choice-note').textContent=!prefs.length ? '先在上一步选择会提醒的日子' : !current ? '已逐项设置不同时间' :
-    current==='0|08:00' ? '已默认选好，可不改' :
     [...document.querySelectorAll('[data-time-choice]')].some(b=>b.dataset.timeChoice===current) ? '' : `当前：${reminderLabel(prefs[0].reminders)}`;
 }
 // Step 3 names the device it recognised. A browser that reports a computer but
