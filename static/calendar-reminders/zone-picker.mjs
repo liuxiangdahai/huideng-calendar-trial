@@ -15,7 +15,8 @@ export function createZonePicker(dialog,{onApply}) {
     $('#zone-result-status').textContent = query ? `找到 ${results.length} 个时区` : '手机所在、当前选择和常用地区排在前面。';
     $('#apply-zone').disabled = !selected;
   }
-  $('#zone-search').addEventListener('input',render);
+  $('#zone-search').addEventListener('input',()=>{dialog.classList.add('is-typing');render();});
+  dialog.addEventListener('close',()=>dialog.classList.remove('is-typing'));
   $('#zone-options').addEventListener('change',event=>{if(event.target.name==='timezone'){selected=event.target.value;$('#apply-zone').disabled=false;}});
   $('#zone-form').addEventListener('submit',event=>{
     event.preventDefault(); const valid=resolveTimeZone(selected);
@@ -24,6 +25,11 @@ export function createZonePicker(dialog,{onApply}) {
   });
   return {open({zone,deviceZone}) {
     current=resolveTimeZone(zone);selected=current;device=resolveTimeZone(deviceZone);zones=listTimeZones();
-    $('#zone-search').value='';$('#zone-error').hidden=true;render();dialog.showModal();$('#zone-search').focus();
+    $('#zone-search').value='';$('#zone-error').hidden=true;render();dialog.showModal();
+    // Phones: no keyboard until the person taps the search box; it used to
+    // pop up at once and squeeze the list out of sight (11-12). Show the
+    // chosen zone instead. Computers keep the cursor in the search box.
+    if(matchMedia('(pointer: coarse)').matches){ document.activeElement?.blur?.(); dialog.querySelector('.zone-option:has(input:checked)')?.scrollIntoView({block:'nearest'}); }
+    else $('#zone-search').focus();
   }};
 }

@@ -1282,3 +1282,12 @@ body[data-page="subscribe"] [data-page-part="home"] { display: none !important; 
 .mode-choice label:has(input:checked)>[data-icon] { background: var(--eave); box-shadow: inset 0 0 0 1px #b9975a99; color: #f1d9a6; }
 #reminder-fields:not(:empty) { margin: 4px 0 12px; padding: 4px 14px; border: 1px solid #e2cfa6; border-radius: 10px; background: #fbf5ea; }
 .reminder-row :is(select, input[type=time]) { border-radius: 8px; background: var(--surface); }
+/* Typing a place on a phone (11-12): the keyboard takes half the screen, so
+   the window drops its explanation and the list keeps the room it needs. */
+/* Touch only: with a mouse, blurring the box on a click would move the list
+   under the pointer. Once typed in, it stays compact until the window closes. */
+@media (pointer: coarse) {
+  #zone-dialog:is(:has(#zone-search:focus), .is-typing) :is(.zone-why, #zone-result-status, .dialog-head .overline) { display: none; }
+  #zone-dialog:is(:has(#zone-search:focus), .is-typing) .zone-options { min-height: 120px; max-height: max(120px, calc(var(--available-height) - 250px)); }
+}
+@media (max-height: 560px) { #zone-dialog :is(.zone-why, #zone-result-status) { display: none; } }
