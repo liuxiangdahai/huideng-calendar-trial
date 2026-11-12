@@ -20,7 +20,9 @@ jobs:
   source:
     if: github.repository == 'liuxiangdahai/huideng-calendar-trial'
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    # The existing browser check itself allows 40 minutes. Do not time it out
+    # early after collecting the source and before the release handoff.
+    timeout-minutes: 60
     permissions:
       contents: write
       actions: write
