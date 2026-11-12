@@ -120,7 +120,8 @@ test('preview, calendar-app choice and guide confirmations never modify a saved 
   await page.locator('[data-guide-expand]>summary').click();
   await page.locator('#guide-reminders').check();
   await page.locator('[data-close="subscription-dialog"]').first().click();
-  await expect(page.locator('#save-state')).toHaveText('已同步到日历，改动会自动更新');
+  // A first add says 已加入日历 for a few seconds, then the everyday line.
+  await expect(page.locator('#save-state')).toHaveText('已同步到日历，改动会自动更新',{timeout:10000});
   await expect(page.locator('#subscribe')).not.toContainText('保存修改');
   expect(await readStored(page, settingsKey)).toEqual(settings);
   expect((await readStored(page, subscriptionKey)).revision).toBe(subscription.revision);
