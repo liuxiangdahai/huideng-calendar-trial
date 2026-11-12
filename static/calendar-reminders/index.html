@@ -99,28 +99,40 @@
               <button type="button" data-time-choice="1|20:00" aria-pressed="false"><span data-icon="moon" aria-hidden="true"></span><strong>晚上 8 点</strong><small>前一天</small></button>
             </div>
           </section>
+          <!-- 更多设置 (11-12): one kind of row throughout, gold hairlines
+               between; the closed summary names what is set now. -->
           <details id="advanced-settings" class="advanced-settings">
-            <summary><span data-icon="sliders" aria-hidden="true"></span><span><strong>更多设置<span class="advanced-optional">（可不改）</span></strong><small id="advanced-summary">分类、逐项提醒、提醒地区、日历标记</small></span><span data-icon="chevron" aria-hidden="true"></span></summary>
-          <div class="advanced-region"><span class="advanced-region-label"><span data-icon="globe" aria-hidden="true"></span>提醒地区</span><button id="zone-settings-inline" class="text-button" type="button" aria-haspopup="dialog"><span id="zone-summary-inline">选择时区</span><span data-icon="chevron-right" aria-hidden="true"></span></button><small>提醒按手机当地时间响起；人在外地时才需要改</small></div>
+            <summary><span data-icon="sliders" aria-hidden="true"></span><span><strong>更多设置</strong><small id="advanced-summary">分类、提醒地区、日历标记</small></span><span data-icon="chevron" aria-hidden="true"></span></summary>
           <div class="category-heading"><h3>按分类调整</h3><button id="reminder-settings" type="button" class="text-button"><span data-icon="bell-settings" aria-hidden="true"></span>批量提醒</button><button id="clear-selection" class="text-button" type="button" aria-label="清空全部选择">全部清空</button></div><p id="category-source" class="category-source" role="status"></p>
           <div id="groups"></div>
-          <fieldset class="title-marks">
-            <legend>日历里怎样区分</legend>
-            <label><input type="radio" name="title-marks" value="none"><span><strong>不加标记</strong><small>只显示名称，如：莲师荟供日</small></span></label>
-            <label><input type="radio" name="title-marks" value="symbols"><span><strong>加符号区分</strong><small>◆ 会提醒　◇ 只显示　◦ 每日藏历</small><small class="title-marks-note">按名称排序的日历里，同一天会提醒的排在前面、每日藏历排在最后</small></span></label>
-          </fieldset>
+          <div class="advanced-other">
+            <h3 class="advanced-other-title">其他</h3>
+            <div class="ledger-row advanced-region"><span data-icon="globe" aria-hidden="true"></span><span class="ledger-name">提醒地区</span><button id="zone-settings-inline" class="ledger-value" type="button" aria-haspopup="dialog" aria-label="提醒地区"><span id="zone-summary-inline">选择时区</span><span data-icon="chevron-right" aria-hidden="true"></span></button></div>
+            <details id="title-marks-row" class="title-marks-row">
+              <summary class="ledger-row"><span data-icon="list" aria-hidden="true"></span><span class="ledger-name">日历标记</span><span class="ledger-value"><span id="title-marks-value">不加标记</span><span data-icon="chevron" aria-hidden="true"></span></span></summary>
+              <fieldset class="title-marks">
+                <legend class="sr-only">日历里怎样区分</legend>
+                <label><input type="radio" name="title-marks" value="none"><span><strong>不加标记</strong><small>只显示名称，如：莲师荟供日</small></span></label>
+                <label><input type="radio" name="title-marks" value="symbols"><span><strong>加符号区分</strong><small>◆ 会提醒　◇ 只显示　◦ 每日藏历</small><small class="title-marks-note">同一天里，会提醒的排在前面、每日藏历排在最后</small></span></label>
+              </fieldset>
+            </details>
+          </div>
           </details>
         </section>
         <aside id="preview-pane" class="preview-column" aria-labelledby="preview-title">
           <!-- The right column is the live preview itself (11-12): no title, no
                step number; a desk-calendar head (red band, two rings) like the
                藏历 page's month. -->
+          <!-- On computers the month stays in view while the left column is
+               long (更多设置 open); what follows waits at the bottom (11-12). -->
+          <div class="preview-stick">
           <section class="preview-panel desk-page">
             <span class="desk-rings" aria-hidden="true"><i></i><i></i></span>
             <h2 id="preview-title" class="sr-only">日期预览</h2>
             <div id="calendar-preview"></div>
           </section>
           <p id="preview-error" class="notice error" role="alert" hidden></p>
+          </div>
           <!-- Step 3 (11-12): on phones it follows step 2; on computers it sits
                under the month in the right column, so both columns end level. -->
           <section class="quick-section step-add" aria-labelledby="add-title">

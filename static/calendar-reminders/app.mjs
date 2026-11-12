@@ -279,7 +279,8 @@ function renderSubscribeUpcoming() {
 function renderRegion(now=new Date()) {
   const info=settings.zone ? zoneInfo(settings.zone,now) : null;
   $('#zone-summary').textContent=info ? `${info.label} · ${info.offset}` : '请选择提醒时区';
-  $('#zone-summary-inline').textContent=$('#zone-summary').textContent;
+  $('#zone-summary-inline').textContent=info ? info.label : '请选择';
+  renderAdvancedSummary();
   const clocks=timeComparison(now,observedZone,settings.zone);
   const clock=(value,label)=>`<div class="clock-item"><span>${esc(label)}</span><strong>${esc(value.time)}</strong><small>${esc(value.label)}${clocks.reminder?.dayLabel ? ` · ${esc(value.date)}${value.dayLabel?`（${esc(value.dayLabel)}）`:''}` : ''}</small></div>`;
   $('#time-comparison').innerHTML=clock(clocks.device,clocks.merged?'设备与提醒时间':'设备时间')+(!clocks.merged&&clocks.reminder?clock(clocks.reminder,'提醒地区时间'):'');
@@ -297,6 +298,20 @@ function checkDeviceTime() {
   if (today!==previousToday || observedZone!==previousZone) renderPreview();
   clearTimeout(dayTimer); dayTimer=setTimeout(checkDeviceTime,Math.min(nextLocalMidnight(),60000-Date.now()%60000+50));
 }
+// 更多设置 closed (11-12): what is set now, in one line. Whatever differs
+// from the default (hand-picked days, another region, symbols) is in red.
+function renderAdvancedSummary() {
+  if(!data) return;
+  const plan=PRESETS.find(preset=>preset.id===matchingPreset(settings,data.catalog)), count=countSelected();
+  const info=settings.zone ? zoneInfo(settings.zone) : null, marks=settings.titleMarks==='symbols';
+  const parts=[
+    [plan ? `${plan.title} ${presetIds(data.catalog,plan.id).length} 项` : count ? `自选 ${count} 项` : '还没选日子', !plan && count>0],
+    [info ? info.label : '未选提醒地区', Boolean(info) && resolveTimeZone(settings.zone)!==resolveTimeZone(observedZone)],
+    [marks ? '加符号区分' : '不加标记', marks],
+  ];
+  $('#advanced-summary').innerHTML=parts.map(([text,changed])=>changed ? `<em>${esc(text)}</em>` : esc(text)).join(' · ');
+  $('#title-marks-value').textContent=marks ? '加符号区分' : '不加标记';
+}
 function renderPresets() {
   const current=matchingPreset(settings,data.catalog);
   // The plan above and the categories below are one choice at two levels of
@@ -310,6 +325,7 @@ function renderPresets() {
   // emblem once (bell rings, lotus opens) and sends out two gilt rings.
   $('#preset-options').innerHTML=PRESETS.map(preset=>`<button class="preset-card" type="button" data-preset="${preset.id}" aria-pressed="${current===preset.id}"${preset.id==='practice'?' aria-describedby="preset-scope-note"':''}><span class="preset-medal" aria-hidden="true">${icon('lotus-seat').replace('class="icon"','class="icon medal-seat"')}<span class="medal-icon">${icon(preset.icon)}</span><span class="medal-wave"></span><span class="medal-wave"></span></span><span class="preset-copy"><strong>${preset.title}<small>${presetIds(data.catalog,preset.id).length} 项</small></strong>${preset.days.length?`<span class="preset-days">${preset.days.map(day=>`<span>${day}</span>`).join('')}</span>`:''}${preset.note?`<span>${preset.note}${preset.days.length===1?preset.days[0]:''}</span>`:''}<em>${icon('bell')}${preset.reminder}</em></span><span class="preset-check" aria-hidden="true">${current===preset.id?icon('check'):''}</span></button>`).join('');
   $('#clear-selection').disabled=!hasSelectedContent();
+  renderAdvancedSummary();
   $('#include-daily-dates').checked=settings.includeDailyDates===true;
 }
 function renderGroups() {
@@ -318,7 +334,7 @@ function renderGroups() {
   $('#groups').innerHTML = data.catalog.groups.map(group => {
     const all = data.catalog.events.filter(event => event.group === group.id);
     const count = all.filter(event => settings.events[event.id].mode !== 'off').length;
-    return `<details class="group-card event-category-${esc(group.id)}" data-group-id="${esc(group.id)}" ${openGroups.has(group.id) ? 'open' : ''}>
+    return `<details class="group-card event-category-${esc(group.id)}${count ? ' has-selected' : ''}" data-group-id="${esc(group.id)}" ${openGroups.has(group.id) ? 'open' : ''}>
       <summary><span class="group-icon">${eventIcon({group:group.id},data.catalog)}</span><span class="group-name"><strong>${esc(group.name)}</strong><small>${all.length} 项</small></span><span class="group-count ${count ? 'has-selected' : ''}">${count ? `已选 ${count} 项` : '未选择'}</span><span class="chevron">${icon('chevron')}</span></summary>
       <div class="group-tools"><div><button type="button" class="text-button" data-select-group="${esc(group.id)}">全选</button><button type="button" class="text-button" data-clear-group="${esc(group.id)}" ${!count ? 'disabled' : ''}>清空</button></div><button type="button" class="text-button" data-reminder-group="${esc(group.id)}" ${!count ? 'disabled' : ''}>${icon('bell-settings')}统一提醒</button></div>
       <div class="event-list">${all.map(event => {
@@ -1219,17 +1235,17 @@ async function init() {
   if(sharedNotice) notify(sharedNotice);
   // Reuse the browser's completed layout. Writing a root variable between two
   // bounding-box reads forced the whole document to lay out twice on startup.
-  const actionBar=$('.action-bar'), previewColumn=$('.preview-column');
+  const actionBar=$('.action-bar'), previewColumn=$('.preview-column'), previewMonth=$('.preview-stick>.desk-page');
   let barHeight=86, previewHeight=Infinity;
   const resizeLayout=()=>{
     const value=`${barHeight}px`;
     if(document.documentElement.style.getPropertyValue('--action-height')!==value)
       document.documentElement.style.setProperty('--action-height',value);
-    // A preview shorter than the window sticks to the top. A taller one scrolls
-    // with the page until its bottom edge meets the action bar, then stays,
-    // so the calendar remains beside a long list of categories.
+    // The month sticks (11-12), not the whole column: a month shorter than
+    // the window stays at the top; a taller one scrolls until its bottom edge
+    // meets the action bar, then stays. The next-days card below waits at
+    // the column's foot, so a long 更多设置 never pushes the month away.
     const room=innerHeight-barHeight;
-    previewColumn.classList.add('can-stick');
     const top=previewHeight<room-40 ? 16 : Math.round(room-previewHeight-16);
     if(previewColumn.style.getPropertyValue('--stick-top')!==`${top}px`) previewColumn.style.setProperty('--stick-top',`${top}px`);
   };
@@ -1241,10 +1257,10 @@ async function init() {
       }
       resizeLayout();
     });
-    observer.observe(actionBar);observer.observe(previewColumn);
+    observer.observe(actionBar);observer.observe(previewMonth);
     window.addEventListener('resize',resizeLayout);
   }else{
-    const measureLayout=()=>{barHeight=actionBar.getBoundingClientRect().height;previewHeight=previewColumn.getBoundingClientRect().height;resizeLayout();};
+    const measureLayout=()=>{barHeight=actionBar.getBoundingClientRect().height;previewHeight=previewMonth.getBoundingClientRect().height;resizeLayout();};
     window.addEventListener('resize',measureLayout);requestAnimationFrame(measureLayout);
   }
   const resizeDialogs=()=>{

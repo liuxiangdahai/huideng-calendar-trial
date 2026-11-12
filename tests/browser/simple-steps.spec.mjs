@@ -14,7 +14,11 @@ test('phones start in three simple steps; computers show the detailed settings',
   // nothing appears at the top of the page.
   await expect(page.locator('.region-bar')).toBeHidden();
   await expect(page.locator('#zone-settings-inline')).toBeVisible();
-  await expect(page.locator('#zone-summary-inline')).toHaveText(await page.locator('#zone-summary').textContent());
+  // The row shows the region's name; the closed 更多设置 names it too (11-12).
+  const zoneName=(await page.locator('#zone-summary').textContent()).split(' · ')[0];
+  await expect(page.locator('#zone-summary-inline')).toHaveText(zoneName);
+  await expect(page.locator('#advanced-summary')).toContainText(zoneName);
+  await expect(page.locator('#advanced-summary')).toContainText('不加标记');
   // Phones always start folded, even after someone opened the details.
   await page.reload();await expect(page.locator('#app')).toBeVisible();
   await expect(page.locator('#advanced-settings')).not.toHaveAttribute('open','');
@@ -59,8 +63,13 @@ test('a shared link pre-fills preset, time, everyday dates and title style, then
   await page.locator('[data-time-choice="0|07:00"]').click();
   await page.locator('#include-daily-dates').check();
   await page.locator('#advanced-settings>summary').click();
+  // 日历标记 is one row; its two choices open in place (11-12).
+  await expect(page.locator('input[name="title-marks"][value="symbols"]')).toBeHidden();
+  await page.locator('#title-marks-row>summary').click();
   await page.locator('input[name="title-marks"][value="symbols"]').check();
   await expect(page.locator('input[name="title-marks"]')).toHaveCount(2);
+  await expect(page.locator('#title-marks-value')).toHaveText('加符号区分');
+  await expect(page.locator('#advanced-summary em')).toHaveText('加符号区分');
   await page.locator('#share-settings').click();
   await expect(page.locator('#share-dialog')).toBeVisible();
   await expect(page.locator('#share-qr svg')).toBeVisible();
@@ -99,6 +108,7 @@ test('after subscribing, the page opens on a sync status with the next reminder;
   expect(titles.every(title=>!/^[◆◇◦]/.test(title))).toBe(true);
   // Choosing symbols is a normal settings change that the feed follows.
   await page.locator('#advanced-settings>summary').click();
+  await page.locator('#title-marks-row>summary').click();
   await page.locator('input[name="title-marks"][value="symbols"]').check();
   // The card keeps its place and says what to do; it must not vanish and pop back.
   await expect(page.locator('#subscribed-card')).toBeVisible();
