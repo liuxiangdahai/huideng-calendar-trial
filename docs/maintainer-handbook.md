@@ -17,7 +17,7 @@
 - 在仓库 Actions 中打开 **Fohui calendar source maintenance**，查看最近结果；长期记录在`docs/evidence/source-maintenance/latest-check.json`。
 - 每月一次，11、12月各加一次。原历无变化时只记录检查结果；完整、已知的未来新增日期通过校验和现有发布检查后更新到原订阅。
 - 若出现待核对分支，从差异链接检查原文对应、稳定编号和资料完整性，再创建PR；不另改佛慧法语的安排。新名称或删除不能静默忽略。失败报告在每次运行的`source-maintenance`附件中。
-- 确认范围看`data/calendar/fohui-dates.json`的`end`（2026-11-09实查仍为2027-05-06）。范围以外，固定荟供等按既定规则生成；法会、天象没有新记录时仍为待确认。
+- 确认范围看`data/calendar/fohui-dates.json`的`end`（2026-11-12 GitHub实查仍为2027-05-06）。范围以外，固定荟供等按既定规则生成；法会、天象没有新记录时仍为待确认。首次云端运行与后续最新结果见`docs/evidence/source-maintenance/README.md`及`latest-check.json`。
 - 手动检查：Actions → Run workflow → `check`；需要更新和发布时选择`maintain`。备用：保存月份HTML后运行`node tools/calendar/fohui-diff.mjs <文件夹> --retrieved-on YYYY-MM-DD`，核对后加`--apply`，再按第3节发布。
 - 来源的robots限制、项目负责人的公开读取决定、故障处理与重新启用说明见`docs/calendar-source-update-proposal.md`。
 

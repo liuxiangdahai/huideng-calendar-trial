@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "verifiedOn": "2026-11-13",
+  "run": "https://github.com/liuxiangdahai/huideng-calendar-trial/actions/runs/43212507686",
+  "workflowConclusion": "success",
+  "version": "f3c3fb69af2c413a47e39f7d034272255e1fa870",
+  "dataVersion": "0a6b1e7eb64f73f5f4d1bf86527df628e6e1b8ed91f5c917ecf8fcb38813d46b",
+  "subscriptionChecks": {
+    "scope": "full",
+    "passed": true,
+    "startedAt": "2026-11-12T12:01:22.857Z",
+    "finishedAt": "2026-11-12T12:03:07.006Z"
+  },
+  "reminderEndpointChecks": {
+    "passed": true,
+    "phoneNotifications": "待真机验收"
+  },
+  "performance": {
+    "releaseAcceptance": "pending",
+    "workerCpuMilliseconds": {
+      "p50": 11.172,
+      "p95": 49.826,
+      "p99": 85.841
+    },
+    "workerPerformanceAcceptance": "pending",
+    "gatewayAnalytics": {
+      "status": "pending",
+      "reason": "账号未提供Pages指标数据集，不能用Worker指标替代。",
+      "performanceAcceptance": "pending"
+    }
+  },
+  "note": "This is the existing release after merging maintenance code; source facts were unchanged. It is not a real new-data automatic publication or phone-notification test."
+}
