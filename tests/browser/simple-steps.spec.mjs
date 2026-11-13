@@ -174,3 +174,27 @@ for (const viewport of [{width:390,height:844},{width:1366,height:900}]) test(`w
     }
   }
 });
+
+test('the subscribe page starts with the choices; the add window says what will ring (11-13)',async({page})=>{
+  await page.setViewportSize({width:390,height:844});await open(page);
+  // One thin line of date, no big masthead and no extra notice box.
+  const masthead=await page.locator('.editorial-masthead').boundingBox();
+  expect(masthead.height).toBeLessThan(80);
+  await expect(page.locator('#unsubscribed-hint')).toHaveCount(0);
+  const firstChoice=await page.locator('[data-preset]').first().boundingBox();
+  expect(firstChoice.y).toBeLessThan(300);
+  await page.locator('[data-preset="practice"]').click();
+  await page.locator('#subscribe').click();
+  const summary=page.locator('#subscription-summary');
+  await expect(summary).toContainText('项提醒');
+  await expect(summary).not.toContainText('全天显示');
+  // The apps are one compact row; the chosen one's coverage is one line.
+  await page.locator('input[name="device"][value="other"]').check();
+  await expect(page.locator('#device-note')).toHaveText('华为、OPPO、小米等');
+  const label=await page.locator('.device-options label').first().boundingBox();
+  expect(label.height).toBeLessThan(60);
+  // A file does not update, so the import fold says how far the festivals reach.
+  await page.locator('.download-fallback>summary').click();
+  await expect(page.locator('#download-coverage')).toContainText('目前节日更新到 ');
+  await expect(page.locator('#download-coverage')).toContainText('要重新下载导入');
+});

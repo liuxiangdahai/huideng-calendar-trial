@@ -13,52 +13,47 @@ async function fixture(page, options = {}) {
   }, options);
 }
 
-test('Chinese guide keeps self-confirmation separate from subscription and per calendar app', async ({ page }) => {
+test('after adding, the guide reminds what to look at instead of asking for check boxes (11-13)', async ({ page }) => {
   await fixture(page);
   await expect(page.locator('#add')).toContainText('先选择');
-  await expect(page.locator('#guide-seen')).toHaveCount(0);
+  await expect(page.locator('.guide-after')).toHaveCount(0);
   await page.evaluate(() => window.guide.update({ app: 'iphone', hasReminders: true, hasSubscription: true }));
-  await expect(page.locator('#guide-seen')).not.toBeChecked();
-  await expect(page.locator('#guide-reminders')).not.toBeChecked();
+  const after = page.locator('#notifications .guide-after');
+  await expect(after).toContainText('加好以后，请看一眼');
+  await expect(after).toContainText('能看到修行日，就是加好了');
+  await expect(page.locator('#notifications input[type="checkbox"]')).toHaveCount(0);
   await page.locator('[data-guide-expand] > summary').click();
   const mac=await page.evaluate(()=>/Macintosh/i.test(navigator.userAgent));
+  await expect(after).toContainText(mac?'Mac 需要允许':'设置 › 日历 › 通知');
   await expect(page.locator('.guide-notification-body')).toContainText(mac?'忽略提醒':'日程提醒');
   await expect(page.locator('.guide-notification-body')).toContainText('允许通知');
   await expect(page.locator('.guide-notification-body')).toContainText(mac?'在电脑上操作':'请拿起手机');
   await expect(page.locator('a[href^="https://support.apple.com/"]').first()).toHaveAttribute('href', /\/zh-cn\//);
-  await page.locator('#guide-seen').check();
-  await page.locator('#guide-reminders').check();
   await page.evaluate(() => window.guide.update({ app: 'google', hasSubscription: false }));
-  await expect(page.locator('#guide-seen')).not.toBeChecked();
-  await expect(page.locator('#guide-reminders')).not.toBeChecked();
+  await expect(after).toContainText('全天活动通知');
   await expect(page.locator('#add')).toContainText('通过网址添加');
   await page.evaluate(() => window.guide.update({ app: 'iphone' }));
-  await expect(page.locator('#guide-seen')).toBeChecked();
-  await expect(page.locator('#guide-reminders')).toBeChecked();
   expect(await page.evaluate(() => window.guide.getState().expanded.iphone)).toBe(true);
-  await expect(page.locator('[data-guide-status]')).not.toContainText('订阅成功');
+  await expect(page.locator('#notifications')).not.toContainText('订阅成功');
 });
 
-test('display-only hides reminder guidance and test, preserves prior user checks when restored', async ({ page }) => {
-  await fixture(page, { app: 'google', progress: { google: { seen: true, reminders: true } } });
+test('display-only says nothing will ring and hides the notification steps and test', async ({ page }) => {
+  await fixture(page, { app: 'google' });
   await page.evaluate(() => window.guide.update({ hasReminders: false }));
-  await expect(page.locator('#guide-seen')).toBeChecked();
-  await expect(page.locator('#guide-reminders,[data-guide-expand],#test-reminder')).toHaveCount(0);
-  await expect(page.locator('#notifications')).toContainText('已跳过通知设置');
+  await expect(page.locator('[data-guide-expand],#test-reminder')).toHaveCount(0);
+  await expect(page.locator('#notifications')).toContainText('不会响铃');
   await page.evaluate(() => window.guide.update({ hasReminders: true }));
-  await expect(page.locator('#guide-reminders')).toBeChecked();
+  await page.locator('[data-guide-expand] > summary').click();
   await page.locator('.guide-test > summary').click();
   await expect(page.locator('#test-reminder')).toHaveAttribute('href','https://huideng-calendar-acceptance.pages.dev/calendar-reminders/reminder-check.html');
   await expect(page.locator('#test-reminder')).not.toHaveAttribute('download');
   await expect(page.locator('.guide-test')).toContainText('无需下载');
 });
 
-test('other calendars show direct brand help without changing existing checks or subscription preferences', async ({ page }) => {
+test('other calendars show direct brand help without changing subscription preferences', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 640 });
   await fixture(page, { app: 'other', brand: 'huawei', progress: { other: { seen: true, reminders: true } } });
   await expect(page.locator('#guide-brand')).toHaveCount(0);
-  await expect(page.locator('#guide-seen')).toBeChecked();
-  await expect(page.locator('#guide-reminders')).toBeChecked();
   expect(await page.evaluate(() => Object.hasOwn(window.guide.getState(), 'brand'))).toBe(false);
   await expect(page.locator('.guide-method')).toHaveCount(2);
   const initialState = await page.evaluate(() => window.guide.getState());
@@ -77,13 +72,11 @@ test('other calendars show direct brand help without changing existing checks or
   await expect(page.locator('[data-guide-help="oppo-subscribe"]')).toContainText('这是网址订阅步骤');
   await expect(page.locator('[data-guide-help="xiaomi-check"]')).toContainText('目前未确认');
   await expect(page.locator('#add')).toContainText('文件导入不会持续更新');
-  // Refreshing subscription availability and returning to the app preserve both
-  // independent confirmations and the accordion the reader was using.
+  // Refreshing subscription availability and returning to the app keep the
+  // accordion the reader was using.
   await page.evaluate(() => window.guide.update({ hasSubscription: true }));
   await expect(page.locator('[data-guide-help="oppo-subscribe"]')).toHaveAttribute('open', '');
   await page.evaluate(() => { window.guide.update({ app: 'google' }); window.guide.update({ app: 'other' }); });
-  await expect(page.locator('#guide-seen')).toBeChecked();
-  await expect(page.locator('#guide-reminders')).toBeChecked();
   await page.locator('[data-guide-expand] > summary').click();
   await page.getByText('华为 HarmonyOS 6.0 通知入口', { exact: true }).click();
   await expect(page.locator('.guide-notification-body')).toContainText('其他版本请使用上方通用步骤');
@@ -112,6 +105,4 @@ test('method shortcuts reach existing controls without generating subscriptions 
   await page.locator('[data-guide-jump="subscription"]').click();
   await expect(page.locator('#feed-url')).toBeFocused();
   expect(await page.evaluate(() => window.actualActions)).toBe(0);
-  await expect(page.locator('#guide-seen')).not.toBeChecked();
-  await expect(page.locator('#guide-reminders')).not.toBeChecked();
 });

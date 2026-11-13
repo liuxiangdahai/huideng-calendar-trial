@@ -98,7 +98,6 @@ test('landscape and keyboard-sized screens keep every form action and Chinese gu
     const help=page.locator('.guide-help').filter({has:page.getByText('找不到这个入口',{exact:true})});
     if(!await help.evaluate(node=>node.open))await page.getByText('找不到这个入口',{exact:true}).click();
     await dialogFits(page,'#subscription-dialog');
-    await page.locator('#guide-reminders').check();
     await page.locator('[data-close="subscription-dialog"]').last().click();
     await fits(page);
     // Start next iteration with a single alarm; this also checks return-to-edit.

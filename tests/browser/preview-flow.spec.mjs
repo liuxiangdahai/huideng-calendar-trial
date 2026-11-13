@@ -116,9 +116,7 @@ test('preview, calendar-app choice and guide confirmations never modify a saved 
   await expect(page.locator('input[name="device"][value="google"]')).toBeHidden();
   await page.locator('#manage-add').click();
   await page.locator('input[name="device"][value="google"]').check();
-  await page.locator('#guide-seen').check();
   await page.locator('[data-guide-expand]>summary').click();
-  await page.locator('#guide-reminders').check();
   await page.locator('[data-close="subscription-dialog"]').first().click();
   // A first add says 已加入日历 for a few seconds, then the everyday line.
   await expect(page.locator('#save-state')).toHaveText('已保存，日历会自己更新');
@@ -131,8 +129,6 @@ test('preview, calendar-app choice and guide confirmations never modify a saved 
   await expect(page.locator('#save-state')).toHaveText('已保存，日历会自己更新');
   await page.locator('#subscribed-open').click();
   await expect(page.locator('input[name="device"][value="google"]')).toBeChecked();
-  await expect(page.locator('#guide-seen')).toBeChecked();
-  await expect(page.locator('#guide-reminders')).toBeChecked();
   expect(patches).toEqual([]);
 });
 

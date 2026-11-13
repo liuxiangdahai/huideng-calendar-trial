@@ -453,14 +453,8 @@ export function createCalendarView(root, {onEditEvent = () => {}, onViewChange =
   // visit is not an empty month (11-11).
   function renderMonthList(cells) {
     const node = $('[data-cal-month-list]');
-    if (state.reading) {
-      const days = cells.filter(cell => cell.inMonth && !cell.disabled && cell.events.length);
-      node.hidden = false;
-      node.innerHTML = `<h3 class="cal-month-list-title">${escape(monthTitle(month).replace(/^\d+年/, ''))}的修行日<span>${days.length} 天</span></h3>${days.length
-        ? `<ul>${days.map(cell => `<li><button type="button" class="cal-month-row${cell.today ? ' is-today' : ''}" data-cal-pick="${cell.date}" data-cal-focus="month-list-${cell.date}"><span class="cal-month-row-date"><b>${cell.day}</b><span>周${WEEKDAYS[weekIndex(cell.date)]}</span></span><span class="cal-month-row-tibetan">${escape(cell.tibetan?.display || '')}</span><span class="cal-month-row-names">${cell.events.map(event => `<span class="is-cat-${categoryOf([event], state.data?.catalog)}">${escape(event.title)}</span>`).join('')}</span></button></li>`).join('')}</ul>`
-        : '<p class="cal-empty">这个月没有修行日。</p>'}`;
-      return;
-    }
+    // The 藏历 page lists its days once, above the grid (11-13).
+    if (state.reading) { node.hidden = true; node.innerHTML = ''; return; }
     const live = cells.filter(cell => cell.inMonth && !cell.disabled);
     const chosen = state.events.length > 0;
     const days = chosen ? live.filter(cell => cell.events.length) : live.filter(cell => cell.spare.length);

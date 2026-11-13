@@ -217,15 +217,28 @@ function renderHome() {
   // Next days, from tomorrow: one row each, with how long until it comes.
   const coming=events.filter(event=>event.date>today).sort((a,b)=>a.date.localeCompare(b.date)||0);
   const byDate=new Map(); for(const event of coming){ if(!byDate.has(event.date)) byDate.set(event.date,[]); byDate.get(event.date).push(event); }
-  const rows=[...byDate].slice(0,5);
-  const inMonth=[...byDate.keys()].filter(date=>date.slice(0,7)===today.slice(0,7)).length;
-  $('#home-upcoming-note').textContent=inMonth ? `本月还有 ${inMonth} 个修行日` : '本月的修行日已过';
-  $('#home-upcoming-list').innerHTML=rows.map(([date,items])=>{
+  // One list, not three (11-13): this month's days from tomorrow on, each
+  // with how long until it comes; the days already past fold into one line;
+  // the next month's first two follow. The month grid has no second list.
+  const month=today.slice(0,7), upcoming=[...byDate];
+  const thisMonth=upcoming.filter(([date])=>date.slice(0,7)===month);
+  const rows=thisMonth.length ? thisMonth : upcoming.slice(0,5);
+  const after=thisMonth.length ? upcoming.filter(([date])=>date.slice(0,7)>month).slice(0,2) : [];
+  const past=new Map();
+  for(const event of events.filter(event=>event.date<=today && event.date.slice(0,7)===month).sort((a,b)=>a.date.localeCompare(b.date))){ if(!past.has(event.date)) past.set(event.date,[]); past.get(event.date).push(event); }
+  const monthNumber=Number(month.slice(5));
+  $('#home-upcoming-title').textContent=thisMonth.length ? `${monthNumber}月的修行日` : '接下来';
+  $('#home-upcoming-note').textContent=thisMonth.length ? `本月还有 ${thisMonth.length} 个修行日` : '本月的修行日已过';
+  const weekday=date=>'日一二三四五六'[new Date(date+'T12:00:00Z').getUTCDay()];
+  const row=([date,items])=>{
     const ranked=rankEvents(items,data.catalog), [label]=[categoryLabel(ranked[0])], days=Math.round((Date.parse(date)-Date.parse(today))/864e5);
     let tibetan=''; try{ tibetan=getTibetanDate(date).display; }catch{}
-    const [,month,day]=date.split('-').map(Number);
-    return `<li><button type="button" class="home-row is-cat-${label[0]}" data-home-date="${date}"><span class="home-row-date"><b>${day}</b><small>${month}月 周${'日一二三四五六'[new Date(date+'T12:00:00Z').getUTCDay()]}</small></span><span class="home-row-name"><strong>${ranked.map(event=>esc(event.title)).join('<i>·</i>')}</strong><small><i class="home-tag">藏历</i>${esc(tibetan)}</small></span><span class="home-row-kind"><i></i>${esc(label[1])}<small>${days===1?'明天':`还有 ${days} 天`}</small></span></button></li>`;
-  }).join('') || '<li class="home-empty">近期没有修行日。</li>';
+    const [,m,day]=date.split('-').map(Number);
+    return `<li><button type="button" class="home-row is-cat-${label[0]}" data-home-date="${date}"><span class="home-row-date"><b>${day}</b><small>${m}月 周${weekday(date)}</small></span><span class="home-row-name"><strong>${ranked.map(event=>esc(event.title)).join('<i>·</i>')}</strong><small><i class="home-tag">藏历</i>${esc(tibetan)}</small></span><span class="home-row-kind"><i></i>${esc(label[1])}<small>${days===1?'明天':`还有 ${days} 天`}</small></span></button></li>`;
+  };
+  const pastFold=thisMonth.length && past.size ? `<li class="home-past"><details><summary>本月已过 ${past.size} 天<span>展开<span data-icon="chevron" aria-hidden="true"></span></span></summary><ul>${[...past].map(([date,items])=>`<li><button type="button" class="home-past-row" data-home-date="${date}"><b>${Number(date.slice(8))}</b><small>周${weekday(date)}</small><span>${rankEvents(items,data.catalog).map(event=>esc(event.title)).join('、')}</span></button></li>`).join('')}</ul></details></li>` : '';
+  $('#home-upcoming-list').innerHTML=rows.length ? pastFold+rows.map(row).join('')+(after.length ? `<li class="home-divider" aria-hidden="true">${Number(after[0][0].slice(5,7))}月</li>`+after.map(row).join('') : '') : '<li class="home-empty">近期没有修行日。</li>';
+  fillIcons($('#home-upcoming-list'));
   // 每月固定的日子: the monthly days of the calendar, in Tibetan date order.
   const days=['','初一','初二','初三','初四','初五','初六','初七','初八','初九','初十','十一','十二','十三','十四','十五','十六','十七','十八','十九','二十','廿一','廿二','廿三','廿四','廿五','廿六','廿七','廿八','廿九','三十'];
   const monthly=data.catalog.events.filter(event=>event.rule?.kind==='tibetan-monthly').sort((a,b)=>a.rule.day-b.rule.day);
@@ -402,7 +415,6 @@ function renderQuickAdd() {
     : calendarDevice.mac ? '点最下面的“加入日历”：可以直接加入 Mac 日历，也可以选 Google 或 Outlook。'
     : '点最下面的“加入日历”：可以直接加入 Google 或 Outlook 日历；要加到手机上，可以扫码。';
   $('#step-add-device').hidden=Boolean(subscription);
-  $('#unsubscribed-hint').hidden=Boolean(subscription) || stopped || conflict;
   $('#share-settings').lastChild.textContent=phone ? '把这套设置分享给师兄' : '用手机扫码继续 · 分享给师兄';
   // Not ringing is a question about the subscription, so it is answered in
   // its window rather than on the page (11-12). A web page cannot open the
@@ -571,6 +583,10 @@ function deviceGuide() {
   const appleUrl=appleSubscriptionUrl(subscription?.feedUrl);
   const ready=Boolean(subscription && !requestPending && !managementRestoring && !dirty() && !conflict);
   guide?.update({app,hasReminders:hasReminders(),hasSubscription:Boolean(subscription),preparing:requestPending||managementRestoring,entryReady:ready});
+  // The four apps are one row of small choices (11-13); what the chosen one
+  // covers is said once underneath.
+  $('#device-note').textContent=app ? $(`input[name="device"][value="${app}"]`)?.closest('label')?.querySelector('small')?.textContent || '' : '';
+  $('#device-note').hidden=!app;
   const apple=$('#iphone-subscribe');
   apple.hidden = app !== 'iphone' || !calendarDevice.apple || !appleUrl || inAppApple;
   if(ready) apple.removeAttribute('aria-disabled'); else apple.setAttribute('aria-disabled','true');
@@ -598,7 +614,7 @@ function deviceGuide() {
   outlook.dataset.step=manualEntry&&app==='outlook'?'2':'';
   const copied=$('#copy-progress');
   copied.hidden=!manualEntry||!ready||copied.dataset.app!==app||copied.dataset.feed!==subscription?.feedUrl;
-  $('#entry-hint').textContent=managementRestoring ? '正在恢复订阅，请稍候。' : !app ? '' : requestPending ? '正在保存你的选择，请稍候。' : !subscription ? '选好日历应用后，我们会准备你的订阅。' : !ready ? '先保存修改，再继续添加到日历。' : inAppApple ? '也可复制上方的 HTTPS 订阅地址，在 Apple 日历中手动添加。复制后仍需到日历中确认。' : app==='iphone' ? calendarDevice.apple ? '将在系统日历中打开订阅确认，请按提示添加。' : '请把订阅地址传到你的 iPhone、iPad 或 Mac 上添加。' : app==='google' ? calendarDevice.mobile ? '请将订阅地址传到电脑，在 Google 日历网页中添加。' : '先复制订阅地址，再打开 Google 日历的“通过网址添加”页面。' : '应用有网址订阅入口时可粘贴此地址；否则请查看下方文件导入方式。';
+  $('#entry-hint').textContent=managementRestoring ? '正在恢复订阅，请稍候。' : !app ? '' : requestPending ? '正在保存你的选择，请稍候。' : !subscription ? '选好日历应用后，我们会准备你的订阅。' : !ready ? '先保存修改，再继续添加到日历。' : inAppApple ? '也可复制上方的 HTTPS 订阅地址，在 Apple 日历中手动添加。复制后仍需到日历中确认。' : app==='iphone' ? calendarDevice.apple ? '会弹出“订阅”页面：看到“移除提醒”请保持关闭，再点“添加”。' : '请把订阅地址传到你的 iPhone、iPad 或 Mac 上添加。' : app==='google' ? calendarDevice.mobile ? '请将订阅地址传到电脑，在 Google 日历网页中添加。' : '先复制订阅地址，再打开 Google 日历的“通过网址添加”页面。' : '应用有网址订阅入口时可粘贴此地址；否则请查看下方文件导入方式。';
   if(app==='outlook') $('#entry-hint').textContent=ready ? '先复制订阅地址，在 Outlook 网页版选择“添加日历 → 从 Web 订阅”；也可查看经典桌面版步骤。' : $('#entry-hint').textContent;
   if(inAppApple && !subscription) $('#entry-hint').textContent='请先在 Safari 或系统浏览器打开本页，再选择内容并准备订阅。微信与浏览器的本机草稿不会自动同步。';
   $('#create-subscription').hidden=inAppApple && !subscription;
@@ -663,7 +679,10 @@ function renderProgress() {
   }
 }
 function renderSubscription() {
-  $('#subscription-summary').textContent = `${selectionSummary()} · 全天显示 · ${zoneLabel()}`;
+  // Same words as the action bar (11-13): "全天显示" read as "never rings".
+  const reminders=Object.values(settings.events).filter(pref=>pref.mode==='remind').length;
+  const ring=!countSelected() && settings.includeDailyDates ? '' : reminders ? ` · ${reminders} 项提醒` : ' · 只显示，不响铃';
+  $('#subscription-summary').textContent = `${selectionSummary()}${ring} · ${zoneLabel()}`;
   // Once a calendar is added, this panel is "my subscription": status and
   // actions first; the add-a-calendar guide folds behind one button.
   // Only a subscription that already existed when the panel opened counts:
@@ -694,6 +713,12 @@ function renderSubscription() {
     const count = downloadable.filter(event => event.preference.mode === mode).length;
     return count ? `<button class="secondary" type="button" data-download="${mode}">${icon('download')}下载${mode === 'remind' ? '提醒' : '仅显示'}日历 · ${count} 项日程</button>` : '';
   }).join('') || '<p>近期没有可下载的已选日程。</p>';
+  // A file does not update (11-13): say how far the festivals reach today.
+  const cn=date=>{ const [y,m,d]=date.split('-').map(Number); return `${y}年${m}月${d}日`; };
+  const coveredUntil=data?.published?.coverage?.end, fileEnd=rangeEnd(today,24);
+  $('#download-coverage').textContent=coveredUntil && coveredUntil<fileEnd
+    ? `目前节日更新到 ${cn(coveredUntil)}：文件里这天之前的节日都齐全；之后到 ${cn(fileEnd)} 只有每月固定的日子（如初八、初十、十五）。新的节日公布后，要重新下载导入。`
+    : `文件里的日子到 ${cn(fileEnd)} 为止。之后的日子，要重新下载导入。`;
   deviceGuide(); renderSaveState(); renderConnection();
   if(managing) renderManageHead();
 }
