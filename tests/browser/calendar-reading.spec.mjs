@@ -80,7 +80,7 @@ test('a card near the bottom of the grid opens upward and stays over the calenda
   expect(card.y + card.height).toBeLessThanOrEqual(grid.y + grid.height + 1);
 });
 
-for (const width of [390, 820]) test(`on phones and tablets every day has a short name in the grid and a full name in the list under it at ${width}px`, async ({page}) => {
+for (const width of [390, 820]) test(`on phones and tablets every day has a short name in the grid and a full name in the list above it at ${width}px`, async ({page}) => {
   await open(page, width);
   const tsokDay = page.locator('[data-cal-date="2026-11-19"]');
   await expect(tsokDay.locator('.cal-abbr')).toHaveText('莲师');
@@ -90,11 +90,9 @@ for (const width of [390, 820]) test(`on phones and tablets every day has a shor
   await expect(losar).toHaveClass(/is-losar/);
   await expect(losar.locator('.cal-abbr')).toHaveText(['新年', '等5项']);
   await page.locator('[data-cal-month]').selectOption('2026-11');
-  const list = page.locator('[data-cal-month-list]');
-  await expect(list.locator('.cal-month-list-title')).toContainText('11月的修行日');
-  const marked = await page.locator('.cal-day:not(.cal-adjacent)[class*="has-cat-"]').count();
-  await expect(list.locator('.cal-month-row')).toHaveCount(marked);
-  const tsok = list.locator('[data-cal-pick="2026-11-19"]');
+  // Full names are in the one list above the grid (11-13).
+  await expect(page.locator('[data-cal-month-list]')).toBeHidden();
+  const tsok = page.locator('#home-upcoming-list [data-home-date="2026-11-19"]');
   await expect(tsok).toContainText('莲师荟供日');
   await expect(tsok).toContainText('十月初十');
   await tsok.click();
@@ -198,21 +196,29 @@ test('the 藏历 page leaves out daily dates even for a subscription that has th
   await expect(home.locator('[data-cal-sheet]')).toBeVisible();
   await expect(home.locator('[data-cal-sheet] .cal-daily-entry')).toHaveCount(0);
   await page.keyboard.press('Escape');
-  await expect(home.locator('.cal-month-list li').first()).toBeVisible();
+  await expect(page.locator('#home-upcoming-list .home-row').first()).toBeVisible();
   await expect(home.locator('.cal-daily-entry')).toHaveCount(0);
 });
 
-for (const width of [390, 1366]) test(`the 藏历 page has no 月历/列表 switch; the month list under the grid follows the month at ${width}px`, async ({page}) => {
+for (const width of [390, 1366]) test(`the 藏历 page has no 月历/列表 switch and no second list under the grid at ${width}px`, async ({page}) => {
   await page.setViewportSize({width, height: 900});
   await page.goto('/calendar-reminders/');
   const home = page.locator('#home-calendar');
   await expect(home.locator('.cal-day')).toHaveCount(42);
   await expect(home.locator('[data-cal-view]')).toHaveCount(0);
   await expect(home.locator('.cal-list-view')).toBeHidden();
-  if (width < 1024) {
-    await home.locator('[data-cal-month]').selectOption('2026-12');
-    await expect(home.locator('.cal-month-list-title')).toContainText('12月的修行日');
-  }
+  await home.locator('[data-cal-month]').selectOption('2026-12');
+  await expect(home.locator('.cal-month-list')).toBeHidden();
+  // One list above the grid (11-13): this month from tomorrow, past days
+  // folded, then the next month's first two days.
+  const list = page.locator('#home-upcoming-list');
+  await expect(page.locator('#home-upcoming-title')).toHaveText('11月的修行日');
+  await expect(list.locator('.home-past summary')).toContainText('本月已过');
+  await expect(list.locator('.home-past-row').first()).toBeHidden();
+  await list.locator('.home-past summary').click();
+  await expect(list.locator('.home-past-row').first()).toBeVisible();
+  await expect(list.locator('.home-divider')).toHaveText('12月');
+  await expect(list.locator('.home-row').last()).toHaveAttribute('data-home-date', /^2026-12-/);
   // The subscription preview keeps its own switch.
   await page.goto('about:blank'); await page.goto('/calendar-reminders/#subscribe');
   if (width >= 1024) await expect(page.locator('#calendar-preview [data-cal-view]')).toHaveCount(2);

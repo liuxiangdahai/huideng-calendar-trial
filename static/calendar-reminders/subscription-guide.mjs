@@ -76,7 +76,7 @@ function addition(app, context, device) {
       ? device.inAppBrowser ? [['globe', '先按上方提示，在 Safari 或系统浏览器中打开本页。'], ['calendar-plus', '在浏览器中点按“加入 Apple 日历”。'], ['bell', '看到“移除提醒”时请保持关闭，到日子才会响。'], ['calendar-check', '在系统打开的日历窗口中确认添加。']]
       : [['calendar-plus', '点按上方“加入 Apple 日历”。'], ['bell', '在 iPhone 弹出的订阅页面里，看到“移除提醒”时请保持关闭，到日子才会响。'], ['calendar-check', '确认添加。']]
       : [['copy', '复制上方的订阅地址。'], ['phone', '将地址发送给自己的 iPhone、iPad 或 Mac。']];
-    return addSteps(app, `${location(device.mac ? '在电脑上操作 · Mac' : device.appleMobile ? '在手机上操作 · iPhone / iPad' : '当前设备用于准备，下一步转到 Apple 设备', device.mac ? 'calendar' : 'phone')}
+    return `<p class="guide-trouble-title">需要帮助时</p>` + addSteps(app, `${location(device.mac ? '在电脑上操作 · Mac' : device.appleMobile ? '在手机上操作 · iPhone / iPad' : '当前设备用于准备，下一步转到 Apple 设备', device.mac ? 'calendar' : 'phone')}
       <p>${prepare}</p>${steps(directSteps)}
       <details class="guide-help" data-guide-help="apple-manual-phone"><summary>在 iPhone / iPad 上手动添加</summary>${location('在手机上操作 · iPhone / iPad')}${steps([
         ['calendar', '打开 Apple“日历”应用。'],
@@ -247,12 +247,6 @@ function notificationSteps(app, device) {
   ])}<p class="guide-note">打开一条荟供日，看“提醒”是否为你设的时间（例如“当天 08:00”）。若显示的时间不对或没有提醒，可直接在日程里修改；小米等手机还可打开“闹钟提醒”，响铃更明显。各品牌的菜单名称可能因版本不同而变化。</p>${huawei}`;
 }
 
-function progressText(progress, hasReminders) {
-  if (!progress.seen) return '请先到日历应用中查看日程，再自行勾选确认。';
-  if (hasReminders && !progress.reminders) return '已记录你看到日程；请继续检查日历提醒。';
-  return hasReminders ? '已记录你的检查结果。实际提醒请以设备收到的通知为准。' : '已记录你看到日程。当前选择仅显示，无需开启提醒。';
-}
-
 export function createSubscriptionGuide(root, { notificationRoot = root, initialState, onStateChange = () => {} } = {}) {
   if (!root) throw new TypeError('缺少订阅引导容器');
   let state = normalizeGuideState(initialState);
@@ -262,11 +256,6 @@ export function createSubscriptionGuide(root, { notificationRoot = root, initial
   const device = calendarEnvironment();
   const snapshot = () => JSON.parse(JSON.stringify(state));
   const notify = () => onStateChange(snapshot());
-
-  function refreshProgress() {
-    const text = notificationRoot.querySelector('[data-guide-status]');
-    if (text && state.app) text.textContent = progressText(state.progress[state.app], context.hasReminders);
-  }
 
   function render() {
     const key = JSON.stringify(context);
@@ -294,20 +283,24 @@ export function createSubscriptionGuide(root, { notificationRoot = root, initial
       return;
     }
     const app = state.app;
-    const progress = state.progress[app];
     const onMac = app === 'iphone' && device.mac;
     const onComputer = onMac || (app === 'outlook' && !device.mobile);
     const deviceName = onMac ? 'Mac' : onComputer ? '电脑' : '手机';
     const addHtml = `<section class="guide-add" aria-label="中文添加帮助">${addition(app, context, device)}</section>`;
-    const notificationHtml = `<section class="guide-check" aria-labelledby="guide-check-title"><h3 id="guide-check-title">${context.hasReminders ? '检查日历提醒' : '确认日程显示'}</h3>
-      ${location(onMac ? '在电脑上操作 · Mac · 添加之后' : onComputer ? '在电脑上操作 · 添加之后' : '在手机上操作 · 添加之后', onComputer ? 'calendar' : 'phone')}
-      <label class="guide-confirm"><input id="guide-seen" data-guide-confirm="seen" type="checkbox"${progress.seen ? ' checked' : ''}><span>我已看到日程<small>已在自己的日历应用中确认日期与内容。</small></span></label>
-      ${context.hasReminders ? `<details class="guide-notifications" data-guide-expand${state.expanded[app] ? ' open' : ''}><summary>${icon('bell')}<span>查看开启步骤</span>${icon('chevron')}</summary><div class="guide-notification-body">${notificationSteps(app, device)}
+    // After adding (11-13): a reminder, not a checklist. Two things to look at,
+    // said plainly; how to turn notifications on stays one tap away.
+    const ringLine = app === 'google' ? 'Google 日历要自己给这个日历设“全天活动通知”，到日子才会响。'
+      : app === 'iphone' ? (onMac ? '要到时响铃，Mac 需要允许“日历”的通知。' : '要到时响铃，手机需要允许“日历”的通知（设置 › 日历 › 通知）。')
+      : onComputer ? '要到时响铃，电脑需要允许 Outlook 或浏览器的通知。' : '要到时响铃，手机需要允许日历应用的通知。';
+    const notificationHtml = `<section class="guide-check guide-after" aria-labelledby="guide-check-title"><h3 id="guide-check-title">${icon('bell')}加好以后，请看一眼</h3>
+      <ul class="guide-after-list">
+        <li>打开${onComputer ? deviceName + '上的' : '手机'}日历，能看到修行日，就是加好了。</li>
+        <li>${context.hasReminders ? ringLine : '你选的日子都是“只显示”，不会响铃；若这份日历自带默认提醒，可以把它关掉。'}</li>
+      </ul>
+      ${context.hasReminders ? `<details class="guide-notifications" data-guide-expand${state.expanded[app] ? ' open' : ''}><summary><span>怎么打开通知</span>${icon('chevron')}</summary><div class="guide-notification-body">${notificationSteps(app, device)}
         <details class="guide-help" data-guide-help="notification-missing"><summary>找不到这个入口</summary><p>${onMac ? '在 Mac“系统设置”的搜索框中输入“通知”，找到“日历”的通知设置。日历列表未显示时，可在日历的“显示”菜单中选择“显示日历列表”。' : onComputer ? '在电脑系统设置中搜索“通知”，找到 Outlook 或你使用的浏览器，再检查通知权限。' : '在手机“设置”的搜索框中输入日历应用名称，打开这个应用的设置，查找通知权限。'}若日历内没有对应选项，请查看该应用的帮助；不同版本的名称可能不同。</p><p>如果日程尚未出现，请先检查是否勾选显示这份日历，并等待日历应用同步。</p></details>
-      </div></details>
-      <label class="guide-confirm"><input id="guide-reminders" data-guide-confirm="reminders" type="checkbox"${progress.reminders ? ' checked' : ''}><span>我已检查提醒<small>已检查日历提醒和${deviceName}系统通知权限。</small></span></label>
-      <details class="guide-help guide-test" data-guide-help="test-reminder"><summary>试一次实际提醒（无需下载）</summary><p>打开独立测试页，添加测试日历，先确认日程出现，再锁屏观察。无需下载文件；可直接在聊天反馈，或复制文字结果。正式订阅保持不变。</p><p>目前优先验证 Apple 日历。Google、Outlook 等需按其添加方式操作，可能无法在短时间内同步；未同步时不能据此判定提醒失败。</p><a id="test-reminder" class="secondary" href="https://huideng-calendar-acceptance.pages.dev/calendar-reminders/reminder-check.html" target="_blank" rel="noopener noreferrer">${icon('bell')}打开提醒测试页</a></details>` : '<p class="guide-note">你选择的日程均为“仅显示”，已跳过通知设置。若日历应用自带默认提醒，请关闭这份日历的默认通知。</p>'}
-      <p class="guide-progress" data-guide-status role="status">${progressText(progress, context.hasReminders)}</p>
+        <details class="guide-help guide-test" data-guide-help="test-reminder"><summary>试一次实际提醒（无需下载）</summary><p>打开独立测试页，添加测试日历，先确认日程出现，再锁屏观察。无需下载文件；可直接在聊天反馈，或复制文字结果。正式订阅保持不变。</p><p>目前优先验证 Apple 日历。Google、Outlook 等需按其添加方式操作，可能无法在短时间内同步；未同步时不能据此判定提醒失败。</p><a id="test-reminder" class="secondary" href="https://huideng-calendar-acceptance.pages.dev/calendar-reminders/reminder-check.html" target="_blank" rel="noopener noreferrer">${icon('bell')}打开提醒测试页</a></details>
+      </div></details>` : ''}
     </section>`;
     if (notificationRoot === root) root.innerHTML = addHtml + notificationHtml;
     else { root.innerHTML = addHtml; notificationRoot.innerHTML = notificationHtml; }
@@ -320,15 +313,6 @@ export function createSubscriptionGuide(root, { notificationRoot = root, initial
     else if (focusHelp) root.ownerDocument.querySelector(`[data-guide-help="${CSS.escape(focusHelp)}"] > summary`)?.focus({ preventScroll: true });
     else if (focusJump) root.querySelector(`[data-guide-jump="${CSS.escape(focusJump)}"]`)?.focus({ preventScroll: true });
     else if (focusNotifications) notificationRoot.querySelector('[data-guide-expand] > summary')?.focus({preventScroll: true});
-  }
-
-  function onChange(event) {
-    if (!state.app) return;
-    const key = event.target.dataset.guideConfirm;
-    if (key === 'seen' || key === 'reminders') {
-      state.progress[state.app][key] = event.target.checked;
-      notify(); refreshProgress();
-    }
   }
 
   function onToggle(event) {
@@ -359,7 +343,6 @@ export function createSubscriptionGuide(root, { notificationRoot = root, initial
 
   const containers = [...new Set([root, notificationRoot])];
   for (const container of containers) {
-    container.addEventListener('change', onChange);
     container.addEventListener('toggle', onToggle, true);
     container.addEventListener('click', onClick);
   }
@@ -384,7 +367,6 @@ export function createSubscriptionGuide(root, { notificationRoot = root, initial
     },
     destroy() {
       for (const container of containers) {
-        container.removeEventListener('change', onChange);
         container.removeEventListener('toggle', onToggle, true);
         container.removeEventListener('click', onClick);
       }

@@ -86,7 +86,6 @@ for (const [name, device] of Object.entries(devices).filter(([name]) => name !==
       await expect(entry).toHaveAttribute('href', sub.feedUrl.replace(/^https:/, 'webcal:'));
       expect(await entry.getAttribute('href')).not.toContain(sub.manageToken);
       await expect(page.locator('#copy-feed')).toBeVisible();
-      await expect(page.locator('#guide-seen')).not.toBeChecked();
       await entry.evaluate(node => node.addEventListener('click', event => {
         event.preventDefault();
         window.observedCalendarClick = { trusted: event.isTrusted, href: node.href };
@@ -94,9 +93,7 @@ for (const [name, device] of Object.entries(devices).filter(([name]) => name !==
       await entry.click();
       expect(await page.evaluate(() => window.observedCalendarClick)).toEqual({ trusted: true, href: sub.feedUrl.replace(/^https:/, 'webcal:') });
       await page.evaluate(() => { window.dispatchEvent(new Event('blur')); window.dispatchEvent(new Event('focus')); document.dispatchEvent(new Event('visibilitychange')); });
-      await expect(page.locator('#guide-seen')).not.toBeChecked();
-      await expect(page.locator('#guide-reminders')).not.toBeChecked();
-      await expect(page.locator('[data-guide-status]')).not.toContainText('订阅成功');
+      await expect(page.locator('#notification-guide')).not.toContainText('订阅成功');
       await page.locator('[data-close="subscription-dialog"]').first().click();
       // Saved and unchanged: the bottom button becomes a quiet "我的订阅".
       await expect(page.locator('#subscribe-label')).toHaveText('我的订阅');
@@ -141,7 +138,6 @@ test('remembered Google choice overrides Apple recommendation and desktop opens 
     await page.locator('[data-guide-expand] > summary').click();
     await expect(page.locator('.guide-notification-body')).toContainText('在电脑上操作');
     await expect(page.locator('.guide-notification-body')).not.toContainText('请拿起手机');
-    await expect(page.locator('#guide-seen')).not.toBeChecked();
     await page.locator('input[name="device"][value="other"]').check();
     await expect(page.locator('#iphone-subscribe,#google-subscribe').filter({ visible: true })).toHaveCount(0);
     expect(service.posts).toBe(1);
@@ -192,7 +188,6 @@ test('Android handoff keeps copy and import available while actual ICS checks fa
     await expect(page.locator('a[href*="cid="],a[href^="intent:"]')).toHaveCount(0);
     await page.locator('#copy-feed').click();
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(sub.feedUrl);
-    await expect(page.locator('#guide-seen')).not.toBeChecked();
     await page.locator('input[name="device"][value="other"]').check();
     await expect(page.locator('#iphone-subscribe')).toBeHidden();
     await expect(page.locator('#google-subscribe')).toBeHidden();
@@ -200,7 +195,6 @@ test('Android handoff keeps copy and import available while actual ICS checks fa
     await expect(page.locator('.download-fallback')).toContainText('文件不会持续更新');
     await page.locator('.download-fallback > summary').click();
     await expect(page.locator('[data-download="remind"]')).toBeVisible();
-    await expect(page.locator('#guide-seen')).not.toBeChecked();
     mode='html';await page.locator('#check-connection').click();
     await expect.poll(()=>Boolean(releaseCheck)).toBe(true);
     await page.locator('#connection-details > summary').click();
@@ -252,7 +246,6 @@ test('slow preparation survives closing and app changes without duplicate creati
     service.release(); await ready(page);
     await expect(page.locator('#iphone-subscribe')).toBeVisible();
     await expect(page).toHaveURL(origin + appPath + '#subscribe');
-    await expect(page.locator('#guide-seen')).not.toBeChecked();
     expect(service.posts).toBe(1);
   } finally { service?.release(); await context.close(); }
 });
@@ -287,7 +280,6 @@ test('failed preparation preserves choices and explicit retry creates one usable
     await ready(page);
     await expect(page.locator('#subscription-error')).toBeHidden();
     await expect(page.locator('#iphone-subscribe')).toBeVisible();
-    await expect(page.locator('#guide-seen')).not.toBeChecked();
     expect(service.posts).toBe(2);
     expect(await read(page, 'huideng.calendar.v2')).toEqual(draft);
   } finally { await context.close(); }
@@ -403,7 +395,6 @@ async function verifyManualSteps(page,sub) {
       await expect(page.locator('#copy-feed')).toHaveClass(/primary/);
       await page.locator('#copy-feed').click();await expect(page.locator('#copy-progress')).toContainText('地址已复制');
       expect(await page.evaluate(()=>window.copiedFeed)).toBe(sub.feedUrl);expect(popups).toBe(0);
-      await expect(page.locator('#guide-seen')).not.toBeChecked();
     }
     await page.evaluate(()=>{Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async()=>{throw Error('denied');}}});document.execCommand=()=>false;});
     await page.locator('#copy-feed').click();await expect(page.locator('#copy-progress')).toContainText('未能自动复制');
@@ -428,7 +419,6 @@ test('clipboard denial offers a selectable read-only URL without implying subscr
     await expect(manual).toBeFocused();
     await expect(manual).toHaveAttribute('readonly','');
     expect(await manual.inputValue()).not.toContain(sub.manageToken);
-    await expect(page.locator('#guide-seen')).not.toBeChecked();
   }finally{await context.close();}
 });
 
@@ -485,8 +475,6 @@ test('in-app browser help is explicit and never fabricates an external-browser o
     await expect(connectionHelp).toContainText('不代表日历应用能够连接订阅服务');
     await page.locator('#copy-feed').click();
     await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
-    await expect(page.locator('#guide-seen')).not.toBeChecked();
-    await expect(page.locator('#guide-reminders')).not.toBeChecked();
     await page.locator('input[name="device"][value="google"]').check();
     await expect(notice).toBeHidden();
     await page.locator('input[name="device"][value="iphone"]').check();
@@ -559,7 +547,6 @@ test('management restore waits for a delayed save and keeps B id, token, draft a
     const page = await context.newPage(); await httpsService(page);
     await openSelected(page); await page.locator('#subscribe').click(); const a = await ready(page);
     const b = await createRemoteB(context, a);
-    await page.locator('#guide-seen').check();await page.locator('#guide-reminders').check();
     const order = [], bRequests = [], leaked = [];
     page.on('request', request => {
       if (request.url().endsWith(`/api/subscriptions/${b.id}`)) {
@@ -579,7 +566,6 @@ test('management restore waits for a delayed save and keeps B id, token, draft a
     // Still tappable: it opens the panel with the progress, and saves nothing.
     await expect(page.locator('#subscribe')).toBeEnabled();
     held.release(); await expectB(page, b);
-    await expect(page.locator('#guide-seen')).not.toBeChecked();
     expect(order.indexOf('GET B')).toBeGreaterThan(order.indexOf('release PATCH A'));
     expect((await context.request.get(`${origin}/api/subscriptions/${a.id}`, { headers: { Authorization: `Bearer ${a.manageToken}` } })).ok()).toBe(true);
     await page.locator('[data-close="subscription-dialog"]').first().click();
@@ -649,7 +635,6 @@ test('successful stop clears a previous error and allows a new explicit subscrip
   try {
     const page = await context.newPage(); const service = await httpsService(page);
     await openSelected(page); await page.locator('#subscribe').click(); const a = await ready(page);
-    await page.locator('#guide-seen').check();await page.locator('#guide-reminders').check();
     await page.evaluate(() => { location.hash = 'manage=incomplete'; });
     await expect(page.locator('#subscription-error')).toContainText('管理链接不完整');
     await page.locator('.management > summary').click();
@@ -661,6 +646,5 @@ test('successful stop clears a previous error and allows a new explicit subscrip
     expect(replacement.id).not.toBe(a.id);
     expect(service.posts).toBe(2);
     await expect(page.locator('#subscription-error')).toBeHidden();
-    await expect(page.locator('#guide-seen')).not.toBeChecked();
   } finally { await context.close(); }
 });

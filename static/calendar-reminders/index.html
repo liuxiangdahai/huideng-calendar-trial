@@ -61,7 +61,6 @@
               <span class="sub-open">订阅链接 · 加到另一台设备 · 停用<span data-icon="chevron-right" aria-hidden="true"></span></span>
             </button>
           </section>
-          <p id="unsubscribed-hint" class="unsubscribed-hint" hidden><b>还没加入日历</b>：选好日子和时间，最后点“加入日历”。</p>
           <section class="quick-section" aria-labelledby="quick-title">
             <div class="quick-heading"><h3 id="quick-title"><span class="step-no">1</span>选择要提醒的日子</h3></div>
             <div class="quick-panel">
@@ -225,7 +224,8 @@
         <p id="manage-check-result" class="manage-check-result" role="status" aria-live="polite"></p>
       </details>
     </section>
-    <fieldset class="device-options"><legend>选择你使用的日历应用</legend><label><input type="radio" name="device" value="iphone"><span data-icon="phone" aria-hidden="true"></span><span>Apple 日历<small>iPhone、iPad、Mac</small></span></label><label><input type="radio" name="device" value="google"><span data-icon="calendar" aria-hidden="true"></span><span>Google 日历<small>通过电脑添加订阅</small></span></label><label><input type="radio" name="device" value="outlook"><span data-icon="calendar" aria-hidden="true"></span><span>Outlook<small>网页版、经典桌面版</small></span></label><label><input type="radio" name="device" value="other"><span data-icon="phone" aria-hidden="true"></span><span>其他日历<small>华为、OPPO、小米等</small></span></label></fieldset>
+    <fieldset class="device-options"><legend>你用的日历</legend><label><input type="radio" name="device" value="iphone"><span data-icon="phone" aria-hidden="true"></span><span>Apple 日历<small>iPhone、iPad、Mac</small></span></label><label><input type="radio" name="device" value="google"><span data-icon="calendar" aria-hidden="true"></span><span>Google 日历<small>通过电脑添加订阅</small></span></label><label><input type="radio" name="device" value="outlook"><span data-icon="calendar" aria-hidden="true"></span><span>Outlook<small>网页版、经典桌面版</small></span></label><label><input type="radio" name="device" value="other"><span data-icon="phone" aria-hidden="true"></span><span>其他日历<small>华为、OPPO、小米等</small></span></label></fieldset>
+    <p id="device-note" class="device-note" aria-live="polite"></p>
     <section class="subscription-entry" aria-labelledby="entry-title">
     <h3 id="entry-title">添加到日历</h3>
     <aside id="apple-browser-notice" class="browser-handoff" aria-labelledby="apple-browser-title" hidden>
@@ -259,7 +259,7 @@
     <div id="subscription-management" hidden>
       <details class="management"><summary>管理这份订阅<small>管理链接 · 停用</small><span data-icon="chevron" aria-hidden="true"></span></summary><p>同一浏览器、同一网站会自动记住你的订阅。后台匿名保存选择，换设备可通过管理链接恢复。</p><p>管理链接可以修改或停用订阅，请只自己保存。若管理链接丢失且浏览器数据已清除，将无法找回原订阅；需在日历应用移除后重新建立。</p><button id="copy-management" type="button" class="secondary"><span data-icon="copy" aria-hidden="true"></span>复制管理链接</button><button id="stop-subscription" type="button" class="text-button danger">停用订阅</button><div id="stop-confirmation" class="notice" hidden><p>停用后将撤销这份订阅中的日程。手机上的订阅日历需要手动移除。</p><div class="feed-actions"><button id="confirm-stop" type="button" class="secondary danger">确认停用</button><button id="cancel-stop" type="button" class="text-button">保留订阅</button></div></div></details>
     </div>
-    <details class="download-fallback"><summary>使用文件导入 · 不持续更新<span data-icon="chevron" aria-hidden="true"></span></summary><p>这是一次性导入，文件不会持续更新。再次导入前，请先删除旧的专用日历，避免重复。仅显示日程请关闭日历的默认通知。</p><div id="downloads" class="downloads"></div><p id="download-status" class="status-note" role="status"></p></details>
+    <details class="download-fallback"><summary>使用文件导入 · 不持续更新<span data-icon="chevron" aria-hidden="true"></span></summary><p>这是一次性导入，文件不会持续更新。再次导入前，请先删除旧的专用日历，避免重复。仅显示日程请关闭日历的默认通知。</p><p id="download-coverage" class="download-coverage"></p><div id="downloads" class="downloads"></div><p id="download-status" class="status-note" role="status"></p></details>
     <div id="notification-guide"></div>
     <div class="dialog-actions"><button type="button" class="secondary" data-close="subscription-dialog">完成</button></div>
   </dialog>

@@ -415,7 +415,7 @@ test('every dialog opens under a red eave that spans the window, and a disabled 
     const context = await browser.newContext({viewport, locale:'zh-CN'}), page = await context.newPage(); await open(page);
     await page.locator('[data-preset="tsok"]').click(); await page.locator('#subscribe').click();
     const dialog = page.locator('#subscription-dialog');
-    await dialog.evaluate(node => Promise.all(node.getAnimations({subtree:true}).map(animation => animation.finished)));
+    await dialog.evaluate(node => Promise.all(node.getAnimations({subtree:true}).map(animation => animation.finished.catch(() => {}))));
     const [frame, eave] = await Promise.all([dialog.boundingBox(), dialog.locator('.dialog-head').boundingBox()]);
     // Edge to edge inside the 1px border, so no white slivers beside the red band.
     expect(Math.abs(eave.x - frame.x)).toBeLessThanOrEqual(1);
