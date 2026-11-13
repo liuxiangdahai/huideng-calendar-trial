@@ -320,8 +320,10 @@ export function createSubscriptionGuide(root, { notificationRoot = root, initial
       const key = event.target.dataset.guideHelp;
       if (event.target.open) openHelp.add(key); else openHelp.delete(key);
     }
-    if (state.app && event.target.matches?.('[data-guide-expand]') && state.expanded[state.app] !== event.target.open) {
-      state.expanded[state.app] = event.target.open;
+    // A late toggle belongs to the app it was drawn for, not the one shown now.
+    const forApp = event.target.dataset?.app || state.app;
+    if (forApp && event.target.matches?.('[data-guide-expand]') && state.expanded[forApp] !== event.target.open) {
+      state.expanded[forApp] = event.target.open;
       notify();
     }
   }
@@ -351,6 +353,10 @@ export function createSubscriptionGuide(root, { notificationRoot = root, initial
     update(next = {}) {
       if (Object.hasOwn(next, 'app')) {
         const app = APPS.includes(next.app) ? next.app : '';
+        // Record the open "怎么打开通知" before switching apps: its toggle event
+        // may not have fired yet when the switch comes right after a tap.
+        const current = notificationRoot.querySelector('[data-guide-expand]');
+        if (state.app && app !== state.app && current?.dataset.app === state.app && state.expanded[state.app] !== current.open) { state.expanded[state.app] = current.open; notify(); }
         if (state.app !== app) { state.app = app; notify(); }
         context.app = app;
       }
