@@ -12,6 +12,8 @@
 
 接手维护先读 [`docs/maintainer-handbook.md`](docs/maintainer-handbook.md)（一页）。
 
+佛慧法语资料自动维护已启用：[查看最新检查](https://github.com/liuxiangdahai/huideng-calendar-trial/actions/workflows/calendar-source.yml) · [中文查看与异常处理说明](docs/calendar-maintenance-guide.md)。检查结果与实际发布状态分开记录。
+
 ## 本地开发
 
 需要 Node.js 24。安装后运行：

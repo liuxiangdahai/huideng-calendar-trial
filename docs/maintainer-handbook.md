@@ -14,6 +14,7 @@
 
 ## 2. 检查佛慧法语自动维护结果
 
+- 非技术查看入口、邮件通知设置及异常处理表见[自动维护中文说明](calendar-maintenance-guide.md)。日常不用下载报告。
 - 在仓库 Actions 中打开 **Fohui calendar source maintenance**，查看最近结果；长期记录在`docs/evidence/source-maintenance/latest-check.json`。
 - 每月一次，11、12月各加一次。原历无变化时只记录检查结果；完整、已知的未来新增日期通过校验和现有发布检查后更新到原订阅。
 - 若出现待核对分支，从差异链接检查原文对应、稳定编号和资料完整性，再创建PR；不另改佛慧法语的安排。新名称或删除不能静默忽略。失败报告在每次运行的`source-maintenance`附件中。
