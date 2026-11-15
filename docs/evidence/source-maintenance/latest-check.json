@@ -1,20 +1,17 @@
 {
   "schemaVersion": 1,
-  "checkedAt": "2026-11-12T11:50:46.136Z",
-  "status": "unchanged",
-  "sourceRange": [
-    "2026-01-01",
-    "2027-05-06"
-  ],
+  "checkedAt": "2026-11-15T23:26:34.787Z",
+  "status": "failed",
+  "sourceRange": null,
   "candidateEnd": null,
-  "newDays": 0,
-  "editedDays": 0,
+  "newDays": null,
+  "editedDays": null,
   "issues": [],
-  "failureCode": null,
+  "failureCode": "source-unreachable",
   "robotsAllowed": false,
   "publicationStatus": null,
   "publicationFailure": null,
   "compareUrl": null,
-  "run": "https://github.com/liuxiangdahai/huideng-calendar-trial/actions/runs/43212611208",
+  "run": "https://github.com/liuxiangdahai/huideng-calendar-trial/actions/runs/43774800477",
   "releaseRun": null
 }
