@@ -46,7 +46,7 @@ async function downloadText(page, selector) {
   return fs.readFile(await (await pending).path(),'utf8');
 }
 
-test('new visitors begin empty, all categories retain exact source names, and choices persist',async({page}) => {
+test('with nothing chosen, all categories retain exact source names, and choices persist',async({page}) => {
   const errors = []; page.on('pageerror',error => errors.push(error.message));
   await open(page);
   await expect(page.locator('h1')).toHaveText('藏历');
@@ -268,6 +268,7 @@ test('desktop layout and visible focus remain usable',async({page}) => {
 
 test('legacy choices migrate without selecting newly added events',async({page}) => {
   await page.addInitScript(() => {
+    localStorage.removeItem('huideng.calendar.v2');
     localStorage.setItem('huideng.calendar.v1',JSON.stringify({version:1,zone:'America/Vancouver',groups:{tsok:{mode:'remind',reminders:[{daysBefore:1,time:'20:00'}]},masters:{mode:'display',reminders:[{daysBefore:0,time:'08:00'}]},buddha:{mode:'off',reminders:[{daysBefore:0,time:'08:00'}]}},overrides:{'dakini-tsok':{mode:'display',reminders:[{daysBefore:0,time:'08:00'}]}}}));
   });
   await open(page); const settings = await draft(page);
