@@ -682,7 +682,6 @@ input[type=time]::-webkit-datetime-edit { padding: 0; }
 @media (max-width: 1023px) { .region-bar { display: none; } }
 
 .title-marks-note { margin-top: 2px; color: var(--muted); font-size: var(--fs-xs); line-height: 1.5; }
-.recommend-tag { margin-left: 8px; padding: 0 7px; border-radius: 9px; background: var(--red-tint); color: var(--wine); font: 500 var(--fs-xs)/20px var(--font-ui); letter-spacing: 0; }
 .daily-calendar-note { margin: -4px 0 10px; padding: 8px 10px; border-radius: var(--r-sm); background: var(--gold-tint); color: #5b4a2d; font-size: var(--fs-sm); line-height: 1.6; }
 
 /* Unsaved changes: same card, same place, warmer tone. */
@@ -1220,7 +1219,6 @@ body[data-page="subscribe"] [data-page-part="home"] { display: none !important; 
 .daily-calendar { margin-top: 8px; padding: 0 14px; border: 1px solid #e2cfa6; border-radius: 10px; background: #fbf5ea; }
 .daily-calendar>summary { display: flex; align-items: center; gap: 8px; min-height: 48px; color: var(--wine); font: 600 var(--fs-md)/1.4 var(--font-serif); list-style: none; cursor: pointer; }
 .daily-calendar>summary::-webkit-details-marker { display: none; }
-.daily-calendar>summary .recommend-tag { margin-left: 0; background: var(--eave); color: #f1d9a6; }
 .daily-calendar>summary .icon { margin-left: auto; width: 16px; height: 16px; color: var(--muted); transition: transform .15s; }
 .daily-calendar[open]>summary .icon { transform: rotate(180deg); }
 .daily-calendar p { margin: 0 0 10px; color: var(--ink-2); font-size: var(--fs-sm); }
@@ -1411,3 +1409,15 @@ body[data-page="subscribe"] .today-feast, body[data-page="subscribe"] .masthead-
 #notification-guide .guide-after .guide-notifications>summary { padding-inline: 4px; }
 /* The file's reach, said in the import fold (11-13). */
 .download-coverage { margin: 0 0 12px; padding: 10px 12px; border-left: 3px solid var(--gold-2); background: #fbf5ea; color: var(--ink-2); font-size: var(--fs-sm); line-height: 1.7; }
+
+/* 加入日历, first time (11-16): no step bar; on Apple no "地址已生成" row
+   while all is well, just the button, the one sentence under it, and copying
+   the link one tap further for other calendars. */
+#subscription-dialog .sub-progress { display: none; }
+#subscription-dialog:not(.is-managing) .subscription-entry:has(#subscription-existing.is-apple-direct) #connection-status[data-quiet="true"] { display: none; }
+#subscription-existing.is-apple-direct #copy-feed,
+#subscription-existing.is-apple-direct .url-label { display: none; }
+#subscription-existing.is-apple-direct + #entry-hint, .entry-actions + #entry-hint { margin: 10px 0 4px; color: var(--ink); font-size: var(--fs-md); line-height: 1.7; }
+.entry-show-copy { display: inline-flex; align-items: center; gap: 4px; margin: 6px 0 2px; color: var(--teal); }
+.entry-show-copy[hidden] { display: none; }
+.entry-show-copy .icon { width: 16px; height: 16px; }

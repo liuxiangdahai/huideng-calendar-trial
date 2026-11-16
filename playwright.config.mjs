@@ -12,7 +12,10 @@ export default defineConfig({
   use: {
     baseURL: 'http://127.0.0.1:4173',
     headless: true,
-    timezoneId: 'Asia/Shanghai'
+    timezoneId: 'Asia/Shanghai',
+    // Most tests start from nothing chosen. A real first visit starts with
+    // 全部修行日 chosen (11-16); the tests of that clear this state.
+    storageState: {cookies: [], origins: [{origin: 'http://127.0.0.1:4173', localStorage: [{name: 'huideng.calendar.v2', value: '{"version":2,"events":{}}'}]}]}
   },
   webServer: {
     command:'node tools/calendar/serve.mjs',

@@ -71,7 +71,7 @@
               <section class="daily-date-option" aria-labelledby="daily-date-title">
                 <label class="event-label" for="include-daily-dates">
                   <span class="daily-date-icon preset-medal" aria-hidden="true"><span data-icon="lotus-seat" class="medal-seat"></span><span data-icon="calendar" class="medal-icon"></span></span>
-                  <span class="daily-date-copy"><span class="daily-date-title-row"><strong id="daily-date-title">另加每日藏历</strong><small>可选</small></span><span id="daily-date-note">每天一条全天的藏历日期，不响铃。</span></span>
+                  <span class="daily-date-copy"><span class="daily-date-title-row"><strong id="daily-date-title">另加每日藏历</strong><small>可选</small></span><span id="daily-date-note">跟着你的订阅一起加进日历，最省事，不用另外操作。每天一条，不响铃。</span></span>
                   <input id="include-daily-dates" type="checkbox" aria-labelledby="daily-date-title" aria-describedby="daily-date-note">
                 </label>
                 <details class="daily-date-help"><summary>显示示例<span data-icon="chevron" aria-hidden="true"></span></summary><div class="daily-date-examples"><p>藏历十月初一<br>藏历九月初九（重日1）<br>藏历九月初九（重日2）<br>藏历闰二月初一</p><p id="daily-date-app-note">可以单独订阅，也可与修行日一起加入。每天会多一条全天日程，不会替换日历应用自带的日期标签。请检查应用的默认通知，避免它自行添加提醒。</p></div></details>
@@ -79,8 +79,8 @@
               <!-- Every day's date, one place (11-12): in this calendar (the box
                    above), or as its own calendar everyone shares (here). -->
               <details class="daily-calendar" aria-labelledby="daily-calendar-title">
-                <summary><span id="daily-calendar-title">另订一个独立的“每日藏历”日历</span><span class="recommend-tag">推荐</span><span data-icon="chevron" aria-hidden="true"></span></summary>
-                <p>这是另外一个日历链接，和你的修行日订阅分开：只有每天一条“藏历某月某日”，不响铃；在手机里可以给它设个淡一点的颜色，也能随时隐藏。大家共用同一个链接。</p>
+                <summary><span id="daily-calendar-title">单独订一个每日藏历日历</span><span data-icon="chevron" aria-hidden="true"></span></summary>
+                <p>适合想把它单独隐藏、换个颜色，或者只要每日藏历、不要修行日提醒的师兄。这是另外一个日历链接，和你的修行日订阅分开；每天一条，不响铃。大家共用同一个链接。</p>
                 <p id="daily-calendar-note" class="daily-calendar-note" hidden>你已勾选上面的“另加每日藏历”。改用这个独立日历时，请取消那个勾选，免得同一天出现两遍。</p>
                 <p id="daily-calendar-how" class="daily-calendar-how"></p>
                 <div class="daily-calendar-actions">
@@ -247,6 +247,7 @@
     <div id="subscription-new"><button id="create-subscription" class="primary full" type="button"><span id="create-subscription-label">请先选择日历应用</span><span data-icon="arrow-right" aria-hidden="true"></span></button></div>
     <div id="subscription-existing" hidden>
       <div class="feed-actions entry-actions"><a id="iphone-subscribe" class="primary" hidden><span data-icon="calendar-plus" aria-hidden="true"></span>加入 Apple 日历</a><button id="copy-feed" class="secondary" type="button"><span data-icon="copy" aria-hidden="true"></span>复制订阅链接</button><a id="google-subscribe" class="secondary" target="_blank" rel="noopener noreferrer" hidden><span data-icon="calendar-plus" aria-hidden="true"></span>加入 Google 日历</a><a id="outlook-subscribe" class="secondary" target="_blank" rel="noopener noreferrer" hidden><span data-icon="calendar-plus" aria-hidden="true"></span>加入 Outlook</a></div>
+      <button id="entry-show-copy" type="button" class="text-button entry-show-copy" hidden>用别的日历？复制订阅链接<span data-icon="chevron" aria-hidden="true"></span></button>
       <p id="copy-progress" class="minor" role="status" hidden></p>
       <label class="url-label">订阅链接<input id="feed-url" readonly aria-label="订阅链接" spellcheck="false"></label>
       <button id="save-subscription" type="button" class="primary full" hidden>保存修改</button>

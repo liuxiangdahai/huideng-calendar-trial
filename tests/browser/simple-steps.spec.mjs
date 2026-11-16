@@ -198,3 +198,46 @@ test('the subscribe page starts with the choices; the add window says what will 
   await expect(page.locator('#download-coverage')).toContainText('目前节日更新到 ');
   await expect(page.locator('#download-coverage')).toContainText('要重新下载导入');
 });
+
+test.describe('a first visit',()=>{
+  test.use({storageState:{cookies:[],origins:[]}});
+  test('starts with 全部修行日 chosen, so 加入日历 works straight away (11-16)',async({page})=>{
+    await page.setViewportSize({width:390,height:844});await open(page);
+    await expect(page.locator('[data-preset="practice"]')).toHaveAttribute('aria-pressed','true');
+    await expect(page.locator('#subscribe')).toBeEnabled();
+    await expect(page.locator('.action-bar')).toContainText('2 项提醒');
+    // Choosing another keeps working; tapping the chosen one clears it.
+    await page.locator('[data-preset="tsok"]').click();
+    await expect(page.locator('[data-preset="tsok"]')).toHaveAttribute('aria-pressed','true');
+    await page.locator('[data-preset="tsok"]').click();
+    await expect(page.locator('#subscribe')).toBeDisabled();
+  });
+});
+
+test.describe('adding on an iPhone',()=>{
+  test.use({userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',viewport:{width:390,height:844}});
+  test('one button, the 移除提醒 sentence right under it, copying one tap further (11-16)',async({page})=>{
+    // The Apple button needs an https feed; serve the local API under one.
+    const local='http://127.0.0.1:4173', secure='https://calendar.example.test';
+    await page.route('**/calendar-reminders/config.json',route=>route.fulfill({json:{apiBaseUrl:secure}}));
+    await page.route(`${secure}/**`,async route=>{
+      const response=await route.fetch({url:route.request().url().replace(secure,local)});
+      await route.fulfill({status:response.status(),headers:{...response.headers(),'access-control-allow-origin':'*'},body:(await response.text()).split(local).join(secure)});
+    });
+    await open(page);
+    await page.locator('[data-preset="tsok"]').click();
+    await page.locator('#subscribe').click();
+    const apple=page.locator('#iphone-subscribe');
+    await expect(apple).toBeVisible();
+    await expect(apple).toHaveAttribute('href',/^webcal:\/\/calendar\.example\.test\//);
+    await expect(page.locator('.entry-actions + #entry-hint')).toContainText('移除提醒');
+    await expect(page.locator('#copy-feed')).toBeHidden();
+    await expect(page.locator('#feed-url')).toBeHidden();
+    await expect(page.locator('#subscription-progress')).toBeHidden();
+    await expect(page.locator('#subscription-dialog .overline')).toBeHidden();
+    await expect(page.locator('#connection-status')).toBeHidden();
+    await page.locator('#entry-show-copy').click();
+    await expect(page.locator('#copy-feed')).toBeVisible();
+    await expect(page.locator('#feed-url')).toHaveValue(/^https:\/\/calendar\.example\.test\//);
+  });
+});

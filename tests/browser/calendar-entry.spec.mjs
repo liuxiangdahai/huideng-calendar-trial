@@ -85,6 +85,9 @@ for (const [name, device] of Object.entries(devices).filter(([name]) => name !==
       await expect(entry).toHaveText('加入 Apple 日历');
       await expect(entry).toHaveAttribute('href', sub.feedUrl.replace(/^https:/, 'webcal:'));
       expect(await entry.getAttribute('href')).not.toContain(sub.manageToken);
+      // Copying is for other calendars, one tap further on Apple (11-16).
+      await expect(page.locator('#copy-feed')).toBeHidden();
+      await page.locator('#entry-show-copy').click();
       await expect(page.locator('#copy-feed')).toBeVisible();
       await entry.evaluate(node => node.addEventListener('click', event => {
         event.preventDefault();
@@ -413,6 +416,7 @@ test('clipboard denial offers a selectable read-only URL without implying subscr
       Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:()=>Promise.reject(new Error('denied'))}});
       document.execCommand=()=>{throw new Error('disabled');};
     });
+    await page.locator('#entry-show-copy').click();
     await page.locator('#copy-feed').click();
     const manual=page.locator('#subscription-error input');
     await expect(manual).toHaveValue(sub.feedUrl);

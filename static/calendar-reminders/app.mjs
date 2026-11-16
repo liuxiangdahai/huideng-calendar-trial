@@ -49,6 +49,7 @@ const calendarDevice = calendarEnvironment();
 const countSelected = () => Object.values(settings.events).filter(pref => pref.mode !== 'off').length;
 const hasSelectedContent = () => countSelected() > 0 || settings.includeDailyDates === true;
 const selectionSummary = () => !countSelected() && settings.includeDailyDates ? '每日藏历 · 仅显示' : `已选 ${countSelected()} 项${settings.includeDailyDates ? ' · 含每日藏历' : ''}`;
+let showCopyForApple = false;
 const dirty = () => Boolean(subscription && JSON.stringify(settings) !== JSON.stringify(subscription.savedSettings));
 const zoneLabel = () => settings.zone ? zoneInfo(settings.zone)?.label || settings.zone : '尚未选择时区';
 const currentApp = () => $('input[name="device"]:checked')?.value || '';
@@ -617,6 +618,13 @@ function deviceGuide() {
   $('#entry-hint').textContent=managementRestoring ? '正在恢复订阅，请稍候。' : !app ? '' : requestPending ? '正在保存你的选择，请稍候。' : !subscription ? '选好日历应用后，我们会准备你的订阅。' : !ready ? '先保存修改，再继续添加到日历。' : inAppApple ? '也可复制上方的 HTTPS 订阅地址，在 Apple 日历中手动添加。复制后仍需到日历中确认。' : app==='iphone' ? calendarDevice.apple ? '会弹出“订阅”页面：看到“移除提醒”请保持关闭，再点“添加”。' : '请把订阅地址传到你的 iPhone、iPad 或 Mac 上添加。' : app==='google' ? calendarDevice.mobile ? '请将订阅地址传到电脑，在 Google 日历网页中添加。' : '先复制订阅地址，再打开 Google 日历的“通过网址添加”页面。' : '应用有网址订阅入口时可粘贴此地址；否则请查看下方文件导入方式。';
   if(app==='outlook') $('#entry-hint').textContent=ready ? '先复制订阅地址，在 Outlook 网页版选择“添加日历 → 从 Web 订阅”；也可查看经典桌面版步骤。' : $('#entry-hint').textContent;
   if(inAppApple && !subscription) $('#entry-hint').textContent='请先在 Safari 或系统浏览器打开本页，再选择内容并准备订阅。微信与浏览器的本机草稿不会自动同步。';
+  // One tap on Apple (11-16): the one sentence that matters sits right under
+  // the button; copying the link is for other calendars, one tap further.
+  const appleDirect=!apple.hidden && ready && !inAppApple;
+  const existing=$('#subscription-existing');
+  existing.classList.toggle('is-apple-direct',appleDirect && !showCopyForApple);
+  if(appleDirect) $('.entry-actions').after($('#entry-hint')); else existing.after($('#entry-hint'));
+  $('#entry-show-copy').hidden=!appleDirect || showCopyForApple;
   $('#create-subscription').hidden=inAppApple && !subscription;
   $('#copy-page').hidden=!inAppApple;
   $('#create-subscription').disabled = !app || !hasSelectedContent() || requestPending || managementRestoring || !settings.zone || creationBlocked;
@@ -641,6 +649,9 @@ function renderConnection() {
   connectionPanel.dataset.state=connection.state;
   // Before anything is prepared there is no connection to describe; keep the panel out of the way.
   connectionPanel.dataset.prepared=String(Boolean(subscription||busy||stopped));
+  // When all is well there is nothing to report while adding (11-16); the
+  // row shows only while saving, after stopping, or when a check fails.
+  connectionPanel.dataset.quiet=String(Boolean(subscription) && !busy && !stopped && !failed && !checking);
   $('#connection-details-label').textContent=checking ? '正在检查' : failed ? '连接失败' : connection.state==='ok' ? '连接正常' : '连接信息';
   $('#connection-status').setAttribute('aria-busy',String(checking||busy));
   $('#connection-symbol').innerHTML=icon(stopped?'bell-off':connection.state==='ok'?'check':connection.state==='error'?'globe':'calendar');
@@ -694,7 +705,8 @@ function renderSubscription() {
   $('#manage-add').setAttribute('aria-expanded',String(dialog.classList.contains('show-add')));
   $('#subscription-title').textContent=managing ? '我的订阅' : '加入日历';
   renderProgress();
-  $('#subscription-dialog .overline').textContent=managing ? '已加入日历' : '我的订阅';
+  $('#subscription-dialog .overline').textContent=managing ? '已加入日历' : '';
+  $('#subscription-dialog .overline').hidden=!managing;
   $('#entry-title').lastChild.textContent=managing ? '加到另一台设备' : '添加到日历';
   if(managing) renderManageHead();
   $('#subscription-new').hidden = Boolean(subscription);
@@ -870,7 +882,9 @@ async function performSaveSubscription(create) {
     if (changedDuringSave) {
       settings = latestDraft; refresh(); renderSubscription();
       notify('已保存上次提交的设置；后续修改仍待保存。');
-    } else notify('已保存，日历会自己更新');
+    } else if(!create) notify('已保存，日历会自己更新');
+    // A first add needs no "saved" toast over the window (11-16): the next
+    // thing to do is the button right in front of the reader.
   } catch (error) { showSubscriptionError(error); }
   finally {
     requestPending = false; renderSubscription();
@@ -1149,6 +1163,7 @@ function attachEvents() {
     catch (error) { showSubscriptionError(error); }
   });
   document.querySelectorAll('input[name="device"]').forEach(input => input.addEventListener('change',()=>{ui.app=input.value;persistUI();$('#entry-attempt').hidden=true;renderProgress();deviceGuide();void prepareSubscription();}));
+  $('#entry-show-copy').addEventListener('click',()=>{showCopyForApple=true;renderSubscription();$('#copy-feed').focus();});
   $('#copy-feed').addEventListener('click',async() => {
     if(!subscription||requestPending||managementRestoring||dirty()||conflict)return;
     const feed=subscription.feedUrl,app=currentApp(),copied=await copy(feed,'订阅地址');
@@ -1237,7 +1252,10 @@ async function init() {
   const savedUI=readStored(uiKey);ui=savedUI&&typeof savedUI==='object'&&!Array.isArray(savedUI)?savedUI:{};
   if(!ui.lastDeviceZone&&observedZone)ui.lastDeviceZone=observedZone;
   const stored = readStored(storageKey) || readStored('huideng.calendar.v1');
-  settings = stored ? normalizeSettings(stored,data.catalog) : defaults(data.catalog,observedZone);
+  // A first visit starts with the recommended days already chosen (11-16):
+  // 全部修行日, 荟供日 ringing at 08:00 and the rest shown only, so "加入日历"
+  // works straight away; anyone can change it before adding.
+  settings = stored ? normalizeSettings(stored,data.catalog) : applyPreset(defaults(data.catalog,observedZone),data.catalog,'practice');
   const credentials = readStored(subscriptionKey);
   if (credentials?.id && credentials.manageToken && credentials.savedSettings && safeHTTP(credentials.feedUrl)) {
     subscription = {...credentials,feedUrl:safeHTTP(credentials.feedUrl),savedSettings:normalizeSettings(credentials.savedSettings,data.catalog)};
